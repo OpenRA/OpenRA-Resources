@@ -1,0 +1,8 @@
+/__pycache__
+/__pycache__/*
+*.e4p
+.eric4project/
+.eric4project/*
+.eric5project/
+.eric5project*
+/__init__.py
