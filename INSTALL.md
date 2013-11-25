@@ -52,7 +52,7 @@ TEMPLATE_DIRS = [os.path.join(BASE_DIR,'templates')]
 ```
 
 ### Finish work with django:
- * Initialize datebase (this will create all tables):
+ * Initialize datebase (this will create all tables). You'll get a prompt asking you if you'd like to create a superuser account for the authentication system. Go ahead and do that:
 
 ```
 python manage.py syncdb
