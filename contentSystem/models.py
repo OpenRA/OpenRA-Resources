@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Maps(models.Model):
+    
+    class Meta:
+        verbose_name = 'Map'
+
     user        = models.ForeignKey(User)
     title       = models.CharField(max_length=200)
     description = models.CharField(max_length=400)
@@ -22,6 +26,10 @@ class Maps(models.Model):
     viewed      = models.IntegerField(default=0)
 
 class Units(models.Model):
+
+    class Meta:
+        verbose_name = 'Unit'
+
     user        = models.ForeignKey(User)
     title       = models.CharField(max_length=200)
     info        = models.CharField(max_length=400)
@@ -32,6 +40,10 @@ class Units(models.Model):
     viewed      = models.IntegerField(default=0)
 
 class Palettes(models.Model):
+
+    class Meta:
+        verbose_name = 'Palette'
+
     user        = models.ForeignKey(User)
     title       = models.CharField(max_length=200)
     info        = models.CharField(max_length=400)
@@ -39,6 +51,10 @@ class Palettes(models.Model):
     posted      = models.DateTimeField('date published')
 
 class Reports(models.Model):
+
+    class Meta:
+        verbose_name = 'Report'
+
     user        = models.ForeignKey(User)
     reason      = models.CharField(max_length=400)
     ex_id       = models.IntegerField(default=0)
@@ -46,6 +62,10 @@ class Reports(models.Model):
     posted      = models.DateTimeField('date published')
 
 class Comments(models.Model):
+
+    class Meta:
+        verbose_name = 'Comment'
+
     user        = models.ForeignKey(User)
     message     = models.CharField(max_length=400)
     ex_id       = models.IntegerField(default=0)
@@ -53,6 +73,10 @@ class Comments(models.Model):
     posted      = models.DateTimeField('date published')
 
 class Screenshots(models.Model):
+
+    class Meta:
+        verbose_name = 'Screenshot'
+
     user        = models.ForeignKey(User)
     ex_id       = models.IntegerField(default=0)
     ex_name     = models.CharField(max_length=16)
