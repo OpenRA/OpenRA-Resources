@@ -1,5 +1,5 @@
 """
-WSGI config for content project.
+WSGI config for OpenRA Content Website project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
