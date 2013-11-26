@@ -5,7 +5,7 @@ from djangoratings.fields import RatingField
 class Maps(models.Model):
     
     class Meta:
-        verbose_name = 'Map'
+        verbose_name    = 'Map'
 
     user        = models.ForeignKey(User)
     title       = models.CharField(max_length=200)
@@ -30,7 +30,7 @@ class Maps(models.Model):
 class Units(models.Model):
 
     class Meta:
-        verbose_name = 'Unit'
+        verbose_name    = 'Unit'
 
     user        = models.ForeignKey(User)
     title       = models.CharField(max_length=200)
@@ -45,7 +45,7 @@ class Units(models.Model):
 class Palettes(models.Model):
 
     class Meta:
-        verbose_name = 'Palette'
+        verbose_name    = 'Palette'
 
     user        = models.ForeignKey(User)
     title       = models.CharField(max_length=200)
@@ -56,7 +56,7 @@ class Palettes(models.Model):
 class Reports(models.Model):
 
     class Meta:
-        verbose_name = 'Report'
+        verbose_name    = 'Report'
 
     user        = models.ForeignKey(User)
     reason      = models.CharField(max_length=400)
@@ -67,7 +67,7 @@ class Reports(models.Model):
 class Comments(models.Model):
 
     class Meta:
-        verbose_name = 'Comment'
+        verbose_name    = 'Comment'
 
     user        = models.ForeignKey(User)
     message     = models.CharField(max_length=400)
@@ -78,7 +78,7 @@ class Comments(models.Model):
 class Screenshots(models.Model):
 
     class Meta:
-        verbose_name = 'Screenshot'
+        verbose_name    = 'Screenshot'
 
     user        = models.ForeignKey(User)
     ex_id       = models.IntegerField(default=0)

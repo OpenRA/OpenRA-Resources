@@ -12,26 +12,12 @@ Django python Web Framework version 1.6
  * Run PostgreSQL server; create user and database (in utf-8 encoding)
  * Change password for postgres user; setup DB backups
  * Create new user for web site in your unix system
- * Initialize Django Site in directory you like:
+ * This repository root is actually a Django Site with additional Apps
 
-```
-django-admin.py startproject contentEngine
-```
+### Edit Django settings.py (systemTool/settings.py)
 
- * Copy APPs you fetched from github into that directory (ex: into root of contentEngine)
-
-### Edit Django settings.py (contentEngine/contentEngine/settings.py)
- * Add APPs you fetched, without touching existing Aplications
-
-```
-INSTALLED_APPS = (
-    ...............
-    ...............
-    'contentSystem',
-    'djangoratings',
-)
-```
-
+ * Generate a new Django secret key and change "SECRET_KEY" setting
+ * Change "DEBUG" setting to False if it's True
  * Edit DB related configuration
 
 ```
@@ -44,12 +30,6 @@ DATABASES = {
         'HOST': 'localhost',
     }
 }
-```
-
- * Add a path to templates
-
-```
-TEMPLATE_DIRS = [os.path.join(BASE_DIR,'templates')]
 ```
 
 ### Finish work with django:
