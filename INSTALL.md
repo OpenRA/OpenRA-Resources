@@ -28,6 +28,7 @@ INSTALLED_APPS = (
     ...............
     ...............
     'contentSystem',
+    'djangoratings',
 )
 ```
 

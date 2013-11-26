@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from djangoratings.fields import RatingField
 
 class Maps(models.Model):
     
@@ -24,6 +25,7 @@ class Maps(models.Model):
     next_rev    = models.IntegerField(default=0)
     downloading = models.BooleanField(default=True)
     viewed      = models.IntegerField(default=0)
+    rating	= RatingField(range=5,allow_anonymous=True,use_cookies=True)
 
 class Units(models.Model):
 
@@ -38,6 +40,7 @@ class Units(models.Model):
     palette     = models.CharField(max_length=16)
     posted      = models.DateTimeField('date published')
     viewed      = models.IntegerField(default=0)
+    rating	= RatingField(range=5,allow_anonymous=True,use_cookies=True)
 
 class Palettes(models.Model):
 
