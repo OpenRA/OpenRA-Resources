@@ -19,13 +19,13 @@ class Maps(models.Model):
     width       = models.CharField(max_length=16)
     height      = models.CharField(max_length=16)
     tileset     = models.CharField(max_length=16)
-    posted      = models.DateTimeField('date published')
     revision    = models.IntegerField(default=1)
     pre_rev     = models.IntegerField(default=0)
     next_rev    = models.IntegerField(default=0)
     downloading = models.BooleanField(default=True)
+    posted      = models.DateTimeField('date published')
     viewed      = models.IntegerField(default=0)
-    rating      = RatingField(range=5,allow_anonymous=True,use_cookies=True)
+    rating      = RatingField(range=5, allow_anonymous=True, use_cookies=True)
 
 class Units(models.Model):
 
@@ -38,9 +38,27 @@ class Units(models.Model):
     unit_type   = models.CharField(max_length=16)
     category    = models.CharField(max_length=16)
     palette     = models.CharField(max_length=16)
+    revision    = models.IntegerField(default=1)
+    pre_rev     = models.IntegerField(default=0)
+    next_rev    = models.IntegerField(default=0)
     posted      = models.DateTimeField('date published')
     viewed      = models.IntegerField(default=0)
-    rating      = RatingField(range=5,allow_anonymous=True,use_cookies=True)
+    rating      = RatingField(range=5, allow_anonymous=True, use_cookies=True)
+
+class Mods(models.Model):
+
+    class Meta:
+        verbose_name = 'Mod'
+
+    user        = models.ForeignKey(User)
+    title       = models.CharField(max_length=200)
+    info        = models.CharField(max_length=2000)
+    revision    = models.IntegerField(default=1)
+    pre_rev     = models.IntegerField(default=0)
+    next_rev    = models.IntegerField(default=0)
+    posted      = models.DateTimeField('date published')
+    viewed      = models.IntegerField(default=0)
+    rating      = RatingField(range=5, allow_anonymous=True, use_cookies=True)
 
 class Palettes(models.Model):
 
