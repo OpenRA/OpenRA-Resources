@@ -18,6 +18,7 @@ Django python Web Framework version 1.6
 
  * Generate a new Django secret key and change "SECRET_KEY" setting
  * Change "DEBUG" setting to False if it's True
+ * Change "OPENRA_PATH" to specify a directory with compiled OpenRA files (make sure it's always the latest release)
  * Edit DB related configuration
 
 ```

@@ -86,3 +86,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 TEMPLATE_DIRS = [os.path.join(BASE_DIR,'templates')]
+
+# Path to directory where OpenRA files are stored
+OPENRA_PATH = ''
