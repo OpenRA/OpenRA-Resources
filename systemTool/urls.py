@@ -4,6 +4,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', include('openraData.urls')),
+    url(r'^', include('openraData.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )
