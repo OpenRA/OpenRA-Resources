@@ -15,7 +15,7 @@ h3 {
 
 body {
   background-color: black;
-  background-image: url("/images/bg.svg");
+  background-image: url("/static/images/bg.svg");
   background-attachment:fixed;
   margin: 0; 
   color: white;
@@ -23,7 +23,7 @@ body {
 }
 
 .no-svg body {
-    background-image: url("/images/bg-fallback.png");
+    background-image: url("/static/images/bg-fallback.png");
 }
 
 hr {
@@ -264,7 +264,7 @@ td, th, tr {
 
 .downloadlinks a {
   font-family: 12px/1.4 Helvetica,arial,freesans,clean,sans-serif; 
-  background: url("/images/download.svg") no-repeat;
+  background: url("/static/images/download.svg") no-repeat;
   background-position: 15px 15px;
   padding:10px 15px 10px 60px;
   display:inline-block;
@@ -279,7 +279,7 @@ td, th, tr {
 }
 
 .no-svg .downloadlinks a {
-  background-image: url("/images/download-fallback.png");
+  background-image: url("/static/images/download-fallback.png");
 }
 
 .downloadlinks a:hover {
