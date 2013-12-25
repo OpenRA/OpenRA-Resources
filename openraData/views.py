@@ -1,8 +1,11 @@
 from django.http import HttpResponse
+from django.template import RequestContext, loader
 #from django.conf import settings
 
 def index(request):
-    return HttpResponse("You are at the OpenRA Content Website index page.")
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {})
+    return HttpResponse(template.render(context))
 
 # Map API
 

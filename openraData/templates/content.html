@@ -1,0 +1,34 @@
+<div id="content">
+	<div id="mainleft">
+		<div id="screenshot">
+			<img width="250" height="150" src="" alt="" />
+		</div>
+	</div>
+	<div>
+		<h2>Share your Content!</h2>
+	</div>
+	<h2 style="clear:both"></h2>
+	<hr />
+	<h3 class="newsTitle"></h3>
+</div>
+
+<script>
+  function nextSlide() {
+    var x = $('#screenshot img:not(.active)');
+    return $(x[Math.floor(Math.random() * x.length)]);
+  }
+
+  function slideSwitch() {
+    var active = $('#screenshot img.active');
+    if (active.length == 0)
+      active = nextSlide();
+    var next = nextSlide();
+    active.addClass('last-active');
+    next.css({opacity: 0.0})
+      .addClass('active')
+      .animate({opacity: 1.0}, 1000, function() {
+          active.removeClass('active last-active');
+    });
+  }
+  $(function() { setInterval("slideSwitch()", 14000); });
+</script>
