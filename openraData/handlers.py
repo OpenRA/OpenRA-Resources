@@ -33,7 +33,6 @@ class MapHandlers():
         command = 'mono OpenRA.Utility.exe --map-preview ' + full_path_to_map
         proc = Popen(command.split(), stdout=PIPE).communicate()
         logfile = open(map_dir + "log", "a")
-        print(proc)
         for line in proc:
             if line != None:
                 logfile.write(line + "\n")
