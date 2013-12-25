@@ -1,7 +1,5 @@
 import shutil
 
-global map_is_uploaded
-map
 class MapHandlers():
     
     def __init__(self):
