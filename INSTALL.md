@@ -7,6 +7,8 @@ That's because this project has some SQL code PostgreSQL specific.
 python (version 2)
 python-psycopg2	(postgresql module)
 Django python Web Framework version 1.6
+mono 2.10 +
+OpenRA.Utility and OpenRA.Lint
 ```
 
  * Run PostgreSQL server; create user and database (in utf-8 encoding)
