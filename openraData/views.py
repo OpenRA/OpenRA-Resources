@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 #from django.http import HttpResponseRedirect
-#from django.conf import settings
 
 from .forms import UploadMapForm
 from openraData import handlers

@@ -20,7 +20,8 @@ OpenRA.Utility and OpenRA.Lint
 
  * Generate a new Django secret key and change "SECRET_KEY" setting
  * Change "DEBUG" setting to False if it's True
- * Change "OPENRA_PATH" to specify a directory with compiled OpenRA files (make sure it's always the latest release)
+ * Modify "OPENRA_PATH" to specify a directory with compiled OpenRA files (with slash at the end) (make sure it's always the latest release)
+ * Directory with compiled OpenRA tools must have write permissions for Django web server user
  * Edit DB related configuration
 
 ```
