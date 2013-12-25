@@ -21,10 +21,14 @@ def login(request):
     return HttpResponse(template.render(context))
 
 def maps(request):
+    uploaded = False
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES)
         if form.is_valid():
-            handlers.handle_uploaded_map(request.FILES['file'])
+            uploadingMap = handlers.MapHandlers()
+            uploadingMap.ProcessUploading(request.FILES['file'])
+            if uploadingMap.map_is_uploaded:
+                uploaded = True
             #return HttpResponseRedirect('/maps/')
     else:
         form = UploadMapForm()
@@ -33,6 +37,7 @@ def maps(request):
     context = RequestContext(request, {
         'content': 'maps.html',
         'form': form,
+        'uploaded': uploaded, 
     })
     return HttpResponse(template.render(context))
 

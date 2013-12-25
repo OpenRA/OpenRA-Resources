@@ -2,3 +2,7 @@
 {{ form.as_p }}
 <input type="submit" value="Submit" />
 </form>
+
+{% if uploaded %}
+    <p>Map was successfully uploaded</p>
+{% endif %}
