@@ -40,6 +40,10 @@ a img {
 	border: none;
 }
 
+a.current {
+  border-bottom: 3px solid #650b03;
+}
+
 p.download, .newsDetails {
   margin-top:0;
   margin-bottom:0;
