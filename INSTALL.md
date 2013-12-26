@@ -16,6 +16,8 @@ sendmail
  * Run PostgreSQL server; create user and database (in utf-8 encoding)
  * Change password for postgres user; setup DB backups
  * Create new user for web site in your unix system
+ * Django web server user must have .openra directory in it's home and have owner rights to it (for OpenRA.Utility)
+ * Directory with compiled OpenRA tools must have write permissions for Django web server user
  * This repository root is actually a Django Site with additional Apps
 
 ### Edit Django settings.py (systemTool/settings.py)
@@ -23,7 +25,6 @@ sendmail
  * Generate a new Django secret key and change "SECRET_KEY" setting
  * Change "DEBUG" setting to False if it's True
  * Modify "OPENRA_PATH" to specify a directory with compiled OpenRA files (with slash at the end) (make sure it's always the latest release)
- * Directory with compiled OpenRA tools must have write permissions for Django web server user
  * Edit DB related configuration
 
 ```
