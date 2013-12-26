@@ -1,0 +1,36 @@
+{% include 'header.html' %}
+<!-- {% block title %}Sign up{% endblock %} -->
+
+<br />
+{% if not user.is_authenticated %}
+
+{% block main_content %}
+
+{% if form.errors %}
+<p class="error">Please correct the errors below:</p>
+{% endif %}
+<table style="width: 400px; border: 2px solid #650b03; padding-top: 5px;">
+<form method="post" action="">{% csrf_token %}
+<tr>
+<td><label for="id_username">Username:</label>{% if form.username.errors %} <span class="error">{{ form.username.errors|join:", " }}</span>{% endif %}</td>
+<td>{{ form.username }}</td></tr>
+<tr><td><label for="id_email">Email address:</label>{% if form.email.errors %} <span class="error">{{ form.email.errors|join:", " }}</span>{% endif %}</td>
+<td>{{ form.email }}</td></tr>
+<tr><td><label for="id_password1">Password:</label>{% if form.password1.errors %} <span class="error">{{ form.password1.errors|join:", " }}</span>{% endif %}</td>
+<td>{{ form.password1 }}</td></tr>
+<tr><td><label for="id_password2">Password (type again):</label>{% if form.password2.errors %} <span class="error">{{ form.password2.errors|join:", " }}</span>{% endif %}</td>
+<td>{{ form.password2 }}</td></tr>
+<tr><td colspan="2"><input type="submit" value="Register &rarr;" /></td></tr>
+</form>
+</table>
+{% endblock %}
+
+<p>Fill out the form (all fields are required), and your account will be created; you'll be sent an email with instructions on how to finish your registration.</p>
+<p>We'll only use your email to send you signup instructions. We hate spam as much as you do.</p>
+
+<p>This account will let you log into the OpenRA Resource Center, upload & manage your content, participate in discussions.</p>
+
+<p>Your username can only consist of alphanumeric characters and underscores and may be up to 20 characters long.</p>
+
+{% endif %}
+{% include 'footer.html' %}

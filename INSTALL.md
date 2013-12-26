@@ -9,6 +9,8 @@ python-psycopg2	(postgresql module)
 Django python Web Framework version 1.6
 mono 2.10 +
 OpenRA.Utility and OpenRA.Lint
+django-registration module (easy_install -Z django-registration)
+sendmail
 ```
 
  * Run PostgreSQL server; create user and database (in utf-8 encoding)

@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 from django.views.generic import RedirectView
 
 from openraData import views
@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^login/$', views.loginView, name='loginView'),
     url(r'^logout$', views.logoutView, name='logoutView'),
     url(r'^logout/$', views.logoutView, name='logoutView'),
+    url(r'^login/', include('registration.backends.default.urls')), 
     url(r'^panel$', views.ControlPanel, name='ControlPanel'),
     url(r'^panel/$', views.ControlPanel, name='ControlPanel'),
     url(r'^map/(?P<arg>\w+)/$', api.mapAPI, name='mapAPI_download'),

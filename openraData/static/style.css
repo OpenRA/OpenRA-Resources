@@ -47,6 +47,16 @@ p.download, .newsDetails {
   font-size: 0.8em;
 }
 
+table tr td {
+	font-size: 0.8em;
+}
+
+.loginForm {
+	width: 400px;
+	border: 2px solid #650b03;
+	padding-top: 5px;
+}
+
 .breadcrumbs {
   margin-top: 1em;
 }

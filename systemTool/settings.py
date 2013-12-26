@@ -36,6 +36,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    'registration',
     'openraData',
     'djangoratings',
 )
@@ -85,7 +87,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-TEMPLATE_DIRS = [os.path.join(BASE_DIR,'templates')]
 
-# Path to directory where OpenRA files are stored
+ACCOUNT_ACTIVATION_DAYS = 7
+
+# Path to directory where OpenRA files are stored ( with slash at the end! )
 OPENRA_PATH = '/usr/lib/openra/'
