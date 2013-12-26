@@ -12,6 +12,12 @@ urlpatterns = patterns('',
     url(r'^maps/?$', views.maps, name='maps'),
     url(r'^units/?$', views.units, name='units'),
     url(r'^mods/?$', views.mods, name='mods'),
+
+    url(r'^maps/upload/?$', views.uploadMap, name='uploadMap'),
+    url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),
+    url(r'^mods/upload/?$', views.uploadMod, name='uploadMod'),
+    url(r'^palettes/upload/?$', views.uploadPalette, name='uploadPalette'),
+
     
     url(r'^login/?$', views.loginView, name='loginView'),
     url(r'^logout/?$', views.logoutView, name='logoutView'),

@@ -54,22 +54,9 @@ def ControlPanel(request):
     return HttpResponse(template.render(context))
 
 def maps(request):
-    uploaded = False
-    if request.method == 'POST':
-        form = UploadMapForm(request.POST, request.FILES)
-        if form.is_valid():
-            uploadingMap = handlers.MapHandlers()
-            uploadingMap.ProcessUploading(request.FILES['file'])
-            if uploadingMap.map_is_uploaded:
-                uploaded = True
-    else:
-        form = UploadMapForm()
-
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'maps.html',
-        'form': form,
-        'uploaded': uploaded, 
     })
     return HttpResponse(template.render(context))
 
@@ -84,5 +71,46 @@ def mods(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'mods.html',
+    })
+    return HttpResponse(template.render(context))
+
+def uploadMap(request):
+    uploaded = False
+    if request.method == 'POST':
+        form = UploadMapForm(request.POST, request.FILES)
+        if form.is_valid():
+            uploadingMap = handlers.MapHandlers()
+            uploadingMap.ProcessUploading(request.FILES['file'])
+            if uploadingMap.map_is_uploaded:
+                uploaded = True
+    else:
+        form = UploadMapForm()
+
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'uploadMap.html',
+        'form': form,
+        'uploaded': uploaded, 
+    })
+    return HttpResponse(template.render(context))
+
+def uploadUnit(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'uploadUnit.html',
+    })
+    return HttpResponse(template.render(context))
+
+def uploadMod(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'uploadMod.html',
+    })
+    return HttpResponse(template.render(context))
+
+def uploadPalette(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'uploadPalette.html',
     })
     return HttpResponse(template.render(context))
