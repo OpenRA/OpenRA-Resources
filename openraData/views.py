@@ -2,13 +2,11 @@ from django.http import HttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
-from django.core.mail import send_mail
+
 from .forms import UploadMapForm, AuthenticationForm
 from openraData import handlers
 
 def index(request):
-    send_mail('Subject here', 'Here is the message.', 'from@example.com',
-    ['ihptru@gmail.com'], fail_silently=False)
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'index_content.html',
