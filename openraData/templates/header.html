@@ -31,7 +31,11 @@
 	<li><a href="/maps/">Maps</a></li>
 	<li><a href="/units/">Units</a></li>
 	<li><a href="/mods/">Mods</a></li>&nbsp;&nbsp;&nbsp;&nbsp;
+	{% if user.is_authenticated %}
+	<li><a href="/panel/">My Content</a></li>
+	{% else %}
 	<li><a href="/login/">Login</a></li>
+	{% endif %}
 </ul>
 <hr />
 <div id="content">

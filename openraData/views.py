@@ -1,8 +1,9 @@
 from django.http import HttpResponse
 from django.template import RequestContext, loader
-#from django.http import HttpResponseRedirect
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseRedirect
 
-from .forms import UploadMapForm
+from .forms import UploadMapForm, AuthenticationForm
 from openraData import handlers
 
 def index(request):
@@ -12,10 +13,43 @@ def index(request):
     })
     return HttpResponse(template.render(context))
 
-def login(request):
+def loginView(request):
+    authenticationStatusMessage = ""
+    if request.method == 'POST':
+        form = AuthenticationForm(request.POST)
+        if form.is_valid():
+            if 'username' in request.POST and 'password' in request.POST:
+                username = request.POST['username']
+                password = request.POST['password']
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    if user.is_active:
+                        login(request, user)
+                        return HttpResponseRedirect('/panel/')
+                else:
+                    authenticationStatusMessage = "Failed to authenticated"
+    else:
+        form = AuthenticationForm()
+
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'login.html',
+        'authenticationStatusMessage': authenticationStatusMessage, 
+        'form': form,
+    })
+    return HttpResponse(template.render(context))
+
+def logoutView(request):
+    if request.user.is_authenticated():
+        logout(request)
+    return HttpResponseRedirect('/')
+
+def ControlPanel(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login/')
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'control_panel.html',
     })
     return HttpResponse(template.render(context))
 
@@ -28,7 +62,6 @@ def maps(request):
             uploadingMap.ProcessUploading(request.FILES['file'])
             if uploadingMap.map_is_uploaded:
                 uploaded = True
-            #return HttpResponseRedirect('/maps/')
     else:
         form = UploadMapForm()
 

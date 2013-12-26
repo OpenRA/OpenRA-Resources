@@ -1,1 +1,24 @@
- 
+{% if not user.is_authenticated %}
+<form action="/login/" method="POST">{% csrf_token %}
+<table style="width: 400px; border: 2px solid #650b03; padding-top: 5px;">
+    {% for field in form %}
+      <tr>
+        <td>{{field.label_tag}}</td>
+        <td>
+          {{ field.errors }}
+          {{ field }}
+        </td>
+      </tr>
+    {% endfor %}
+    <tr><td colspan="2"><hr /></td></tr>
+    <tr><td><input type="submit" value="Submit" /></td><td>
+		{% if authenticationStatusMessage %}
+			<p>{{ authenticationStatusMessage }}</p>
+		{% endif %}
+		</td>
+    </tr>
+  </table>
+</form>
+{% else %}
+	<a href="/logout/">Logout</a>
+{% endif %}
