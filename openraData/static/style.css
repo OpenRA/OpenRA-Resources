@@ -20,7 +20,7 @@ html {
 
 body {
   background-color: black;
-  background-image: url("../OpenRA Resource Center_fichiers/bg.svg");
+  background-image: url("/static/images/bg.svg");
   background-attachment:fixed;
   margin: 0; 
   color: white;
@@ -47,7 +47,6 @@ a img {
 
 a.current {
   border-bottom: 3px solid #74c2e7;
-
 }
 
 p.download, .newsDetails {
@@ -63,7 +62,7 @@ table tr td {
 
 .Table {
 	width: 400px;
-	border: 2px solid #182547;
+	border: 2px solid #74c2e7;
 	padding-top: 5px;
 }
 

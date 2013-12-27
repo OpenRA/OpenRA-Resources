@@ -22,7 +22,7 @@ class MapHandlers():
         self.map_full_path_filename = ""
         self.minimap_filename = ""
         self.currentDirectory = os.getcwd() + os.sep    # web root
-        self.UID = "0"
+        self.UID = "1"
         self.LOG = []
 
         self.MapMod = ""
@@ -92,8 +92,8 @@ class MapHandlers():
 
 
         try:
-            self.UID = str(int(Maps.objects.latest('id')) + 1)
-        except:
+            self.UID = str(int(Maps.objects.latest('id').id) + 1)
+        except: # table is empty, using default value
             pass
         self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID.rjust(7, '0') + '/'
         if not os.path.exists(self.map_full_path_directory):
