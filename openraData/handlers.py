@@ -9,52 +9,74 @@ class MapHandlers():
         self.map_is_uploaded = False
         self.minimap_generated = False
         self.maphash = ""
+        self.LintPassed = False
+        self.map_full_path_directory = ""
+        self.map_full_path_filename = ""
+        self.minimap_filename = ""
+        self.currentDirectory = os.getcwd() + os.sep    # web root
+        self.UID = 0
+        self.LOG = []
 
     def ProcessUploading(self, f):
-        with open('/tmp/tempMapfile', 'wb+') as destination:
-            for chunk in f.chunks():
-                destination.write(chunk)
-
         name = f.name
         badChars = ": ; < > @ $ # & ( ) % '".split()
         for badchar in badChars:
             name = name.replace(badchar, "_")
         name = name.replace(" ", "_")
 
-        newDestination = __name__.split('.')[0] + '/data/maps/1234'
-        if not os.path.exists(newDestination):
-            os.makedirs(newDestination)
-        newDestination = newDestination + name   # relative path
-        shutil.move('/tmp/tempMapfile', newDestination)
+        self.UID = '1236'
+        self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID + '/'
+        if not os.path.exists(self.map_full_path_directory):
+            os.makedirs(self.map_full_path_directory + 'content')
+        self.map_full_path_filename = self.map_full_path_directory + name
+        self.minimap_filename = os.path.splitext(name)[0] + ".png"
+
+        with open(self.map_full_path_filename, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
         self.map_is_uploaded = True
+        self.flushLog( ['Map was successfully uploaded as "%s"\n' % name] )
         
-        self.GetHash(newDestination)
-        self.LintCheck(newDestination)
-        self.GenerateMinimap(newDestination)
+        self.UnzipMap()
+        self.GetHash()
+        self.LintCheck()
+        self.GenerateMinimap()
 
-    def GetHash(self, filepath):
-        current_working_dir = os.getcwd() + os.sep
-        full_path_to_map = current_working_dir + filepath
+    def UnzipMap(self):
+        pass
 
-    def LintCheck(self, filepath):
-        current_working_dir = os.getcwd() + os.sep
-        full_path_to_map = current_working_dir + filepath
-
-    def GenerateMinimap(self, filepath):
-        current_working_dir = os.getcwd() + os.sep
-        full_path_to_map = current_working_dir + filepath
-        basename_png = os.path.splitext(os.path.basename(filepath))[0] + ".png"
-        map_dir = current_working_dir + os.path.dirname(filepath) + os.sep
-
+    def GetHash(self):
         os.chdir(settings.OPENRA_PATH)
-        command = 'mono OpenRA.Utility.exe --map-preview ' + full_path_to_map
+
+        command = 'mono OpenRA.Utility.exe --map-hash ' + self.map_full_path_filename
         proc = Popen(command.split(), stdout=PIPE).communicate()
-        logfile = open(map_dir + "log", "a")
-        for line in proc:
+        self.maphash = proc[0].strip()
+        self.flushLog(proc)
+
+        os.chdir(self.currentDirectory)
+
+    def LintCheck(self):
+        self.LintPassed = True
+
+    def GenerateMinimap(self):
+        os.chdir(settings.OPENRA_PATH)
+
+        command = 'mono OpenRA.Utility.exe --map-preview ' + self.map_full_path_filename
+        proc = Popen(command.split(), stdout=PIPE).communicate()
+        self.flushLog(proc)
+
+        shutil.move(settings.OPENRA_PATH + self.minimap_filename,
+                self.map_full_path_directory + 'content/' + self.minimap_filename)        
+        if proc[1] == None: # no output in stderr
+            self.minimap_generated = True
+
+        os.chdir(self.currentDirectory)
+
+    def flushLog(self, output=[]):
+        logfile = open(self.map_full_path_directory + "log", "a")
+        for line in output:
             if line != None:
-                logfile.write(line + "\n")
+                logfile.write(line)
+                self.LOG.append(line)
         logfile.close()
-        shutil.move(settings.OPENRA_PATH + basename_png, map_dir + basename_png)
-        
-        os.chdir(current_working_dir)
-        self.minimap_generated = True
+        return True

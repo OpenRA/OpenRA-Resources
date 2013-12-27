@@ -75,14 +75,26 @@ def mods(request):
     return HttpResponse(template.render(context))
 
 def uploadMap(request):
-    uploaded = False
+    uploadingLog = ""
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES)
         if form.is_valid():
             uploadingMap = handlers.MapHandlers()
             uploadingMap.ProcessUploading(request.FILES['file'])
             if uploadingMap.map_is_uploaded:
-                uploaded = True
+                uploadingLog = uploadingMap.LOG
+                uid = uploadingMap.UID
+                if uploadingMap.LintPassed:
+                    pass
+                else:
+                    pass
+                if uploadingMap.minimap_generated:
+                    pass
+                else:
+                    pass
+            else:
+                pass
+
     else:
         form = UploadMapForm()
 
@@ -90,7 +102,7 @@ def uploadMap(request):
     context = RequestContext(request, {
         'content': 'uploadMap.html',
         'form': form,
-        'uploaded': uploaded, 
+        'uploadingLog': uploadingLog,
     })
     return HttpResponse(template.render(context))
 

@@ -42,8 +42,10 @@
 			<input type="submit" value="Submit" />
 		</td>
 		<td>
-			{% if uploaded %}
-    		<p>Map was successfully uploaded</p>
+			{% if uploadingLog %}
+			{% for line in uploadingLog %}
+    		<p>{{ line }}</p>
+    		{% endfor %}
 			{% endif %}
 		</td>
 	</tr>
