@@ -10,17 +10,16 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from openraData.models import Maps
 
-
 class MapHandlers():
     
-    def __init__(self):
+    def __init__(self, map_full_path_filename="", map_full_path_directory="", minimap_filename=""):
         self.map_is_uploaded = False
         self.minimap_generated = False
         self.maphash = ""
         self.LintPassed = False
-        self.map_full_path_directory = ""
-        self.map_full_path_filename = ""
-        self.minimap_filename = ""
+        self.map_full_path_directory = map_full_path_directory
+        self.map_full_path_filename = map_full_path_filename
+        self.minimap_filename = minimap_filename
         self.currentDirectory = os.getcwd() + os.sep    # web root
         self.UID = "1"
         self.LOG = []
@@ -90,7 +89,6 @@ class MapHandlers():
                     self.LOG.append('Failed. Reason: %s' % line)
                     return False
 
-
         try:
             self.UID = str(int(Maps.objects.latest('id').id) + 1)
         except: # table is empty, using default value
@@ -107,7 +105,7 @@ class MapHandlers():
         self.flushLog( ['Map was successfully uploaded as "%s"' % name] )
         self.flushLog( [info] )
         
-        self.GetHash(self.map_full_path_filename)
+        self.GetHash()
         self.UnzipMap()
         self.LintCheck()
 
@@ -142,10 +140,10 @@ class MapHandlers():
     def UnzipMap(self):
         pass
 
-    def GetHash(self, fullpath):
+    def GetHash(self):
         os.chdir(settings.OPENRA_PATH)
 
-        command = 'mono OpenRA.Utility.exe --map-hash ' + fullpath
+        command = 'mono OpenRA.Utility.exe --map-hash ' + self.map_full_path_filename
         proc = Popen(command.split(), stdout=PIPE).communicate()
         self.maphash = proc[0].strip()
         self.flushLog(proc)
