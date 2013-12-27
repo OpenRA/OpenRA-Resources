@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^maps/?$', views.maps, name='maps'),
     url(r'^units/?$', views.units, name='units'),
     url(r'^mods/?$', views.mods, name='mods'),
+    url(r'^palettes/?$', views.mods, name='palettes'),
 
     url(r'^maps/upload/?$', views.uploadMap, name='uploadMap'),
     url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),

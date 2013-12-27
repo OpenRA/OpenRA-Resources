@@ -74,15 +74,24 @@ def mods(request):
     })
     return HttpResponse(template.render(context))
 
+def palettes(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'palettes.html',
+    })
+    return HttpResponse(template.render(context))
+
 def uploadMap(request):
-    uploadingLog = ""
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/maps/')
+    uploadingLog = []
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES)
         if form.is_valid():
             uploadingMap = handlers.MapHandlers()
-            uploadingMap.ProcessUploading(request.FILES['file'])
+            uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST['info'])
+            uploadingLog = uploadingMap.LOG
             if uploadingMap.map_is_uploaded:
-                uploadingLog = uploadingMap.LOG
                 uid = uploadingMap.UID
                 if uploadingMap.LintPassed:
                     pass
@@ -94,6 +103,7 @@ def uploadMap(request):
                     pass
             else:
                 pass
+            form = UploadMapForm()
 
     else:
         form = UploadMapForm()
@@ -107,6 +117,8 @@ def uploadMap(request):
     return HttpResponse(template.render(context))
 
 def uploadUnit(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/units/')
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'uploadUnit.html',
@@ -114,6 +126,8 @@ def uploadUnit(request):
     return HttpResponse(template.render(context))
 
 def uploadMod(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/mods/')
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'uploadMod.html',
@@ -121,6 +135,8 @@ def uploadMod(request):
     return HttpResponse(template.render(context))
 
 def uploadPalette(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/palettes/')
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'uploadPalette.html',
