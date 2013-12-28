@@ -4,16 +4,16 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="46px" height="46px" viewBox="0 0 46 46" enable-background="new 0 0 46 46" xml:space="preserve">
 <rect fill="#287EC2" width="46" height="46"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="0" y1="0.5" x2="46" y2="0.5"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="0" y1="9.5" x2="46" y2="9.5"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="0" y1="18.5" x2="46" y2="18.5"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="0" y1="27.5" x2="46" y2="27.5"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="0" y1="36.5" x2="46" y2="36.5"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="0" y1="45.5" x2="46" y2="45.5"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="0.5" y1="0" x2="0.5" y2="46"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="9.5" y1="0" x2="9.5" y2="46"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="18.5" y1="0" x2="18.5" y2="46"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="27.5" y1="0" x2="27.5" y2="46"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="36.5" y1="0" x2="36.5" y2="46"/>
-<line stroke="#2BACE2" stroke-miterlimit="10" x1="45.5" y1="0" x2="45.5" y2="46"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="0" y1="0.5" x2="46" y2="0.5"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="0" y1="9.5" x2="46" y2="9.5"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="0" y1="18.5" x2="46" y2="18.5"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="0" y1="27.5" x2="46" y2="27.5"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="0" y1="36.5" x2="46" y2="36.5"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="0" y1="45.5" x2="46" y2="45.5"/>
+<line stroke="#3591CF" stroke-miterlimit="10" x1="0.5" y1="0" x2="0.5" y2="46"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="9.5" y1="0" x2="9.5" y2="46"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="18.5" y1="0" x2="18.5" y2="46"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="27.5" y1="0" x2="27.5" y2="46"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="36.5" y1="0" x2="36.5" y2="46"/>
+<line stroke="#3691CF" stroke-miterlimit="10" x1="45.5" y1="0" x2="45.5" y2="46"/>
 </svg>
