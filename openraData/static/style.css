@@ -1,17 +1,3 @@
-h1 {
-    font-size: 220%;
-    font-family: Cambria, Georgia, Times New Roman, Serif; 
-}
-
-h2, h3 {
-  font-size: 175%;
-  font-family: Helvetica,arial,freesans,clean,sans-serif;
-  margin: 10px 0;
-}
-
-h3 {
-    font-size: 125%;
-}
 
 html {
   height: 100%;
@@ -27,8 +13,28 @@ body {
   font: 14px/1.3 Helvetica,arial,freesans,clean,sans-serif;
 }
 
+body a { text-decoration: none; }
+body a:visited { text-decoration: none; }
+body a:hover { text-decoration: none; }
+
+
 .no-svg body {
     background-image: url("/static/images/bg-fallback.png");
+}
+
+h1 {
+    font-size: 220%;
+    font-family: Cambria, Georgia, Times New Roman, Serif; 
+}
+
+h2, h3 {
+  font-size: 175%;
+  font-family: Helvetica,arial,freesans,clean,sans-serif;
+  margin: 10px 0;
+}
+
+h3 {
+    font-size: 125%;
 }
 
 hr {
@@ -71,6 +77,28 @@ table tr td {
   margin-top: 1em;
 }
 
+#rssfeed {
+  width: 800px;
+  margin: 5px auto;
+}
+
+.feed {
+  margin: 0px 0px;
+  padding: 0px 0px 0px 30px;
+  background: url("../OpenRA Resource Center_fichiers/feed-icon16.gif") no-repeat scroll 5px center transparent;
+  font-weight: bold;
+  color: rgb(240, 232, 232);
+}
+
+#container {
+  width: 800px;
+  margin: 0px auto;
+  border: 3px solid #74c2e7;
+  background: #74c2e7;
+  background: rgba(32, 44, 69, 0.4);
+  box-shadow: 0px 0px 20px #000;
+}
+
 #header {
   height: 66px;
   border-bottom: solid 3px #74c2e7;
@@ -78,22 +106,21 @@ table tr td {
 }
 
 #header h1 {
-  margin: 0 auto;
+  margin: 0px auto;
   width:535px;
 }
 
 #header img {
   vertical-align: middle; 
-  margin: -33px 0px;
+  margin: -33px 10px;
 }
 
-#container {
-  width: 800px;
-  margin: 30px auto;
-  border: 3px solid #74c2e7;
-  background: #74c2e7;
-  background: rgba(32, 44, 69, 0.4);
-  box-shadow: 0px 0px 20px #000;
+#ghbanner img {
+    float: right;
+    margin: -72px -3px;
+    top: 0px;
+    right: 0px;
+    border: 0px none;
 }
 
 #content {
@@ -172,7 +199,6 @@ table tr td {
   border: solid 2px #74c2e7;
 }
 
-
 #screenshot IMG.active {
   z-index:10;
 }
@@ -191,6 +217,40 @@ table tr td {
   padding-top: 10px;
   padding-right: 10px;
   float: right;
+}
+
+#quick-search {
+  float: left;
+  margin: 13px 10px;
+  width: 204px;
+  height: 30px;
+  border: 2px solid #74c2e7;
+  background: #74c2e7;
+  background: rgba(32, 44, 69, 0.4);
+  /* box-shadow: 0px 0px 20px #000; */
+}
+
+#qsearch {
+  color: white;
+  float: left;
+  top: 0px; 
+  z-index: 1;
+  padding-left: 5px;
+  margin: 0px;
+  border: medium none;
+  width: 170px;
+  height: 30px;
+  background: 0% 0% transparent; 
+}
+
+.btn {
+width: 30px;
+height: 30px; 
+float: right;
+margin: 0px;
+padding: 0px;
+border: medium none;
+background: none repeat scroll 0% 0% transparent;
 }
 
 /* Comment position hacks */
