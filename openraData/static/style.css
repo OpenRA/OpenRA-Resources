@@ -233,14 +233,18 @@ table tr td {
   background: 0% 0% transparent; 
 }
 
+#quick-search input:focus {
+    outline : none;
+}
+
 .btn {
-width: 30px;
-height: 30px; 
-float: right;
-margin: 0px;
-padding: 0px;
-border: medium none;
-background: none repeat scroll 0% 0% transparent;
+  width: 30px;
+  height: 30px; 
+  float: right;
+  margin: 0px;
+  padding: 0px;
+  border: medium none;
+  background: none repeat scroll 0% 0% transparent;
 }
 
 /* Comment position hacks */

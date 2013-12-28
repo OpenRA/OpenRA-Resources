@@ -44,6 +44,13 @@ def logoutView(request):
         logout(request)
     return HttpResponseRedirect('/')
 
+def feed(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'feed.html',
+    })
+    return HttpResponse(template.render(context))
+
 def ControlPanel(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
