@@ -161,7 +161,7 @@ class MapHandlers():
         self.flushLog(proc)
 
         shutil.move(settings.OPENRA_PATH + self.minimap_filename,
-                self.map_full_path_directory + 'content/' + self.minimap_filename)        
+                self.map_full_path_directory + os.path.splitext(self.minimap_filename)[0] + "-mini.png")        
         if proc[1] == None: # no output in stderr
             self.minimap_generated = True
 

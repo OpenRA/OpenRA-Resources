@@ -14,6 +14,9 @@ urlpatterns = patterns('',
     url(r'^mods/?$', views.mods, name='mods'),
     url(r'^palettes/?$', views.mods, name='palettes'),
 
+    url(r'^maps/(?P<arg>\d+)/?$', views.displayMap, name='displayMap'),
+    url(r'^maps/(?P<arg>\d+)/minimap/?$', views.serveMinimap, name='serveMinimap'),
+
     url(r'^maps/upload/?$', views.uploadMap, name='uploadMap'),
     url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),
     url(r'^mods/upload/?$', views.uploadMod, name='uploadMod'),

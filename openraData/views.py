@@ -1,10 +1,13 @@
+import os
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 
 from .forms import UploadMapForm, AuthenticationForm
+from django.contrib.auth.models import User
 from openraData import handlers
+from openraData.models import Maps
 
 def index(request):
     template = loader.get_template('index.html')
@@ -74,26 +77,40 @@ def maps(request):
     })
     return HttpResponse(template.render(context))
 
-def units(request):
+def displayMap(request, arg):
+    try:
+        mapObject = Maps.objects.get(id=arg.lstrip('0'))
+    except:
+        return HttpResponseRedirect('/')
+    userObject = User.objects.get(pk=mapObject.user_id)
     template = loader.get_template('index.html')
     context = RequestContext(request, {
-        'content': 'units.html',
+        'content': 'displayMap.html',
+        'map': mapObject,
+        'userid': userObject,
+        'arg': arg,
     })
     return HttpResponse(template.render(context))
 
-def mods(request):
-    template = loader.get_template('index.html')
-    context = RequestContext(request, {
-        'content': 'mods.html',
-    })
-    return HttpResponse(template.render(context))
-
-def palettes(request):
-    template = loader.get_template('index.html')
-    context = RequestContext(request, {
-        'content': 'palettes.html',
-    })
-    return HttpResponse(template.render(context))
+def serveMinimap(request, arg):
+    minimap = ""
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
+    try:
+        mapDir = os.listdir(path)
+    except:
+        return HttpResponseRedirect("/")
+    for filename in mapDir:
+        if filename.endswith("-mini.png"):
+            minimap = filename
+            break
+    if minimap == "":
+        minimap = "nominimap.png"
+        serveImage = os.getcwd() + os.sep + __name__.split('.')[0] + '/static/images/nominimap.png'
+    else:
+        serveImage = path + os.sep + minimap
+    response = HttpResponse(open(serveImage), content_type='image/png')
+    response['Content-Disposition'] = 'attachment; filename="%s"' % minimap
+    return response
 
 def uploadMap(request):
     if not request.user.is_authenticated():
@@ -127,6 +144,27 @@ def uploadMap(request):
         'content': 'uploadMap.html',
         'form': form,
         'uploadingLog': uploadingLog,
+    })
+    return HttpResponse(template.render(context))
+
+def units(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'units.html',
+    })
+    return HttpResponse(template.render(context))
+
+def mods(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'mods.html',
+    })
+    return HttpResponse(template.render(context))
+
+def palettes(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'palettes.html',
     })
     return HttpResponse(template.render(context))
 
