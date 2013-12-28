@@ -212,7 +212,7 @@ table tr td {
 #quick-search {
   float: left;
   margin: 13px 10px;
-  width: 204px;
+  width: 194px;
   height: 30px;
   border: 2px solid #74c2e7;
   background: #74c2e7;
@@ -228,7 +228,7 @@ table tr td {
   padding-left: 5px;
   margin: 0px;
   border: medium none;
-  width: 170px;
+  width: 160px;
   height: 30px;
   background: 0% 0% transparent; 
 }

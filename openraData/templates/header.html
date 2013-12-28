@@ -36,7 +36,7 @@
 	<img alt="Visit OpenRA official website" src="/static/images/open-ra-org.svg">
 </a>
 
-<form id="quick-search" method="GET" action="/search/">
+<form id="quick-search" method="POST" action="/search/">{% csrf_token %}
 	<input id="qsearch" type="text" value="Search..." onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';" name="qsearch"></input>
 	<input class="btn" type="image" src="/static/images/search.svg" title="Search" name="searchsubmit" alt="Search"></input>
 </form>
