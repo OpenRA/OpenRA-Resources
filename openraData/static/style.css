@@ -245,6 +245,7 @@ table tr td {
   padding: 0px;
   border: medium none;
   background: none repeat scroll 0% 0% transparent;
+  position: fixed;
 }
 
 /* Comment position hacks */

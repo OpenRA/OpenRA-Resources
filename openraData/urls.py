@@ -22,7 +22,8 @@ urlpatterns = patterns('',
     
     url(r'^login/?$', views.loginView, name='loginView'),
     url(r'^logout/?$', views.logoutView, name='logoutView'),
-    url(r'^/news/feed/?$', views.feed, name='feed'),
+    url(r'^news/feed/?$', views.feed, name='feed'),
+    url(r'^search/', views.search, name='search'),
 
     url(r'^login/register/?$', RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),
         name='registration_register'), 

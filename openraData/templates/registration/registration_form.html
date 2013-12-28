@@ -9,7 +9,7 @@
 {% if form.errors %}
 <p class="error">Please correct the errors below:</p>
 {% endif %}
-<table style="width: 400px; border: 2px solid #650b03; padding-top: 5px;">
+<table class="Table">
 <form method="post" action="">{% csrf_token %}
 <tr>
 <td><label for="id_username">Username:</label>{% if form.username.errors %} <span class="error">{{ form.username.errors|join:", " }}</span>{% endif %}</td>

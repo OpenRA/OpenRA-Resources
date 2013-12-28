@@ -51,6 +51,13 @@ def feed(request):
     })
     return HttpResponse(template.render(context))
 
+def search(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'search.html',
+    })
+    return HttpResponse(template.render(context))
+
 def ControlPanel(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
