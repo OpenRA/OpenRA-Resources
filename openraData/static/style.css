@@ -13,11 +13,6 @@ body {
   font: 14px/1.3 Helvetica,arial,freesans,clean,sans-serif;
 }
 
-body a { text-decoration: none; }
-body a:visited { text-decoration: none; }
-body a:hover { text-decoration: none; }
-
-
 .no-svg body {
     background-image: url("/static/images/bg-fallback.png");
 }
@@ -81,10 +76,14 @@ table tr td {
   margin: 5px auto;
 }
 
+#rssfeed a { text-decoration: none; }
+#rssfeed a:visited { text-decoration: none; }
+#rssfeed a:hover { text-decoration: none; }
+
 .feed {
   margin: 0px 0px;
   padding: 0px 0px 0px 30px;
-  background: url("../OpenRA Resource Center_fichiers/feed-icon16.gif") no-repeat scroll 5px center transparent;
+  background: url("/static/images/feed-icon16.gif") no-repeat scroll 5px center transparent;
   font-weight: bold;
   color: rgb(240, 232, 232);
 }
@@ -106,20 +105,12 @@ table tr td {
 
 #header h1 {
   margin: 0px auto;
-  width:535px;
+  width:555px;
 }
 
 #header img {
   vertical-align: middle; 
   margin: -33px 10px;
-}
-
-#ghbanner img {
-    float: right;
-    margin: -72px -3px;
-    top: 0px;
-    right: 0px;
-    border: 0px none;
 }
 
 #content {

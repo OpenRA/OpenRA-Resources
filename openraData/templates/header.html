@@ -24,21 +24,21 @@
 </head>
 <body>
 
-<div id="rssfeed"><a class="feed" href="libs/feed.php">Rss feed</a></div>
+<div id="rssfeed"><a class="feed" href="/news/feed/">Rss feed</a></div>
 
 <div id="container">
 
 <div id="header">
-	<h1><img src="OpenRA%20Resource%20Center_fichiers/soviet-logo.svg">OpenRA Resource Center</h1>
+	<h1><img src="/static/images/soviet-logo.svg">OpenRA Resource Center</h1>
 </div>
 
-<a id="ghbanner" href="http://open-ra.org">
-	<img alt="Visit OpenRA official website" src="OpenRA%20Resource%20Center_fichiers/open-ra-org.svg">
+<a id="ghbanner" href="http://open-ra.org" target="_blank">
+	<img alt="Visit OpenRA official website" src="/static/images/open-ra-org.svg">
 </a>
 
-<form id="quick-search" method="GET" action="index.php">
+<form id="quick-search" method="GET" action="/search/">
 	<input id="qsearch" class="tbox" type="text" value="Search..." onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';" name="qsearch"></input>
-	<input class="btn" type="image" src="OpenRA%20Resource%20Center_fichiers/search.svg" title="Search" name="searchsubmit" alt="Search"></input>
+	<input class="btn" type="image" src="/static/images/search.svg" title="Search" name="searchsubmit" alt="Search"></input>
 	<input type="hidden" value="search" name="p"></input>
 </form>
 	
