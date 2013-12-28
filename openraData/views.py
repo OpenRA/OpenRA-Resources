@@ -124,6 +124,7 @@ def uploadMap(request):
             uploadingLog = uploadingMap.LOG
             if uploadingMap.map_is_uploaded:
                 uid = uploadingMap.UID
+                uploadingLog.append("<a href='http://" + request.META['HTTP_HOST'] + "/maps/" + str(uid).rjust(7, '0') +"'>show map</a>")
                 if uploadingMap.LintPassed:
                     pass
                 else:
