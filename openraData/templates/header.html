@@ -29,24 +29,24 @@
 <div id="container">
 
 <div id="header">
-	<h1><img src="OpenRA%20Resource%20Center_fichiers/soviet-logo.svg">OpenRA Resource Center</h1>
+	<h1><img src="static/images/soviet-logo.svg">OpenRA Resource Center</h1>
 </div>
 
 <a id="ghbanner" href="http://open-ra.org">
-	<img alt="Visit OpenRA official website" src="OpenRA%20Resource%20Center_fichiers/open-ra-org.svg">
+	<img title="Visit OpenRA official website" alt="Visit OpenRA official website" src="static/images/open-ra-org.svg">
 </a>
 
 <form id="quick-search" method="GET" action="index.php">
-	<input id="qsearch" class="tbox" type="text" value="Search..." onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';" name="qsearch"></input>
-	<input class="btn" type="image" src="OpenRA%20Resource%20Center_fichiers/search.svg" title="Search" name="searchsubmit" alt="Search"></input>
+	<input id="qsearch" class="tbox" type="text" value="Search..." onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';" name="qsearch" title="Search maps, units, mods, authors..." alt="Search maps, units, mods, authors..."></input>
+	<input class="btn" type="image" src="static/images/search.svg" title="Search" name="searchsubmit" alt="Search"></input>
 	<input type="hidden" value="search" name="p"></input>
 </form>
 	
 <ul id="nav">
-	<li><a href="/">Home</a></li>&nbsp;&nbsp;&nbsp;&nbsp;
+	<li><a href="/">Home</a></li>
 	<li><a href="/maps/">Maps</a></li>
 	<li><a href="/units/">Units</a></li>
-	<li><a href="/mods/">Mods</a></li>&nbsp;&nbsp;&nbsp;&nbsp;
+	<li><a href="/mods/">Mods</a></li>
 	{% if user.is_authenticated %}
 	<li><a href="/panel/">My Content</a></li>
 	{% else %}
