@@ -13,6 +13,7 @@ def index(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'index_content.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -37,6 +38,7 @@ def loginView(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'login.html',
+        'request': request,
         'authenticationStatusMessage': authenticationStatusMessage, 
         'form': form,
     })
@@ -51,6 +53,7 @@ def feed(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'feed.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -58,6 +61,7 @@ def search(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'search.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -67,6 +71,7 @@ def ControlPanel(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'control_panel.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -74,6 +79,7 @@ def maps(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'maps.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -86,6 +92,7 @@ def displayMap(request, arg):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'displayMap.html',
+        'request': request,
         'map': mapObject,
         'userid': userObject,
         'arg': arg,
@@ -116,6 +123,7 @@ def uploadMap(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
     uploadingLog = []
+    uid = False
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES)
         if form.is_valid():
@@ -123,8 +131,7 @@ def uploadMap(request):
             uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST['info'])
             uploadingLog = uploadingMap.LOG
             if uploadingMap.map_is_uploaded:
-                uid = uploadingMap.UID
-                uploadingLog.append("<a href='http://" + request.META['HTTP_HOST'] + "/maps/" + str(uid).rjust(7, '0') +"'>show map</a>")
+                uid = str(uploadingMap.UID).rjust(7, '0')
                 if uploadingMap.LintPassed:
                     pass
                 else:
@@ -143,8 +150,10 @@ def uploadMap(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'uploadMap.html',
+        'request': request,
         'form': form,
         'uploadingLog': uploadingLog,
+        'uid': uid,
     })
     return HttpResponse(template.render(context))
 
@@ -152,6 +161,7 @@ def units(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'units.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -159,6 +169,7 @@ def mods(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'mods.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -166,6 +177,7 @@ def palettes(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'palettes.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -175,6 +187,7 @@ def uploadUnit(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'uploadUnit.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -184,6 +197,7 @@ def uploadMod(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'uploadMod.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 
@@ -193,5 +207,6 @@ def uploadPalette(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'uploadPalette.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))

@@ -103,7 +103,8 @@ class MapHandlers():
 
         self.map_is_uploaded = True
         self.flushLog( ['Map was successfully uploaded as "%s"' % name] )
-        self.flushLog( [info] )
+        if info:
+            self.flushLog( [info] )
         
         self.GetHash()
         self.UnzipMap()

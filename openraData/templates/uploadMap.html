@@ -1,19 +1,8 @@
-<table class="Table">
-	<tr><td>
-		<a href="/maps/upload">Upload map</a>
-	</td>
-	<td>
-		<a href="/units/upload">Upload unit</a>
-	</td>
-	<td>
-		<a href="/palettes/upload">Upload palette</a>
-	</td>
-	<td>
-		<a href="/mods/upload">Upload mod</a>
-	</td></tr>
-</table>
+{% include 'uploadMenu.html' %}
 
 {% if user.is_authenticated %}
+
+<table class="Table"><tr><td>Upload your oramap file:</td></tr></table>
 <form action="/maps/upload/" method="POST" enctype="multipart/form-data">{% csrf_token %}
 <table class="Table">
 	<tr>
@@ -39,13 +28,17 @@
 	</tr>
 	<tr>
 		<td>
-			<input type="submit" value="Submit" />
+			<input type="submit" value="Upload" />
 		</td>
 		<td>
 			{% if uploadingLog %}
 			{% for line in uploadingLog %}
-    		<p>{{ line }}</p>
+    			<p>{{ line }}</p>
     		{% endfor %}
+			{% endif %}
+			{% if uid %}
+				<p style="padding-left: 40px;"><a href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/' }}{{ uid }}>
+				<img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>
 			{% endif %}
 		</td>
 	</tr>
