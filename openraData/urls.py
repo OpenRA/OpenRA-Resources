@@ -16,6 +16,7 @@ urlpatterns = patterns('',
 
     url(r'^maps/(?P<arg>\d+)/?$', views.displayMap, name='displayMap'),
     url(r'^maps/(?P<arg>\d+)/minimap/?$', views.serveMinimap, name='serveMinimap'),
+    url(r'^maps/(?P<arg>\d+)/lintlog/?$', views.serveLintLog, name='serveLintLog'),
 
     url(r'^maps/upload/?$', views.uploadMap, name='uploadMap'),
     url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),

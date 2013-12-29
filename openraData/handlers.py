@@ -12,14 +12,15 @@ from openraData.models import Maps
 
 class MapHandlers():
     
-    def __init__(self, map_full_path_filename="", map_full_path_directory="", minimap_filename=""):
+    def __init__(self, map_full_path_filename="", map_full_path_directory="", preview_filename=""):
         self.map_is_uploaded = False
         self.minimap_generated = False
+        self.fullpreview_generated = False
         self.maphash = ""
         self.LintPassed = False
         self.map_full_path_directory = map_full_path_directory
         self.map_full_path_filename = map_full_path_filename
-        self.minimap_filename = minimap_filename
+        self.preview_filename = preview_filename
         self.currentDirectory = os.getcwd() + os.sep    # web root
         self.UID = "1"
         self.LOG = []
@@ -45,12 +46,6 @@ class MapHandlers():
             self.LOG.append('Failed. Unsupported file type.')
             return False
 
-        name = f.name
-        badChars = ": ; < > @ $ # & ( ) % '".split()
-        for badchar in badChars:
-            name = name.replace(badchar, "_")
-        name = name.replace(" ", "_")
-
         z = zipfile.ZipFile(tempname, mode='a')
         yamlData = ""
         mapFileContent = []
@@ -62,6 +57,16 @@ class MapHandlers():
         if "map.yaml" not in mapFileContent or "map.bin" not in mapFileContent:
             self.LOG.append('Failed. Invalid map format.')
             return False
+        z.close()
+
+        self.GetHash(tempname)
+        userObject = User.objects.get(pk=user_id)
+        try:
+            hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
+            self.LOG.append("Failed. You've already uploaded this map.")
+            return False
+        except:
+            pass   # all good
 
         #Load basic map info
         for line in string.split(yamlData, '\n'):
@@ -89,30 +94,8 @@ class MapHandlers():
                     self.LOG.append('Failed. Reason: %s' % line)
                     return False
 
-        try:
-            self.UID = str(int(Maps.objects.latest('id').id) + 1)
-        except: # table is empty, using default value
-            pass
-        self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID.rjust(7, '0') + '/'
-        if not os.path.exists(self.map_full_path_directory):
-            os.makedirs(self.map_full_path_directory + 'content')
-        self.map_full_path_filename = self.map_full_path_directory + name
-        self.minimap_filename = os.path.splitext(name)[0] + ".png"
-
-        shutil.move(tempname, self.map_full_path_filename)
-
-        self.map_is_uploaded = True
-        self.flushLog( ['Map was successfully uploaded as "%s"' % name] )
-        if info:
-            self.flushLog( [info] )
-        
-        self.GetHash()
-        self.UnzipMap()
-        self.LintCheck()
-
-        u = User.objects.get(pk=user_id)
         transac = Maps(
-            user = u,
+            user = userObject,
             title = self.MapTitle,
             description = self.MapDesc,
             info = info,
@@ -134,45 +117,105 @@ class MapHandlers():
             viewed = 0,
             )
         transac.save()
-        self.UID = transac.id
+        self.UID = str(transac.id)
+
+        name = f.name
+        badChars = ": ; < > @ $ # & ( ) % '".split()
+        for badchar in badChars:
+            name = name.replace(badchar, "_")
+        name = name.replace(" ", "_")
+
+        self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID.rjust(7, '0') + '/'
+        if not os.path.exists(self.map_full_path_directory):
+            os.makedirs(self.map_full_path_directory + 'content')
+        self.map_full_path_filename = self.map_full_path_directory + name
+        self.preview_filename = os.path.splitext(name)[0] + ".png"
+
+        shutil.move(tempname, self.map_full_path_filename)
+
+        self.map_is_uploaded = True
+        self.flushLog( ['Map was successfully uploaded as "%s"' % name] )
+        if info:
+            self.flushLog( [info] )
+        
+        self.UnzipMap()
+        self.LintCheck(self.MapMod)
+        if self.LintPassed:
+            Maps.objects.filter(id=transac.id).update(requires_upgrade=False)
 
         self.GenerateMinimap()
+        #self.GenerateFullPreview()
 
     def UnzipMap(self):
-        pass
+        z = zipfile.ZipFile(self.map_full_path_filename, mode='a')
+        z.extractall(self.map_full_path_directory + 'content/')
+        z.close()
 
-    def GetHash(self):
+    def GetHash(self, filepath=""):
+        if filepath == "":
+            filepath = self.map_full_path_filename
+
         os.chdir(settings.OPENRA_PATH)
 
-        command = 'mono OpenRA.Utility.exe --map-hash ' + self.map_full_path_filename
+        command = 'mono OpenRA.Utility.exe --map-hash ' + filepath
         proc = Popen(command.split(), stdout=PIPE).communicate()
         self.maphash = proc[0].strip()
         self.flushLog(proc)
 
         os.chdir(self.currentDirectory)
 
-    def LintCheck(self):
-        self.LintPassed = True
+    def LintCheck(self, mod):
+        os.chdir(settings.OPENRA_PATH)
+
+        command = 'mono OpenRA.Lint.exe ' + mod + ' ' + self.map_full_path_filename
+        proc = Popen(command.split(), stdout=PIPE).communicate()
+        if proc[0].strip() == "":
+            self.flushLog( ['Yaml check succeeded.'] )
+            self.LintPassed = True
+        else:
+            self.flushLog(proc, "lint")
+            self.flushLog( ['Yaml check failed.'] )
+
+        os.chdir(self.currentDirectory)
 
     def GenerateMinimap(self):
         os.chdir(settings.OPENRA_PATH)
 
         command = 'mono OpenRA.Utility.exe --map-preview ' + self.map_full_path_filename
         proc = Popen(command.split(), stdout=PIPE).communicate()
-        self.flushLog(proc)
 
-        shutil.move(settings.OPENRA_PATH + self.minimap_filename,
-                self.map_full_path_directory + os.path.splitext(self.minimap_filename)[0] + "-mini.png")        
-        if proc[1] == None: # no output in stderr
+        try:
+            shutil.move(settings.OPENRA_PATH + self.preview_filename,
+                self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-mini.png")
+            self.flushLog(proc)
             self.minimap_generated = True
+        except:
+            self.flushLog( ["Failed to generate minimap for this file."] )        
 
         os.chdir(self.currentDirectory)
 
-    def flushLog(self, output=[]):
-        logfile = open(self.map_full_path_directory + "log", "a")
+    def GenerateFullPreview(self):
+        os.chdir(settings.OPENRA_PATH)
+
+        command = 'mono OpenRA.Utility.exe --full-preview ' + self.map_full_path_filename
+        proc = Popen(command.split(), stdout=PIPE).communicate()
+
+        try:
+            shutil.move(settings.OPENRA_PATH + self.preview_filename,
+                self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-full.png")
+            self.flushLog(proc)
+            self.fullpreview_generated = True
+        except:
+            self.flushLog( ["Failed to generate fullpreview for this file."] )
+
+        os.chdir(self.currentDirectory)
+
+    def flushLog(self, output=[], lint=""):
+        logfile = open(self.map_full_path_directory + lint + "log", "a")
         for line in output:
             if line != None:
                 logfile.write(line.strip() + "\n")
-                self.LOG.append(line.strip())
+                if lint == "":
+                    self.LOG.append(line.strip())
         logfile.close()
         return True

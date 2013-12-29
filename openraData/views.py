@@ -1,5 +1,5 @@
 import os
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
@@ -118,6 +118,25 @@ def serveMinimap(request, arg):
     response = HttpResponse(open(serveImage), content_type='image/png')
     response['Content-Disposition'] = 'attachment; filename="%s"' % minimap
     return response
+
+def serveLintLog(request, arg):
+    lintlog = ""
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
+    try:
+        mapDir = os.listdir(path)
+    except:
+        return HttpResponseRedirect("/")
+    for filename in mapDir:
+        if filename == "lintlog":
+            lintlog = filename
+            break
+    if lintlog == "":
+        return HttpResponseRedirect('/maps/'+arg)
+    else:
+        serveLog = path + os.sep + lintlog
+        response = HttpResponse(open(serveLog), content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % lintlog
+        return response
 
 def uploadMap(request):
     if not request.user.is_authenticated():

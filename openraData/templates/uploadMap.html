@@ -33,7 +33,12 @@
 		<td>
 			{% if uploadingLog %}
 			{% for line in uploadingLog %}
+				<hr />
+				{% if line == "Yaml check failed." %}
+				<p>{{ line }} See <a href={{ '/maps/' }}{{ uid }}{{ '/lintlog' }}>lintlog</a></p>
+				{% else %}
     			<p>{{ line }}</p>
+    			{% endif %}
     		{% endfor %}
 			{% endif %}
 			{% if uid %}
