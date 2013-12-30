@@ -24,7 +24,12 @@
 </head>
 <body>
 
-<div id="rssfeed"><a class="feed" href="/news/feed/">Rss feed</a></div>
+<div id="rssfeed">
+	<a class="feed" href="/news/feed/">Rss feed</a>
+	{% if user.is_authenticated %}
+		<a href="/logout/" class="logout">Logout</a>
+	{% endif %}
+</div>
 
 <div id="container">
 
