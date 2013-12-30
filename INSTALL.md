@@ -47,6 +47,6 @@ DATABASES = {
 python manage.py syncdb
 ```
 
-### Setup WebServer, URLs, RewriteRules, etc.
+### Setup WebServer etc.
   
 

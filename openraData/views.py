@@ -101,7 +101,7 @@ def displayMap(request, arg):
 
 def serveMinimap(request, arg):
     minimap = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.rjust(7, '0')
     try:
         mapDir = os.listdir(path)
     except:
@@ -121,7 +121,7 @@ def serveMinimap(request, arg):
 
 def serveLintLog(request, arg):
     lintlog = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.rjust(7, '0')
     try:
         mapDir = os.listdir(path)
     except:

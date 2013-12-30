@@ -136,7 +136,7 @@ class MapHandlers():
         self.map_is_uploaded = True
         self.flushLog( ['Map was successfully uploaded as "%s"' % name] )
         if info:
-            self.flushLog( [info] )
+            self.flushLog( ['Info: ' + info] )
         
         self.UnzipMap()
         self.LintCheck(self.MapMod)
