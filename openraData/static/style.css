@@ -90,7 +90,6 @@ table tr td {
 
 .logout {
   float: right;
-  text-decoration: underline;
   padding-right: 5px;
 }
 
@@ -107,7 +106,8 @@ table tr td {
 #header {
   height: 66px;
   border-bottom: solid 3px #74c2e7;
-  background-color: #234c76;
+  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
+  /*background-color: #234c76;*/
 }
 
 #header h1 {
@@ -157,7 +157,8 @@ table tr td {
   font-size: 0.7em; 
   text-align: center;
   border-top: solid 3px #74c2e7;
-  background-color: #234c76;
+  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
+  /*background-color: #234c76;*/
   font: 11px Cambria, Georgia, Times New Roman, Serif;
 }
 
