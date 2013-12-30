@@ -131,11 +131,30 @@ def serveLintLog(request, arg):
             lintlog = filename
             break
     if lintlog == "":
-        return HttpResponseRedirect('/maps/'+arg)
+        return HttpResponseRedirect('/maps/'+arg.rjust(7, '0'))
     else:
         serveLog = path + os.sep + lintlog
         response = HttpResponse(open(serveLog), content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename="%s"' % lintlog
+        return response
+
+def serveOramap(request, arg):
+    oramap = ""
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.rjust(7, '0')
+    try:
+        mapDir = os.listdir(path)
+    except:
+        return HttpResponseRedirect("/")
+    for filename in mapDir:
+        if filename.endswith(".oramap"):
+            oramap = filename
+            break
+    if oramap == "":
+        return HttpResponseRedirect('/maps/'+arg.rjust(7, '0'))
+    else:
+        serveOramap = path + os.sep + oramap
+        response = HttpResponse(open(serveOramap), content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % oramap
         return response
 
 def uploadMap(request):
