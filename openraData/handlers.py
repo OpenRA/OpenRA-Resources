@@ -22,7 +22,7 @@ class MapHandlers():
         self.map_full_path_filename = map_full_path_filename
         self.preview_filename = preview_filename
         self.currentDirectory = os.getcwd() + os.sep    # web root
-        self.UID = "1"
+        self.UID = 0
         self.LOG = []
 
         self.MapMod = ""
@@ -63,7 +63,8 @@ class MapHandlers():
         userObject = User.objects.get(pk=user_id)
         try:
             hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
-            self.LOG.append("Failed. You've already uploaded this map.")
+            self.LOG.append("Failed. You've already uploaded")
+            self.UID = str(hashExists.id).rjust(7, '0')
             return False
         except:
             pass   # all good

@@ -35,9 +35,13 @@
 			{% for line in uploadingLog %}
 				<hr />
 				{% if line == "Yaml check failed." %}
-				<p>{{ line }} See <a href={{ '/maps/' }}{{ uid }}{{ '/lintlog' }}>lintlog</a></p>
+					<p>{{ line }} See <a href={{ '/maps/' }}{{ uid }}{{ '/lintlog' }}>lintlog</a></p>
 				{% else %}
-    			<p>{{ line }}</p>
+					{% if line == "Failed. You've already uploaded" %}
+					 <p>{{ line }} <a href={{ '/maps/' }}{{ uid }}>this map</a> before:</p>
+					{% else %}
+    					<p>{{ line }}</p>
+    				{% endif %}
     			{% endif %}
     		{% endfor %}
 			{% endif %}

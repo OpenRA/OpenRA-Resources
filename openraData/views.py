@@ -142,15 +142,15 @@ def uploadMap(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
     uploadingLog = []
-    uid = False
+    uid = 0
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES)
         if form.is_valid():
             uploadingMap = handlers.MapHandlers()
             uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST['info'])
             uploadingLog = uploadingMap.LOG
+            uid = str(uploadingMap.UID).rjust(7, '0')
             if uploadingMap.map_is_uploaded:
-                uid = str(uploadingMap.UID).rjust(7, '0')
                 if uploadingMap.LintPassed:
                     pass
                 else:
