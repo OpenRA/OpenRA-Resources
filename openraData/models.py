@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, connection
 from django.contrib.auth.models import User
 from djangoratings.fields import RatingField
 
@@ -6,6 +6,14 @@ class Maps(models.Model):
     
     class Meta:
         verbose_name = 'Map'
+
+    def mapVersionsHandlerInit():
+        #functionInit = """
+        #
+        #"""
+        #cursor = connection.cursor()
+        #cursor.execute(functionInit)
+        print("Created function GetMapVersions.")
 
     user                = models.ForeignKey(User)
     title               = models.CharField(max_length=200)
@@ -28,6 +36,8 @@ class Maps(models.Model):
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
     rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
+
+    mapVersionsHandlerInit()
 
 class Units(models.Model):
 
