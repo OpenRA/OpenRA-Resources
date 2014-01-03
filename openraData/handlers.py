@@ -22,7 +22,7 @@ class MapHandlers():
         self.map_full_path_filename = map_full_path_filename
         self.preview_filename = preview_filename
         self.currentDirectory = os.getcwd() + os.sep    # web root
-        self.UID = 0
+        self.UID = False
         self.LOG = []
 
         self.MapMod = ""
