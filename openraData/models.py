@@ -33,11 +33,13 @@ class Maps(models.Model):
     downloading         = models.BooleanField(default=True)
     requires_upgrade    = models.BooleanField(default=False)
     advanced_map        = models.BooleanField(default=False)
+    lua                 = models.BooleanField(default=False)
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
     rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
 
-    mapVersionsHandlerInit()
+    # Uncomment next line to initialize map functions
+    #mapVersionsHandlerInit()
 
 class Units(models.Model):
 
