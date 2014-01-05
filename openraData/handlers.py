@@ -18,6 +18,8 @@ class MapHandlers():
         self.fullpreview_generated = False
         self.maphash = ""
         self.LintPassed = False
+        self.advanced_map = False
+        self.lua_map = False
         self.map_full_path_directory = map_full_path_directory
         self.map_full_path_filename = map_full_path_filename
         self.preview_filename = preview_filename
@@ -54,6 +56,8 @@ class MapHandlers():
             if filename == "map.yaml":
                 mapbytes = z.read(filename)
                 yamlData = mapbytes.decode("utf-8")
+            if filename.endswith(".lua"):
+                self.lua_map = True
         if "map.yaml" not in mapFileContent or "map.bin" not in mapFileContent:
             self.LOG.append('Failed. Invalid map format.')
             return False
@@ -70,6 +74,8 @@ class MapHandlers():
             pass   # all good
 
         #Load basic map info
+        countAdvanced = 0
+        shouldCount = False
         for line in string.split(yamlData, '\n'):
             if line[0:5] == "Title":
                 self.MapTitle = line[6:].strip().replace("'", "''")
@@ -94,6 +100,12 @@ class MapHandlers():
                 if state.strip().lower() in ['true', 'on', 'yes', 'y']:
                     self.LOG.append('Failed. Reason: %s' % line)
                     return False
+            if line.strip()[0:5] == "Rules":
+                shouldCount = True
+            if shouldCount:
+                countAdvanced += 1
+        if countAdvanced > 20:
+            self.advanced_map = True
 
         transac = Maps(
             user = userObject,
@@ -113,7 +125,8 @@ class MapHandlers():
             next_rev = 0,
             downloading = True,
             requires_upgrade = not self.LintPassed,
-            advanced_map = False,
+            advanced_map = self.advanced_map,
+            lua = self.lua_map,
             posted = timezone.now(),
             viewed = 0,
             )

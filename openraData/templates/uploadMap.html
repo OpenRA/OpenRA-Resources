@@ -46,7 +46,7 @@
     		{% endfor %}
 			{% endif %}
 			{% if uid %}
-				<p style="padding-left: 40px;"><a href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/' }}{{ uid }}>
+				<p><a href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/' }}{{ uid }}>
 				<img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>
 			{% endif %}
 		</td>

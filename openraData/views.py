@@ -89,6 +89,7 @@ def displayMap(request, arg):
     except:
         return HttpResponseRedirect('/')
     userObject = User.objects.get(pk=mapObject.user_id)
+    Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'displayMap.html',
