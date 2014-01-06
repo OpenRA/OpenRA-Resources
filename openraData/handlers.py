@@ -3,6 +3,7 @@ import os
 import magic
 import zipfile
 import string
+import re
 from subprocess import Popen, PIPE
 
 from django.conf import settings
@@ -47,6 +48,18 @@ class MapHandlers():
         if mimetype != 'application/zip' or os.path.splitext(f.name)[1] != '.oramap':
             self.LOG.append('Failed. Unsupported file type.')
             return False
+
+        name = f.name
+        badChars = ": ; < > @ $ # & ( ) % '".split()
+        for badchar in badChars:
+            name = name.replace(badchar, "_")
+        name = name.replace(" ", "_")
+        # There can be weird chars still, if so: stop uploading
+        findBadChars = re.findall(r'(\W+)', name)
+        for bc in findBadChars:
+            if bc != '.':
+                self.LOG.append('Failed. Your filename is bogus; rename and try again.')
+                return False
 
         z = zipfile.ZipFile(tempname, mode='a')
         yamlData = ""
@@ -132,12 +145,6 @@ class MapHandlers():
             )
         transac.save()
         self.UID = str(transac.id)
-
-        name = f.name
-        badChars = ": ; < > @ $ # & ( ) % '".split()
-        for badchar in badChars:
-            name = name.replace(badchar, "_")
-        name = name.replace(" ", "_")
 
         self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID.rjust(7, '0') + '/'
         if not os.path.exists(self.map_full_path_directory):
