@@ -40,5 +40,7 @@ urlpatterns = patterns('',
     url(r'^map/(?P<arg>\w+)/(?P<value>\w+)/$', api.mapAPI, name='mapAPI'), 
     url(r'^map/(?P<arg>\w+)/(?P<value>\w+)/(?P<filter>\w+)/$', api.mapAPI, name='mapAPI_list'),
     
-    url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico'))
+    url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
+
+    url(r'^.*$', views.handle404, name='handle404'),
 )
