@@ -9,7 +9,7 @@
     <![endif]-->
     <link href="/static/style.css" rel="stylesheet">
     <link href="/static/favicon.ico" rel="shortcut icon" type="image/x-icon">
-    <link href="/news/atom/" rel="alternate" type="application/atom+xml">
+    <link href="/news/feed/" rel="alternate" type="application/atom+xml">
     <script>
 		function supportsSVG() {
 			return !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGRect;
@@ -27,7 +27,8 @@
 <div id="rssfeed">
 	<a class="feed" href="/news/feed/">Rss feed</a>
 	{% if user.is_authenticated %}
-		<a class="logout" style="text-decoration: underline;" href="/logout/">Logout</a>
+		<a class="userManageTop" style="text-decoration: underline;" href="/logout/">Logout</a>
+		<a class="userManageTop" style="text-decoration: underline; padding-right: 10px;" href="/profile/">Profile</a>
 	{% endif %}
 </div>
 

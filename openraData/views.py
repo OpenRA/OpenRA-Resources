@@ -257,3 +257,13 @@ def handle404(request):
         'content': '404.html',
     })
     return HttpResponse(template.render(context))
+
+def profile(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'profile.html',
+        'request': request,
+    })
+    return HttpResponse(template.render(context))

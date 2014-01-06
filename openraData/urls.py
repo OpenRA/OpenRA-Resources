@@ -35,6 +35,7 @@ urlpatterns = patterns('',
     url(r'^login/', include('registration.backends.default.urls')),
 
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
+    url(r'^profile/?$', views.profile, name='profile'),
     
     url(r'^map/(?P<arg>\w+)/$', api.mapAPI, name='mapAPI_download'),
     url(r'^map/(?P<arg>\w+)/(?P<value>\w+)/$', api.mapAPI, name='mapAPI'), 
