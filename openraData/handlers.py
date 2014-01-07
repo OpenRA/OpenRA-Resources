@@ -57,7 +57,7 @@ class MapHandlers():
         # There can be weird chars still, if so: stop uploading
         findBadChars = re.findall(r'(\W+)', name)
         for bc in findBadChars:
-            if bc != '.':
+            if bc not in ['.','-']:
                 self.LOG.append('Failed. Your filename is bogus; rename and try again.')
                 return False
 
