@@ -1,1 +1,1 @@
-Django tools and applications to serve OpenRA Resrouce Center
+Django tools and applications to serve OpenRA Resource Center
