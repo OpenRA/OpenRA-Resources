@@ -255,6 +255,7 @@ def handle404(request):
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': '404.html',
+        'request': request,
     })
     return HttpResponse(template.render(context))
 

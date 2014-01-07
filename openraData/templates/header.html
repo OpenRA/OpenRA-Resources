@@ -48,14 +48,20 @@
 </form>
 	
 <ul id="nav">
-	<li class="nav-selected"><a href="/">Home</a></li>
-	<li><a href="/maps/">Maps</a></li>
-	<li><a href="/units/">Units</a></li>
-	<li><a href="/mods/">Mods</a></li>
+	<li {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>
+		<a href="/">Home</a></li>
+	<li {% if request.path == '/maps/' or request.path == '/maps' %}{{ 'class="nav-selected"' }}{% endif %}>
+		<a href="/maps/">Maps</a></li>
+	<li {% if request.path == '/units/' or request.path == '/units' %}{{ 'class="nav-selected"' }}{% endif %}>
+		<a href="/units/">Units</a></li>
+	<li {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %}>
+		<a href="/mods/">Mods</a></li>
 	{% if user.is_authenticated %}
-		<li><a href="/panel/">My Content</a></li>
+		<li {% if request.path == '/panel/' or request.path == '/panel' %}{{ 'class="nav-selected"' }}{% endif %}>
+			<a href="/panel/">My Content</a></li>
 	{% else %}
-		<li><a href="/login/">Login</a></li>
+		<li {% if request.path == '/login/' or request.path == '/login' %}{{ 'class="nav-selected"' }}{% endif %}>
+			<a href="/login/">Login</a></li>
 	{% endif %}
 </ul>
 <hr />
