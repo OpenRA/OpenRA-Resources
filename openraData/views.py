@@ -14,6 +14,7 @@ def index(request):
     context = RequestContext(request, {
         'content': 'index_content.html',
         'request': request,
+        'title': '',
     })
     return HttpResponse(template.render(context))
 
@@ -39,6 +40,7 @@ def loginView(request):
     context = RequestContext(request, {
         'content': 'login.html',
         'request': request,
+        'title': ' - Login',
         'authenticationStatusMessage': authenticationStatusMessage, 
         'form': form,
     })
@@ -54,6 +56,7 @@ def feed(request):
     context = RequestContext(request, {
         'content': 'feed.html',
         'request': request,
+        'title': ' - Rss Feed',
     })
     return HttpResponse(template.render(context))
 
@@ -62,6 +65,7 @@ def search(request):
     context = RequestContext(request, {
         'content': 'search.html',
         'request': request,
+        'title': ' - Search',
     })
     return HttpResponse(template.render(context))
 
@@ -72,6 +76,7 @@ def ControlPanel(request):
     context = RequestContext(request, {
         'content': 'control_panel.html',
         'request': request,
+        'title': ' - My Content',
     })
     return HttpResponse(template.render(context))
 
@@ -80,6 +85,7 @@ def maps(request):
     context = RequestContext(request, {
         'content': 'maps.html',
         'request': request,
+        'title': ' - Maps',
     })
     return HttpResponse(template.render(context))
 
@@ -94,6 +100,7 @@ def displayMap(request, arg):
     context = RequestContext(request, {
         'content': 'displayMap.html',
         'request': request,
+        'title': ' - Map details - ' + mapObject.title,
         'map': mapObject,
         'userid': userObject,
         'arg': arg,
@@ -191,6 +198,7 @@ def uploadMap(request):
     context = RequestContext(request, {
         'content': 'uploadMap.html',
         'request': request,
+        'title': ' - Uploading Map',
         'form': form,
         'uploadingLog': uploadingLog,
         'uid': uid,
@@ -202,6 +210,7 @@ def units(request):
     context = RequestContext(request, {
         'content': 'units.html',
         'request': request,
+        'title': ' - Units',
     })
     return HttpResponse(template.render(context))
 
@@ -210,6 +219,7 @@ def mods(request):
     context = RequestContext(request, {
         'content': 'mods.html',
         'request': request,
+        'title': ' - Mods',
     })
     return HttpResponse(template.render(context))
 
@@ -218,6 +228,7 @@ def palettes(request):
     context = RequestContext(request, {
         'content': 'palettes.html',
         'request': request,
+        'title': ' - Palettes',
     })
     return HttpResponse(template.render(context))
 
@@ -228,6 +239,7 @@ def uploadUnit(request):
     context = RequestContext(request, {
         'content': 'uploadUnit.html',
         'request': request,
+        'title': ' - Uploading Unit',
     })
     return HttpResponse(template.render(context))
 
@@ -238,6 +250,7 @@ def uploadMod(request):
     context = RequestContext(request, {
         'content': 'uploadMod.html',
         'request': request,
+        'title': ' - Uploading Mod',
     })
     return HttpResponse(template.render(context))
 
@@ -248,6 +261,7 @@ def uploadPalette(request):
     context = RequestContext(request, {
         'content': 'uploadPalette.html',
         'request': request,
+        'title': ' - Uploading Palette',
     })
     return HttpResponse(template.render(context))
 
@@ -256,6 +270,7 @@ def handle404(request):
     context = RequestContext(request, {
         'content': '404.html',
         'request': request,
+        'title': ' - Page not found',
     })
     return HttpResponse(template.render(context))
 
@@ -266,5 +281,6 @@ def profile(request):
     context = RequestContext(request, {
         'content': 'profile.html',
         'request': request,
+        'title': ' - Profile',
     })
     return HttpResponse(template.render(context))
