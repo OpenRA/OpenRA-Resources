@@ -94,11 +94,11 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
                 mapObject = mapObject.order_by("rating_score")
             if apifilter == "author":
                 if filtervalue != "":
-                    mapObject = mapObject.filter(author=filtervalue)
+                    mapObject = mapObject.filter(author__iexact=filtervalue.lower())
             if apifilter == "uploader":
                 if filtervalue != "":
                     try:
-                        u = User.objects.get(username=filtervalue)
+                        u = User.objects.get(username__iexact=filtervalue.lower())
                         mapObject = mapObject.filter(user_id=u.id)
                     except:
                         pass
