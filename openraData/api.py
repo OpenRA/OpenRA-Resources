@@ -10,9 +10,9 @@ from django.contrib.auth.models import User
 def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
     # get detailed map info by title
     if arg == "title":
-        title = value
+        title = value.lower()
         try:
-            mapObject = Maps.objects.get(title__contains=title)
+            mapObject = Maps.objects.get(title__icontains=title)
         except:
             raise Http404
         response_data = serialize_basic_map_info(mapObject)
