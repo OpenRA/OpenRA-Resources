@@ -4,9 +4,10 @@ import base64
 from django.http import Http404
 from django.http import HttpResponse
 from openraData.models import Maps
+from django.contrib.auth.models import User
 # Map API
 
-def mapAPI(request, arg, value="", apifilter=""):
+def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
     # get detailed map info by title
     if arg == "title":
         title = value
@@ -75,10 +76,32 @@ def mapAPI(request, arg, value="", apifilter=""):
         if mod == "":
             raise Http404
         if apifilter != "":
-            if apifilter not in ["rating", "players", "author", "date"]:
+            if apifilter not in ["rating", "-rating", "players", "-players", "posted", "-posted", "author", "uploader"]:
                 raise Http404
         try:
             mapObject = Maps.objects.all().filter(game_mod=mod.lower())
+            if apifilter == "players":
+                mapObject = mapObject.order_by("-players")
+            if apifilter == "-players":
+                mapObject = mapObject.order_by("players")
+            if apifilter == "posted":
+                mapObject = mapObject.order_by("-posted")
+            if apifilter == "-posted":
+                mapObject = mapObject.order_by("posted")
+            if apifilter == "rating":
+                mapObject = mapObject.order_by("-rating_score")
+            if apifilter == "-rating":
+                mapObject = mapObject.order_by("rating_score")
+            if apifilter == "author":
+                if filtervalue != "":
+                    mapObject = mapObject.filter(author=filtervalue)
+            if apifilter == "uploader":
+                if filtervalue != "":
+                    try:
+                        u = User.objects.get(username=filtervalue)
+                        mapObject = mapObject.filter(user_id=u.id)
+                    except:
+                        pass
         except:
             raise Http404
         basic_response = []
