@@ -37,9 +37,9 @@ urlpatterns = patterns('',
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
     url(r'^profile/?$', views.profile, name='profile'),
     
-    url(r'^map/(?P<arg>\w+)/$', api.mapAPI, name='mapAPI_download'),
-    url(r'^map/(?P<arg>\w+)/(?P<value>\w+)/$', api.mapAPI, name='mapAPI'), 
-    url(r'^map/(?P<arg>\w+)/(?P<value>\w+)/(?P<filter>\w+)/$', api.mapAPI, name='mapAPI_list'),
+    url(r'^map/(?P<arg>\w+)/?$', api.mapAPI, name='mapAPI_download'),
+    url(r'^map/(?P<arg>\w+)/(?P<value>\w+)/?$', api.mapAPI, name='mapAPI'), 
+    url(r'^map/(?P<arg>\w+)/(?P<value>\w+)/(?P<filter>\w+)/?$', api.mapAPI, name='mapAPI_list'),
     
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
 
