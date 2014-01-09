@@ -123,6 +123,8 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             raise Http404
         if not mapObject.downloading:
             raise Http404
+        if mapObject.requires_upgrade and mapObject.next_rev != 0:
+            raise Http404
         path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id).rjust(7, '0')
         try:
             mapDir = os.listdir(path)
