@@ -81,7 +81,7 @@ class MapHandlers():
         try:
             hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
             self.LOG.append("Failed. You've already uploaded")
-            self.UID = str(hashExists.id).rjust(5, '0')
+            self.UID = str(hashExists.id)
             return False
         except:
             pass   # all good
