@@ -147,6 +147,11 @@ table tr td {
   text-decoration: none;
 }
 
+#nav li:hover {
+  border: solid #74c2e7;
+  border-width: 0 0 2px 0;
+}
+
 #nav .nav-selected {
   border: solid #74c2e7;
   border-width: 0 0 2px 0;
