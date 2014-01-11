@@ -121,6 +121,8 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         try:
             mapObject = Maps.objects.all().filter(game_mod=mod.lower()).filter(next_rev=0)
             mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True).order_by("id")
+            if not mapObject:
+                raise Http404
         except:
             raise Http404
         data = ""
