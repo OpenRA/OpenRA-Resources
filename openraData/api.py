@@ -212,7 +212,7 @@ def get_url(request, mapid):
     url = "http://" + request.META['HTTP_HOST'] + "/maps/" + str(mapid) + "/oramap"
     return url
 
-def CrashReport(request):
+def CrashReports(request):
     ID = 0
     gameID = 0
     desync = False
@@ -232,7 +232,7 @@ def CrashReport(request):
         if not request.FILES['syncreport.log']:
             raise Http404
 
-    transac = Maps(
+    transac = CrashReports(
         gameID = gameID,
         desync = desync,
         gist = 0,
