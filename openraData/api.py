@@ -35,7 +35,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             mapObject = Maps.objects.get(map_hash=map_hash)
         except:
             raise Http404
-        url = "http://" + request.META['HTTP_HOST'] + "/maps/" + str(mapObject.id).rjust(7, '0') + "/oramap"
+        url = get_url(request, mapObject.id)
         last_revision = True
         if mapObject.next_rev != 0:
             last_revision = False
@@ -114,6 +114,19 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             basic_response.append(response_data)
 
         return HttpResponse(json.dumps(basic_response), content_type="application/json")
+    elif arg == "sync":
+        mod = value
+        if mod == "":
+            raise Http404
+        try:
+            mapObject = Maps.objects.all().filter(game_mod=mod.lower()).filter(next_rev=0)
+            mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True).order_by("id")
+        except:
+            raise Http404
+        data = ""
+        for item in mapObject:
+            data = data + get_url(request, item.id) + "/sync" + "\n"
+        return HttpResponse(data, content_type="plain/text")
     else:
         # serve application/zip by hash
         oramap = ""
@@ -125,7 +138,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             raise Http404
         if mapObject.requires_upgrade and mapObject.next_rev != 0:
             raise Http404
-        path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id).rjust(7, '0')
+        path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id)
         try:
             mapDir = os.listdir(path)
         except:
@@ -172,7 +185,7 @@ def serialize_basic_map_info(mapObject):
 
 def get_minimap(mapid, soft=False):
     minimap = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapid).rjust(7, '0')
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapid)
     try:
         mapDir = os.listdir(path)
     except:
@@ -194,5 +207,5 @@ def get_minimap(mapid, soft=False):
     return minimap
 
 def get_url(request, mapid):
-    url = "http://" + request.META['HTTP_HOST'] + "/maps/" + str(mapid).rjust(7, '0') + "/oramap"
+    url = "http://" + request.META['HTTP_HOST'] + "/maps/" + str(mapid) + "/oramap"
     return url

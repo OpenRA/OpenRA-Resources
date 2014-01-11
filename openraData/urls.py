@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     url(r'^maps/(?P<arg>\d+)/minimap/?$', views.serveMinimap, name='serveMinimap'),
     url(r'^maps/(?P<arg>\d+)/lintlog/?$', views.serveLintLog, name='serveLintLog'),
     url(r'^maps/(?P<arg>\d+)/oramap/?$', views.serveOramap, name='serveOramap'),
+    url(r'^maps/(?P<arg>\d+)/oramap/(?P<sync>\w+)/?$', views.serveOramap, name='serverSyncOramap'),
 
     url(r'^maps/upload/?$', views.uploadMap, name='uploadMap'),
     url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),

@@ -26,6 +26,7 @@ sendmail
  * Generate a new Django secret key and change "SECRET_KEY" setting
  * Change "DEBUG" setting to False if it's True
  * Modify "OPENRA_PATH" to specify a directory with compiled OpenRA files (with slash at the end) (make sure it's always the latest release)
+ * Modify "RSYNC_MAP_PATH" to specify a directory where 'good' maps will be dumped by website trigger for dedicated servers usage
  * Edit DB related configuration
 
 ```

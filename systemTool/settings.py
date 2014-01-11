@@ -92,3 +92,8 @@ ACCOUNT_ACTIVATION_DAYS = 7
 
 # Path to directory where OpenRA files are stored ( with slash at the end! )
 OPENRA_PATH = '/usr/lib/openra/'
+
+# Path to directory which will be shared over rsync, with full permissions for website user ( with slash at the end! )
+# Must be outside of website's path tree
+# Website trigger will dump there 'good' maps for dedicated servers
+RSYNC_MAP_PATH = ''

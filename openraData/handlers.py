@@ -81,7 +81,7 @@ class MapHandlers():
         try:
             hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
             self.LOG.append("Failed. You've already uploaded")
-            self.UID = str(hashExists.id).rjust(7, '0')
+            self.UID = str(hashExists.id).rjust(5, '0')
             return False
         except:
             pass   # all good
@@ -146,7 +146,7 @@ class MapHandlers():
         transac.save()
         self.UID = str(transac.id)
 
-        self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID.rjust(7, '0') + '/'
+        self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID + '/'
         if not os.path.exists(self.map_full_path_directory):
             os.makedirs(self.map_full_path_directory + 'content')
         self.map_full_path_filename = self.map_full_path_directory + name

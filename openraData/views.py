@@ -103,13 +103,13 @@ def displayMap(request, arg):
         'title': ' - Map details - ' + mapObject.title,
         'map': mapObject,
         'userid': userObject,
-        'arg': arg,
+        'arg': arg.lstrip('0'),
     })
     return HttpResponse(template.render(context))
 
 def serveMinimap(request, arg):
     minimap = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.rjust(7, '0')
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
     try:
         mapDir = os.listdir(path)
     except:
@@ -129,7 +129,7 @@ def serveMinimap(request, arg):
 
 def serveLintLog(request, arg):
     lintlog = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.rjust(7, '0')
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
     try:
         mapDir = os.listdir(path)
     except:
@@ -139,16 +139,16 @@ def serveLintLog(request, arg):
             lintlog = filename
             break
     if lintlog == "":
-        return HttpResponseRedirect('/maps/'+arg.rjust(7, '0'))
+        return HttpResponseRedirect('/maps/'+arg.lstrip('0'))
     else:
         serveLog = path + os.sep + lintlog
         response = HttpResponse(open(serveLog), content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename="%s"' % lintlog
         return response
 
-def serveOramap(request, arg):
+def serveOramap(request, arg, sync=""):
     oramap = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.rjust(7, '0')
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
     try:
         mapDir = os.listdir(path)
     except:
@@ -158,9 +158,11 @@ def serveOramap(request, arg):
             oramap = filename
             break
     if oramap == "":
-        return HttpResponseRedirect('/maps/'+arg.rjust(7, '0'))
+        return HttpResponseRedirect('/maps/'+arg.lstrip('0'))
     else:
         serveOramap = path + os.sep + oramap
+        if sync == "sync":
+                oramap = arg.lstrip('0') + ".oramap"
         response = HttpResponse(open(serveOramap), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename="%s"' % oramap
         return response
@@ -177,7 +179,7 @@ def uploadMap(request):
             uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST['info'])
             uploadingLog = uploadingMap.LOG
             if uploadingMap.UID:
-                uid = str(uploadingMap.UID).rjust(7, '0')
+                uid = str(uploadingMap.UID)
             if uploadingMap.map_is_uploaded:
                 if uploadingMap.LintPassed:
                     pass
