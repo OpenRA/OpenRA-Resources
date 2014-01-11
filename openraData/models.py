@@ -117,3 +117,12 @@ class Screenshots(models.Model):
     ex_name             = models.CharField(max_length=16)
     posted              = models.DateTimeField('date published')
     map_preview         = models.BooleanField(default=False)
+
+class CrashReports(models.Model):
+
+    class Meta:
+        verbose_name = 'CrashReport'
+
+    gameID              = models.IntegerField(default=0)
+    desync              = models.BooleanField(default=False)
+    gistID              = models.IntegerField(default=0)

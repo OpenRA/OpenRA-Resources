@@ -211,3 +211,42 @@ def get_minimap(mapid, soft=False):
 def get_url(request, mapid):
     url = "http://" + request.META['HTTP_HOST'] + "/maps/" + str(mapid) + "/oramap"
     return url
+
+def CrashReport(request):
+    ID = 0
+    gameID = 0
+    desync = False
+    if request.method != 'POST':
+        raise Http404
+    if not request.POST['gameID']:
+        raise Http404
+    gameID = request.POST['gameID']
+
+    if request.POST['desync']:
+        desync = True
+
+    if not request.FILES['exception.log']:
+        raise Http404
+
+    if desync:
+        if not request.FILES['syncreport.log']:
+            raise Http404
+
+    transac = Maps(
+        gameID = gameID,
+        desync = desync,
+        gist = 0,
+        )
+    transac.save()
+    ID = transac.id
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/crashlogs/' + str(ID) + os.sep
+    if not os.path.exists(path):
+        os.makedirs(path)
+    with open(path + str(gameID) + "-exception.log", 'wb+') as destination:
+        for chunk in request.FILES['exception.log'].chunks():
+            destination.write(chunk)
+
+    if desync:
+        with open(path + str(gameID) + "-syncreport.log", 'wb+') as destination:
+            for chunk in request.FILES['syncreport.log'].chunks():
+                destination.write(chunk)

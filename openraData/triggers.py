@@ -7,3 +7,7 @@ def recalculate_hashes():
 def map_upgrade():
     # this function upgrades all existings maps using OpenRA.Utility and triggers recalculate_hashes() function
     pass
+
+def filterMapsRsync():
+	# this function syncs rsync directory with fresh list of maps using embedded API
+	pass
