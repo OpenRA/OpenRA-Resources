@@ -38,6 +38,12 @@ hr {
   background: #74c2e7;
 }
 
+.hr-thick {
+  border: 0;
+  height: 3px;
+  background: #74c2e7;
+}
+
 a, a:visited { 
   color: white 
 }
