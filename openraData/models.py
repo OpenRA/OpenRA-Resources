@@ -124,5 +124,5 @@ class CrashReports(models.Model):
         verbose_name = 'CrashReport'
 
     gameID              = models.IntegerField(default=0)
-    desync              = models.BooleanField(default=False)
+    isdesync            = models.BooleanField(default=False)
     gistID              = models.IntegerField(default=0)

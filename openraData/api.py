@@ -1,12 +1,14 @@
 import os
 import json
 import base64
+from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
 from django.http import HttpResponse
 from openraData.models import Maps
+from openraData.models import CrashReports
 from django.contrib.auth.models import User
-# Map API
 
+# Map API
 def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
     # get detailed map info by title
     if arg == "title":
@@ -212,30 +214,38 @@ def get_url(request, mapid):
     url = "http://" + request.META['HTTP_HOST'] + "/maps/" + str(mapid) + "/oramap"
     return url
 
-def CrashReports(request):
+# Crash Log API
+@csrf_exempt
+def CrashLogs(request):
     ID = 0
     gameID = 0
     desync = False
     if request.method != 'POST':
         raise Http404
-    if not request.POST['gameID']:
+    if not request.POST.get('gameID', False):
         raise Http404
-    gameID = request.POST['gameID']
+    gameID = request.POST.get('gameID', False)
 
-    if request.POST['desync']:
-        desync = True
+    if request.POST.get('desync', False):
+        temp = request.POST.get('desync', False)
+        if temp == 'True':
+            desync = True
 
-    if not request.FILES['exception.log']:
+    try:
+        exception = request.FILES['exception']
+    except:
         raise Http404
 
     if desync:
-        if not request.FILES['syncreport.log']:
+        try:
+            syncreport = request.FILES['syncreport']
+        except:
             raise Http404
 
     transac = CrashReports(
-        gameID = gameID,
-        desync = desync,
-        gist = 0,
+        gameID = int(gameID),
+        isdesync = desync,
+        gistID = 0,
         )
     transac.save()
     ID = transac.id
@@ -243,10 +253,11 @@ def CrashReports(request):
     if not os.path.exists(path):
         os.makedirs(path)
     with open(path + str(gameID) + "-exception.log", 'wb+') as destination:
-        for chunk in request.FILES['exception.log'].chunks():
+        for chunk in exception.chunks():
             destination.write(chunk)
 
     if desync:
         with open(path + str(gameID) + "-syncreport.log", 'wb+') as destination:
-            for chunk in request.FILES['syncreport.log'].chunks():
+            for chunk in syncreport.chunks():
                 destination.write(chunk)
+    return HttpResponse('done')
