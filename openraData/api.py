@@ -3,7 +3,8 @@ import json
 import base64
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+
 from openraData.models import Maps
 from openraData.models import CrashReports
 from django.contrib.auth.models import User
@@ -232,13 +233,15 @@ def CrashLogs(request):
             desync = True
 
     try:
-        exception = request.FILES['exception']
+        exceptionlog = request.FILES['exception']
+        debuglog = request.FILES['debug']
+        lualog = request.FILES['lua']
     except:
         raise Http404
 
     if desync:
         try:
-            syncreport = request.FILES['syncreport']
+            syncreportlog = request.FILES['syncreport']
         except:
             raise Http404
 
@@ -249,15 +252,52 @@ def CrashLogs(request):
         )
     transac.save()
     ID = transac.id
+
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/crashlogs/' + str(ID) + os.sep
     if not os.path.exists(path):
         os.makedirs(path)
-    with open(path + str(gameID) + "-exception.log", 'wb+') as destination:
-        for chunk in exception.chunks():
-            destination.write(chunk)
+
+    for filename in [exceptionlog, debuglog, lualog]:
+        if filename == exceptionlog:
+            name = "-exception.log"
+        elif filename == debuglog:
+            name = "-debug.log"
+        elif filename == lualog:
+            name = "-lua.log"
+        with open(path + str(gameID) + name, 'wb+') as destination:
+            for chunk in filename.chunks():
+                destination.write(chunk)
 
     if desync:
         with open(path + str(gameID) + "-syncreport.log", 'wb+') as destination:
-            for chunk in syncreport.chunks():
+            for chunk in syncreportlog.chunks():
                 destination.write(chunk)
-    return HttpResponse('done')
+        crashObject = CrashReports.objects.all().filter(gameID=int(gameID))
+        if crashObject:
+            # TODO: trigger gist API
+            return HttpResponse('')
+        return HttpResponse('')
+    else:
+        # TODO: post something about an exception to github somewhere
+        resp = "http://" + request.META['HTTP_HOST'] + "/crashlogs/" + str(ID) + "/exception\n"
+        resp += "http://" + request.META['HTTP_HOST'] + "/crashlogs/" + str(ID) + "/debug\n"
+        resp += "http://" + request.META['HTTP_HOST'] + "/crashlogs/" + str(ID) + "/lua\n"
+        return HttpResponse(resp)
+
+def CrashLogsServe(request, crashid, logfile):
+    logfilename = ""
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/crashlogs/' + crashid.lstrip('0')
+    try:
+        Dir = os.listdir(path)
+    except:
+        return HttpResponseRedirect("/")
+    for filename in Dir:
+        if logfile in filename:
+            logfilename = filename
+            break
+    if logfilename == "":
+        return HttpResponseRedirect('/crashlogs/')
+    serveLog = path + os.sep + logfilename
+    response = HttpResponse(open(serveLog), content_type='plain/text')
+    response['Content-Disposition'] = 'attachment; filename="%s"' % logfilename
+    return response
