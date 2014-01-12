@@ -146,7 +146,7 @@ table tr td {
   text-decoration: none;
 }
 
-#nav li:hover {
+#nav a:hover {
   border: solid #74c2e7;
   border-width: 0 0 2px 0;
 }
@@ -162,21 +162,6 @@ table tr td {
  }
 #nav a:visited { text-decoration: none; }
 #nav a:hover { text-decoration: none; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* margin: top right bottom left; */
 
 #nav li ul {
   display: none;
@@ -202,7 +187,7 @@ table tr td {
 
 #nav li ul a {
   display: block; 
-    padding: 0 0 0 10px;
+  padding: 0 0 0 10px;
   margin: 0px 0px 0px 10px;
   text-align: left;
 }
@@ -215,8 +200,6 @@ table tr td {
   border: solid #74c2e7;
   border-width: 0 0 2px 0;
 }
-
-
 
 .submenu-top {
   background: url("/static/images/submenu-top.png");
@@ -242,16 +225,6 @@ table tr td {
   background: url("/static/images/submenu-bottom.png");
   height: 11px;
 }
-
-
-
-
-
-
-
-
-
-
 
 #footer {
   margin-top:20px;
