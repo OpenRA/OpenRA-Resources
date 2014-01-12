@@ -131,7 +131,6 @@ table tr td {
   padding-right:50px;
 }
 
-
 #nav {
   list-style-type:none;
   margin: 20px auto;
@@ -168,7 +167,7 @@ table tr td {
   display: none;
   height: auto;
   padding: 0;
-  margin: 0 0 0 422px;         /* used if there are 6 links in the main menu :  Home - Maps - Units - Mods - Other - Login */
+  margin: 0 0 0 415px;         /* used if there are 6 links in the main menu :  Home - Maps - Units - Mods - Other - Login */
   position: absolute;
   width: 197px;
 }
