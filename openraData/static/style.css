@@ -136,7 +136,6 @@ table tr td {
   margin: 20px auto;
   width:80%;
   text-align:center;
-  font: 15px Cambria, Georgia, Times New Roman, Serif;
 }
 
 #nav li {
@@ -157,9 +156,102 @@ table tr td {
   border-width: 0 0 2px 0;
 }
 
-#nav a { text-decoration: none; }
+#nav a { 
+    text-decoration: none;
+    font: 17px Cambria, Georgia, Times New Roman, Serif;
+ }
 #nav a:visited { text-decoration: none; }
 #nav a:hover { text-decoration: none; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* margin: top right bottom left; */
+
+#nav li ul {
+  display: none;
+  height: auto;
+  padding: 0;
+  /* margin: 0 0 0 413px; */    /* used if there are only 5 links in the main menu : Home - Maps - Units - Other - Login */
+  margin: 0 0 0 445px;          /* used if there are 6 links in the main menu :  Home - Maps - Units - Mods - Other - Login */
+  position: absolute;
+  width: 197px;
+}
+
+#nav li:hover ul {
+  display: block;
+}
+
+#nav li li { 
+  display: block;
+  float: none;
+  margin: 0px;
+  padding: 0px;
+  width: 197px;
+}
+
+#nav li ul a {
+  display: block; 
+    padding: 0 0 0 10px;
+  margin: 0px 0px 0px 10px;
+  text-align: left;
+}
+
+#nav li li:hover {
+ border: none;
+}
+
+#nav li li span:hover {
+  border: solid #74c2e7;
+  border-width: 0 0 2px 0;
+}
+
+
+
+.submenu-top {
+  background: url("/static/images/submenu-top.png");
+  height: 22px;
+}
+
+.submenu-1st-link {
+  background: url("/static/images/submenu-1st-link.png");
+  height: 30px;
+}
+
+.submenu-2nd-link {
+  background: url("/static/images/submenu-2nd-link.png");
+  height: 30px;
+}
+
+.submenu-3nd-link {
+  background: url("/static/images/submenu-3nd-link.png");
+  height: 30px;
+}
+
+.submenu-bottom {
+  background: url("/static/images/submenu-bottom.png");
+  height: 11px;
+}
+
+
+
+
+
+
+
+
+
+
 
 #footer {
   margin-top:20px;
