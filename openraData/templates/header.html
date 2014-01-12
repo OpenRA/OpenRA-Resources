@@ -50,20 +50,25 @@
 <ul id="nav">
 	<li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></li>
 	<li><a href="/maps/"><span {% if request.path == '/maps/' or request.path == '/maps' %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
-	<li><a href="/units/"><span {% if request.path == '/units/' or request.path == '/units' %}{{ 'class="nav-selected"' }}{% endif %}>Units</span></a></li>
-    <li><a href="/mods/"><span {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %}>Mods</span></a></li>        
+	<li><a href="/units/"><span {% if request.path == '/units/' or request.path == '/units' %}{{ 'class="nav-selected"' }}{% endif %}>Units</span></a></li>       
     <li><a href="#"><span>Other<span></a>
         <ul>
             <li class="submenu-top"></li> <!-- do not add any link inside this LI -->
             
             <li class="submenu-1st-link">
-            <a href="/palettes/"><span {% if request.path == '/palettes/' or request.path == '/palettes' %}{{ 'class="nav-selected"' }}{% endif %}>Palettes</span></a></li>            
+            <a href="/mods/"><span {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %}>Mods</span></a></li>            
             
             <li class="submenu-2nd-link">
-            <a href="/screenshots/"><span {% if request.path == '/screenshots/' or request.path == '/screenshots' %}{{ 'class="nav-selected"' }}{% endif %}>Screenshots</span></a></li>
+            <a href="/palettes/"><span {% if request.path == '/palettes/' or request.path == '/palettes' %}{{ 'class="nav-selected"' }}{% endif %}>Palettes</span></a></li>
             
             <li class="submenu-3nd-link">
+            <a href="/screenshots/"><span {% if request.path == '/screenshots/' or request.path == '/screenshots' %}{{ 'class="nav-selected"' }}{% endif %}>Screenshots</span></a></li>
+
+            <li class="submenu-4th-link">
             <a href="/assets/"><span {% if request.path == '/assets/' or request.path == '/assets' %}{{ 'class="nav-selected"' }}{% endif %}>Assets Packages</span></a></li>
+
+            <li class="submenu-5th-link">
+            <a href="/replays/"><span {% if request.path == '/replays/' or request.path == '/replays' %}{{ 'class="nav-selected"' }}{% endif %}>Replays</span></a></li>
                 
             <li class="submenu-bottom"></li> <!-- do not add any link inside this LI -->
         </ul>

@@ -234,6 +234,33 @@ def palettes(request):
     })
     return HttpResponse(template.render(context))
 
+def screenshots(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'screenshots.html',
+        'request': request,
+        'title': ' - Screenshots',
+    })
+    return HttpResponse(template.render(context))
+
+def assets(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'assets.html',
+        'request': request,
+        'title': ' - Assets Packages Mirrors',
+    })
+    return HttpResponse(template.render(context))
+
+def replays(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'replays.html',
+        'request': request,
+        'title': ' - Replays',
+    })
+    return HttpResponse(template.render(context))
+
 def uploadUnit(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/units/')

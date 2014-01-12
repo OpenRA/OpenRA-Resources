@@ -167,7 +167,7 @@ table tr td {
   display: none;
   height: auto;
   padding: 0;
-  margin: 0 0 0 415px;         /* used if there are 6 links in the main menu :  Home - Maps - Units - Mods - Other - Login */
+  margin: -5px 0 0 350px;
   position: absolute;
   width: 197px;
 }
@@ -213,6 +213,16 @@ table tr td {
 .submenu-3nd-link {
   background: url("/static/images/submenu-3nd-link.png");
   height: 30px;
+}
+
+.submenu-4th-link {
+  background: url("/static/images/submenu-4th-link.png");
+  height: 30px;
+}
+
+.submenu-5th-link {
+  background: url("/static/images/submenu-5th-link.png");
+  height: 30px;  
 }
 
 .submenu-bottom {
