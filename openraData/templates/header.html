@@ -48,14 +48,27 @@
 </form>
 	
 <ul id="nav">
-	<li {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>
-		<a href="/">Home</a></li>
-	<li {% if request.path == '/maps/' or request.path == '/maps' %}{{ 'class="nav-selected"' }}{% endif %}>
-		<a href="/maps/">Maps</a></li>
-	<li {% if request.path == '/units/' or request.path == '/units' %}{{ 'class="nav-selected"' }}{% endif %}>
-		<a href="/units/">Units</a></li>
-	<li {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %}>
-		<a href="/mods/">Mods</a></li>
+	<li {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}><a href="/">Home</a></li>
+	<li {% if request.path == '/maps/' or request.path == '/maps' %}{{ 'class="nav-selected"' }}{% endif %}><a href="/maps/">Maps</a></li>
+	<li {% if request.path == '/units/' or request.path == '/units' %}{{ 'class="nav-selected"' }}{% endif %}><a href="/units/">Units</a></li>
+    <li {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %}><a href="/mods/">Mods</a></li>        
+    <li><a href="#">Other</a>
+        <ul>
+            <li class="submenu-top"></li> <!-- do not add any link inside this LI -->
+            
+            <li {% if request.path == '/palettes/' or request.path == '/palettes' %}{{ 'class="nav-selected submenu-1st-link"' }}{% endif %}>
+            <a href="http://engine.ihptru.net:8000/palettes/"><span>Palettes</span></a></li>            
+            
+            <li {% if request.path == '/palettes/' or request.path == '/screenshots' %}{{ 'class="nav-selected submenu-2nd-link"' }}{% endif %}>
+            <a href="http://engine.ihptru.net:8000/screenshots/"><span>Screenshots</span></a></li>
+            
+            <li {% if request.path == '/assets/' or request.path == '/assets' %}{{ 'class="nav-selected submenu-3nd-link"' }}{% endif %}>
+            <a href="http://openra-mirror.ihptru.net/"><span>Assets Packages</span></a></li>
+                
+            <li class="submenu-bottom"></li> <!-- do not add any link inside this LI -->
+        </ul>
+    </li>            
+        
 	{% if user.is_authenticated %}
 		<li {% if request.path == '/panel/' or request.path == '/panel' %}{{ 'class="nav-selected"' }}{% endif %}>
 			<a href="/panel/">My Content</a></li>
