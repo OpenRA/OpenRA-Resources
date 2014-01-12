@@ -131,11 +131,12 @@ table tr td {
   padding-right:50px;
 }
 
+
 #nav {
   list-style-type:none;
   margin: 20px auto;
   width:80%;
-  text-align:center;
+  text-align: left;
 }
 
 #nav li {
@@ -146,7 +147,7 @@ table tr td {
   text-decoration: none;
 }
 
-#nav a:hover {
+#nav span:hover {
   border: solid #74c2e7;
   border-width: 0 0 2px 0;
 }
@@ -167,8 +168,7 @@ table tr td {
   display: none;
   height: auto;
   padding: 0;
-  /* margin: 0 0 0 413px; */    /* used if there are only 5 links in the main menu : Home - Maps - Units - Other - Login */
-  margin: 0 0 0 445px;          /* used if there are 6 links in the main menu :  Home - Maps - Units - Mods - Other - Login */
+  margin: 0 0 0 422px;         /* used if there are 6 links in the main menu :  Home - Maps - Units - Mods - Other - Login */
   position: absolute;
   width: 197px;
 }
@@ -194,11 +194,6 @@ table tr td {
 
 #nav li li:hover {
  border: none;
-}
-
-#nav li li span:hover {
-  border: solid #74c2e7;
-  border-width: 0 0 2px 0;
 }
 
 .submenu-top {
@@ -301,6 +296,7 @@ table tr td {
   border: 2px solid #74c2e7;
   background: #74c2e7;
   background: rgba(32, 44, 69, 0.4);
+  margin-right: 50px;
   /* box-shadow: 0px 0px 20px #000; */
 }
 

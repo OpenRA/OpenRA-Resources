@@ -46,33 +46,33 @@
 	<input id="qsearch" type="text" alt="Search maps, units, mods, authors..." title="Search maps, units, mods, authors..." value="Search..." onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';" name="qsearch"></input>
 	<input class="btn" type="image" src="/static/images/search.svg" title="Search" name="searchsubmit" alt="Search"></input>
 </form>
-	
+
 <ul id="nav">
-	<li><a {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %} href="/">Home</a></li>
-	<li><a {% if request.path == '/maps/' or request.path == '/maps' %}{{ 'class="nav-selected"' }}{% endif %} href="/maps/">Maps</a></li>
-	<li><a {% if request.path == '/units/' or request.path == '/units' %}{{ 'class="nav-selected"' }}{% endif %} href="/units/">Units</a></li>
-    <li><a {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %} href="/mods/">Mods</a></li>        
-    <li><a href="#">Other</a>
+	<li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></li>
+	<li><a href="/maps/"><span {% if request.path == '/maps/' or request.path == '/maps' %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
+	<li><a href="/units/"><span {% if request.path == '/units/' or request.path == '/units' %}{{ 'class="nav-selected"' }}{% endif %}>Units</span></a></li>
+    <li><a href="/mods/"><span {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %}>Mods</span></a></li>        
+    <li><a href="#"><span>Other<span></a>
         <ul>
             <li class="submenu-top"></li> <!-- do not add any link inside this LI -->
             
             <li class="submenu-1st-link">
-            <a {% if request.path == '/palettes/' or request.path == '/palettes' %}{{ 'class="nav-selected"' }}{% endif %} href="/palettes/"><span>Palettes</span></a></li>            
+            <a href="/palettes/"><span {% if request.path == '/palettes/' or request.path == '/palettes' %}{{ 'class="nav-selected"' }}{% endif %}>Palettes</span></a></li>            
             
             <li class="submenu-2nd-link">
-            <a {% if request.path == '/screenshots/' or request.path == '/screenshots' %}{{ 'class="nav-selected"' }}{% endif %} href="/screenshots/"><span>Screenshots</span></a></li>
+            <a href="/screenshots/"><span {% if request.path == '/screenshots/' or request.path == '/screenshots' %}{{ 'class="nav-selected"' }}{% endif %}>Screenshots</span></a></li>
             
             <li class="submenu-3nd-link">
-            <a {% if request.path == '/assets/' or request.path == '/assets' %}{{ 'class="nav-selected"' }}{% endif %} href="/assets/"><span>Assets Packages</span></a></li>
+            <a href="/assets/"><span {% if request.path == '/assets/' or request.path == '/assets' %}{{ 'class="nav-selected"' }}{% endif %}>Assets Packages</span></a></li>
                 
             <li class="submenu-bottom"></li> <!-- do not add any link inside this LI -->
         </ul>
     </li>            
         
 	{% if user.is_authenticated %}
-		<li><a {% if request.path == '/panel/' or request.path == '/panel' %}{{ 'class="nav-selected"' }}{% endif %} href="/panel/">My Content</a></li>
+		<li><a href="/panel/"><span {% if request.path == '/panel/' or request.path == '/panel' %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
 	{% else %}
-		<li><a {% if request.path == '/login/' or request.path == '/login' %}{{ 'class="nav-selected"' }}{% endif %} href="/login/">Login</a></li>
+		<li><a href="/login/"><span {% if request.path == '/login/' or request.path == '/login' %}{{ 'class="nav-selected"' }}{% endif %}>Login</span></a></li>
 	{% endif %}
 </ul>
 <hr class="hr-thick"/>
