@@ -1,11 +1,11 @@
 ## Prepare enviroment
-We will use PostgreSQL server even though our framework supports many...
-That's because this project has some SQL code PostgreSQL specific.
+We will use MySQL server even though our framework supports many...
+That's because this project has some SQL code MySQL specific.
 ### Dependencies:
 
 ```
 python (version 2)
-python-psycopg2	(postgresql module)
+python-mysqldb (mysql module)
 python-magic
 Django python Web Framework version 1.6
 mono 2.10 +
@@ -14,8 +14,8 @@ django-registration module (easy_install -Z django-registration)
 sendmail
 ```
 
- * Run PostgreSQL server; create user and database (in utf-8 encoding)
- * Change password for postgres user; setup DB backups
+ * Run MySQL server; create user and database (in utf-8 encoding)
+ * Setup DB backups
  * Create new user for web site in your unix system
  * Django web server user must have .openra directory in it's home and have owner rights to it (for OpenRA.Utility)
  * Directory with compiled OpenRA tools must have write permissions for Django web server user
@@ -32,7 +32,7 @@ sendmail
 ```
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': '',
         'USER': '',
         'PASSWORD': '',
@@ -42,12 +42,16 @@ DATABASES = {
 ```
 
 ### Finish work with django:
- * Initialize datebase (this will create all tables). You'll get a prompt asking you if you'd like to create a superuser account for the authentication system. Go ahead and do that:
+ * Initialize database (this will create all tables). You'll get a prompt asking you if you'd like to create a superuser account for the authentication system. Go ahead and do that:
 
 ```
 python manage.py syncdb
 ```
 
 ### Setup WebServer etc.
-  
+
+### Init map procedures:
+Go to http://yoursitename/admin/
+Authenticate with superuser account
+On Admin Index page click: "Init map procedures" link
 

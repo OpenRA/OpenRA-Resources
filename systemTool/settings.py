@@ -61,7 +61,7 @@ WSGI_APPLICATION = 'systemTool.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django',
         'USER': 'django',
         'PASSWORD': 'django',
