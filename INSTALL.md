@@ -51,7 +51,8 @@ python manage.py syncdb
 ### Setup WebServer etc.
 
 ### Init map procedures:
-Go to http://yoursitename/admin/
-Authenticate with superuser account
-On Admin Index page click: "Init map procedures" link
+ * Go to http://yoursitename/admin/
+ * Authenticate with superuser account
+ * On Admin Index page click: "Init map procedures" link
+<br />
 
