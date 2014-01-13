@@ -53,5 +53,7 @@ urlpatterns = patterns('',
 
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
 
+    url(r'^initMapProcedures/?$', views.initMapProcedures, name='initMapProcedures'),
+
     url(r'^.*$', views.handle404, name='handle404'),
 )
