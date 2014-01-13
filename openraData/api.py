@@ -1,6 +1,7 @@
 import os
 import json
 import base64
+import zipfile
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -233,17 +234,9 @@ def CrashLogs(request):
             desync = True
 
     try:
-        exceptionlog = request.FILES['exception']
-        debuglog = request.FILES['debug']
-        lualog = request.FILES['lua']
+        openraLogs = request.FILES['logs']
     except:
         raise Http404
-
-    if desync:
-        try:
-            syncreportlog = request.FILES['syncreport']
-        except:
-            raise Http404
 
     transac = CrashReports(
         gameID = int(gameID),
@@ -257,31 +250,26 @@ def CrashLogs(request):
     if not os.path.exists(path):
         os.makedirs(path)
 
-    for filename in [exceptionlog, debuglog, lualog]:
-        if filename == exceptionlog:
-            name = "-exception.log"
-        elif filename == debuglog:
-            name = "-debug.log"
-        elif filename == lualog:
-            name = "-lua.log"
-        with open(path + str(gameID) + name, 'wb+') as destination:
-            for chunk in filename.chunks():
-                destination.write(chunk)
+    z = zipfile.ZipFile(openraLogs, mode='a')
+    z.extractall(path)
+    z.close()
+
+    resp = ""
+    logfiles = os.listdir(path)
+    for filename in logfiles:
+        if filename in ['.','..']:
+            continue
+        resp += "http://" + request.META['HTTP_HOST'] + "/crashlogs/" + str(ID) + os.sep + os.path.splitext(filename)[0] + "\n"
 
     if desync:
-        with open(path + str(gameID) + "-syncreport.log", 'wb+') as destination:
-            for chunk in syncreportlog.chunks():
-                destination.write(chunk)
         crashObject = CrashReports.objects.all().filter(gameID=int(gameID))
         if crashObject:
-            # TODO: trigger gist API
-            return HttpResponse('')
-        return HttpResponse('')
+            # TODO: trigger gist API (update file)
+            return HttpResponse(resp)
+        # TODO: there are no stored syncreports with the same game id, so just post it on gist
+        return HttpResponse(resp)
     else:
         # TODO: post something about an exception to github somewhere
-        resp = "http://" + request.META['HTTP_HOST'] + "/crashlogs/" + str(ID) + "/exception\n"
-        resp += "http://" + request.META['HTTP_HOST'] + "/crashlogs/" + str(ID) + "/debug\n"
-        resp += "http://" + request.META['HTTP_HOST'] + "/crashlogs/" + str(ID) + "/lua\n"
         return HttpResponse(resp)
 
 def CrashLogsServe(request, crashid, logfile):
@@ -299,5 +287,5 @@ def CrashLogsServe(request, crashid, logfile):
         return HttpResponseRedirect('/crashlogs/')
     serveLog = path + os.sep + logfilename
     response = HttpResponse(open(serveLog), content_type='plain/text')
-    response['Content-Disposition'] = 'attachment; filename="%s"' % logfilename
+    response['Content-Disposition'] = 'attachment; filename="%s"' % crashid.lstrip('0')+logfilename
     return response
