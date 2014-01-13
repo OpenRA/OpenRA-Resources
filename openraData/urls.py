@@ -52,6 +52,8 @@ urlpatterns = patterns('',
     url(r'^crashlogs/(?P<crashid>\w+)/(?P<logfile>\w+)/?$', api.CrashLogsServe, name='CrashLogsServe'),
 
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
+    url(r'^robots\.txt$', RedirectView.as_view(url='/static/robots.txt')),
+    url(r'^sitemap\.xml$', RedirectView.as_view(url='/static/sitemap.xml')),
 
     url(r'^initMapProcedures/?$', views.initMapProcedures, name='initMapProcedures'),
 
