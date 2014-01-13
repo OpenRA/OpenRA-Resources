@@ -37,6 +37,8 @@ class MapHandlers():
         self.MapDesc = ""
         self.MapPlayers = 0
 
+        self.revisions = []
+
     def ProcessUploading(self, user_id, f, info, rev=1, pre_r=0):
         tempname = '/tmp/oramaptemp.oramap'
         with open(tempname, 'wb+') as destination:
@@ -240,3 +242,18 @@ class MapHandlers():
                     self.LOG.append(line.strip())
         logfile.close()
         return True
+
+    def GetRevisions(self, mapid, seek_next=False):
+        if seek_next:
+            mapObject = Maps.objects.get(id=mapid)
+            if mapObject.next_rev == 0:
+                return
+            self.revisions.append(mapObject.next_rev)
+            self.GetRevisions(mapObject.next_rev, True)
+            return
+        self.revisions.insert(0, mapid)
+        mapObject = Maps.objects.get(id=mapid)
+        if mapObject.pre_rev == 0:
+            self.GetRevisions(self.revisions[-1], True)
+            return
+        self.GetRevisions(mapObject.pre_rev)

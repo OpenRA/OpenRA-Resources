@@ -55,7 +55,5 @@ urlpatterns = patterns('',
     url(r'^robots\.txt$', RedirectView.as_view(url='/static/robots.txt')),
     url(r'^sitemap\.xml$', RedirectView.as_view(url='/static/sitemap.xml')),
 
-    url(r'^initMapProcedures/?$', views.initMapProcedures, name='initMapProcedures'),
-
     url(r'^.*$', views.handle404, name='handle404'),
 )

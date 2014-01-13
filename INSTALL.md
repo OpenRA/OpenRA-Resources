@@ -1,11 +1,11 @@
 ## Prepare enviroment
-We will use MySQL server even though our framework supports many...
-That's because this project has some SQL code MySQL specific.
+We will use PostgreSQL server even though our framework supports many...
+That's just our preference, so if you deploy it, you can choose any Database you want.
 ### Dependencies:
 
 ```
 python (version 2)
-python-mysqldb (mysql module)
+python-psycopg2  (postgresql module)
 python-magic
 Django python Web Framework version 1.6
 mono 2.10 +
@@ -14,8 +14,8 @@ django-registration module (easy_install -Z django-registration)
 sendmail
 ```
 
- * Run MySQL server; create user and database (in utf-8 encoding)
- * Setup DB backups
+ * Run PostgreSQL server; create user and database (in utf-8 encoding)
+ * Change password for postgres user; setup DB backups
  * Create new user for web site in your unix system
  * Django web server user must have .openra directory in it's home and have owner rights to it (for OpenRA.Utility)
  * Directory with compiled OpenRA tools must have write permissions for Django web server user
@@ -32,7 +32,7 @@ sendmail
 ```
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': '',
         'USER': '',
         'PASSWORD': '',
@@ -49,10 +49,4 @@ python manage.py syncdb
 ```
 
 ### Setup WebServer etc.
-
-### Init map procedures:
- * Go to 'http://yoursitename/login' and authenticate with superuser account
- * Then go to 'http://yoursitename/initMapProcedures'
- * If you get something like 'Created procedure...', everything is done!
-<br />
 
