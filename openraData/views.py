@@ -181,17 +181,6 @@ def uploadMap(request):
             uploadingLog = uploadingMap.LOG
             if uploadingMap.UID:
                 uid = str(uploadingMap.UID)
-            if uploadingMap.map_is_uploaded:
-                if uploadingMap.LintPassed:
-                    pass
-                else:
-                    pass
-                if uploadingMap.minimap_generated:
-                    pass
-                else:
-                    pass
-            else:
-                pass
             form = UploadMapForm()
 
     else:
@@ -206,7 +195,7 @@ def uploadMap(request):
         'uploadingLog': uploadingLog,
         'uid': uid,
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def units(request):
     template = loader.get_template('index.html')

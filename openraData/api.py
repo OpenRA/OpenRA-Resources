@@ -2,6 +2,7 @@ import os
 import json
 import base64
 import zipfile
+from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -265,6 +266,7 @@ def CrashLogs(request):
         crashObject = CrashReports.objects.all().filter(gameID=int(gameID))
         if crashObject:
             # TODO: trigger gist API (update file)
+            # settings.GITHUB_API_TOKEN
             return HttpResponse(resp)
         # TODO: there are no stored syncreports with the same game id, so just post it on gist
         return HttpResponse(resp)
