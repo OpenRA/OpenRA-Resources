@@ -6,6 +6,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Count
 
 from openraData.models import Maps
 from openraData.models import CrashReports
@@ -125,7 +126,8 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             raise Http404
         try:
             mapObject = Maps.objects.all().filter(game_mod=mod.lower()).filter(next_rev=0)
-            mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True).distinct('map_hash').order_by("id")
+            mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True)
+            mapObject = mapObject.annotate(count_hashes=Count("map_hash")).order_by("id")
             if not mapObject:
                 raise Http404
         except:

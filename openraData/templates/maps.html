@@ -1,1 +1,14 @@
-<center><h2>In Development</h2></center>
+<table id="map_grid" style="margin-left: -33px; background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4); border: 1px solid #74c2e7;">
+<tr>
+	{% for item in maps %}
+	<td style="border: 1px solid #74c2e7;">
+		<center><a style="display:block; margin-bottom: 0px;" href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/' }}{{ item.id }}>
+			<img style='display: block; max-width: 100px; padding: 8px;' src={{ '/maps/' }}{{ item.id }}{{ '/minimap' }} />{{ item.title }}</center></a>
+		{% if forloop.counter == 6 %}
+		</tr>
+		<tr>
+		{% endif %}
+	</td>
+	{% endfor %}
+</tr>
+</table>

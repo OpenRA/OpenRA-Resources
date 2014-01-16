@@ -4,6 +4,7 @@ from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.db import connection
+from django.db.models import Count
 
 from .forms import UploadMapForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -82,11 +83,13 @@ def ControlPanel(request):
     return HttpResponse(template.render(context))
 
 def maps(request):
+    mapObject = Maps.objects.all().annotate(count_hashes=Count("map_hash")).order_by("-posted").filter(next_rev=0)
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'maps.html',
         'request': request,
         'title': ' - Maps',
+        'maps': mapObject,
     })
     return HttpResponse(template.render(context))
 
