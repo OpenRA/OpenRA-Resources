@@ -84,7 +84,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             if apifilter not in ["rating", "-rating", "players", "-players", "posted", "-posted", "author", "uploader"]:
                 raise Http404
         try:
-            mapObject = Maps.objects.all().filter(game_mod=mod.lower())
+            mapObject = Maps.objects.all().filter(game_mod=mod.lower()).distinct('map_hash')
             if apifilter == "players":
                 mapObject = mapObject.order_by("-players")
             if apifilter == "-players":
@@ -125,7 +125,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             raise Http404
         try:
             mapObject = Maps.objects.all().filter(game_mod=mod.lower()).filter(next_rev=0)
-            mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True).order_by("id")
+            mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True).distinct('map_hash').order_by("id")
             if not mapObject:
                 raise Http404
         except:
