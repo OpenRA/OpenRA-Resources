@@ -363,6 +363,10 @@ td, th, tr {
   width:25%;
 }
 
+#paging td:hover {
+  background: rgba(32, 44, 69, 0.4);
+}
+
 #serverlist {
   text-align:center;
 }

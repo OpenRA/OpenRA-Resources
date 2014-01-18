@@ -1,4 +1,5 @@
 import os
+import math
 from django.http import HttpResponse, StreamingHttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
@@ -82,14 +83,25 @@ def ControlPanel(request):
     })
     return HttpResponse(template.render(context))
 
-def maps(request):
+def maps(request, page=1, filter=""):
+    perPage = 36
+    slice_start = perPage*int(page)-perPage
+    slice_end = perPage*int(page)
     mapObject = Maps.objects.all().annotate(count_hashes=Count("map_hash")).order_by("-posted").filter(next_rev=0)
+    amount =len(mapObject)
+    rowsRange = int(math.ceil(amount/float(perPage)))
+    mapObject = mapObject[slice_start:slice_end]
+    if len(mapObject) == 0:
+        return HttpResponseRedirect("/maps/")
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'maps.html',
         'request': request,
         'title': ' - Maps',
         'maps': mapObject,
+        'page': int(page),
+        'range': [i+1 for i in range(rowsRange)],
+        'amount': amount,
     })
     return HttpResponse(template.render(context))
 
