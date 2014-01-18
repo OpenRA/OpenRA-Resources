@@ -247,7 +247,7 @@ table tr td {
 }
 
 .copyright {
- width: 600px;
+ width: 700px;
  height: 100%;
  position: relative;
  float:left;
@@ -256,7 +256,7 @@ table tr td {
 }
 
 .FAQ {
- width: 100px;
+ width: 50px;
  height: 100%;
  position: relative;
  float:left;
@@ -265,7 +265,7 @@ table tr td {
 }
 
 .Links {
- width: 100px;
+ width: 50px;
  height: 100%;
  position: relative;
  float:left;
