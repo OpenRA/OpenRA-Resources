@@ -35,16 +35,16 @@
 <div id="container">
 
 <div id="header">
-	<h1><img src="/static/images/soviet-logo.svg">OpenRA Resource Center</h1>
+	<h1><img src="/static/images/soviet-logo.svg" onerror='this.onerror = null; this.src="/static/images/soviet-logo-fallback.png"'>OpenRA Resource Center</h1>
 </div>
 
 <a id="ghbanner" href="http://open-ra.org" target="_blank" title="Go to OpenRA Official Website">
-	<img alt="Visit OpenRA official website" src="/static/images/open-ra-org.svg">
+	<img alt="Visit OpenRA official website" src="/static/images/open-ra-org.svg" onerror='this.onerror = null; this.src="/static/images/open-ra-org-fallback.png"'>
 </a>
 
 <form id="quick-search" method="POST" action="/search/">{% csrf_token %}
 	<input id="qsearch" type="text" alt="Search maps, units, mods, authors..." title="Search maps, units, mods, authors..." value="Search..." onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';" name="qsearch"></input>
-	<input class="btn" type="image" src="/static/images/search.svg" title="Search" name="searchsubmit" alt="Search"></input>
+	<input class="btn" type="image" src="/static/images/search.svg" onerror='this.onerror = null; this.src="/static/images/search-fallback.png"' title="Search" name="searchsubmit" alt="Search"></input>
 </form>
 
 <ul id="nav">
