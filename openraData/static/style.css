@@ -92,7 +92,7 @@ table tr td {
 .feed {
   margin: 0px 0px;
   padding: 0px 0px 0px 30px;
-  background: url("/static/images/feed-icon16.gif") no-repeat scroll 5px center transparent;
+  background: url("/static/images/feed-icon16.png") no-repeat scroll 5px center transparent;
   font-weight: bold;
   color: rgb(240, 232, 232);
 }
