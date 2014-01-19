@@ -88,7 +88,7 @@ def maps(request, page=1, filter=""):
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
     mapObject = Maps.objects.all().annotate(count_hashes=Count("map_hash")).order_by("-posted").filter(next_rev=0)
-    amount =len(mapObject)
+    amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0:
@@ -316,5 +316,23 @@ def profile(request):
         'content': 'profile.html',
         'request': request,
         'title': ' - Profile',
+    })
+    return HttpResponse(template.render(context))
+
+def faq(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'faq.html',
+        'request': request,
+        'title': ' - FAQ',
+    })
+    return HttpResponse(template.render(context))
+
+def links(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'links.html',
+        'request': request,
+        'title': ' - Links',
     })
     return HttpResponse(template.render(context))

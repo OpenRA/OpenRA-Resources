@@ -45,6 +45,8 @@ urlpatterns = patterns('',
 
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
     url(r'^profile/?$', views.profile, name='profile'),
+    url(r'^faq/?$', views.faq, name='faq'),
+    url(r'^links/?$', views.links, name='links'),
     
     url(r'^map/(?P<arg>\w+)/?$', api.mapAPI, name='mapAPI_download'),
     url(r'^map/(?P<arg>\w+)/(?P<value>\w+)/?$', api.mapAPI, name='mapAPI'), 
