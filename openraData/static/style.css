@@ -237,13 +237,40 @@ table tr td {
 #footer {
   margin-top:20px;
   clear: both;
-  height:35px;
+  height: 35px;
   font-size: 0.7em; 
   text-align: center;
   border-top: solid 3px #74c2e7;
   background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
-  /*background-color: #234c76;*/
   font: 11px Cambria, Georgia, Times New Roman, Serif;
+  line-height: 35px;
+}
+
+.copyright {
+ width: 700px;
+ height: 100%;
+ position: relative;
+ float:left;
+ vertical-align: middle;
+ display:inline-block;
+}
+
+.FAQ {
+ width: 50px;
+ height: 100%;
+ position: relative;
+ float:left;
+ vertical-align: middle;
+ display:inline-block;
+}
+
+.Links {
+ width: 50px;
+ height: 100%;
+ position: relative;
+ float:left;
+ vertical-align: middle;
+ display:inline-block;
 }
 
 #newslist li {
