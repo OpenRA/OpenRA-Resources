@@ -1,7 +1,10 @@
 <table class='Table'>
 <tr>
-	<td>
-		<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} />
+	<td>{% if fullPreview %}
+			<a href={{ '/maps/' }}{{ arg }}{{ '/render' }}><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></a>
+		{% else %}
+			<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} />
+		{% endif %}
 	</td>
 </tr>
 <tr>

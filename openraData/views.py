@@ -106,6 +106,16 @@ def maps(request, page=1, filter=""):
     return HttpResponse(template.render(context))
 
 def displayMap(request, arg):
+    fullPreview = False
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+    try:
+        mapDir = os.listdir(path)
+        for filename in mapDir:
+            if filename.endswith("-full.png"):
+                fullPreview = True
+                break
+    except:
+        pass
     try:
         mapObject = Maps.objects.get(id=arg.lstrip('0'))
     except:
@@ -120,8 +130,28 @@ def displayMap(request, arg):
         'map': mapObject,
         'userid': userObject,
         'arg': arg.lstrip('0'),
+        'fullPreview': fullPreview,
     })
     return HttpResponse(template.render(context))
+
+def serveRender(request, arg):
+    render = ""
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+    try:
+        mapDir = os.listdir(path)
+    except:
+        return HttpResponseRedirect("/")
+    for filename in mapDir:
+        if filename.endswith("-full.png"):
+            render = filename
+            break
+    if render == "":
+        return HttpResponseRedirect('/maps/'+arg.lstrip('0'))
+    else:
+        serveImage = path + os.sep + render
+        response = HttpResponse(open(serveImage), content_type='image/png')
+        response['Content-Disposition'] = 'attachment; filename = "%s"' % render
+        return response
 
 def serveMinimap(request, arg):
     minimap = ""
@@ -140,7 +170,7 @@ def serveMinimap(request, arg):
     else:
         serveImage = path + os.sep + minimap
     response = HttpResponse(open(serveImage), content_type='image/png')
-    response['Content-Disposition'] = 'attachment; filename="%s"' % minimap
+    response['Content-Disposition'] = 'attachment; filename = "%s"' % minimap
     return response
 
 def serveLintLog(request, arg):
@@ -159,7 +189,7 @@ def serveLintLog(request, arg):
     else:
         serveLog = path + os.sep + lintlog
         response = HttpResponse(open(serveLog), content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % lintlog
+        response['Content-Disposition'] = 'attachment; filename = "%s"' % lintlog
         return response
 
 def serveOramap(request, arg, sync=""):
@@ -180,7 +210,7 @@ def serveOramap(request, arg, sync=""):
         if sync == "sync":
                 oramap = arg.lstrip('0') + ".oramap"
         response = HttpResponse(open(serveOramap), content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % oramap
+        response['Content-Disposition'] = 'attachment; filename = "%s"' % oramap
         return response
 
 def uploadMap(request):
