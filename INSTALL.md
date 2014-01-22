@@ -12,6 +12,7 @@ mono 2.10 +
 OpenRA.Utility and OpenRA.Lint
 django-registration module (easy_install -Z django-registration)
 sendmail
+curl
 ```
 
  * Run PostgreSQL server; create user and database (in utf-8 encoding)
@@ -27,6 +28,7 @@ sendmail
  * Change "DEBUG" setting to False if it's True
  * Modify "OPENRA_PATH" to specify a directory with compiled OpenRA files (with slash at the end) (make sure it's always the latest release)
  * Modify "RSYNC_MAP_PATH" to specify a directory where 'good' maps will be dumped by website trigger for dedicated servers usage
+ * Modify GITHUB related settings (user, repository and API token): used to post an issue with info about OpenRA crash report
  * Edit DB related configuration
 
 ```

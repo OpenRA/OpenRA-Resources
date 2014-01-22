@@ -98,5 +98,7 @@ OPENRA_PATH = '/usr/lib/openra/'
 # Website trigger will dump there 'good' maps for dedicated servers
 RSYNC_MAP_PATH = ''
 
-# Github API token
+# Github related configuration
 GITHUB_API_TOKEN = ''
+GITHUB_USER = ''
+GITHUB_REPO = ''
