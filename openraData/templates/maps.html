@@ -1,4 +1,5 @@
 <h2 style="clear:both">Found {{ amount }} maps</h2>
+{% if amount != 0 %}
 <table id="map_grid" style="margin-left: -33px; background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4); border: 1px solid #74c2e7;">
 <tr>
 	{% for item in maps %}
@@ -30,4 +31,5 @@
 	{% endfor %}
 </tr>
 </table>
+{% endif %}
 {% endif %}

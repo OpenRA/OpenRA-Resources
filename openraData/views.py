@@ -91,7 +91,7 @@ def maps(request, page=1, filter=""):
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))
     mapObject = mapObject[slice_start:slice_end]
-    if len(mapObject) == 0:
+    if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/")
     template = loader.get_template('index.html')
     context = RequestContext(request, {

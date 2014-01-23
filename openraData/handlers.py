@@ -10,6 +10,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
 from openraData.models import Maps
+from openraData.models import Screenshots
 
 class MapHandlers():
     
@@ -167,7 +168,7 @@ class MapHandlers():
             Maps.objects.filter(id=transac.id).update(requires_upgrade=False)
 
         self.GenerateMinimap()
-        #self.GenerateFullPreview()
+        #self.GenerateFullPreview(userObject)
 
     def UnzipMap(self):
         z = zipfile.ZipFile(self.map_full_path_filename, mode='a')
@@ -217,7 +218,7 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateFullPreview(self):
+    def GenerateFullPreview(self, userObject):
         os.chdir(settings.OPENRA_PATH)
 
         command = 'mono OpenRA.Utility.exe --full-preview ' + self.map_full_path_filename
@@ -228,6 +229,14 @@ class MapHandlers():
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-full.png")
             self.flushLog(proc)
             self.fullpreview_generated = True
+            transac = Screenshots(
+                user = userObject,
+                ex_id = int(self.UID),
+                ex_name = "maps",
+                posted =  timezone.now(),
+                map_preview = True,
+                )
+            transac.save()
         except:
             self.flushLog( ["Failed to generate fullpreview for this file."] )
 
