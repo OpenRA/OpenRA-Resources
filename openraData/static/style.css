@@ -233,6 +233,7 @@ table tr td {
 }
 
 #footer {
+  width: 800px;
   margin-top:20px;
   clear: both;
   height: 35px;
@@ -245,42 +246,21 @@ table tr td {
 }
 
 .copyright {
-  width: 100%;
+  margin-left: 223px;
   height: 100%;
   float: left;
   vertical-align: middle;
 }
 
 .FAQ {
-  width: 50px;
-  position: relative;
-  float: left;
-  vertical-align: middle;
-  display: inline-block;
-  height: 20px;
-  font-size: 0.7em; 
-  text-align: center;
-  border: solid 3px #74c2e7;
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
-  font: 11px Cambria, Georgia, Times New Roman, Serif;
-  line-height: 20px;
-  margin-bottom: 20px;
+  width: 40px;
+  float: right;
 }
 
 .Links {
-  width: 50px;
-  position: relative;
-  float: left;
-  vertical-align: middle;
-  display: inline-block;
-  height: 20px;
-  font-size: 0.7em; 
-  text-align: center;
-  border: solid 3px #74c2e7;
-  border-left: 0px;
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
-  font: 11px Cambria, Georgia, Times New Roman, Serif;
-  line-height: 20px;
+  width: 40px;
+  float: right;
+  margin-right: 10px;
 }
 
 #newslist li {
