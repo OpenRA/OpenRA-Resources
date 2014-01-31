@@ -9,5 +9,8 @@ def map_upgrade():
     pass
 
 def filterMapsRsync():
-	# this function syncs rsync directory with fresh list of maps using embedded API
+	# this function syncs rsync directory with fresh list of maps, triggered by uploading a new map
 	pass
+
+def LintCheck():
+	# weekly, this function performs a Lint Check for all existing maps
