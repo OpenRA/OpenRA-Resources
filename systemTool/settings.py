@@ -102,3 +102,6 @@ RSYNC_MAP_PATH = ''
 GITHUB_API_TOKEN = ''
 GITHUB_USER = ''
 GITHUB_REPO = ''
+
+# Email address of a person who is responsible for fixing map uploading issues
+ADMIN_EMAIL = ''

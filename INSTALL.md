@@ -29,6 +29,7 @@ curl
  * Modify "OPENRA_PATH" to specify a directory with compiled OpenRA files (with slash at the end) (make sure it's always the latest release)
  * Modify "RSYNC_MAP_PATH" to specify a directory where 'good' maps will be dumped by website trigger for dedicated servers usage
  * Modify GITHUB related settings (user, repository and API token): used to post an issue with info about OpenRA crash report
+ * Modify "ADMIN_EMAIL" to specify an email address of a person who is responsible for fixing map uploading issues
  * Edit DB related configuration
 
 ```

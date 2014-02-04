@@ -1,3 +1,7 @@
+from django.conf import settings
+from django.contrib.auth.models import User
+from openraData.models import Maps
+
 # Map Triggers
 
 def recalculate_hashes():
@@ -9,6 +13,7 @@ def map_upgrade():
     pass
 
 def filterMapsRsync():
+	# sync + syncall
 	# this function syncs rsync directory with fresh list of maps, triggered by uploading a new map
 	pass
 

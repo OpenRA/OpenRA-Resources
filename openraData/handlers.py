@@ -266,3 +266,16 @@ class MapHandlers():
             self.GetRevisions(self.revisions[-1], True)
             return
         self.GetRevisions(mapObject.pre_rev)
+
+    def GetLatest(self, mapid):
+        mapObject = Maps.objects.get(id=mapid)
+        if mapObject.next_rev == 0:
+            return mapObject.id
+        return self.GetLatest(mapObject.next_rev)
+
+    def DeleteMap(self, mapid):
+        pass
+
+    def NotifyOnFail(self, message, tempname):
+        # send an email to admin attaching map file which is already saved in temp location
+        pass
