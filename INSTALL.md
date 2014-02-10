@@ -7,11 +7,15 @@ That's just our preference, so if you deploy it, you can choose any Database you
 python (version 2)
 python-psycopg2  (postgresql module)
 python-magic
+python-openid
+python-requests
+python-requests-oauthlib
 Django python Web Framework version 1.6
 mono 2.10 +
 OpenRA.Utility and OpenRA.Lint
 django-registration module (easy_install -Z django-registration)
-sendmail
+django-allauth (pip install django-allauth)
+sendmail (or any other mail server)
 curl
 ```
 
@@ -20,6 +24,7 @@ curl
  * Create new user for web site in your unix system
  * Django web server user must have .openra directory in it's home and have owner rights to it (for OpenRA.Utility)
  * Directory with compiled OpenRA tools must have write permissions for Django web server user
+ * Make sure Django web server user can write to '/tmp/'
  * This repository root is actually a Django Site with additional Apps
 
 ### Edit Django settings.py (systemTool/settings.py)
@@ -53,3 +58,9 @@ python manage.py syncdb
 
 ### Setup WebServer etc.
 
+### Post-Installation
+## Configure allauth
+ * Create an application at github (callback url: http://yoursitedomain.com/accounts/github/login/callback/)
+ * Go to your site admin page --> "Sites" (django.contrib.sites application) --> create a site with proper domain name
+ * Go to "Social Apps" --> Add a new social app (set a proper client id and secret, chose a proper site)
+ * Load http://yoursitedomain.com/accounts/github/login/  to authorize your new application at github

@@ -35,7 +35,7 @@ urlpatterns = patterns('',
     url(r'^assets/?$', views.assets, name='assets'),
 
     url(r'^replays/?$', views.replays, name='replays'),
-    
+
     url(r'^login/?$', views.loginView, name='loginView'),
     url(r'^login/register/?$', RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),
         name='registration_register'), 
