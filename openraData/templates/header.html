@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="utf-8">
@@ -35,7 +36,7 @@
 <div id="container">
 
 <div id="header">
-	<h1><img src="/static/images/soviet-logo.svg" onerror='this.onerror = null; this.src="/static/images/soviet-logo-fallback.png"'>OpenRA Resource Center</h1>
+	<h1><img src="/static/images/soviet-logo.svg" onerror='this.onerror = null; this.src="/static/images/soviet-logo-fallback.png"' alt="logo">OpenRA Resource Center</h1>
 </div>
 
 <a id="ghbanner" href="http://open-ra.org" target="_blank" title="Go to OpenRA Official Website">
@@ -43,16 +44,16 @@
 </a>
 
 <form id="quick-search" method="POST" action="/search/">{% csrf_token %}
-	<input id="qsearch" type="text" alt="Search maps, units, mods, authors..." title="Search maps, units, mods, authors..." value="Search..." onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';" name="qsearch"></input>
-	<input class="btn" type="image" src="/static/images/search.svg" onerror='this.onerror = null; this.src="/static/images/search-fallback.png"' title="Search" name="searchsubmit" alt="Search"></input>
+	<input id="qsearch" type="text" title="Search maps, units, mods, authors..." value="Search..." onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';" name="qsearch">
+	<input class="btn" type="image" src="/static/images/search.svg" onerror='this.onerror = null; this.src="/static/images/search-fallback.png"' title="Search" name="searchsubmit" alt="Search">
 </form>
 
 <ul id="nav">
-	<li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></li>
+	<li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></a></li>
 	<li><a href="/maps/"><span {% if request.path == '/maps/' or request.path == '/maps' %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
 	<li><a href="/units/"><span {% if request.path == '/units/' or request.path == '/units' %}{{ 'class="nav-selected"' }}{% endif %}>Units</span></a></li>       
     <li><a href="#"><span 
-    	{% if request.path == '/mods/' or request.path == '/mods' or request.path == '/palettes/' or request.path == '/palettes' or	request.path == '/screenshots/' or request.path == '/screenshots' or request.path == '/assets/' or request.path == '/assets' or	request.path == '/replays/' or request.path == '/replays' %}{{ 'class="nav-selected"' }}{% endif %}>Other<span></a>
+    	{% if request.path == '/mods/' or request.path == '/mods' or request.path == '/palettes/' or request.path == '/palettes' or	request.path == '/screenshots/' or request.path == '/screenshots' or request.path == '/assets/' or request.path == '/assets' or	request.path == '/replays/' or request.path == '/replays' %}{{ 'class="nav-selected"' }}{% endif %}>Other</span></a>
         <ul>
             <li class="submenu-top"></li> <!-- do not add any link inside this LI -->
             

@@ -24,7 +24,7 @@ curl
  * Create new user for web site in your unix system
  * Django web server user must have .openra directory in it's home and have owner rights to it (for OpenRA.Utility)
  * Directory with compiled OpenRA tools must have write permissions for Django web server user
- * Make sure Django web server user can write to '/tmp/'
+ * Make sure Django web server user can write into '/tmp/'
  * This repository root is actually a Django Site with additional Apps
 
 ### Edit Django settings.py (systemTool/settings.py)
@@ -59,8 +59,8 @@ python manage.py syncdb
 ### Setup WebServer etc.
 
 ### Post-Installation
-## Configure allauth
+#### Configure allauth
  * Create an application at github (callback url: http://yoursitedomain.com/accounts/github/login/callback/)
- * Go to your site admin page --> "Sites" (django.contrib.sites application) --> create a site with proper domain name
- * Go to "Social Apps" --> Add a new social app (set a proper client id and secret, chose a proper site)
+ * Go to your site admin page; "Sites" (django.contrib.sites application); create a site with a proper domain name
+ * Go to "Social Apps"; Add a new social app (set a proper client id and secret, chose a proper site)
  * Load http://yoursitedomain.com/accounts/github/login/  to authorize your new application at github
