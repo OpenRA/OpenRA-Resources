@@ -4,50 +4,39 @@
 
 {% include 'header.html' %}
 {% block content %}
-
-
-
-
-
-<h1>{% trans "Sign In" %}</h1>
+<h1>Sign In</h1>
 
 <div id="accountsmain">
 
     <div id="localaccount">    
-    Please sign in with your local account. <br/><br/>
+    Please sign in with your local account.<br/><br/>
 
-    <div class="frame">
+        <div class="frame">
         <form id="login" method="POST" action="{% url 'account_login' %}">{% csrf_token %}
             <div class="row">
-            <div class="innerCellLeft"><label for="id_username">Username:</label>{% if form.login.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.login.errors|join:", " }}</span>{% endif %}</div>
+            <div class="innerCellLeft"><label class="loginField" for="id_username">Username:</label>{% if form.login.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.login.errors|join:", " }}</span>{% endif %}</div>
             <div class="innerCellRight">{{ form.login }}</div>
             </div>
             <div class="row">
-            <div class="innerCellLeft"><label for="id_password">Password:</label>{% if form.password.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.password.errors|join:", " }}</span>{% endif %}</div>
+            <div class="innerCellLeft"><label class="loginField" for="id_password">Password:</label>{% if form.password.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.password.errors|join:", " }}</span>{% endif %}</div>
             <div class="innerCellRight">{{ form.password }}</div>
             </div>
             <div class="row">
-            <div class="innerCellLeft"><label for="id_remember">Remember Me:  </label>{{ form.remember }}{% if form.remember.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.remember.errors|join:", " }}</span>{% endif %}</div>
+            <div class="innerCellLeft"><label class="loginField" for="id_remember">Remember Me:  </label>{{ form.remember }}{% if form.remember.errors %}<span style="color: #800000; font-weight: bold;" class="error">{{ form.remember.errors|join:", " }}</span>{% endif %}</div><div class="innerCellRight"></div>
             </div>
             {% if redirect_field_value %}
               <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}
               <div class="row">
-              <div class="innerCellLeft"><br/><a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a></div>
+              <div class="innerCellLeft"><br/><a class="button loginField" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a></div>
               <div class="innerCellRight"><button class="primaryAction" type="submit">{% trans "Sign In" %}</button></div>
               </div>
         </form>
-    </div>
-
+        </div>
     <br/>
     Don't have an account? <a href="/accounts/register/">Create one now</a>.
 
     </div>
-
-    
-    
-    
-    
     
     {% if socialaccount.providers  %}
     {% include "socialaccount/snippets/login_extra.html" %}
@@ -63,9 +52,8 @@
         <br/>
         You'll just be asked to authorize this website to use your login.
     </div>
-
+    {% endif %}
 </div>
-
 
 {% endblock %}
 {% include 'footer.html' %}
