@@ -46,8 +46,7 @@ class MapHandlers():
             for chunk in f.chunks():
                 destination.write(chunk)
 
-        mime = magic.Magic(mime=True)
-        mimetype = mime.from_file(tempname)
+        mimetype = magic.from_file(tempname, mime=True)
         if mimetype != 'application/zip' or os.path.splitext(f.name)[1] != '.oramap':
             self.LOG.append('Failed. Unsupported file type.')
             return False
