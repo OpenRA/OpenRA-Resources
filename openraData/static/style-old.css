@@ -395,85 +395,37 @@ p.registerInfo {
   font-size: 0.9em;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-.frame {
-  box-shadow: 0px 0px 10px #000;
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
-  border: 2px solid #74c2e7;
-}
-
-
-
-
-
-#accountsmain {
-  height: 240px;  
+div#outer {
+  display: table;
   font-size: 0.9em;
+  width: 400px;
+  border: 2px solid #74c2e7;
+  padding: 10px 10px 10px 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 0px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-#localaccount {  
-  float: left;
-}
-
-#localaccount form {
-  width: 300px;
-  /* height: 130px; */
-  padding: 10px;
-}
-
-.row{
+div#row{
+  width: 390px;
+  display: table-row;
+  width: auto;
   clear: both;
-  margin-bottom: 10px;
 }
 
-.innerCellLeft {
+div#innerCellLeft {
   width: 200px;
+  padding-top: 20px;
   float: left;
+  display: table-column;  
 }
 
-.innerCellRight {
- margin-top: -16px;
- margin-bottom: 10px;
- float: right; 
-}
-
-
-
-
-
-#socialaccounts { 
-  width: 300px;
-  height: 130px;
+div#innerCellRight {
+  padding-top: 16px;
   float: right;
+  display: table-column;  
 }
-
-#socialaccounts_providers {
-  list-style-type: none;
-  padding-left: 5px;
-}
-
-#socialaccounts_providers li {
-  display: inline;
-  margin-left: 5px;
-}
-
-
-
-
-
-
-
-
-/* top, right, bottom, left */
-
