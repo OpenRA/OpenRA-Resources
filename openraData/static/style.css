@@ -63,7 +63,7 @@ p.download, .newsDetails {
 }
 
 table tr td {
-	font-size: 0.8em;
+	font-size: 0.9em;
 }
 
 .Table {
@@ -388,4 +388,44 @@ td, th, tr {
 
 #paging td:hover {
   background: rgba(32, 44, 69, 0.4);
+}
+
+/* Registration and Login pages */
+p.registerInfo {
+  font-size: 0.9em;
+}
+
+div#outer {
+  display: table;
+  font-size: 0.9em;
+  width: 400px;
+  border: 2px solid #74c2e7;
+  padding: 10px 10px 10px 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 0px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+div#row{
+  width: 390px;
+  display: table-row;
+  width: auto;
+  clear: both;
+}
+
+div#innerCellLeft {
+  width: 200px;
+  padding-top: 20px;
+  float: left;
+  display: table-column;  
+}
+
+div#innerCellRight {
+  padding-top: 16px;
+  float: right;
+  display: table-column;  
 }

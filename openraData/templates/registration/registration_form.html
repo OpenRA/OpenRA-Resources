@@ -1,35 +1,35 @@
 {% include 'header.html' %}
 
-<br />
 {% if not user.is_authenticated %}
 
 {% block main_content %}
 
 {% if form.errors %}
-<p class="error">Please correct the errors below:</p>
+<p style="color: #800000; font-weight: bold;" class="error">Please correct the errors below:</p>
 {% endif %}
-<table class="Table">
+
+<div id="outer">
 <form method="post" action="">{% csrf_token %}
-<tr>
-<td><label for="id_username">Username:</label>{% if form.username.errors %} <span class="error">{{ form.username.errors|join:", " }}</span>{% endif %}</td>
-<td>{{ form.username }}</td></tr>
-<tr><td><label for="id_email">Email address:</label>{% if form.email.errors %} <span class="error">{{ form.email.errors|join:", " }}</span>{% endif %}</td>
-<td>{{ form.email }}</td></tr>
-<tr><td><label for="id_password1">Password:</label>{% if form.password1.errors %} <span class="error">{{ form.password1.errors|join:", " }}</span>{% endif %}</td>
-<td>{{ form.password1 }}</td></tr>
-<tr><td><label for="id_password2">Password (type again):</label>{% if form.password2.errors %} <span class="error">{{ form.password2.errors|join:", " }}</span>{% endif %}</td>
-<td>{{ form.password2 }}</td></tr>
-<tr><td colspan="2"><input type="submit" value="Register &rarr;" /></td></tr>
+<div id="row">
+<div id="innerCellLeft"><label for="id_username">Username:</label>{% if form.username.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.username.errors|join:", " }}</span>{% endif %}</div>
+<div id="innerCellRight">{{ form.username }}</div></div>
+<div id="row"><div id="innerCellLeft"><label for="id_email">Email address:</label>{% if form.email.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.email.errors|join:", " }}</span>{% endif %}</div>
+<div id="innerCellRight">{{ form.email }}</div></div>
+<div id="row"><div id="innerCellLeft"><label for="id_password1">Password:</label>{% if form.password1.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.password1.errors|join:", " }}</span>{% endif %}</div>
+<div id="innerCellRight">{{ form.password1 }}</div></div>
+<div id="row"><div id="innerCellLeft"><label for="id_password2">Password (type again):</label>{% if form.password2.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.password2.errors|join:", " }}</span>{% endif %}</div>
+<div id="innerCellRight">{{ form.password2 }}</div></div><br />
+<div><div colspan="2"><input type="submit" value="Register &rarr;" /></div></div>
 </form>
-</table>
+</div>
 {% endblock %}
 
-<p>Fill out the form (all fields are required), and your account will be created; you'll be sent an email with instructions on how to finish your registration.</p>
-<p>We'll only use your email to send you signup instructions. We hate spam as much as you do.</p>
+<p class="registerInfo">Fill out the form (all fields are required), and your account will be created; you'll be sent an email with instructions on how to finish your registration.
+We'll only use your email to send you signup instructions. We hate spam as much as you do.<br /><br />
 
-<p>This account will let you log into the OpenRA Resource Center, upload & manage your content, participate in discussions.</p>
+This account will let you log into the OpenRA Resource Center, upload &amp; manage your content, participate in discussions.<br /><br />
 
-<p>Your username can only consist of alphanumeric characters and underscores and may be up to 20 characters long.</p>
+Your username can only consist of alphanumeric characters and underscores and may be up to 20 characters long.</p>
 
 {% endif %}
 {% include 'footer.html' %}

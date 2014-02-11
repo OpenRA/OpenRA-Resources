@@ -28,8 +28,8 @@
 <div id="rssfeed">
 	<a class="feed" href="/news/feed/">Rss feed</a>
 	{% if user.is_authenticated %}
-		<a class="userManageTop" style="text-decoration: underline;" href="/logout/">Logout</a>
-		<a class="userManageTop" style="text-decoration: underline; padding-right: 10px;" href="/profile/">Profile</a>
+		<a class="userManageTop" style="text-decoration: underline;" href="/accounts/logout/">Logout</a>
+		<a class="userManageTop" style="text-decoration: underline; padding-right: 10px;" href="/accounts/profile/">Profile ({{ user.username}})</a>
 	{% endif %}
 </div>
 
@@ -79,7 +79,7 @@
 	{% if user.is_authenticated %}
 		<li><a href="/panel/"><span {% if request.path == '/panel/' or request.path == '/panel' %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
 	{% else %}
-		<li><a href="/login/"><span {% if request.path == '/login/' or request.path == '/login' %}{{ 'class="nav-selected"' }}{% endif %}>Login</span></a></li>
+		<li><a href="/accounts/login/"><span {% if request.path == '/accounts/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Login</span></a></li>
 	{% endif %}
 </ul>
 

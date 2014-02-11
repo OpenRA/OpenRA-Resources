@@ -21,34 +21,6 @@ def index(request):
     })
     return HttpResponse(template.render(context))
 
-def loginView(request):
-    authenticationStatusMessage = ""
-    if request.method == 'POST':
-        form = AuthenticationForm(request.POST)
-        if form.is_valid():
-            if 'username' in request.POST and 'password' in request.POST:
-                username = request.POST['username']
-                password = request.POST['password']
-                user = authenticate(username=username, password=password)
-                if user is not None:
-                    if user.is_active:
-                        login(request, user)
-                        return HttpResponseRedirect('/panel/')
-                else:
-                    authenticationStatusMessage = "Failed to authenticate"
-    else:
-        form = AuthenticationForm()
-
-    template = loader.get_template('index.html')
-    context = RequestContext(request, {
-        'content': 'login.html',
-        'request': request,
-        'title': ' - Login',
-        'authenticationStatusMessage': authenticationStatusMessage, 
-        'form': form,
-    })
-    return HttpResponse(template.render(context))
-
 def logoutView(request):
     if request.user.is_authenticated():
         logout(request)

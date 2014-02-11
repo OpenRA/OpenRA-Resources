@@ -36,16 +36,16 @@ urlpatterns = patterns('',
 
     url(r'^replays/?$', views.replays, name='replays'),
 
-    url(r'^login/?$', views.loginView, name='loginView'),
-    url(r'^login/register/?$', RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),
+    url(r'^accounts/register/?$', RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),
         name='registration_register'), 
-    url(r'^login/', include('registration.backends.default.urls')),
+    url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^logout/?$', views.logoutView, name='logoutView'),
+
     url(r'^news/feed/?$', views.feed, name='feed'),
     url(r'^search/', views.search, name='search'),
 
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
-    url(r'^profile/?$', views.profile, name='profile'),
+    url(r'^accounts/profile/?$', views.profile, name='profile'),
     url(r'^faq/?$', views.faq, name='faq'),
     url(r'^links/?$', views.links, name='links'),
     
