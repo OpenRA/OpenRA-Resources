@@ -14,15 +14,15 @@
         <div class="frame">
         <form id="login" method="POST" action="{% url 'account_login' %}">{% csrf_token %}
             <div class="row">
-            <div class="innerCellLeft"><label for="id_username">Username:</label>{% if form.login.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.login.errors|join:", " }}</span>{% endif %}</div>
+            <div class="innerCellLeft"><label for="id_username">Username:</label>{% if form.login.errors %}<br /><span style="color: #ff0000; font-weight: bold;" class="error">{{ form.login.errors|join:", " }}</span>{% endif %}</div>
             <div class="innerCellRight">{{ form.login }}</div>
             </div>
             <div class="row">
-            <div class="innerCellLeft"><label for="id_password">Password:</label>{% if form.password.errors %}<br /><span style="color: #800000; font-weight: bold;" class="error">{{ form.password.errors|join:", " }}</span>{% endif %}</div>
+            <div class="innerCellLeft"><label for="id_password">Password:</label>{% if form.password.errors %}<br /><span style="color: #ff0000; font-weight: bold;" class="error">{{ form.password.errors|join:", " }}</span>{% endif %}</div>
             <div class="innerCellRight">{{ form.password }}</div>
             </div>
             <div class="row">
-            <div class="innerCellLeft"><label for="id_remember">Remember Me:  </label>{{ form.remember }}{% if form.remember.errors %}<span style="color: #800000; font-weight: bold;" class="error">{{ form.remember.errors|join:", " }}</span>{% endif %}</div><div class="innerCellRight">
+            <div class="innerCellLeft"><label for="id_remember">Remember Me:  </label>{{ form.remember }}{% if form.remember.errors %}<span style="color: #ff0000; font-weight: bold;" class="error">{{ form.remember.errors|join:", " }}</span>{% endif %}</div><div class="innerCellRight">
             {% if redirect_field_value %}
               <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}</div>
