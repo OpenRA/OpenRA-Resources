@@ -56,7 +56,49 @@ DATABASES = {
 python manage.py syncdb
 ```
 
-### Setup WebServer etc.
+### Setup Production (using nginx + gunicorn)
+All-sufficient guide: http://goodcode.io/blog/django-nginx-gunicorn/
+
+Running gunicorn (WSGI HTTP Server) this way (10 instances, max timeout 120 seconds):
+
+```
+gunicorn_django -w 10 -t 120 --log-file=/path/to/djangoserver.log -b 127.0.0.1:8000
+```
+
+Nginx config for our virtual host (replace PATH where needed):
+
+```
+server {
+        listen 80;
+        server_name resource.openra.net;
+        access_log /path/to/access.log;
+        error_log /path/to/error.log;
+
+        root /path/to/our/django/site/;
+        location /static/ { # STATIC_URL
+                alias /path/to/our/primary/application/static/; # STATIC_ROOT
+                expires 30d;
+        }
+
+        location /media/ { # MEDIA_URL
+                alias /path/to/our/primary/application/static/; # MEDIA_ROOT
+                expires 30d;
+         }
+        location /static/admin/ {
+                alias /usr/local/lib/python2.7/dist-packages/django/contrib/admin/static/admin/;
+        }
+        location / {
+                proxy_pass_header Server;
+                proxy_set_header Host $http_host;
+                proxy_redirect off;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Scheme $scheme;
+                proxy_connect_timeout 10;
+                proxy_read_timeout 120;
+                proxy_pass http://127.0.0.1:8000/;
+        }
+}
+```
 
 ### Post-Installation
 #### Configure allauth
