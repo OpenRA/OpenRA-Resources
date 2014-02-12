@@ -1,7 +1,7 @@
 ## Prepare enviroment
 We will use PostgreSQL server even though our framework supports many...
 That's just our preference, so if you deploy it, you can choose any Database you want.
-### Dependencies:
+### Dependencies
 
 ```
 python (version 2)
@@ -49,7 +49,7 @@ DATABASES = {
 }
 ```
 
-### Finish work with django:
+### Finish work with django
  * Initialize database (this will create all tables). You'll get a prompt asking you if you'd like to create a superuser account for the authentication system. Go ahead and do that:
 
 ```
