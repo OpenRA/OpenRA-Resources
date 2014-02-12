@@ -75,7 +75,7 @@
 	{% if user.is_authenticated %}
 		<li><a href="/panel/"><span {% if request.path == '/panel/' or request.path == '/panel' %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
 	{% else %}
-		<li><a href="/accounts/login/"><span {% if request.path == '/accounts/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Login</span></a></li>
+		<li><a href="/accounts/login/"><span {% if request.path == '/accounts/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>
 	{% endif %}
 </ul>
 
