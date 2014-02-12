@@ -1,5 +1,7 @@
 import os
 import math
+import re
+import urllib2
 from django.http import HttpResponse, StreamingHttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
@@ -251,11 +253,36 @@ def screenshots(request):
     return HttpResponse(template.render(context))
 
 def assets(request):
+    noErrors = False
+    mirrors_list = []
+    url = 'http://open-ra.org/packages/'
+    try:
+        data = urllib2.urlopen(url).read()
+        data = data.split('Parent Directory</a>')[1].split('<hr />')[0]
+        mirrors = re.findall('<a href="(.*)">', data)
+        for mirror in mirrors:
+            links_list = []
+            name = os.path.splitext(mirror)[0].replace('-',' ')
+            links = urllib2.urlopen(url + mirror).read()
+            links = links.split('\n')[0:-1]
+            for onelink in links:
+                try:
+                    status = urllib2.urlopen(onelink)
+                    status = "online"
+                except HTTPError as e:
+                    status = "offline"
+                links_list.append([onelink, status])
+            mirrors_list.append([name, links_list])
+            noErrors = True
+    except:
+        pass
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'assets.html',
         'request': request,
         'title': ' - Assets Packages Mirrors',
+        'noerrors': noErrors,
+        'mirrors_list': mirrors_list,
     })
     return HttpResponse(template.render(context))
 

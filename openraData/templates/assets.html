@@ -1,1 +1,18 @@
-<center><h2>In Development</h2></center>
+{% if noerrors %}
+	{% for mirror in mirrors_list %}
+		<h3>{{mirror.0}}:</h3>
+		{% for link in mirror.1 %}
+			<span style="padding-left: 50px;padding-top: 5px;">
+				{% if link.1 == "online" %}
+					(<span style="color: #00ff00; font-weight: bold;">{{link.1}}</span>)
+				{% else %}
+					(<span style="color: #ff0000; font-weight: bold;">{{link.1}}</span>)
+				{% endif %}
+				<a href="{{link.0}}" target="_blank">{{link.0}}</a>
+			</span><br />
+		{% endfor %}
+		<br />
+	{% endfor %}
+	<br />
+	<span style="font-size: 0.9em">Installation tutorial: <a href="https://github.com/OpenRA/OpenRA/wiki/Game-Content">https://github.com/OpenRA/OpenRA/wiki/Game-Content</a></span>
+{% endif %}
