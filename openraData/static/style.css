@@ -157,6 +157,7 @@ table tr td {
   display:inline;
   font-size: 1.2em;
   margin: 0 10px;
+  padding-bottom: 15px;
   color: white;
   text-decoration: none;
 }
@@ -182,9 +183,9 @@ table tr td {
   display: none;
   height: auto;
   padding: 0;
-  margin: -5px 0 0 350px;
+  margin: 10px 0 0 359px;
   position: absolute;
-  width: 197px;
+  width: 177px;
 }
 
 #nav li:hover ul {
@@ -202,47 +203,47 @@ table tr td {
 #nav li ul a {
   display: block; 
   padding: 0 0 0 10px;
-  margin: 0px 0px 0px 10px;
-  text-align: left;
+  margin: 0px 0px 0px 0px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  text-align: lef80t;
 }
 
 #nav li li:hover {
   border: none;
 }
 
-.submenu-top {
-  background: url("/static/images/submenu-top.png");
-  height: 22px;
+/* Other submenu box */
+.arrow_box {
+  text-align: left;
+  position: relative;
+  background: url("/static/images/subNavBg.png");
+  border: 2px solid #74c2e7;
 }
 
-.submenu-1st-link {
-  background: url("/static/images/submenu-1st-link.png");
-  height: 30px;
+.arrow_box:after, .arrow_box:before {
+  bottom: 100%;
+  left: 9%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
 }
 
-.submenu-2nd-link {
-  background: url("/static/images/submenu-2nd-link.png");
-  height: 30px;
+.arrow_box:after {
+  border-color: rgba(136, 183, 213, 0);
+  border-bottom-color: #20456C;
+  border-width: 6px;
+  margin-left: -6px;
 }
 
-.submenu-3nd-link {
-  background: url("/static/images/submenu-3nd-link.png");
-  height: 30px;
-}
-
-.submenu-4th-link {
-  background: url("/static/images/submenu-4th-link.png");
-  height: 30px;
-}
-
-.submenu-5th-link {
-  background: url("/static/images/submenu-5th-link.png");
-  height: 30px;  
-}
-
-.submenu-bottom {
-  background: url("/static/images/submenu-bottom.png");
-  height: 11px;
+.arrow_box:before {
+  border-color: rgba(194, 225, 245, 0);
+  border-bottom-color: #74c2e7;
+  border-width: 10px;
+  margin-left: -10px;
 }
 
 #footer {
