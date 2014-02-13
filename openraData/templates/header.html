@@ -56,7 +56,7 @@
     	{% if request.path == '/mods/' or request.path == '/mods' or request.path == '/palettes/' or request.path == '/palettes' or	request.path == '/screenshots/' or request.path == '/screenshots' or request.path == '/assets/' or request.path == '/assets' or	request.path == '/replays/' or request.path == '/replays' %}{{ 'class="nav-selected"' }}{% endif %}>Other</span></a>
         <ul class="arrow_box">
             <li>
-            <a href="/mods/"><span {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %}>Mods</span></a></li>            
+            <a href="#"><span {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Mods</span></a></li>            
             
             <li>
             <a href="/palettes/"><span {% if request.path == '/palettes/' or request.path == '/palettes' %}{{ 'class="nav-selected"' }}{% endif %}>Palettes</span></a></li>
