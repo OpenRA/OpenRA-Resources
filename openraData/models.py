@@ -29,9 +29,9 @@ class Maps(models.Model):
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
     rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
-    creative_commons    = models.BooleanField(default=False)
-    commercial_use      = models.BooleanField(default=False)
-    allow_modifications = models.BooleanField(default=False)
+    policy_cc           = models.BooleanField(default=False)
+    policy_adaptations  = models.CharField(max_length=30)
+    policy_commercial   = models.BooleanField(default=False)
 
 class Units(models.Model):
 
@@ -50,9 +50,9 @@ class Units(models.Model):
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
     rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
-    creative_commons    = models.BooleanField(default=False)
-    commercial_use      = models.BooleanField(default=False)
-    allow_modifications = models.BooleanField(default=False)
+    policy_cc           = models.BooleanField(default=False)
+    policy_adaptations  = models.CharField(max_length=30)
+    policy_commercial   = models.BooleanField(default=False)
 
 class Mods(models.Model):
 
@@ -69,8 +69,9 @@ class Mods(models.Model):
     viewed              = models.IntegerField(default=0)
     rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
     creative_commons    = models.BooleanField(default=False)
-    commercial_use      = models.BooleanField(default=False)
-    allow_modifications = models.BooleanField(default=False)
+    policy_cc           = models.BooleanField(default=False)
+    policy_adaptations  = models.CharField(max_length=30)
+    policy_commercial   = models.BooleanField(default=False)
 
 class Palettes(models.Model):
 
