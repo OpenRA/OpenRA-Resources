@@ -44,7 +44,7 @@ hr {
 }
 
 a, a:visited { 
-  color: white 
+  color: white;
 }
 
 a img {
@@ -271,10 +271,26 @@ table tr td {
   float: right;
 }
 
+.FAQ a {
+  text-decoration: none;
+}
+
+.FAQ a:hover {
+  text-decoration: underline;
+}
+
 .Links {
   width: 40px;
   float: right;
   margin-right: 10px;
+}
+
+.Links a {
+  text-decoration: none;
+}
+
+.Links a:hover {
+  text-decoration: underline;
 }
 
 #newslist li {

@@ -28,8 +28,8 @@
 <div id="rssfeed">
 	<a class="feed" href="/news/feed/">Rss feed</a>
 	{% if user.is_authenticated %}
-		<a class="userManageTop" style="text-decoration: underline;" href="/accounts/logout/">Logout</a>
-		<a class="userManageTop" style="text-decoration: underline; padding-right: 10px;" href="/accounts/profile/">Profile ({{ user.username}})</a>
+		<a class="userManageTop" style="text-decoration: underline;" href="/accounts/logout/">Sign out</a>
+		<a class="userManageTop" style="text-decoration: underline; padding-right: 30px;" href="/accounts/profile/">Profile ({{ user.username}})</a>
 	{% endif %}
 </div>
 
