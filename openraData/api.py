@@ -7,7 +7,7 @@ from subprocess import Popen, PIPE
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.db.models import Count
 
 from openraData.models import Maps
@@ -24,7 +24,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         except:
             raise Http404
         response_data = serialize_basic_map_info(mapObject)
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        return StreamingHttpResponse(json.dumps(response_data), content_type="application/json")
     
     # get detailed map info by hash
     elif arg == "hash":
@@ -34,7 +34,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         except:
             raise Http404
         response_data = serialize_basic_map_info(mapObject)
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        return StreamingHttpResponse(json.dumps(response_data), content_type="application/json")
     
     # get URL of map by hash
     elif arg == "url":
@@ -53,7 +53,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         response_data['map_hash'] = mapObject.map_hash
         response_data['revision'] = mapObject.revision
         response_data['last_revision'] = last_revision
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        return StreamingHttpResponse(json.dumps(response_data), content_type="application/json")
     
     # get minimap preview by hash (represented in JSON by encoded into base64)
     elif arg == "minimap":
@@ -76,7 +76,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         response_data['map_hash'] = mapObject.map_hash
         response_data['revision'] = mapObject.revision
         response_data['last_revision'] = last_revision
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        return StreamingHttpResponse(json.dumps(response_data), content_type="application/json")
     
     # get detailed map info + encoded minimap + URL for a range of maps (supports filters)
     elif arg == "list":
@@ -121,7 +121,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             response_data['url'] = url
             basic_response.append(response_data)
 
-        return HttpResponse(json.dumps(basic_response), content_type="application/json")
+        return StreamingHttpResponse(json.dumps(basic_response), content_type="application/json")
     elif arg == "sync":
         mod = value
         if mod == "":
@@ -137,7 +137,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         data = ""
         for item in mapObject:
             data = data + get_url(request, item.id) + "/sync" + "\n"
-        return HttpResponse(data, content_type="plain/text")
+        return StreamingHttpResponse(data, content_type="plain/text")
     else:
         # serve application/zip by hash
         oramap = ""
@@ -162,7 +162,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             raise Http404
         serveOramap = path + os.sep + oramap
         oramap = os.path.splitext(oramap)[0] + "-" + str(mapObject.revision) + ".oramap"
-        response = HttpResponse(open(serveOramap), content_type='application/zip')
+        response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename = "%s"' % oramap
         return response
 
@@ -329,7 +329,7 @@ def CrashLogs(request):
         content = json.dumps(content)
         command = "curl -k -X POST --data '%s' https://api.github.com/repos/%s/%s/issues?access_token=%s > /dev/null 2>&1" % (content, settings.GITHUB_USER, settings.GITHUB_REPO, settings.GITHUB_API_TOKEN)
         os.system(command)
-    return HttpResponse('Done, check https://github.com/%s/%s/search?q=GameID:%s&ref=cmdform&type=Issues\n' % (settings.GITHUB_USER, settings.GITHUB_REPO, gameID))
+    return StreamingHttpResponse('Done, check https://github.com/%s/%s/search?q=GameID:%s&ref=cmdform&type=Issues\n' % (settings.GITHUB_USER, settings.GITHUB_REPO, gameID))
 
 def CrashLogsServe(request, crashid, logfile):
     logfilename = ""
@@ -345,6 +345,6 @@ def CrashLogsServe(request, crashid, logfile):
     if logfilename == "":
         return HttpResponseRedirect('/crashlogs/')
     serveLog = path + os.sep + logfilename
-    response = HttpResponse(open(serveLog), content_type='plain/text')
+    response = StreamingHttpResponse(open(serveLog), content_type='plain/text')
     response['Content-Disposition'] = 'attachment; filename="%s"' % crashid.lstrip('0')+logfilename
     return response

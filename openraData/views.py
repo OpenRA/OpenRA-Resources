@@ -21,7 +21,7 @@ def index(request):
         'request': request,
         'title': '',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def logoutView(request):
     if request.user.is_authenticated():
@@ -35,7 +35,7 @@ def feed(request):
         'request': request,
         'title': ' - Rss Feed',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def search(request):
     template = loader.get_template('index.html')
@@ -44,7 +44,7 @@ def search(request):
         'request': request,
         'title': ' - Search',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def ControlPanel(request):
     if not request.user.is_authenticated():
@@ -55,7 +55,7 @@ def ControlPanel(request):
         'request': request,
         'title': ' - My Content',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def maps(request, page=1, filter=""):
     perPage = 36
@@ -77,7 +77,7 @@ def maps(request, page=1, filter=""):
         'range': [i+1 for i in range(rowsRange)],
         'amount': amount,
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def displayMap(request, arg):
     fullPreview = False
@@ -106,7 +106,7 @@ def displayMap(request, arg):
         'arg': arg.lstrip('0'),
         'fullPreview': fullPreview,
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def serveRender(request, arg):
     render = ""
@@ -123,7 +123,7 @@ def serveRender(request, arg):
         return HttpResponseRedirect('/maps/'+arg.lstrip('0'))
     else:
         serveImage = path + os.sep + render
-        response = HttpResponse(open(serveImage), content_type='image/png')
+        response = StreamingHttpResponse(open(serveImage), content_type='image/png')
         response['Content-Disposition'] = 'attachment; filename = "%s"' % render
         return response
 
@@ -143,7 +143,7 @@ def serveMinimap(request, arg):
         serveImage = os.getcwd() + os.sep + __name__.split('.')[0] + '/static/images/nominimap.png'
     else:
         serveImage = path + os.sep + minimap
-    response = HttpResponse(open(serveImage), content_type='image/png')
+    response = StreamingHttpResponse(open(serveImage), content_type='image/png')
     response['Content-Disposition'] = 'attachment; filename = "%s"' % minimap
     return response
 
@@ -162,7 +162,7 @@ def serveLintLog(request, arg):
         return HttpResponseRedirect('/maps/'+arg.lstrip('0'))
     else:
         serveLog = path + os.sep + lintlog
-        response = HttpResponse(open(serveLog), content_type='text/plain')
+        response = StreamingHttpResponse(open(serveLog), content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename = "%s"' % lintlog
         return response
 
@@ -183,7 +183,7 @@ def serveOramap(request, arg, sync=""):
         serveOramap = path + os.sep + oramap
         if sync == "sync":
                 oramap = arg.lstrip('0') + ".oramap"
-        response = HttpResponse(open(serveOramap), content_type='application/zip')
+        response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename = "%s"' % oramap
         return response
 
@@ -223,7 +223,7 @@ def units(request):
         'request': request,
         'title': ' - Units',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def mods(request):
     template = loader.get_template('index.html')
@@ -232,7 +232,7 @@ def mods(request):
         'request': request,
         'title': ' - Mods',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def palettes(request):
     template = loader.get_template('index.html')
@@ -241,7 +241,7 @@ def palettes(request):
         'request': request,
         'title': ' - Palettes',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def screenshots(request):
     template = loader.get_template('index.html')
@@ -250,7 +250,7 @@ def screenshots(request):
         'request': request,
         'title': ' - Screenshots',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def assets(request):
     noErrors = False
@@ -284,7 +284,7 @@ def assets(request):
         'noerrors': noErrors,
         'mirrors_list': mirrors_list,
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def replays(request):
     template = loader.get_template('index.html')
@@ -293,7 +293,7 @@ def replays(request):
         'request': request,
         'title': ' - Replays',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def uploadUnit(request):
     if not request.user.is_authenticated():
@@ -304,7 +304,7 @@ def uploadUnit(request):
         'request': request,
         'title': ' - Uploading Unit',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def uploadMod(request):
     if not request.user.is_authenticated():
@@ -315,7 +315,7 @@ def uploadMod(request):
         'request': request,
         'title': ' - Uploading Mod',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def uploadPalette(request):
     if not request.user.is_authenticated():
@@ -326,7 +326,7 @@ def uploadPalette(request):
         'request': request,
         'title': ' - Uploading Palette',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def handle404(request):
     template = loader.get_template('index.html')
@@ -335,7 +335,7 @@ def handle404(request):
         'request': request,
         'title': ' - Page not found',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def profile(request):
     if not request.user.is_authenticated():
@@ -346,7 +346,7 @@ def profile(request):
         'request': request,
         'title': ' - Profile',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def faq(request):
     template = loader.get_template('index.html')
@@ -355,7 +355,7 @@ def faq(request):
         'request': request,
         'title': ' - FAQ',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 def links(request):
     template = loader.get_template('index.html')
@@ -364,4 +364,13 @@ def links(request):
         'request': request,
         'title': ' - Links',
     })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
+
+def uptime(request):
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'uptime.html',
+        'request': request,
+        'title': ' - Uptime',
+    })
+    return StreamingHttpResponse(template.render(context))

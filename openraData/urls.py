@@ -60,6 +60,7 @@ urlpatterns = patterns('',
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
     url(r'^robots\.txt$', RedirectView.as_view(url='/static/robots.txt')),
     url(r'^sitemap\.xml$', RedirectView.as_view(url='/static/sitemap.xml')),
+    url(r'^uptime/?$', views.uptime, name="uptime"),
 
     url(r'^.*$', views.handle404, name='handle404'),
 )
