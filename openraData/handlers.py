@@ -10,6 +10,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
 from openraData.models import Maps
+from openraData.models import Units
+from openraData.models import Mods
 from openraData.models import Screenshots
 
 class MapHandlers():
@@ -251,30 +253,64 @@ class MapHandlers():
         logfile.close()
         return True
 
-    def GetRevisions(self, mapid, seek_next=False):
-        if seek_next:
-            mapObject = Maps.objects.get(id=mapid)
-            if mapObject.next_rev == 0:
-                return
-            self.revisions.append(mapObject.next_rev)
-            self.GetRevisions(mapObject.next_rev, True)
+########## Revisions
+
+def GetRevisions(self, itemid, modelName, seek_next=False):
+    if seek_next:
+        if modelName.lower() == "maps":
+            itemObject = Maps.objects.get(id=itemid)
+        elif modelName.lower() == "units":
+            itemObject = Units.objects.get(id=itemid)
+        elif modelName.lower() == "mods":
+            itemObject = Mods.objects.get(id=itemid)
+        if itemObject.next_rev == 0:
             return
-        self.revisions.insert(0, mapid)
-        mapObject = Maps.objects.get(id=mapid)
-        if mapObject.pre_rev == 0:
-            self.GetRevisions(self.revisions[-1], True)
-            return
-        self.GetRevisions(mapObject.pre_rev)
+        self.revisions.append(itemObject.next_rev)
+        self.GetRevisions(itemObject.next_rev, True)
+        return
+    self.revisions.insert(0, itemid)
+    if modelName.lower() == "maps":
+        itemObject = Maps.objects.get(id=itemid)
+    elif modelName.lower() == "units":
+        itemObject = Units.objects.get(id=itemid)
+    elif modelName.lower() == "mods":
+        itemObject = Mods.objects.get(id=itemid)
+    if itemObject.pre_rev == 0:
+        self.GetRevisions(self.revisions[-1], modelName, True)
+        return
+    self.GetRevisions(itemObject.pre_rev)
 
-    def GetLatest(self, mapid):
-        mapObject = Maps.objects.get(id=mapid)
-        if mapObject.next_rev == 0:
-            return mapObject.id
-        return self.GetLatest(mapObject.next_rev)
+def GetLatestRevisionID(self, itemid, modelName):
+    if modelName.lower() == "maps":
+        itemObject = Maps.objects.get(id=itemid)
+    elif modelName.lower() == "units":
+        itemObject = Units.objects.get(id=itemid)
+    elif modelName.lower() == "mods":
+        itemObject = Mods.objects.get(id=itemid)
+    if itemObject.next_rev == 0:
+        return itemObject.id
+    return self.GetLatestRevisionID(itemObject.next_rev)
 
-    def DeleteMap(self, mapid):
-        pass
+##########
 
-    def NotifyOnFail(self, message, tempname):
-        # send an email to admin attaching map file which is already saved in temp location
-        pass
+def DeleteMap(self, itemid):
+    pass
+
+def DeleteUnit(self, itemid):
+    pass
+
+def DeleteMod(self, itemid):
+    pass
+
+def DeletePalette(self, itemid):
+    pass
+
+def DeleteReplay(self, itemid):
+    pass
+
+def DeleteScreenshot(self, itemid):
+    pass
+
+def NotifyOnFail(self, message, tempname):
+    # send an email to admin attaching file which is already saved in temp location
+    pass
