@@ -102,7 +102,8 @@ server {
 
 ### Post-Installation
 #### Configure allauth
- * Create an application at github (callback url: http://yoursitedomain.com/accounts/github/login/callback/)
+ * Create an application at Github (callback url: http://yoursitedomain.com/accounts/github/login/callback/)
  * Go to your site admin page; "Sites" (django.contrib.sites application); create a site with a proper domain name
  * Go to "Social Apps"; Add a new social app (set a proper client id and secret, chose a proper site)
  * Load http://yoursitedomain.com/accounts/github/login/  to authorize your new application at github
+ * Do the similar actions to create and set up Google Application (without creating new site over django admin)
