@@ -195,7 +195,7 @@ def uploadMap(request):
         return HttpResponseRedirect('/maps/')
     uploadingLog = []
     uid = False
-    initial = {'policy_cc': 'cc_yes', 'commercial': 'com_yes', 'adaptations': 'adapt_yes'}
+    initial = {'policy_cc': 'cc_yes', 'commercial': 'com_no', 'adaptations': 'adapt_alike'}
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES, initial=initial)
         if form.is_valid():
