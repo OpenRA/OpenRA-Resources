@@ -518,3 +518,8 @@ p.registerInfo {
   border: 2px solid #74c2e7;
   padding-top: 20px;
 }
+
+/* Upload forms */
+.license_cc .license_options {
+  list-style-type: none;
+}

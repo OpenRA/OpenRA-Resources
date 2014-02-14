@@ -192,8 +192,9 @@ def uploadMap(request):
         return HttpResponseRedirect('/maps/')
     uploadingLog = []
     uid = False
+    initial = {'policy_cc': 'cc_yes', 'commercial': 'com_yes', 'modifications': 'mod_yes'}
     if request.method == 'POST':
-        form = UploadMapForm(request.POST, request.FILES)
+        form = UploadMapForm(request.POST, request.FILES, initial=initial)
         if form.is_valid():
             uploadingMap = handlers.MapHandlers()
             uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST['info'])
@@ -203,7 +204,7 @@ def uploadMap(request):
             form = UploadMapForm()
 
     else:
-        form = UploadMapForm()
+        form = UploadMapForm(initial=initial)
 
     template = loader.get_template('index.html')
     context = RequestContext(request, {

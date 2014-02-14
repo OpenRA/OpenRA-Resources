@@ -1,5 +1,14 @@
 {% if user.is_authenticated %}
-
+<script>
+    $(document).ready(function() {
+    $("input[value=cc_yes]").click(function() {
+        $(".license_options").show();
+    });
+    $("input[value=cc_no]").click(function() {
+        $(".license_options").hide();
+    });
+    });    
+</script>
 <table class="Table"><tr><td>Upload your oramap file:</td></tr></table>
 <form action="/maps/upload/" method="POST" enctype="multipart/form-data">{% csrf_token %}
 <table class="Table">
@@ -26,12 +35,22 @@
 	</tr>
 	<tr>
 		<td colspan="2">
-			Use a Creative Commons license?
-			{{form.policy_cc}}
-			Allow commercial uses of your work?
-			{{form.commercial}}
-			Allow modifications of your work?
-			{{form.modifications}}
+			<div class="license_cc">
+			Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
+			{% for radio in form.policy_cc %}
+				<label>{{ radio.tag }} {{ radio.choice_label }}</label>
+    		{% endfor %}
+    		</div>
+    		<div class="license_options"><br />
+			Allow commercial uses of your work?<br />
+			{% for radio in form.commercial %}
+    			<label>{{ radio.tag }} {{ radio.choice_label }}</label>
+			{% endfor %}<br /><br />
+			Allow modifications of your work?<br />
+			{% for radio in form.modifications %}
+    			<label>{{ radio.tag }} {{ radio.choice_label }}</label>
+			{% endfor %}
+			</div>
 		</td>
 	</tr>
 	<tr>
