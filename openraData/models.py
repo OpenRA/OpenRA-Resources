@@ -9,8 +9,8 @@ class Maps(models.Model):
 
     user                = models.ForeignKey(User)
     title               = models.CharField(max_length=200)
-    description         = models.CharField(max_length=400)
-    info                = models.CharField(max_length=400)
+    description         = models.CharField(max_length=2000)
+    info                = models.CharField(max_length=2000)
     author              = models.CharField(max_length=40)
     map_type            = models.CharField(max_length=40)
     players             = models.IntegerField(default=0)

@@ -7,7 +7,7 @@
     $("input[value=cc_no]").click(function() {
         $(".license_options").hide();
     });
-    });    
+    });
 </script>
 <table class="Table"><tr><td>Upload your oramap file:</td></tr></table>
 <form action="/maps/upload/" method="POST" enctype="multipart/form-data">{% csrf_token %}
@@ -47,7 +47,7 @@
     			<label>{{ radio.tag }} {{ radio.choice_label }}</label>
 			{% endfor %}<br /><br />
 			Allow modifications of your work?<br />
-			{% for radio in form.modifications %}
+			{% for radio in form.adaptations %}
     			<label>{{ radio.tag }} {{ radio.choice_label }}</label>
 			{% endfor %}
 			</div>

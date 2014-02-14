@@ -11,7 +11,7 @@ from django.db.models import Count
 
 from .forms import UploadMapForm
 from django.contrib.auth.models import User
-from openraData import handlers
+from openraData import handlers, misc
 from openraData.models import Maps
 
 def index(request):
@@ -94,6 +94,7 @@ def displayMap(request, arg):
         mapObject = Maps.objects.get(id=arg.lstrip('0'))
     except:
         return HttpResponseRedirect('/')
+    license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
     template = loader.get_template('index.html')
@@ -105,6 +106,8 @@ def displayMap(request, arg):
         'userid': userObject,
         'arg': arg.lstrip('0'),
         'fullPreview': fullPreview,
+        'license': license,
+        'icons': icons,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -192,16 +195,16 @@ def uploadMap(request):
         return HttpResponseRedirect('/maps/')
     uploadingLog = []
     uid = False
-    initial = {'policy_cc': 'cc_yes', 'commercial': 'com_yes', 'modifications': 'mod_yes'}
+    initial = {'policy_cc': 'cc_yes', 'commercial': 'com_yes', 'adaptations': 'adapt_yes'}
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES, initial=initial)
         if form.is_valid():
             uploadingMap = handlers.MapHandlers()
-            uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST['info'])
+            uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST)
             uploadingLog = uploadingMap.LOG
             if uploadingMap.UID:
                 uid = str(uploadingMap.UID)
-            form = UploadMapForm()
+            form = UploadMapForm(initial=initial)
 
     else:
         form = UploadMapForm(initial=initial)

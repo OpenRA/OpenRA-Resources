@@ -42,7 +42,7 @@ class MapHandlers():
 
         self.revisions = []
 
-    def ProcessUploading(self, user_id, f, info, rev=1, pre_r=0):
+    def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
         tempname = '/tmp/oramaptemp.oramap'
         with open(tempname, 'wb+') as destination:
             for chunk in f.chunks():
@@ -124,11 +124,25 @@ class MapHandlers():
         if countAdvanced > 20:
             self.advanced_map = True
 
+        cc = False
+        commercial = False
+        adaptations = ""
+        if post['policy_cc'] == 'cc_yes':
+            cc = True
+            if post['commercial'] == "com_yes":
+                commercial = True
+            if post['adaptations'] == "adapt_yes":
+                adaptations = "yes"
+            elif post['adaptations'] == "adapt_no":
+                adaptations = "no"
+            else:
+                adaptations = "yes and shared alike"
+
         transac = Maps(
             user = userObject,
             title = self.MapTitle,
             description = self.MapDesc,
-            info = info,
+            info = post['info'],
             author = self.MapAuthor,
             map_type = self.MapType,
             players = self.MapPlayers,
@@ -146,6 +160,9 @@ class MapHandlers():
             lua = self.lua_map,
             posted = timezone.now(),
             viewed = 0,
+            policy_cc = cc,
+            policy_commercial = commercial,
+            policy_adaptations = adaptations,
             )
         transac.save()
         self.UID = str(transac.id)
@@ -160,8 +177,8 @@ class MapHandlers():
 
         self.map_is_uploaded = True
         self.flushLog( ['Map was successfully uploaded as "%s"' % name] )
-        if info:
-            self.flushLog( ['Info: ' + info] )
+        if post['info'] != "":
+            self.flushLog( ['Info: ' + post['info']] )
         
         self.UnzipMap()
         self.LintCheck(self.MapMod)
