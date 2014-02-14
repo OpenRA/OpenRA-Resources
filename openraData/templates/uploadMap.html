@@ -1,5 +1,3 @@
-{% include 'uploadMenu.html' %}
-
 {% if user.is_authenticated %}
 
 <table class="Table"><tr><td>Upload your oramap file:</td></tr></table>
@@ -19,6 +17,21 @@
 		</td>
 		<td>
 			{{ form.file }}
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<hr />
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			Use a Creative Commons license?
+			{{form.policy_cc}}
+			Allow commercial uses of your work?
+			{{form.commercial}}
+			Allow modifications of your work?
+			{{form.modifications}}
 		</td>
 	</tr>
 	<tr>

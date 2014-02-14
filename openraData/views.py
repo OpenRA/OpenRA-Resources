@@ -2,14 +2,14 @@ import os
 import math
 import re
 import urllib2
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.db import connection
 from django.db.models import Count
 
-from .forms import UploadMapForm, AuthenticationForm
+from .forms import UploadMapForm
 from django.contrib.auth.models import User
 from openraData import handlers
 from openraData.models import Maps
