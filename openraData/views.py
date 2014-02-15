@@ -19,6 +19,7 @@ def index(request):
     context = RequestContext(request, {
         'content': 'index_content.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': '',
     })
     return StreamingHttpResponse(template.render(context))
@@ -33,6 +34,7 @@ def feed(request):
     context = RequestContext(request, {
         'content': 'feed.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Rss Feed',
     })
     return StreamingHttpResponse(template.render(context))
@@ -42,6 +44,7 @@ def search(request):
     context = RequestContext(request, {
         'content': 'search.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Search',
     })
     return StreamingHttpResponse(template.render(context))
@@ -53,17 +56,18 @@ def ControlPanel(request):
     context = RequestContext(request, {
         'content': 'control_panel.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - My Content',
     })
     return StreamingHttpResponse(template.render(context))
 
 def maps(request, page=1, filter=""):
-    perPage = 36
+    perPage = 10
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
     mapObject = Maps.objects.all().annotate(count_hashes=Count("map_hash")).order_by("-posted").filter(next_rev=0)
     amount = len(mapObject)
-    rowsRange = int(math.ceil(amount/float(perPage)))
+    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of pages
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/")
@@ -71,6 +75,7 @@ def maps(request, page=1, filter=""):
     context = RequestContext(request, {
         'content': 'maps.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Maps',
         'maps': mapObject,
         'page': int(page),
@@ -101,6 +106,7 @@ def displayMap(request, arg):
     context = RequestContext(request, {
         'content': 'displayMap.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Map details - ' + mapObject.title,
         'map': mapObject,
         'userid': userObject,
@@ -213,6 +219,7 @@ def uploadMap(request):
     context = RequestContext(request, {
         'content': 'uploadMap.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Uploading Map',
         'form': form,
         'uploadingLog': uploadingLog,
@@ -225,6 +232,7 @@ def units(request):
     context = RequestContext(request, {
         'content': 'units.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Units',
     })
     return StreamingHttpResponse(template.render(context))
@@ -234,6 +242,7 @@ def mods(request):
     context = RequestContext(request, {
         'content': 'mods.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Mods',
     })
     return StreamingHttpResponse(template.render(context))
@@ -243,6 +252,7 @@ def palettes(request):
     context = RequestContext(request, {
         'content': 'palettes.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Palettes',
     })
     return StreamingHttpResponse(template.render(context))
@@ -252,6 +262,7 @@ def screenshots(request):
     context = RequestContext(request, {
         'content': 'screenshots.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Screenshots',
     })
     return StreamingHttpResponse(template.render(context))
@@ -284,6 +295,7 @@ def assets(request):
     context = RequestContext(request, {
         'content': 'assets.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Assets Packages Mirrors',
         'noerrors': noErrors,
         'mirrors_list': mirrors_list,
@@ -295,6 +307,7 @@ def replays(request):
     context = RequestContext(request, {
         'content': 'replays.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Replays',
     })
     return StreamingHttpResponse(template.render(context))
@@ -306,6 +319,7 @@ def uploadUnit(request):
     context = RequestContext(request, {
         'content': 'uploadUnit.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Uploading Unit',
     })
     return StreamingHttpResponse(template.render(context))
@@ -317,6 +331,7 @@ def uploadMod(request):
     context = RequestContext(request, {
         'content': 'uploadMod.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Uploading Mod',
     })
     return StreamingHttpResponse(template.render(context))
@@ -328,6 +343,7 @@ def uploadPalette(request):
     context = RequestContext(request, {
         'content': 'uploadPalette.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Uploading Palette',
     })
     return StreamingHttpResponse(template.render(context))
@@ -337,6 +353,7 @@ def handle404(request):
     context = RequestContext(request, {
         'content': '404.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Page not found',
     })
     return StreamingHttpResponse(template.render(context))
@@ -348,6 +365,7 @@ def profile(request):
     context = RequestContext(request, {
         'content': 'profile.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Profile',
     })
     return StreamingHttpResponse(template.render(context))
@@ -357,6 +375,7 @@ def faq(request):
     context = RequestContext(request, {
         'content': 'faq.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - FAQ',
     })
     return StreamingHttpResponse(template.render(context))
@@ -366,6 +385,7 @@ def links(request):
     context = RequestContext(request, {
         'content': 'links.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Links',
     })
     return StreamingHttpResponse(template.render(context))
@@ -375,6 +395,7 @@ def uptime(request):
     context = RequestContext(request, {
         'content': 'uptime.html',
         'request': request,
+        'http_host': request.META['HTTP_HOST'],
         'title': ' - Uptime',
     })
     return StreamingHttpResponse(template.render(context))

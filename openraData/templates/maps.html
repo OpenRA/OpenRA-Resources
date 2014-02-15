@@ -1,35 +1,25 @@
-<h2 style="clear:both">Found {{ amount }} maps</h2>
+<h2>Found {{ amount }} maps</h2>
 {% if amount != 0 %}
-<table id="map_grid">
-<tr>
+
+<div id="map_grid">
 	{% for item in maps %}
-	<td>
-		<center><a style="display:block;" href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/' }}{{ item.id }}>
-			<img style='display: block; max-width: 100px; padding: 8px;' src={{ '/maps/' }}{{ item.id }}{{ '/minimap' }} />{{ item.title }}</center></a>
-		{% if forloop.counter == 6 %}
-		</tr>
-		<tr>
-		{% endif %}
-	</td>
+		<div id="map_grid_cell">
+			<a href="http://{{http_host}}/maps/{{item.id}}"><img src="/maps/{{item.id}}/minimap" />{{ item.title }}</a>
+		</div>
 	{% endfor %}
-</tr>
-</table>
-<br />
+</div>
 {% if 2 in range %}
-<table id="paging" style="background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4); width: 0%;">
-<tr>
+<div id="paging">
+	<div id="br"></div>
 	{% for i in range %}
+	<div id="paging_cell">
 	{% if i == page %}
-		<td style="background: rgba(32, 44, 69, 0.4); width: 10px; border: 1px solid #74c2e7;">
-			<center><span style="font-weight: bold;">{{ i }}</span></center>
-		</td>
+		<span>{{ i }}</span>
 	{% else %}
-		<td style="width: 10px; border: 1px solid #74c2e7;">
-			<center><a style="display:block;" href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/page/' }}{{ i }}>{{ i }}</a></center>
-		</td>
+		<a href="http://{{http_host}}/maps/page/{{i}}">{{ i }}</a>
 	{% endif %}
+	</div>
 	{% endfor %}
-</tr>
-</table>
+</div>
 {% endif %}
 {% endif %}
