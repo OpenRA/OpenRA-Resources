@@ -50,30 +50,30 @@
 
 <ul id="nav">
 	<li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></a></li>
-	<li><a href="/maps/"><span {% if request.path == '/maps/' or request.path == '/maps' %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
-	<li><a href="/units/"><span {% if request.path == '/units/' or request.path == '/units' %}{{ 'class="nav-selected"' }}{% endif %}>Units</span></a></li>      
+	<li><a href="/maps/"><span {% if '/maps' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
+	<li><a href="#"><span {% if '/units' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Units</span></a></li>      
     <li><a href="#"><span 
-    	{% if request.path == '/mods/' or request.path == '/mods' or request.path == '/palettes/' or request.path == '/palettes' or	request.path == '/screenshots/' or request.path == '/screenshots' or request.path == '/assets/' or request.path == '/assets' or	request.path == '/replays/' or request.path == '/replays' %}{{ 'class="nav-selected"' }}{% endif %}>Other</span></a>
+    	{% if '/mods' in request.path or '/palettes' in request.path or '/screenshots' in request.path or '/assets' in request.path or '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Other</span></a>
         <ul class="arrow_box">
             <li>
-            <a href="#"><span {% if request.path == '/mods/' or request.path == '/mods' %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Mods</span></a></li>            
+            <a href="#"><span {% if '/mods' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Mods</span></a></li>            
             
             <li>
-            <a href="/palettes/"><span {% if request.path == '/palettes/' or request.path == '/palettes' %}{{ 'class="nav-selected"' }}{% endif %}>Palettes</span></a></li>
+            <a href="#"><span {% if '/palettes' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Palettes</span></a></li>
             
             <li>
-            <a href="/screenshots/"><span {% if request.path == '/screenshots/' or request.path == '/screenshots' %}{{ 'class="nav-selected"' }}{% endif %}>Screenshots</span></a></li>
+            <a href="#"><span {% if '/screenshots' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Screenshots</span></a></li>
 
             <li>
-            <a href="/assets/"><span {% if request.path == '/assets/' or request.path == '/assets' %}{{ 'class="nav-selected"' }}{% endif %}>Assets Packages</span></a></li>
+            <a href="#"><span {% if '/assets' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Assets Packages</span></a></li>
 
             <li>
-            <a href="/replays/"><span {% if request.path == '/replays/' or request.path == '/replays' %}{{ 'class="nav-selected"' }}{% endif %}>Replays</span></a></li>
+            <a href="#"><span {% if '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Replays</span></a></li>
         </ul>
     </li>            
         
 	{% if user.is_authenticated %}
-		<li><a href="/panel/"><span {% if request.path == '/panel/' or request.path == '/panel' %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
+		<li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
 	{% else %}
 		<li><a href="/accounts/login/"><span {% if request.path == '/accounts/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>
 	{% endif %}

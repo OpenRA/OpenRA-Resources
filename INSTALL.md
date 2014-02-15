@@ -59,10 +59,10 @@ python manage.py syncdb
 ### Setup Production (using nginx + gunicorn)
 All-sufficient guide: http://goodcode.io/blog/django-nginx-gunicorn/
 
-Running gunicorn (WSGI HTTP Server) this way (10 instances, max timeout 120 seconds):
+Running gunicorn (WSGI HTTP Server) this way (10 instances, max timeout 30 seconds):
 
 ```
-gunicorn_django -w 10 -t 120 --log-file=/path/to/djangoserver.log -b 127.0.0.1:8000
+gunicorn_django -w 10 -t 30 --log-file=/path/to/djangoserver.log -b 127.0.0.1:8000
 ```
 
 Nginx config for our virtual host (replace PATH where needed):
