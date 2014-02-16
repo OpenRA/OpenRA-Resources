@@ -48,7 +48,7 @@ a, a:visited {
 }
 
 a img {
-	border: none;
+    border: none;
 }
 
 a.current {
@@ -63,7 +63,7 @@ p.download, .newsDetails {
 }
 
 table tr td {
-	font-size: 0.9em;
+    font-size: 0.9em;
 }
 
 div#br {
@@ -113,6 +113,7 @@ div#br {
   font-size: 0.9em;
   text-align: center;
   margin-left: 3px;
+  padding-bottom: 10px;
 }
 
 #map_grid_cell {
@@ -341,6 +342,23 @@ div#br {
 .Links a:hover {
   text-decoration: underline;
 }
+
+.link-container h3 {
+  margin: 24px 0 6px;
+}
+  .link-container ul {
+    list-style-type: none;
+    margin: 0;
+  }
+    .link-container ul li {
+      padding: 2px 0;
+    }
+      .link-container ul li a {
+        text-decoration: none;
+      }
+      .link-container ul li a:hover {
+        text-decoration: underline;
+      }
 
 #newslist li {
   margin: 10px 0;
