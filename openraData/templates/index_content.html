@@ -1,42 +1,43 @@
-<div id="mainleft">
-	<div id="screenshot">
-		<img width="250" height="150" src="" alt="screenshot" />
-	</div>
-</div>
-<div>
-	<h2>Share your Content!</h2>
-</div>
+        <div id="mainleft">
+            <div id="screenshot">
+                <img width="250" height="150" src="" alt="screenshot" />
+            </div>
+        </div>
 
-<div>
-OpenRA is a free and open-source RTS game engine that lets you play re-balanced games like 
-C&amp;C Red Alert, C&amp;C Tiberian Dawn, Dune 2000...<br />
-<br />
-The engine allows players to create new mods, add modified versions of units, buildings etc.
-It also offers advanced features for creating maps and missions.<br />
-<br /><br />
-If you created a new map and want to play it with other players, you just have to:<br />
-- upload it here<br />
-- create a new game and select your new map<br />
-- other players, joining it, will automatically download the map directly from this website<br /><br />
-Note: some OpenRA dedicated servers synchronize maps with this site's API to help your easier distribute maps and missions!<br />
-</div>
-<script>
-  function nextSlide() {
-    var x = $('#screenshot img:not(.active)');
-    return $(x[Math.floor(Math.random() * x.length)]);
-  }
+        <div>
+            <h2>Share your Content!</h2>
+        </div>
 
-  function slideSwitch() {
-    var active = $('#screenshot img.active');
-    if (active.length == 0)
-      active = nextSlide();
-    var next = nextSlide();
-    active.addClass('last-active');
-    next.css({opacity: 0.0})
-      .addClass('active')
-      .animate({opacity: 1.0}, 1000, function() {
-          active.removeClass('active last-active');
-    });
-  }
-  $(function() { setInterval("slideSwitch()", 14000); });
-</script>
+        <div>
+            OpenRA is a free and open-source RTS game engine that lets you play re-balanced games like 
+            C&amp;C Red Alert, C&amp;C Tiberian Dawn, Dune 2000...<br />
+            <br />
+            The engine allows players to create new mods, add modified versions of units, buildings etc.
+            It also offers advanced features for creating maps and missions.<br />
+            <br /><br />
+            If you created a new map and want to play it with other players, you just have to:<br />
+            - upload it here<br />
+            - create a new game and select your new map<br />
+            - other players, joining it, will automatically download the map directly from this website<br /><br />
+            Note: some OpenRA dedicated servers synchronize maps with this site's API to help your easier distribute maps and missions!<br />
+        </div>
+
+        <script>
+            function nextSlide() {
+                var x = $('#screenshot img:not(.active)');
+                return $(x[Math.floor(Math.random() * x.length)]);
+            }
+
+            function slideSwitch() {
+                var active = $('#screenshot img.active');
+                if (active.length == 0)
+                    active = nextSlide();
+                var next = nextSlide();
+                active.addClass('last-active');
+                next.css({opacity: 0.0}).addClass('active').animate({opacity: 1.0}, 1000, function() {
+                  active.removeClass('active last-active');
+                });
+            }
+
+            $(function() { setInterval("slideSwitch()", 14000); });
+        </script>

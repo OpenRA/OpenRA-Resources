@@ -1,25 +1,25 @@
-<h2>Found {{ amount }} maps</h2>
-{% if amount != 0 %}
-
-<div id="map_grid">
-	{% for item in maps %}
-		<div id="map_grid_cell">
-			<a href="http://{{http_host}}/maps/{{item.id}}"><img src="/maps/{{item.id}}/minimap" />{{ item.title }}</a>
-		</div>
-	{% endfor %}
-</div>
-{% if 2 in range %}
-<div id="paging">
-	<div id="br"></div>
-	{% for i in range %}
-	<div id="paging_cell">
-	{% if i == page %}
-		<span>{{ i }}</span>
-	{% else %}
-		<a href="http://{{http_host}}/maps/page/{{i}}">{{ i }}</a>
-	{% endif %}
-	</div>
-	{% endfor %}
-</div>
-{% endif %}
-{% endif %}
+            <h2>Found {{ amount }} maps</h2>
+            {% if amount != 0 %}
+            <div id="map_grid">
+                {% for item in maps %}
+                    <div id="map_grid_cell">
+                        <a href="http://{{http_host}}/maps/{{item.id}}"><img src="/maps/{{item.id}}/minimap" />{{ item.title }}</a>
+                    </div>
+                {% endfor %}
+                <div style="clear:both"></div>
+            </div>
+            {% if 2 in range %}
+            <div id="paging">
+                <div id="br"></div>
+                {% for i in range %}
+                <div id="paging_cell">
+                {% if i == page %}
+                    <span>{{ i }}</span>
+                {% else %}
+                    <a href="http://{{http_host}}/maps/page/{{i}}">{{ i }}</a>
+                {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endif %}
