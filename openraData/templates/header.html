@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=1024" />
     <title>OpenRA Resource Center{{ title }}</title>
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
@@ -12,71 +12,79 @@
     <link href="/static/favicon.ico" rel="shortcut icon" type="image/x-icon">
     <link href="/news/feed/" rel="alternate" type="application/atom+xml">
     <script>
-		function supportsSVG() {
-			return !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGRect;
-		}
-		$(document).ready(function(){
-			if (!supportsSVG()) {
-				document.documentElement.className += ' no-svg';
-					$('img[src$=".svg"]').attr('src', function(){return $(this).attr('src').replace('.svg', '-fallback.png');});
-			}
-		});
-	</script>
+        function supportsSVG() {
+            return !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGRect;
+        }
+        $(document).ready(function(){
+            if (!supportsSVG()) {
+                document.documentElement.className += ' no-svg';
+                $('img[src$=".svg"]').attr('src', function() {
+                    return $(this).attr('src').replace('.svg', '-fallback.png');
+                });
+            }
+        });
+    </script>
 </head>
 <body>
 
-<div id="rssfeed">
-	<a class="feed" href="/news/feed/">Rss feed</a>
-	{% if user.is_authenticated %}
-		<a class="userManageTop" style="text-decoration: underline;" href="/accounts/logout/">Sign out</a>
-		<a class="userManageTop" style="text-decoration: underline; padding-right: 30px;" href="/accounts/profile/">Profile ({{ user.username}})</a>
-	{% endif %}
-</div>
+    <div id="rssfeed">
+        <a class="feed" href="/news/feed/">Rss feed</a>
+    {% if user.is_authenticated %}
+        <a class="userManageTop" style="text-decoration: underline;" href="/accounts/logout/">Sign out</a>
+        <a class="userManageTop" style="text-decoration: underline; padding-right: 30px;" href="/accounts/profile/">Profile ({{ user.username}})</a>
+    {% endif %}
+    </div>
 
-<div id="container">
+    <div id="container">
+        <div id="header">
+            <h1>
+                <img src="/static/images/soviet-logo.svg" onerror='this.onerror = null; this.src="/static/images/soviet-logo-fallback.png"' alt="logo">
+                OpenRA Resource Center
+            </h1>
+        </div>
 
-<div id="header">
-	<h1><img src="/static/images/soviet-logo.svg" onerror='this.onerror = null; this.src="/static/images/soviet-logo-fallback.png"' alt="logo">OpenRA Resource Center</h1>
-</div>
+        <a id="ghbanner" href="http://open-ra.org" target="_blank" title="Go to OpenRA Official Website">
+            <img alt="Visit OpenRA official website" src="/static/images/open-ra-org.svg" onerror='this.onerror = null; this.src="/static/images/open-ra-org-fallback.png"'>
+        </a>
 
-<a id="ghbanner" href="http://open-ra.org" target="_blank" title="Go to OpenRA Official Website">
-	<img alt="Visit OpenRA official website" src="/static/images/open-ra-org.svg" onerror='this.onerror = null; this.src="/static/images/open-ra-org-fallback.png"'>
-</a>
+        <form id="quick-search" method="POST" action="/search/">{% csrf_token %}
+            <input id="qsearch"
+                type="text"
+                title="Search maps, units, mods, authors..."
+                value="Search..."
+                onblur="this.value=!this.value?'Search...':this.value;"
+                onfocus="this.select()"
+                onclick="this.value='';"
+                name="qsearch">
 
-<form id="quick-search" method="POST" action="/search/">{% csrf_token %}
-	<input id="qsearch" type="text" title="Search maps, units, mods, authors..." value="Search..." onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';" name="qsearch">
-	<input class="btn" type="image" src="/static/images/search.svg" onerror='this.onerror = null; this.src="/static/images/search-fallback.png"' title="Search" name="searchsubmit" alt="Search">
-</form>
+            <input class="btn"
+                type="image"
+                src="/static/images/search.svg"
+                onerror='this.onerror = null; this.src="/static/images/search-fallback.png"'
+                title="Search"
+                name="searchsubmit"
+                alt="Search">
+        </form>
 
-<ul id="nav">
-	<li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></a></li>
-	<li><a href="/maps/"><span {% if '/maps' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
-	<li><a href="#"><span {% if '/units' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Units</span></a></li>      
-    <li><a href="#"><span 
-    	{% if '/mods' in request.path or '/palettes' in request.path or '/screenshots' in request.path or '/assets' in request.path or '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Other</span></a>
-        <ul class="arrow_box">
-            <li>
-            <a href="#"><span {% if '/mods' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Mods</span></a></li>            
-            
-            <li>
-            <a href="#"><span {% if '/palettes' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Palettes</span></a></li>
-            
-            <li>
-            <a href="#"><span {% if '/screenshots' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Screenshots</span></a></li>
-
-            <li>
-            <a href="#"><span {% if '/assets' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Assets Packages</span></a></li>
-
-            <li>
-            <a href="#"><span {% if '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Replays</span></a></li>
+        <ul id="nav">
+            <li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></a></li>
+            <li><a href="/maps/"><span {% if '/maps' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
+            <li><a href="#"><span {% if '/units' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Units</span></a></li>      
+            <li><a href="#"><span 
+                {% if '/mods' in request.path or '/palettes' in request.path or '/screenshots' in request.path or '/assets' in request.path or '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Other</span></a>
+                <ul class="arrow_box">
+                    <li><a href="#"><span {% if '/mods' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Mods</span></a></li>            
+                    <li><a href="#"><span {% if '/palettes' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Palettes</span></a></li>
+                    <li><a href="#"><span {% if '/screenshots' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Screenshots</span></a></li>
+                    <li><a href="#"><span {% if '/assets' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Assets Packages</span></a></li>
+                    <li><a href="#"><span {% if '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Replays</span></a></li>
+                </ul>
+            </li>
+        {% if user.is_authenticated %}
+            <li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
+        {% else %}
+            <li><a href="/accounts/login/"><span {% if request.path == '/accounts/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>
+        {% endif %}
         </ul>
-    </li>            
-        
-	{% if user.is_authenticated %}
-		<li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
-	{% else %}
-		<li><a href="/accounts/login/"><span {% if request.path == '/accounts/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>
-	{% endif %}
-</ul>
 
-<div id="content">
+        <div id="content">
