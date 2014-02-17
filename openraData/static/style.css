@@ -139,6 +139,7 @@ div#br {
 #map_grid_cell img {
   display: block;
   max-width: 120px;
+  max-height: 135px;
   padding: 8px;
   margin: 0 auto;
 }

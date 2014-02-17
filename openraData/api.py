@@ -138,6 +138,17 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         for item in mapObject:
             data = data + get_url(request, item.id) + "/sync" + "\n"
         return StreamingHttpResponse(data, content_type="plain/text")
+    elif arg == "syncall":
+        mod = value
+        if mod == "":
+            raise Http404
+        mapObject = Maps.objects.all().filter(game_mod=mod.lower()).annotate(count_hashes=Count("map_hash")).order_by("id")
+        if not mapObject:
+            raise Http404
+        data = ""
+        for item in mapObject:
+            data = data + get_url(request, item.id) + "/sync" + "\n"
+        return StreamingHttpResponse(data, content_type="plain/text")
     else:
         # serve application/zip by hash
         oramap = ""
