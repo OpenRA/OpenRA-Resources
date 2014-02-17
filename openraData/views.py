@@ -362,11 +362,14 @@ def profile(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
     template = loader.get_template('index.html')
+    mapObject = Maps.objects.filter(user_id=request.user.id)
+    amountMaps = len(mapObject)
     context = RequestContext(request, {
         'content': 'profile.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': ' - Profile',
+        'amountMaps': amountMaps,
     })
     return StreamingHttpResponse(template.render(context))
 

@@ -1,1 +1,106 @@
-<center><h2>In Development</h2></center>
+        <div id="profile_container">
+            <nav class="side_nav">
+                <ul>
+                    <li><a href="/accounts/profile/" {% if '/accounts/profile/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Summary</a></li>
+                    <li><a href="/accounts/password/" {% if 'accounts/password/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Password</a></li>
+                    <li><a href="/accounts/notifications/" {% if '/accounts/notifications/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Notifications</a></li>
+                </ul>
+            </nav>
+
+            <div class="side_nav_content">
+            {% if '/accounts/profile/' in request.path %}
+                <div>
+                    <div class="profile_row">
+                        <div class="label">Username:</div>
+                        <div>{% if user.is_authenticated %} {{ user }} {% endif %}</div>
+                    </div>
+                    <div class="profile_row">
+                        <div class="label">Password:</div>
+                        <div>**************** <a href="/accounts/password/">(change)</a></div>
+                    </div>
+                </div>
+
+                <div class="content_row">
+                    <p>Account created on {% if user.is_authenticated %} {{ user.date_joined }} {% endif %}</p>
+                    <section>{% if user.is_authenticated %} You have uploaded {{ amountMaps }} maps {% endif %}</section>
+                </div>
+
+            {% endif %}
+            {% if '/accounts/password/' in request.path %}
+                <div id="changePasswordForm">
+                    <form method="POST" action="{% url 'account_change_password' %}" class="password_change" id="password_change">
+                        {% csrf_token %}
+
+                        <ul class="errorlist">
+                            <li>This field is required.</li>
+                        </ul>
+                        <p>
+                            <label for="id_oldpassword">Current Password:</label>
+                            <input id="id_oldpassword" name="oldpassword" placeholder="Password" type="password" />
+                        </p>
+                        <ul class="errorlist">
+                            <li>This field is required.</li>
+                        </ul>
+                        <p>
+                            <label for="id_password1">New Password:</label>
+                            <input id="id_password1" name="password1" placeholder="Password" type="password" />
+                        </p>
+                        <ul class="errorlist">
+                            <li>This field is required.</li>
+                        </ul>
+                        <p>
+                            <label for="id_password2">New Password (again):</label>
+                            <input id="id_password2" name="password2" placeholder="Password" type="password" />
+                        </p>
+                        <button type="submit" name="action">Change Password</button>
+                    </form>
+                </div>
+
+                <script type="text/javascript">
+                function handlePasswordChanging()
+                {
+                    $("#changePasswordForm form").submit(function(e)
+                    {
+                        var postData = $(this).serializeArray();
+                        var formURL = $(this).attr("action");
+                        $.ajax(
+                        {
+                            url : formURL,
+                            type: "POST",
+                            data : postData,
+                            success:function(data, textStatus, jqXHR) 
+                            {
+                                //data: return data from server
+                                $("#changePasswordForm").html(data);
+                                handlePasswordChanging();
+
+                                if ($("#changePasswordForm ul.errorlist").length === 0)
+                                    $("#changePasswordForm").html("Password changed succesfully.");
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) 
+                            {
+                                //if fails
+                            }
+                        });
+                        e.preventDefault(); //STOP default action
+                    });
+                }
+                handlePasswordChanging();
+                </script>
+
+            {% endif %}
+            {% if '/accounts/notifications/' in request.path %}
+                <div>
+                    <form>
+                        <div class="checkbox">
+                            <input type="checkbox" value="1" id="checkboxInput" name="" />
+                            <label for="checkboxInput"></label>
+                        </div>
+                        <label for="checkboxInput">Receive email notifications if my upload gets commented</label>
+                    </form>
+                    <p>- Does nothing yet -</p>
+                </div>
+            {% endif %}
+            </div>
+            <div class="clear"></div>
+        </div>

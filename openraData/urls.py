@@ -46,6 +46,8 @@ urlpatterns = patterns('',
 
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
     url(r'^accounts/profile/?$', views.profile, name='profile'),
+    url(r'^accounts/password/?$', views.profile, name='profile'),
+    url(r'^accounts/notifications/?$', views.profile, name='profile'),
     url(r'^faq/?$', views.faq, name='faq'),
     url(r'^links/?$', views.links, name='links'),
     
