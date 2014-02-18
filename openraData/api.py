@@ -13,6 +13,7 @@ from django.db.models import Count
 from openraData.models import Maps
 from openraData.models import CrashReports
 from django.contrib.auth.models import User
+from openraData import misc
 
 # Map API
 def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
@@ -122,6 +123,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             basic_response.append(response_data)
 
         return StreamingHttpResponse(json.dumps(basic_response), content_type="application/json")
+
     elif arg == "sync":
         mod = value
         if mod == "":
@@ -158,7 +160,9 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             raise Http404
         if not mapObject.downloading:
             raise Http404
-        if mapObject.requires_upgrade and mapObject.next_rev != 0:
+        if mapObject.requires_upgrade:
+            raise Http404
+        if mapObject.next_rev != 0:
             raise Http404
         path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id)
         try:
@@ -181,6 +185,11 @@ def serialize_basic_map_info(mapObject):
     last_revision = True
     if mapObject.next_rev != 0:
         last_revision = False
+    license, icons = misc.selectLicenceInfo(mapObject)
+    if license != None:
+        license = "Creative Commons " + license
+    else:
+        license = "null"
     response_data = {}
     response_data['id'] = mapObject.id
     response_data['title'] = mapObject.title
@@ -201,8 +210,10 @@ def serialize_basic_map_info(mapObject):
     response_data['lua'] = mapObject.lua
     response_data['posted'] = str(mapObject.posted)
     response_data['viewed'] = mapObject.viewed
+    response_data['downloaded'] = mapObject.downloaded
     response_data['rating_votes'] = mapObject.rating_votes
     response_data['rating_score'] = mapObject.rating_score
+    response_data['license'] = license
     return response_data
 
 def get_minimap(mapid, soft=False):
