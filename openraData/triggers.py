@@ -17,6 +17,8 @@ def map_upgrade():
 
 def PushMapsToRsyncDirs():
 	# this function syncs rsync directories with fresh list of maps, triggered by uploading a new map
+	if settings.RSYNC_MAP_PATH.strip() == "":
+		return
 	mods = Maps.objects.values_list('game_mod', flat=True).distinct()
 	RSYNC_MAP_PATH = settings.RSYNC_MAP_PATH
 	if not RSYNC_MAP_PATH.endswith('/'):
