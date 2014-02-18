@@ -292,6 +292,7 @@ div#br {
   position: relative;
   background: url("/static/images/subNavBg.png");
   border: 2px solid #74c2e7;
+  box-shadow: 0px 0px 10px #000;
 }
 
 .arrow_box:after, .arrow_box:before {
