@@ -8,6 +8,27 @@
                                 <div><img src="/maps/{{item.id}}/minimap" /></div><div>{{ item.title }}</div>
                             </div>
                         </a>
+                        <div class="map_tooltip">
+                            <div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
+                            <table>
+                                <tr>
+                                    <td class="tooltip_title">Author: </td>
+                                    <td class="tooltip_value">{{ item.author }} </td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip_title">Uploader: </td>
+                                    <td class="tooltip_value">{{ item.user }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip_title">Revision: </td>
+                                    <td class="tooltip_value">{{ item.revision }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip_title">Players: </td>
+                                    <td class="tooltip_value">{{ item.players }}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 {% endfor %}
                 <div class="clear"></div>
