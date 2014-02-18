@@ -13,6 +13,7 @@
 
                     <div class="frame">
                         <form id="login" method="POST" action="{% url 'account_login' %}">{% csrf_token %}
+                            {% if form.non_field_errors %}<span style="color: #ff0000; font-weight: bold;" class="error">{{ form.non_field_errors|join:", " }}</span>{% endif %}
                             <div class="row">
                                 <div class="innerCellLeft">
                                     <label for="id_username">Username:</label>{% if form.login.errors %}<br />

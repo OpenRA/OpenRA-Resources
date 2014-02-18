@@ -25,6 +25,7 @@ curl
  * Django web server user must have .openra directory in it's home and have owner rights to it (for OpenRA.Utility)
  * Directory with compiled OpenRA tools must have write permissions for Django web server user
  * Make sure Django web server user can write into '/tmp/'
+ * Configure RSYNC server with 2 new directories: 'maps' and 'MapAPImirror' (This names are used in guides)
  * This repository root is actually a Django Site with additional Apps
 
 ### Edit Django settings.py (systemTool/settings.py)
