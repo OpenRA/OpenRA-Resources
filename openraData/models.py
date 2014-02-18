@@ -2,6 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 from djangoratings.fields import RatingField
 
+class UserOptions(models.Model):
+
+    class Meta:
+        verbose_name = 'UserOption'
+
+    user                = models.ForeignKey(User)
+    notifications_email = models.BooleanField(default=False)
+    notifications_site  = models.BooleanField(default=True)
+
 class Maps(models.Model):
     
     class Meta:
@@ -28,6 +37,7 @@ class Maps(models.Model):
     lua                 = models.BooleanField(default=False)
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
+    downloaded          = models.IntegerField(default=0)
     rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
     policy_cc           = models.BooleanField(default=False)
     policy_adaptations  = models.CharField(max_length=30)
@@ -49,6 +59,7 @@ class Units(models.Model):
     next_rev            = models.IntegerField(default=0)
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
+    downloaded          = models.IntegerField(default=0)
     rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
     policy_cc           = models.BooleanField(default=False)
     policy_adaptations  = models.CharField(max_length=30)
@@ -67,11 +78,24 @@ class Mods(models.Model):
     next_rev            = models.IntegerField(default=0)
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
+    downloaded          = models.IntegerField(default=0)
     rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
-    creative_commons    = models.BooleanField(default=False)
     policy_cc           = models.BooleanField(default=False)
     policy_adaptations  = models.CharField(max_length=30)
     policy_commercial   = models.BooleanField(default=False)
+
+class Replays(models.Model):
+
+    class Meta:
+        verbose_name = 'Replay'
+
+    user                = models.ForeignKey(User)
+    title               = models.CharField(max_length=200)
+    info                = models.CharField(max_length=2000)
+    version             = models.CharField(max_length=50)
+    posted              = models.DateTimeField('date published')
+    viewed              = models.IntegerField(default=0)
+    downloaded          = models.IntegerField(default=0)
 
 class Palettes(models.Model):
 
@@ -93,6 +117,7 @@ class Reports(models.Model):
     reason              = models.CharField(max_length=400)
     ex_id               = models.IntegerField(default=0)
     ex_name             = models.CharField(max_length=16)
+    infringement        = models.BooleanField(default=False)
     posted              = models.DateTimeField('date published')
 
 class Comments(models.Model):
