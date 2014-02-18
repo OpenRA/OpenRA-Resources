@@ -1,137 +1,81 @@
-<div>
-<div>
-	<div>{% if fullPreview %}
-			<a href={{ '/maps/' }}{{ arg }}{{ '/render' }}><img src={{ '/maps/' }}{{ arg }}{{ '/render' }} /></a>
-		{% else %}
-			<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} />
-		{% endif %}
-	</div>
-</div>
-<div>
-	<div>
-		Uploader: {{ userid.username }}
-	</div>
-</div>
-<div>
-	<div>
-		Title: {{ map.title }}
-	</div>
-</div>
-<div>
-	<div>
-		Description: {{ map.description }}
-	</div>
-</div>
-<div>
-	<div>
-		Info: {{ map.info }}
-	</div>
-</div>
-<div>
-	<div>
-		Author: {{ map.author }}
-	</div>
-</div>
-<div>
-	<div>
-		Type: {{ map.map_type }}
-	</div>
-</div>
-<div>
-	<div>
-		Max Players: {{ map.players }}
-	</div>
-</div>
-<div>
-	<div>
-		Mod: {{ map.game_mod }}
-	</div>
-</div>
-<div>
-	<div>
-		Hash: {{ map.map_hash }}
-	</div>
-</div>
-<div>
-	<div>
-		Width: {{ map.width }}
-	</div>
-</div>
-<div>
-	<div>
-		Height: {{ map.height }}
-	</div>
-</div>
-<div>
-	<div>
-		Tileset: {{ map.tileset }}
-	</div>
-</div>
-<div>
-	<div>
-		Revision: {{ map.revision }}
-	</div>
-</div>
-<div>
-	<div>
-		Previous revision: {{ map.pre_rev }}
-	</div>
-</div>
-<div>
-	<div>
-		Next revision: {{ map.next_rev }}
-	</div>
-</div>
-<div>
-	<div>
-		Allowed for downloading over API: {{ map.downloading }}
-	</div>
-</div>
-<div>
-	<div>
-		Requires upgrade: {{ map.requires_upgrade }}
-	</div>
-</div>
-<div>
-	<div>
-		Advanced map: {{ map.advanced_map }}
-	</div>
-</div>
-<div>
-	<div>
-		Map with Lua: {{ map.lua }}
-	</div>
-</div>
-<div>
-	<div>
-		Published: {{ map.posted }}
-	</div>
-</div>
-<div>
-	<div>
-		Viewed: {{ map.viewed }}
-	</div>
-</div>
-<div>
-	<div>
-		Votes: {{ map.rating_votes }}
-	</div>
-</div>
-<div>
-	<div>
-		Score: {{ map.rating_score }}
-	</div>
-</div>
-<div>
-	<div>
-		Download: <a href={{ '/maps/' }}{{ arg }}{{ '/oramap' }}>mapfile</a>
-	</div>
-</div>
-<div>
-	<div>
-		{% if license %}
-		<a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/{{icons}}/4.0/88x31.png" /></a><br />This work is licensed under a <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">Creative Commons {{license}}</a>.
-		{% endif %}
-	</div>
-</div>
-</div>
+            <div id="map_data_container">
+                <div class="left_map_content">
+                    <div class="map_title">{{ map.title }}</div>
+                    <div class="map_description"><div class="map_label">Description</div>{{ map.description|default:"No description :(" }}</div>
+                    <div class="map_info">{{ map.info|default:"" }}</div>
+                </div>
+                <div class="right_map_content">
+                    <div class="map_image_container">
+                        <div class="map_image">
+                        {% if fullPreview %}
+                            <a href={{ '/maps/' }}{{ arg }}{{ '/render' }}><img src={{ '/maps/' }}{{ arg }}{{ '/render' }} /></a>
+                        {% else %}
+                            <img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} />
+                        {% endif %}
+                            <div class="map_dl">
+                                <a href={{ '/maps/' }}{{ arg }}{{ '/oramap' }}>Download mapfile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+
+                <div class="bottom_map_content">
+                    <div class="left_map_content">
+                        <div>
+                            {% if license %}
+                            <div class="cclImg">
+                                <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">
+                                    <img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/{{icons}}/4.0/88x31.png" />
+                                </a>
+                            </div>
+                            <p>This work is licensed under a <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">Creative Commons {{license}}</a>.</p>
+                            {% endif %}
+                        </div>
+                        <hr />
+                        <div class="map_extra">
+                            <div class="map_data_label">API download allowed:</div><div class="map_data_text">{{ map.downloading }}</div>
+                            <div class="map_data_label">Requires upgrade:</div><div class="map_data_text">{{ map.requires_upgrade }}</div>
+                            <div class="map_data_label">Advanced map:</div><div class="map_data_text">{{ map.advanced_map }}</div>
+                            <div class="map_data_label">Map with Lua:</div><div class="map_data_text">{{ map.lua }}</div>
+                        </div>
+                    </div>
+                    <div class="right_map_content">
+                        <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
+                        <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
+                        <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>
+                        <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type }}</div>
+                        <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.width }} x {{ map.height }}</div>
+                        <div class="map_data_label">Max Players:</div><div class="map_data_text">{{ map.players }}</div>
+                        <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
+                        <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
+                    </div>
+                    <div class="clear"></div>
+
+                    <div class="bottom_map_content">
+                        <div class="left_map_content">
+                            <table>
+                                <tr>
+                                    <th>Prev revision</th>
+                                    <th>Revision</th>
+                                    <th>Next revision</th>
+                                </tr>
+                                <tr>
+                                    <td>{{ map.pre_rev }}</td>
+                                    <td>{{ map.revision }}</td>
+                                    <td>{{ map.next_rev }}</td>
+                                </tr>
+                                <tr><th colspan="3">Hash</th></tr>
+                                <tr><td colspan="3">{{ map.map_hash }}</td></tr>
+                            </table>
+                        </div>
+                        <div class="right_map_content">
+                            <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
+                            <div class="map_data_label">Votes:</div><div class="map_data_text">{{ map.rating_votes }}</div>
+                            <div class="map_data_label">Score:</div><div class="map_data_text">{{ map.rating_score }}</div>
+                        </div>
+
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
