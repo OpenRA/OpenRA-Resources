@@ -43,6 +43,10 @@ hr {
   background: #74c2e7;
 }
 
+.clear {
+  clear: both;
+}
+
 a, a:visited { 
   color: white;
 }
@@ -84,6 +88,10 @@ div#br {
   margin-left: -1px;
 }
 
+#paging_celler {
+  display: table-cell;
+}
+
 #paging_cell a {
   font-size: 0.9em;
   display: block;
@@ -91,6 +99,7 @@ div#br {
   width: 25px;
   height: 25px;
   line-height: 25px;
+  vertical-align: bottom
 }
 
 #paging_cell a:hover {
@@ -114,6 +123,7 @@ div#br {
   text-align: center;
   margin-left: 3px;
   padding-bottom: 10px;
+  position: relative;
 }
 
 #map_grid_cell {
@@ -123,25 +133,36 @@ div#br {
   float: left;
   margin-top: -1px;
   margin-left: -1px;
+  position: relative;
 }
 
 #map_grid_cell a {
   display: block;
   min-height: 170px;
   width: 138px;
+  position: relative;
 }
 
-#map_grid_cell a:hover {
+.cell-link-container {
+  text-align: center;
+  position: absolute;
+  bottom: 2px;
+}
+
+.cell-link-container div {
+  text-align: center;
+  width: 138px;
+}
+
+#map_grid_cell:hover {
   background: rgba(32, 44, 69, 0.7);
   transition: all 0.6s ease;
 }
 
 #map_grid_cell img {
-  display: block;
   max-width: 120px;
   max-height: 135px;
   padding: 8px;
-  margin: 0 auto;
 }
 
 #rssfeed {
@@ -195,6 +216,7 @@ div#br {
 #content {
   padding-left:50px;
   padding-right:50px;
+  position: relative;
 }
 
 #nav {
@@ -218,9 +240,8 @@ div#br {
   border-width: 0 0 2px 0;
 }
 
-#nav .nav-selected {
-  border: solid #74c2e7;
-  border-width: 0 0 2px 0;
+.nav-selected {
+  border-bottom: 2px solid #74c2e7;
 }
 
 #nav a { 
@@ -237,6 +258,7 @@ div#br {
   margin: 10px 0 0 359px;
   position: absolute;
   width: 177px;
+  z-index: 100;
 }
 
 #nav li:hover ul {
@@ -591,3 +613,138 @@ p.registerInfo {
 .license_cc .license_options {
   list-style-type: none;
 }
+
+/* Profile pages */
+
+#profile_container {
+  min-height: 300px;
+  padding: 20px 0 0;
+}
+  .side_nav {
+    float: left;
+
+    width: 200px;
+
+    font-size: 16px;
+  }
+    .side_nav ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+      .side_nav ul li {
+        padding: 0 0 10px 0;
+      }
+        .side_nav a {
+          text-decoration: none;
+        }
+        .side_nav a:hover {
+          border-bottom: 2px solid skyblue;
+        }
+
+  .side_nav_content {
+    margin: 0 0 0 200px;
+
+  }
+    .side_nav_content div.profile_row {
+      margin: 0 0 10px 0;
+    }
+      .side_nav_content div.label {
+        width: 100px;
+        float: left;
+      }
+  .content_row {
+    margin: 30px 0 0;
+  }
+
+#changePasswordForm {
+  position: absolute;
+  bottom: 100px;
+}
+  #changePasswordForm ul.errorlist {
+    font-size: 10px;
+    list-style-type: none;
+    margin: 10px 0 0;
+    padding: 0 0 0 200px;
+    color: #dfdfdf;
+  }
+  #changePasswordForm p {
+    margin: 0;
+  }
+    input[type="password"], input[type="text"], input[type="email"] {
+      background: rgba(32, 44, 69, 0.4);
+      border: 2px solid #74c2e7;
+      padding: 2px;
+      color: #fff;
+      width: 150px;
+    }
+    button[type="submit"] {
+      border: 1px solid #dfdfdf;
+      background: dfdfdf;
+      padding: 4px 6px;
+    }
+    #changePasswordForm label {
+      font-size: 12px;
+      width: 140px;
+      display: inline-block;
+    }
+  #changePasswordForm button[type="submit"] {
+    width: 302px;
+    height: 32px;
+    margin: 12px 0 0;
+    font-size: 16px;
+    line-height: 16px;
+  }
+  button[type="submit"]:hover {
+    box-shadow: inset 2px 2px 10px #777;
+  }
+  button[type="submit"]:active {
+    box-shadow: inset 2px 2px 10px #555;
+    outline: none;
+  }
+
+.checkbox {
+  width: 16px;
+  height: 15px;
+  display: inline-block;
+  position: relative;
+  margin: 0 10px 0 0;
+}
+  .checkbox label {
+    cursor: pointer;
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 0;
+      left: 0;
+    background: transparent;
+    border: 2px solid skyblue;
+  }
+  .checkbox label:after {
+    opacity: 0;
+    content: '';
+    position: absolute;
+    width: 11px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    top: 3px;
+    left: 2px;
+    border: 3px solid #fff;
+    border-top: none;
+    border-right: none;
+
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+  .checkbox label:hover::after {
+    opacity: 0.2;
+  }
+  .checkbox input[type=checkbox]:checked + label:after {
+    opacity: 1;
+  }
+  .checkbox input[type=checkbox] {
+    display: none;
+  }
