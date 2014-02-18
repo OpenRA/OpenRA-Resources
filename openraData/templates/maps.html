@@ -3,14 +3,17 @@
             <div id="map_grid">
                 {% for item in maps %}
                     <div id="map_grid_cell">
-                        <a href="http://{{http_host}}/maps/{{item.id}}"><img src="/maps/{{item.id}}/minimap" />{{ item.title }}</a>
+                        <a href="http://{{http_host}}/maps/{{item.id}}">
+                            <div class="cell-link-container">
+                                <div><img src="/maps/{{item.id}}/minimap" /></div><div>{{ item.title }}</div>
+                            </div>
+                        </a>
                     </div>
                 {% endfor %}
-                <div style="clear:both"></div>
+                <div class="clear"></div>
             </div>
             {% if 2 in range %}
             <div id="paging">
-                <div id="br"></div>
                 {% for i in range %}
                 <div id="paging_cell">
                 {% if i == page %}
@@ -22,4 +25,5 @@
                 {% endfor %}
             </div>
             {% endif %}
+            <div class="clear"></div>
             {% endif %}
