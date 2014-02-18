@@ -11,6 +11,7 @@ from django.db.models import Count
 
 from .forms import UploadMapForm
 from django.contrib.auth.models import User
+from allauth.socialaccount.models import SocialAccount
 from openraData import handlers, misc
 from openraData.models import Maps
 
@@ -361,15 +362,20 @@ def handle404(request):
 def profile(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
-    template = loader.get_template('index.html')
     mapObject = Maps.objects.filter(user_id=request.user.id)
     amountMaps = len(mapObject)
+    ifsocial = False
+    social = SocialAccount.objects.filter(user=request.user.id)
+    if len(social) != 0:
+        ifsocial = True
+    template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'profile.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': ' - Profile',
         'amountMaps': amountMaps,
+        'ifsocial': ifsocial,
     })
     return StreamingHttpResponse(template.render(context))
 
