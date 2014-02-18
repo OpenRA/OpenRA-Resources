@@ -2,7 +2,9 @@
             <nav class="side_nav">
                 <ul>
                     <li><a href="/accounts/profile/" {% if '/accounts/profile/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Summary</a></li>
+                    {% if ifsocial == False %}
                     <li><a href="/accounts/password/" {% if 'accounts/password/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Password</a></li>
+                    {% endif %}
                     <li><a href="/accounts/notifications/" {% if '/accounts/notifications/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Notifications</a></li>
                 </ul>
             </nav>
@@ -14,10 +16,12 @@
                         <div class="label">Username:</div>
                         <div>{% if user.is_authenticated %} {{ user }} {% endif %}</div>
                     </div>
+                    {% if ifsocial == False %}
                     <div class="profile_row">
                         <div class="label">Password:</div>
                         <div>**************** <a href="/accounts/password/">(change)</a></div>
                     </div>
+                    {% endif %}
                 </div>
 
                 <div class="content_row">
@@ -27,6 +31,7 @@
 
             {% endif %}
             {% if '/accounts/password/' in request.path %}
+                {% if ifsocial == False %}
                 <div id="changePasswordForm">
                     <form method="POST" action="{% url 'account_change_password' %}" class="password_change" id="password_change">
                         {% csrf_token %}
@@ -55,6 +60,7 @@
                         <button type="submit" name="action">Change Password</button>
                     </form>
                 </div>
+                {% endif %}
 
                 <script type="text/javascript">
                 function handlePasswordChanging()
