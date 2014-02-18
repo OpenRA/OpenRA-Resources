@@ -5,6 +5,7 @@ import zipfile
 import string
 import re
 from subprocess import Popen, PIPE
+import multiprocessing
 
 from django.conf import settings
 from django.utils import timezone
@@ -13,6 +14,7 @@ from openraData.models import Maps
 from openraData.models import Units
 from openraData.models import Mods
 from openraData.models import Screenshots
+from openraData import triggers
 
 class MapHandlers():
     
@@ -187,6 +189,8 @@ class MapHandlers():
 
         self.GenerateMinimap()
         #self.GenerateFullPreview(userObject)
+        p = multiprocessing.Process(target=triggers.PushMapsToRsyncDirs, args=(), name='triggers')
+        p.start()
 
     def UnzipMap(self):
         z = zipfile.ZipFile(self.map_full_path_filename, mode='a')
@@ -202,7 +206,7 @@ class MapHandlers():
         command = 'mono OpenRA.Utility.exe --map-hash ' + filepath
         proc = Popen(command.split(), stdout=PIPE).communicate()
         self.maphash = proc[0].strip()
-        self.flushLog(proc)
+        self.LOG.append(self.maphash)
 
         os.chdir(self.currentDirectory)
 
