@@ -52,7 +52,7 @@ a, a:visited {
 }
 
 a img {
-    border: none;
+  border: none;
 }
 
 a.current {
@@ -67,7 +67,7 @@ p.download, .newsDetails {
 }
 
 table tr td {
-    font-size: 0.9em;
+  font-size: 0.9em;
 }
 
 div#br {
@@ -245,8 +245,8 @@ div#br {
 }
 
 #nav a { 
-    text-decoration: none;
-    font: 17px Cambria, Georgia, Times New Roman, Serif;
+  text-decoration: none;
+  font: 17px Cambria, Georgia, Times New Roman, Serif;
  }
 #nav a:visited { text-decoration: none; }
 #nav a:hover { text-decoration: none; }
@@ -766,10 +766,10 @@ p.registerInfo {
   z-index: 10;
   top: -40%;
   left: -23%;
-  font: 11px arial;
+  font: 12px arial;
   text-align: left;
 
-  background: #232323;
+  background: url("/static/images/subNavBg.png");
   border: 1px solid lightblue;
   box-shadow: 2px 2px 10px #000;
 }
@@ -793,13 +793,11 @@ p.registerInfo {
     color: #eeb695;
   }
     .map_tooltip .tooltip_title {
-      display: inline-block;
       width: 30%;
       color: #dfdfdf;
       padding: 1px 0;
     }
     .map_tooltip .tooltip_value {
-      display: inline-block;
       width: 70%;
       color: #f0f0f0;
       padding: 1px 0;
