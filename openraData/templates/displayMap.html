@@ -1,6 +1,13 @@
             <div id="map_data_container">
                 <div class="left_map_content">
                     <div class="map_title">{{ map.title }}</div>
+                    {% if map.advanced_map %}
+                    <div class="map_options">Map is <b>Advanced</b> 
+                        {% if map.lua %}
+                            and contains <b>Lua</b> logic
+                        {% endif %}
+                    </div>
+                    {% endif %}
                     <div class="map_description"><div class="map_label">Description</div>{{ map.description|default:"No description :(" }}</div>
                     <div class="map_info">{{ map.info|default:"" }}</div>
                 </div>
@@ -29,16 +36,18 @@
                                     <img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/{{icons}}/4.0/88x31.png" />
                                 </a>
                             </div>
-                            <p>This work is licensed under a <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">Creative Commons {{license}}</a>.</p>
+                            <p>This work is licensed under a <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">Creative Commons {{license}}</a>.</p><p><a href="#">Report copyright infringement</a></p>
                             {% endif %}
                         </div>
                         <hr />
-                        <div class="map_extra">
-                            <div class="map_data_label">API download allowed:</div><div class="map_data_text">{{ map.downloading }}</div>
-                            <div class="map_data_label">Requires upgrade:</div><div class="map_data_text">{{ map.requires_upgrade }}</div>
-                            <div class="map_data_label">Advanced map:</div><div class="map_data_text">{{ map.advanced_map }}</div>
-                            <div class="map_data_label">Map with Lua:</div><div class="map_data_text">{{ map.lua }}</div>
+                        {% if map.next_rev != 0 or map.downloading == False or map.requires_upgrade == True %}
+                        <div>
+                            <p><b>Attention!</b> Map can't be automatcially downloaded by OpenRA game!<br />
+                                {% if map.downloading == False %}<p>Reason: Too many reports</p>{% endif %}
+                                {% if map.requires_upgrade == True %}<p>Reason: Requires upgrade, see <a style="text-decoration: underline;" href="/maps/{{arg}}/lintlog">lintlog</a> (Failed for version: {{version}})</p>{% endif %}
+                                {% if map.next_rev != 0 %}<p>Reason: There is a newer version of this map</p>{% endif %}
                         </div>
+                        {% endif %}
                     </div>
                     <div class="right_map_content">
                         <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
@@ -57,13 +66,21 @@
                             <table>
                                 <tr>
                                     <th>Prev revision</th>
-                                    <th>Revision</th>
+                                    <th><a style="text-decoration: underline;" href="#" title="Show all revisions">Revision</a></th>
                                     <th>Next revision</th>
                                 </tr>
                                 <tr>
                                     <td>{{ map.pre_rev }}</td>
                                     <td>{{ map.revision }}</td>
-                                    <td>{{ map.next_rev }}</td>
+                                    <td>{% if map.next_rev == 0 %}
+                                            {%if map.user_id == request.user.id %}
+                                            <a href="#">Upload new revision</a>
+                                            {% else %}
+                                            It's the latest revision
+                                            {% endif %}
+                                        {% else %}
+                                            <a href="/maps/{{map.next_rev}}/"><img src="/maps/{{map.next_rev}}/minimap" /></a>
+                                        {% endif %}</td>
                                 </tr>
                                 <tr><th colspan="3">Hash</th></tr>
                                 <tr><td colspan="3">{{ map.map_hash }}</td></tr>
@@ -71,8 +88,13 @@
                         </div>
                         <div class="right_map_content">
                             <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
-                            <div class="map_data_label">Votes:</div><div class="map_data_text">{{ map.rating_votes }}</div>
-                            <div class="map_data_label">Score:</div><div class="map_data_text">{{ map.rating_score }}</div>
+                            <div class="map_data_label">Downloaded</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
+                            <div class="map_data_label"></div><div class="map_data_text"><a href="#">Show yaml</a></div>
+                            <div class="map_data_label"></div><div class="map_data_text"><a href="#">Report map</a></div>
+                            {% if request.user.is_superuser or map.user_id == request.user.id %}
+                            <div class="map_data_label"></div><div class="map_data_text"><a href="#">Edit map</a></div>
+                            <div class="map_data_label"></div><div class="map_data_text"><a href="#">Delete {%if map.user_id == request.user.id %}my {% endif %}map</a></div>
+                            {% endif %}
                         </div>
 
                     </div>

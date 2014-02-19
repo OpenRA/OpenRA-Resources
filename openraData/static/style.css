@@ -766,11 +766,11 @@ p.registerInfo {
   z-index: 10;
   top: -40%;
   left: -23%;
-  font: 12px arial;
+  font: 12px Helvetica,arial,freesans,clean,sans-serif;
   text-align: left;
 
-  background: url("/static/images/subNavBg.png");
-  border: 1px solid lightblue;
+  background: url("/static/images/subNavBg.png") repeat scroll 0% 0% transparent;;
+  border: 1px solid #74c2e7;
   box-shadow: 2px 2px 10px #000;
 }
   .map_tooltip table {
@@ -826,6 +826,11 @@ p.registerInfo {
     }
     .map_description {
       position: relative;
+      padding: 8px 0;
+    }
+    .map_options {
+      position: relative;
+      border-bottom: 2px solid #74c2e7;
       padding: 8px 0;
     }
   .right_map_content {
