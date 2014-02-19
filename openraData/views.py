@@ -2,6 +2,7 @@ import os
 import math
 import re
 import urllib2
+from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +11,7 @@ from django.db import connection
 from django.db.models import Count
 
 from .forms import UploadMapForm
+from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openraData import handlers, misc
@@ -100,6 +102,16 @@ def displayMap(request, arg):
         mapObject = Maps.objects.get(id=arg.lstrip('0'))
     except:
         return HttpResponseRedirect('/')
+    path = settings.OPENRA_PATH
+    if not path.endswith('/'):
+        path += '/'
+    versionFile = open(path + 'mods/ra/mod.yaml', 'r')
+    version = versionFile.read()
+    versionFile.close()
+    try:
+        version = re.findall('Version: (.*)', version)[0]
+    except:
+        version = "null"
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -115,6 +127,7 @@ def displayMap(request, arg):
         'fullPreview': fullPreview,
         'license': license,
         'icons': icons,
+        'version': version,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -195,6 +208,7 @@ def serveOramap(request, arg, sync=""):
                 oramap = arg.lstrip('0') + ".oramap"
         response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename = "%s"' % oramap
+        Maps.objects.filter(id=arg.lstrip()).update(downloaded=F('downloaded')+1)
         return response
 
 def uploadMap(request):

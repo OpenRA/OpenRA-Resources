@@ -179,6 +179,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         oramap = os.path.splitext(oramap)[0] + "-" + str(mapObject.revision) + ".oramap"
         response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename = "%s"' % oramap
+        Maps.objects.filter(id=mapObject.id).update(downloaded=mapObject.downloaded+1)
         return response
 
 def serialize_basic_map_info(mapObject):
