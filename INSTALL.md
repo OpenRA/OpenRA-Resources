@@ -32,7 +32,7 @@ curl
 
  * Generate a new Django secret key and change "SECRET_KEY" setting
  * Change "DEBUG" setting to False if it's True
- * Modify "OPENRA_PATH" to specify a directory with compiled OpenRA files (with slash at the end) (make sure it's always the latest release)
+ * Modify "OPENRA_PATH" to specify a directory with compiled OpenRA files (make sure it's always the latest release)
  * Modify "RSYNC_MAP_PATH" and "RSYNC_MAP_API_PATH" to specify directories where maps will be dumped by website trigger for dedicated servers and Map API mirrors usage. See [Sync Maps over Rsync](https://github.com/OpenRA/OpenRA-Content-Engine/wiki/Sync-maps-over-RSYNC-%28for-dedicated-servers%29) guide for details.
  * Modify GITHUB related settings (user, repository and API token): used to post an issue with info about OpenRA crash report
  * Modify "ADMIN_EMAIL" to specify an email address of a person who is responsible for fixing map uploading issues

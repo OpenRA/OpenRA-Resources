@@ -113,10 +113,10 @@ STATIC_URL = '/static/'
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
-# Path to directory where OpenRA files are stored ( with slash at the end! )
+# Path to directory where OpenRA files are stored
 OPENRA_PATH = '/usr/lib/openra/'
 
-# Path to directory which will be shared over rsync, with full permissions for website user ( with slash at the end! )
+# Path to directory which will be shared over rsync, with full permissions for website user
 # Must be outside of website's path tree
 # RSYNC_MAP_PATH: Website trigger will dump there 'good' maps for dedicated servers
 # RSYNC_MAP_API_PATH: Website trigger will dump there allowed for auto-downloading maps for Map API mirrors usage

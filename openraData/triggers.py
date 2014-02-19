@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count
 from openraData.models import Maps
+from openraData import misc
 
 # Map Triggers
 
@@ -20,12 +21,8 @@ def PushMapsToRsyncDirs():
 	if settings.RSYNC_MAP_PATH.strip() == "":
 		return
 	mods = Maps.objects.values_list('game_mod', flat=True).distinct()
-	RSYNC_MAP_PATH = settings.RSYNC_MAP_PATH
-	if not RSYNC_MAP_PATH.endswith('/'):
-		RSYNC_MAP_PATH += '/'
-	RSYNC_MAP_API_PATH = settings.RSYNC_MAP_API_PATH
-	if not RSYNC_MAP_API_PATH.endswith('/'):
-		RSYNC_MAP_API_PATH += '/'
+	RSYNC_MAP_PATH = misc.addSlash(settings.RSYNC_MAP_PATH)
+	RSYNC_MAP_API_PATH = misc.addSlash(settings.RSYNC_MAP_API_PATH)
 	if os.path.exists(RSYNC_MAP_PATH):
 		shutil.rmtree(RSYNC_MAP_PATH)
 	for mod in mods:

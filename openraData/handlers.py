@@ -231,7 +231,7 @@ class MapHandlers():
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
-            shutil.move(misc.addShash(settings.OPENRA_PATH) + self.preview_filename,
+            shutil.move(misc.addSlash(settings.OPENRA_PATH) + self.preview_filename,
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-mini.png")
             self.flushLog(proc)
             self.minimap_generated = True
