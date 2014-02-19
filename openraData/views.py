@@ -2,6 +2,7 @@ import os
 import math
 import re
 import urllib2
+import datetime
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
@@ -33,14 +34,18 @@ def logoutView(request):
     return HttpResponseRedirect('/')
 
 def feed(request):
-    template = loader.get_template('index.html')
+    mapObject = Maps.objects.order_by("posted")[0:20]
+    d = datetime.datetime.utcnow()
+    lastBuildDate = d.isoformat("T")
+    template = loader.get_template('feed.html')
     context = RequestContext(request, {
-        'content': 'feed.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
-        'title': ' - Rss Feed',
+        'title': 'OpenRA Resource Center - Rss Feed',
+        'lastBuildDate': lastBuildDate,
+        'mapObject': mapObject,
     })
-    return StreamingHttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context), content_type='text/xml')
 
 def search(request):
     template = loader.get_template('index.html')
