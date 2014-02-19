@@ -14,7 +14,7 @@ from openraData.models import Maps
 from openraData.models import Units
 from openraData.models import Mods
 from openraData.models import Screenshots
-from openraData import triggers
+from openraData import triggers, misc
 
 class MapHandlers():
     
@@ -231,7 +231,7 @@ class MapHandlers():
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
-            shutil.move(settings.OPENRA_PATH + self.preview_filename,
+            shutil.move(misc.addShash(settings.OPENRA_PATH) + self.preview_filename,
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-mini.png")
             self.flushLog(proc)
             self.minimap_generated = True
@@ -247,7 +247,7 @@ class MapHandlers():
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
-            shutil.move(settings.OPENRA_PATH + self.preview_filename,
+            shutil.move(misc.addSlash(settings.OPENRA_PATH) + self.preview_filename,
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-full.png")
             self.flushLog(proc)
             self.fullpreview_generated = True

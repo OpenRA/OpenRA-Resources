@@ -26,3 +26,8 @@ def selectLicenceInfo(itemObject):
 		name = "Attribution-NonCommercial-ShareAlike 4.0 International"
 		icons = 'by-nc-sa'
 	return name, icons
+
+def addSlash(path):
+	if not path.endswith('/'):
+		path += '/'
+	return path

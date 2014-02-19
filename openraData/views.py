@@ -107,9 +107,7 @@ def displayMap(request, arg):
         mapObject = Maps.objects.get(id=arg.lstrip('0'))
     except:
         return HttpResponseRedirect('/')
-    path = settings.OPENRA_PATH
-    if not path.endswith('/'):
-        path += '/'
+    path = misc.addShash(settings.OPENRA_PATH)
     versionFile = open(path + 'mods/ra/mod.yaml', 'r')
     version = versionFile.read()
     versionFile.close()
