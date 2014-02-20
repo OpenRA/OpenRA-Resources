@@ -610,7 +610,7 @@ p.registerInfo {
 
 /* Upload forms */
 .upload_container {
-  width: 460px;
+  width: 360px;
   margin: 0 auto;
 }
   .upload_container input[type="text"] {
