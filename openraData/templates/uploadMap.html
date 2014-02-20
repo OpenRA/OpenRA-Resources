@@ -9,80 +9,84 @@
                     });
                 });
             </script>
-            <table class="Table"><tr><td>Upload your oramap file:</td></tr></table>
-            <form action="/maps/upload/" method="POST" enctype="multipart/form-data">{% csrf_token %}
-                <table class="Table">
-                    <tr>
-                        <td>
-                            <label for="id_username">Info:</label>{% if form.info.errors %} <span class="error">{{ form.info.errors|join:", " }}</span>{% endif %}
-                        </td>
-                        <td>
-                            {{ form.info }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="id_username">File:</label>{% if form.file.errors %} <span class="error">{{ form.file.errors|join:", " }}</span>{% endif %}
-                        </td>
-                        <td>
-                            {{ form.file }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <hr />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <div class="license_cc">
-                            Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
-                            {% for radio in form.policy_cc %}
-                                <label>{{ radio.tag }} {{ radio.choice_label }}</label>
-                            {% endfor %}
-                            </div>
-                            <div class="license_options"><br />
-                            Allow commercial uses of your work?<br />
-                            {% for radio in form.commercial %}
-                                <label>{{ radio.tag }} {{ radio.choice_label }}</label>
-                            {% endfor %}<br /><br />
-                            Allow modifications of your work?<br />
-                            {% for radio in form.adaptations %}
-                                <label>{{ radio.tag }} {{ radio.choice_label }}</label>
-                            {% endfor %}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <hr />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="submit" value="Upload" />
-                        </td>
-                        <td>
-                            {% if uploadingLog %}
-                            {% for line in uploadingLog %}
+            <div class="upload_container">
+                <form action="/maps/upload/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+                    <table class="Table">
+                        <tr>
+                            <th colspan="2">Upload your oramap file</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="id_username">Info:</label>{% if form.info.errors %} <span class="error">{{ form.info.errors|join:", " }}</span>{% endif %}
+                            </td>
+                            <td>
+                                {{ form.info }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="id_username">File:</label>{% if form.file.errors %} <span class="error">{{ form.file.errors|join:", " }}</span>{% endif %}
+                            </td>
+                            <td>
+                                {{ form.file }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
                                 <hr />
-                                {% if line == "Yaml check failed." %}
-                                    <p>{{ line }} See <a href={{ '/maps/' }}{{ uid }}{{ '/lintlog' }}>lintlog</a></p>
-                                {% else %}
-                                    {% if line == "Failed. You've already uploaded" %}
-                                     <p>{{ line }} <a href={{ '/maps/' }}{{ uid }}>this map</a> before:</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div class="license_cc">
+                                Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
+                                {% for radio in form.policy_cc %}
+                                    <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+                                {% endfor %}
+                                </div>
+                                <div class="license_options"><br />
+                                Allow commercial uses of your work?<br />
+                                {% for radio in form.commercial %}
+                                    <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+                                {% endfor %}<br /><br />
+                                Allow modifications of your work?<br />
+                                {% for radio in form.adaptations %}
+                                    <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+                                {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <hr />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="submit" value="Upload" />
+                            </td>
+                            <td>
+                                {% if uploadingLog %}
+                                {% for line in uploadingLog %}
+                                    <hr />
+                                    {% if line == "Yaml check failed." %}
+                                        <p>{{ line }} See <a href={{ '/maps/' }}{{ uid }}{{ '/lintlog' }}>lintlog</a></p>
                                     {% else %}
-                                        <p>{{ line }}</p>
+                                        {% if line == "Failed. You've already uploaded" %}
+                                         <p>{{ line }} <a href={{ '/maps/' }}{{ uid }}>this map</a> before:</p>
+                                        {% else %}
+                                            <p>{{ line }}</p>
+                                        {% endif %}
                                     {% endif %}
+                                {% endfor %}
                                 {% endif %}
-                            {% endfor %}
-                            {% endif %}
-                            {% if uid %}
-                                <p><a href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/' }}{{ uid }}>
-                                <img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>
-                            {% endif %}
-                        </td>
-                    </tr>
-                </table>
-            </form>
+                                {% if uid %}
+                                    <p><a href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/' }}{{ uid }}>
+                                    <img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
             {% endif %}
