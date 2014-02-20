@@ -10,6 +10,12 @@
                     {% endif %}
                     <div class="map_description"><div class="map_label">Description</div>{{ map.description|default:"No description :(" }}</div>
                     <div class="map_info">{{ map.info|default:"" }}</div>
+                    <div class="editMapInfo">
+                        <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+                            <input type="text" name="mapInfo" value="{{map.info}}">
+                            <button type="submit">Edit</button>
+                        </form>
+                    </div>
                 </div>
                 <div class="right_map_content">
                     <div class="map_image_container">
@@ -44,7 +50,7 @@
                                 <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
                                     <label>Infringement: </label><input type="checkbox" name="infringement" value="true">
                                     <label>Reason: </label><input type="text" name="reportReason">
-                                    <button class="reportMapButton" type="submit">Report</button>
+                                    <button type="submit">Report</button>
                                 </form>
                             </div>
                             {% endif %}
@@ -112,7 +118,7 @@
                                 {% endif %}
                             </div>
                             {% if request.user.is_superuser or map.user_id == request.user.id %}
-                            <div class="map_data_label"></div><div class="map_data_text"><a href="#">Edit map</a></div>
+                            <div class="map_data_label"></div><div class="map_data_text"><a class="editMapInfoShow">Edit map Info</a></div>
                             <div class="map_data_label"></div><div class="map_data_text"><a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a></div>
                             {% endif %}
                         </div>
@@ -133,6 +139,7 @@
                 $(function() {
                     $( document ).ready(function() {
                         $(".reportMap").hide();
+                        $(".editMapInfo").hide();
                     });
                     $(".report").click(function() {
                         $(".reportMap").hide();
@@ -143,6 +150,9 @@
                         $(".reportMap").hide();
                         $(".reportMap input[type='checkbox']").prop('checked', true);
                         $(".reportMap").show(100);
-                    })
+                    });
+                    $(".editMapInfoShow").click(function() {
+                        $(".editMapInfo").show(100);
+                    });
                 });
             </script>

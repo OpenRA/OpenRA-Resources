@@ -96,7 +96,7 @@ def maps(request, page=1, filter=""):
 
 def displayMap(request, arg):
     if request.method == 'POST':
-        if request.POST['reportReason'].strip() != "":
+        if request.POST.get('reportReason', "").strip() != "":
             checkReports = Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name='maps')
             if not checkReports:
                 infringement = request.POST.get('infringement', False)
@@ -112,6 +112,9 @@ def displayMap(request, arg):
                 )
                 transac.save()
                 return HttpResponseRedirect('/maps/'+arg)
+        elif request.POST.get('mapInfo', False) != False:
+            Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())
+            return HttpResponseRedirect('/maps/'+arg)
     fullPreview = False
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
     try:

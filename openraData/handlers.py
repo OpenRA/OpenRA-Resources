@@ -49,7 +49,7 @@ class MapHandlers():
             for chunk in f.chunks():
                 destination.write(chunk)
 
-        command = 'file -b --mime-type ' % tempname
+        command = 'file -b --mime-type %s' % tempname
         proc = Popen(command.split(), stdout=PIPE).communicate()
         mimetype = proc[0].strip()
         if mimetype != 'application/zip' or os.path.splitext(f.name)[1] != '.oramap':
