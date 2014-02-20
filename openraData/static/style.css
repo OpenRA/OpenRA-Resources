@@ -922,13 +922,12 @@ p.registerInfo {
   .reportMap label {
     font-size: 0.9em;
   }
-.editMapInfo {
+.editMapInfo, .allReports {
   display: none;
 }
-.editMapInfoShow, .report, .reportCopyright {
+.editMapInfoShow, .report, .reportCopyright, .allReportsShow {
   cursor: pointer;
 }
-
 
 /* Panel content */
 #panel_content {

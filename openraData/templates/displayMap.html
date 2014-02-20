@@ -98,6 +98,13 @@
                                 <tr><td colspan="3">{{ map.map_hash }}</td></tr>
                             </table>
                         </div>
+                        <div class="allReports">
+                            <hr />
+                            <p>Reports:</p>
+                                {% for item in reports %}
+                                <p>{{item.3}} by {{item.0}}{% if item.2 == True %} (copyright infringement){% endif %}: {{item.1}}</p>
+                                {% endfor %}
+                        </div>
                     </div>
                     <div class="right_map_content">
                         <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
@@ -113,8 +120,8 @@
                         <div class="map_data_label"></div><div class="map_data_text"><a href="#">Show yaml</a></div>
                         <div class="map_data_label"></div><div class="map_data_text">
                             {% if request.user.is_authenticated %}
-                            {% if reported == True %}<a href="/maps/{{map.id}}/cancelreport/">Cancel Report</a>
-                            {% else %}<a class="report">Report map</a>
+                            {% if reported == True %}<a href="/maps/{{map.id}}/cancelreport/">Cancel Report</a>{% if reports %} (<a class="allReportsShow">See reports</a>){% endif %}
+                            {% else %}<a class="report">Report map</a>{% if reports %} (<a class="allReportsShow">See reports</a>){% endif %}
                             {% endif %}
                             {% endif %}
                         </div>
@@ -157,6 +164,12 @@
                             $(".editMapInfo").hide(100);
                         else
                             $(".editMapInfo").show(100);
+                    });
+                    $(".allReportsShow").click(function() {
+                        if ( $(".allReports").is(':visible') )
+                            $(".allReports").hide(100);
+                        else
+                            $(".allReports").show(100);
                     });
                 });
             </script>
