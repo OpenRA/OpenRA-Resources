@@ -63,7 +63,8 @@ def ControlPanel(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
     template = loader.get_template('index.html')
-    mapObject = Maps.objects.filter(user_id=request.user.id).filter(next_rev=0).distinct("map_hash").order_by("map_hash", "-posted")
+    mapObject = Maps.objects.filter(user_id=request.user.id).filter(next_rev=0).distinct("map_hash")
+    mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
     context = RequestContext(request, {
         'content': 'control_panel.html',
         'request': request,
@@ -77,7 +78,8 @@ def maps(request, page=1, filter=""):
     perPage = 20
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
-    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash').order_by("map_hash", "-posted")
+    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
@@ -116,6 +118,7 @@ def displayMap(request, arg):
                     posted = timezone.now(),
                 )
                 transac.save()
+                misc.send_email_to_admin_OnReport("Item: http://%s  By user_id: %s  Reason: %s  Infringement: %s" % (request.META['HTTP_HOST']+'/maps/'+arg, request.user.id, request.POST['reportReason'].strip(), infringement))
                 return HttpResponseRedirect('/maps/'+arg)
         elif request.POST.get('mapInfo', False) != False:
             Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())

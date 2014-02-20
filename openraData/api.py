@@ -130,8 +130,8 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             raise Http404
         try:
             mapObject = Maps.objects.filter(game_mod=mod.lower()).filter(next_rev=0)
-            mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True)
-            mapObject = mapObject.distinct("map_hash").order_by("map_hash", "id")
+            mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True).distinct("map_hash")
+            mapObject = sorted(mapObject, key=lambda x: (x.id))
             if not mapObject:
                 raise Http404
         except:
@@ -144,7 +144,8 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         mod = value
         if mod == "":
             raise Http404
-        mapObject = Maps.objects.filter(game_mod=mod.lower()).distinct("map_hash").order_by("map_hash", "id")
+        mapObject = Maps.objects.filter(game_mod=mod.lower()).distinct("map_hash")
+        mapObject = sorted(mapObject, key=lambda x: (x.id))
         if not mapObject:
             raise Http404
         data = ""

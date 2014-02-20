@@ -1,3 +1,6 @@
+from django.core import mail
+from django.conf import settings
+
 def selectLicenceInfo(itemObject):
 	creative_commons = itemObject.policy_cc
 	commercial_use = itemObject.policy_commercial
@@ -31,3 +34,20 @@ def addSlash(path):
 	if not path.endswith('/'):
 		path += '/'
 	return path
+
+def send_email_to_admin_OnMapFail(tempname):
+	connection = mail.get_connection()
+	connection.open()
+	email = mail.EmailMessage('OpenRA Resource Center - Failed to upload map', 'See attachment', settings.ADMIN_EMAIL,
+                          [settings.ADMIN_EMAIL], connection=connection)
+	email.attach_file(tempname)
+	email.send()
+	connection.close()
+
+def send_email_to_admin_OnReport(body):
+	connection = mail.get_connection()
+	connection.open()
+	email = mail.EmailMessage('OpenRA Resource Center - New Report', body, settings.ADMIN_EMAIL,
+                          [settings.ADMIN_EMAIL], connection=connection)
+	email.send()
+	connection.close()

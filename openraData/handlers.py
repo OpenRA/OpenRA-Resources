@@ -80,6 +80,7 @@ class MapHandlers():
                 self.lua_map = True
         if "map.yaml" not in mapFileContent or "map.bin" not in mapFileContent:
             self.LOG.append('Failed. Invalid map format.')
+            misc.send_email_to_admin_OnMapFail(tempname)
             return False
         z.close()
 
@@ -119,6 +120,7 @@ class MapHandlers():
                 state = line.split(':')[1]
                 if state.strip().lower() in ['true', 'on', 'yes', 'y']:
                     self.LOG.append('Failed. Reason: %s' % line)
+                    misc.send_email_to_admin_OnMapFail(tempname)
                     return False
             if line.strip()[0:5] == "Rules":
                 shouldCount = True
@@ -314,25 +316,3 @@ def GetLatestRevisionID(self, itemid, modelName):
     return self.GetLatestRevisionID(itemObject.next_rev)
 
 ##########
-
-def DeleteMap(self, itemid):
-    pass
-
-def DeleteUnit(self, itemid):
-    pass
-
-def DeleteMod(self, itemid):
-    pass
-
-def DeletePalette(self, itemid):
-    pass
-
-def DeleteReplay(self, itemid):
-    pass
-
-def DeleteScreenshot(self, itemid):
-    pass
-
-def NotifyOnFail(self, message, tempname):
-    # send an email to admin attaching file which is already saved in temp location
-    pass
