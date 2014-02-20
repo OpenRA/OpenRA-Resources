@@ -77,7 +77,7 @@ def maps(request, page=1, filter=""):
     perPage = 20
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
-    mapObject = Maps.objects.all().annotate(count_hashes=Count("map_hash")).order_by("-posted").filter(next_rev=0)
+    mapObject = Maps.objects.all().order_by("-posted").filter(next_rev=0)
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
