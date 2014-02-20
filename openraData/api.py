@@ -88,7 +88,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
             if apifilter not in ["rating", "-rating", "players", "-players", "posted", "-posted", "author", "uploader"]:
                 raise Http404
         try:
-            mapObject = Maps.objects.all().filter(game_mod=mod.lower()).distinct('map_hash')
+            mapObject = Maps.objects.filter(game_mod=mod.lower()).distinct('map_hash')
             if apifilter == "players":
                 mapObject = mapObject.order_by("-players")
             if apifilter == "-players":
@@ -129,9 +129,9 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         if mod == "":
             raise Http404
         try:
-            mapObject = Maps.objects.all().filter(game_mod=mod.lower()).filter(next_rev=0)
+            mapObject = Maps.objects.filter(game_mod=mod.lower()).filter(next_rev=0)
             mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True)
-            mapObject = mapObject.annotate(count_hashes=Count("map_hash")).order_by("id")
+            mapObject = mapObject.distinct("map_hash").order_by("map_hash", "id")
             if not mapObject:
                 raise Http404
         except:
@@ -144,7 +144,7 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         mod = value
         if mod == "":
             raise Http404
-        mapObject = Maps.objects.all().filter(game_mod=mod.lower()).annotate(count_hashes=Count("map_hash")).order_by("id")
+        mapObject = Maps.objects.filter(game_mod=mod.lower()).distinct("map_hash").order_by("map_hash", "id")
         if not mapObject:
             raise Http404
         data = ""
@@ -293,7 +293,7 @@ def CrashLogs(request):
 
     # perform Gist manipulatons if it's a desync
     if desync:
-        crashObject = CrashReports.objects.all().filter(gameID=int(gameID))
+        crashObject = CrashReports.objects.filter(gameID=int(gameID))
         if len(crashObject) == 1:
             with open(path + "syncreport.log", "r") as syncContent:
                 fileToGist = syncContent.read()
