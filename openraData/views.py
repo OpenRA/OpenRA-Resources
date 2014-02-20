@@ -3,6 +3,7 @@ import math
 import re
 import urllib2
 import datetime
+import shutil
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
@@ -16,7 +17,7 @@ from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openraData import handlers, misc
-from openraData.models import Maps
+from openraData.models import Maps, Screenshots, Comments, Reports
 
 def index(request):
     template = loader.get_template('index.html')
@@ -242,6 +243,36 @@ def uploadMap(request):
         'form': form,
         'uploadingLog': uploadingLog,
         'uid': uid,
+    })
+    return StreamingHttpResponse(template.render(context))
+
+def DeleteMap(request, arg):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/maps/')
+    try:
+        mapObject = Maps.objects.get(id=arg.lstrip())
+    except:
+        return HttpResponseRedirect('/maps/')
+    mapTitle = mapObject.title
+    mapAuthor = mapObject.author
+    if mapObject.user_id == request.user.id:
+        path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+        try:
+            shutil.rmtree(path)
+        except:
+            pass
+        Screenshots.objects.filter(user_id=request.user.id, ex_id=mapObject.id, ex_name='maps').delete()
+        Reports.objects.filter(user_id=request.user.id, ex_id=mapObject.id, ex_name='maps').delete()
+        Comments.objects.filter(user_id=request.user.id, ex_id=mapObject.id, ex_name='maps').delete()
+        mapObject.delete()
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'deleteMap.html',
+        'request': request,
+        'http_host': request.META['HTTP_HOST'],
+        'title': 'Delete Map',
+        'mapTitle': mapTitle,
+        'mapAuthor': mapAuthor,
     })
     return StreamingHttpResponse(template.render(context))
 

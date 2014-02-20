@@ -93,7 +93,7 @@
                             <div class="map_data_label"></div><div class="map_data_text"><a href="#">Report map</a></div>
                             {% if request.user.is_superuser or map.user_id == request.user.id %}
                             <div class="map_data_label"></div><div class="map_data_text"><a href="#">Edit map</a></div>
-                            <div class="map_data_label"></div><div class="map_data_text"><a href="#">Delete {%if map.user_id == request.user.id %}my {% endif %}map</a></div>
+                            <div class="map_data_label"></div><div class="map_data_text"><a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a></div>
                             {% endif %}
                         </div>
 
@@ -101,3 +101,13 @@
                     <div class="clear"></div>
                 </div>
             </div>
+            <script>
+                function confirmDelete()
+                {
+                    var agree=confirm('Are you sure you want to delete this map?');
+                    if (agree)
+                    return true ;
+                    else
+                    return false ;
+                }
+            </script>
