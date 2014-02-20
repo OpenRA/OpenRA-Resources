@@ -8,7 +8,10 @@
                         {% endif %}
                     </div>
                     {% endif %}
-                    <div class="map_description"><div class="map_label">Description</div>{{ map.description|default:"No description :(" }}</div>
+                    <div class="map_description">
+                        <div class="map_label">Description</div>
+                        <p>{{ map.description|default:"No description :(" }}</p>
+                    </div>
                     <div class="map_info">{{ map.info|default:"" }}</div>
                     <div class="editMapInfo">
                         <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
@@ -44,7 +47,9 @@
                             </div>
                             <p>This work is licensed under a <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">Creative Commons {{license}}</a>.</p>
                             {% if request.user.is_authenticated %}
-                                {% if reported == False %}<p><a class="reportCopyright">Report copyright infringement</a></p>{% endif %}
+                                {% if reported == False %}
+                                <p><a class="reportCopyright">Report copyright infringement</a></p>
+                                {% endif %}
                             {% endif %}
                             <div class="reportMap">
                                 <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
@@ -53,9 +58,9 @@
                                     <button type="submit">Report</button>
                                 </form>
                             </div>
+                            <hr />
                             {% endif %}
                         </div>
-                        <hr />
                         {% if map.next_rev != 0 or map.downloading == False or map.requires_upgrade == True %}
                         <div>
                             <p><b>Attention!</b> Map can't be automatcially downloaded by OpenRA game!<br />
@@ -63,22 +68,10 @@
                                 {% if map.requires_upgrade == True %}<p>Reason: Requires upgrade, see <a style="text-decoration: underline;" href="/maps/{{arg}}/lintlog">lintlog</a> (Failed for version: {{version}})</p>{% endif %}
                                 {% if map.next_rev != 0 %}<p>Reason: There is a newer version of this map</p>{% endif %}
                         </div>
+                        {% else %}
+                        <p>This map is in pristine condition. :)</p>
                         {% endif %}
-                    </div>
-                    <div class="right_map_content">
-                        <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
-                        <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
-                        <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>
-                        <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type }}</div>
-                        <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.width }} x {{ map.height }}</div>
-                        <div class="map_data_label">Max Players:</div><div class="map_data_text">{{ map.players }}</div>
-                        <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
-                        <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
-                    </div>
-                    <div class="clear"></div>
-
-                    <div class="bottom_map_content">
-                        <div class="left_map_content">
+                        <div>
                             <table>
                                 <tr>
                                     <th>Prev revision</th>
@@ -106,23 +99,30 @@
                                 <tr><td colspan="3">{{ map.map_hash }}</td></tr>
                             </table>
                         </div>
-                        <div class="right_map_content">
-                            <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
-                            <div class="map_data_label">Downloaded</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
-                            <div class="map_data_label"></div><div class="map_data_text"><a href="#">Show yaml</a></div>
-                            <div class="map_data_label"></div><div class="map_data_text">
-                                {% if request.user.is_authenticated %}
-                                {% if reported == True %}<a href="/maps/{{map.id}}/cancelreport/">Cancel Report</a>
-                                {% else %}<a class="report">Report map</a>
-                                {% endif %}
-                                {% endif %}
-                            </div>
-                            {% if request.user.is_superuser or map.user_id == request.user.id %}
-                            <div class="map_data_label"></div><div class="map_data_text"><a class="editMapInfoShow">Edit map Info</a></div>
-                            <div class="map_data_label"></div><div class="map_data_text"><a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a></div>
+                    </div>
+                    <div class="right_map_content">
+                        <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
+                        <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
+                        <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>
+                        <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type }}</div>
+                        <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.width }} x {{ map.height }}</div>
+                        <div class="map_data_label">Max Players:</div><div class="map_data_text">{{ map.players }}</div>
+                        <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
+                        <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
+                        <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
+                        <div class="map_data_label">Downloaded</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
+                        <div class="map_data_label"></div><div class="map_data_text"><a href="#">Show yaml</a></div>
+                        <div class="map_data_label"></div><div class="map_data_text">
+                            {% if request.user.is_authenticated %}
+                            {% if reported == True %}<a href="/maps/{{map.id}}/cancelreport/">Cancel Report</a>
+                            {% else %}<a class="report">Report map</a>
+                            {% endif %}
                             {% endif %}
                         </div>
-
+                        {% if request.user.is_superuser or map.user_id == request.user.id %}
+                        <div class="map_data_label"></div><div class="map_data_text"><a class="editMapInfoShow">Edit map Info</a></div>
+                        <div class="map_data_label"></div><div class="map_data_text"><a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a></div>
+                        {% endif %}
                     </div>
                     <div class="clear"></div>
                 </div>
@@ -130,29 +130,34 @@
             <script>
                 function confirmDelete()
                 {
-                    var agree=confirm('Are you sure you want to delete this map?');
+                    var agree = confirm('Are you sure you want to delete this map?');
                     if (agree)
-                    return true ;
+                        return true;
                     else
-                    return false ;
+                        return false;
                 }
                 $(function() {
-                    $( document ).ready(function() {
-                        $(".reportMap").hide();
-                        $(".editMapInfo").hide();
-                    });
                     $(".report").click(function() {
-                        $(".reportMap").hide();
-                        $(".reportMap input[type='checkbox']").prop('checked', false);
-                        $(".reportMap").show(100);
+                        if ( $(".reportMap").is(':visible') )
+                            $(".reportMap").hide(100);
+                        else {
+                            $(".reportMap input[type='checkbox']").prop('checked', false);
+                            $(".reportMap").show(100);
+                        }
                     });
                     $(".reportCopyright").click(function() {
-                        $(".reportMap").hide();
-                        $(".reportMap input[type='checkbox']").prop('checked', true);
-                        $(".reportMap").show(100);
+                        if ( $(".reportMap").is(':visible') )
+                            $(".reportMap").hide(100);
+                        else {
+                            $(".reportMap input[type='checkbox']").prop('checked', true);
+                            $(".reportMap").show(100);
+                        }
                     });
                     $(".editMapInfoShow").click(function() {
-                        $(".editMapInfo").show(100);
+                        if ( $(".editMapInfo").is(':visible') )
+                            $(".editMapInfo").hide(100);
+                        else
+                            $(".editMapInfo").show(100);
                     });
                 });
             </script>

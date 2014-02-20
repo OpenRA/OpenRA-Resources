@@ -63,11 +63,13 @@ def ControlPanel(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
     template = loader.get_template('index.html')
+    mapObject = Maps.objects.filter(user_id=request.user.id).order_by("-posted").filter(next_rev=0)
     context = RequestContext(request, {
         'content': 'control_panel.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': ' - My Content',
+        'maps': mapObject,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -75,7 +77,7 @@ def maps(request, page=1, filter=""):
     perPage = 20
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
-    mapObject = Maps.objects.all().annotate(count_hashes=Count("map_hash")).order_by("-posted").filter(next_rev=0)
+    mapObject = Maps.objects.all().order_by("-posted").filter(next_rev=0)
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
