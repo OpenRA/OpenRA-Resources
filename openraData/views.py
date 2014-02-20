@@ -146,6 +146,11 @@ def displayMap(request, arg):
     reports = []
     reportObject = Reports.objects.filter(ex_id=mapObject.id, ex_name='maps')
     for item in reportObject:
+        try:
+            usr = User.objects.get(pk=item.user_id)
+            reports.append([usr.username, item.reason, item.infringement, item.posted])
+        except:
+            pass
         if item.user_id == request.user.id:
             reportedByUser = True
             break
@@ -166,7 +171,7 @@ def displayMap(request, arg):
         'license': license,
         'icons': icons,
         'version': version,
-        'reports': reportObject,
+        'reports': reports,
         'reported': reportedByUser,
     })
     return StreamingHttpResponse(template.render(context))
