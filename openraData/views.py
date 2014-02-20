@@ -124,7 +124,7 @@ def displayMap(request, arg):
             Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())
             return HttpResponseRedirect('/maps/'+arg)
     fullPreview = False
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
         mapDir = os.listdir(path)
         for filename in mapDir:
@@ -134,7 +134,7 @@ def displayMap(request, arg):
     except:
         pass
     try:
-        mapObject = Maps.objects.get(id=arg.lstrip('0'))
+        mapObject = Maps.objects.get(id=arg)
     except:
         return HttpResponseRedirect('/')
     path = misc.addSlash(settings.OPENRA_PATH)
@@ -169,7 +169,7 @@ def displayMap(request, arg):
         'title': ' - Map details - ' + mapObject.title,
         'map': mapObject,
         'userid': userObject,
-        'arg': arg.lstrip('0'),
+        'arg': arg,
         'fullPreview': fullPreview,
         'license': license,
         'icons': icons,
@@ -181,7 +181,7 @@ def displayMap(request, arg):
 
 def serveRender(request, arg):
     render = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
         mapDir = os.listdir(path)
     except:
@@ -191,7 +191,7 @@ def serveRender(request, arg):
             render = filename
             break
     if render == "":
-        return HttpResponseRedirect('/maps/'+arg.lstrip('0'))
+        return HttpResponseRedirect('/maps/'+arg)
     else:
         serveImage = path + os.sep + render
         response = StreamingHttpResponse(open(serveImage), content_type='image/png')
@@ -200,7 +200,7 @@ def serveRender(request, arg):
 
 def serveMinimap(request, arg):
     minimap = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
         mapDir = os.listdir(path)
     except:
@@ -220,7 +220,7 @@ def serveMinimap(request, arg):
 
 def serveLintLog(request, arg):
     lintlog = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
         mapDir = os.listdir(path)
     except:
@@ -230,7 +230,7 @@ def serveLintLog(request, arg):
             lintlog = filename
             break
     if lintlog == "":
-        return HttpResponseRedirect('/maps/'+arg.lstrip('0'))
+        return HttpResponseRedirect('/maps/'+arg)
     else:
         serveLog = path + os.sep + lintlog
         response = StreamingHttpResponse(open(serveLog), content_type='text/plain')
@@ -239,7 +239,7 @@ def serveLintLog(request, arg):
 
 def serveOramap(request, arg, sync=""):
     oramap = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
         mapDir = os.listdir(path)
     except:
@@ -249,14 +249,14 @@ def serveOramap(request, arg, sync=""):
             oramap = filename
             break
     if oramap == "":
-        return HttpResponseRedirect('/maps/'+arg.lstrip('0'))
+        return HttpResponseRedirect('/maps/'+arg)
     else:
         serveOramap = path + os.sep + oramap
         if sync == "sync":
-                oramap = arg.lstrip('0') + ".oramap"
+                oramap = arg + ".oramap"
         response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename = "%s"' % oramap
-        Maps.objects.filter(id=arg.lstrip()).update(downloaded=F('downloaded')+1)
+        Maps.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
         return response
 
 def uploadMap(request):
@@ -294,13 +294,13 @@ def DeleteMap(request, arg):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
     try:
-        mapObject = Maps.objects.get(id=arg.lstrip())
+        mapObject = Maps.objects.get(id=arg)
     except:
         return HttpResponseRedirect('/maps/')
     mapTitle = mapObject.title
     mapAuthor = mapObject.author
     if mapObject.user_id == request.user.id:
-        path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+        path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
         try:
             shutil.rmtree(path)
         except:
