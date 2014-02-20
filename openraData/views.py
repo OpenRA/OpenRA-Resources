@@ -63,7 +63,7 @@ def ControlPanel(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
     template = loader.get_template('index.html')
-    mapObject = Maps.objects.filter(user_id=request.user.id).annotate(count_hashes=Count("map_hash")).order_by("-posted").filter(next_rev=0)
+    mapObject = Maps.objects.filter(user_id=request.user.id).order_by("-posted").filter(next_rev=0)
     context = RequestContext(request, {
         'content': 'control_panel.html',
         'request': request,
