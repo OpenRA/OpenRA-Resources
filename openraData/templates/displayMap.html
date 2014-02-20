@@ -66,7 +66,6 @@
                             <p><b>Attention!</b> Map can't be automatcially downloaded by OpenRA game!<br />
                                 {% if map.downloading == False %}<p>Reason: Too many reports</p>{% endif %}
                                 {% if map.requires_upgrade == True %}<p>Reason: Requires upgrade, see <a style="text-decoration: underline;" href="/maps/{{arg}}/lintlog">lintlog</a> (Failed for version: {{version}})</p>{% endif %}
-                                {% if map.next_rev != 0 %}<p>Reason: There is a newer version of this map</p>{% endif %}
                         </div>
                         {% else %}
                         <p>This map is in pristine condition. :)</p>

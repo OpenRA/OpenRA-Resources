@@ -101,6 +101,9 @@ def displayMap(request, arg):
         if request.POST.get('reportReason', "").strip() != "":
             checkReports = Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name='maps')
             if not checkReports:
+                checkReports = Reports.objects.filter(ex_id=arg, ex_name='maps')
+                if len(checkReports) >= 2:
+                    Maps.objects.filter(id=arg).update(downloading=False)
                 infringement = request.POST.get('infringement', False)
                 if infringement == "true":
                     infringement = True
