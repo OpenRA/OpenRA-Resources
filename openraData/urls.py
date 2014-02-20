@@ -65,5 +65,7 @@ urlpatterns = patterns('',
     url(r'^sitemap\.xml$', RedirectView.as_view(url='/static/sitemap.xml')),
     url(r'^uptime/?$', views.uptime, name="uptime"),
 
+    url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
+
     url(r'^.*$', views.handle404, name='handle404'),
 )

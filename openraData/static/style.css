@@ -912,3 +912,7 @@ p.registerInfo {
 #map_data_container a:hover {
   text-decoration: underline;
 }
+
+.reportMap label {
+  font-size: 0.9em;
+}

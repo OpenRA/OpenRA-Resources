@@ -6,7 +6,6 @@ That's just our preference, so if you deploy it, you can choose any Database you
 ```
 python (version 2)
 python-psycopg2  (postgresql module)
-python-magic (pip install python-magic)
 python-openid
 python-requests
 python-requests-oauthlib

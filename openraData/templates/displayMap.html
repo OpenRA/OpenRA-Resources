@@ -36,7 +36,17 @@
                                     <img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/{{icons}}/4.0/88x31.png" />
                                 </a>
                             </div>
-                            <p>This work is licensed under a <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">Creative Commons {{license}}</a>.</p><p><a href="#">Report copyright infringement</a></p>
+                            <p>This work is licensed under a <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">Creative Commons {{license}}</a>.</p>
+                            {% if request.user.is_authenticated %}
+                                {% if reported == False %}<p><a class="reportCopyright">Report copyright infringement</a></p>{% endif %}
+                            {% endif %}
+                            <div class="reportMap">
+                                <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+                                    <label>Infringement: </label><input type="checkbox" name="infringement" value="true">
+                                    <label>Reason: </label><input type="text" name="reportReason">
+                                    <button class="reportMapButton" type="submit">Report</button>
+                                </form>
+                            </div>
                             {% endif %}
                         </div>
                         <hr />
@@ -70,7 +80,11 @@
                                     <th>Next revision</th>
                                 </tr>
                                 <tr>
-                                    <td>{{ map.pre_rev }}</td>
+                                    <td>{% if map.pre_rev == 0 %}
+                                        It's the first revision
+                                        {% else %}
+                                            <a href="/maps/{{map.pre_rev}}/"><img src="/maps/{{map.pre_rev}}/minimap" /></a>
+                                        {% endif %}</td>
                                     <td>{{ map.revision }}</td>
                                     <td>{% if map.next_rev == 0 %}
                                             {%if map.user_id == request.user.id %}
@@ -90,7 +104,13 @@
                             <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
                             <div class="map_data_label">Downloaded</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
                             <div class="map_data_label"></div><div class="map_data_text"><a href="#">Show yaml</a></div>
-                            <div class="map_data_label"></div><div class="map_data_text"><a href="#">Report map</a></div>
+                            <div class="map_data_label"></div><div class="map_data_text">
+                                {% if request.user.is_authenticated %}
+                                {% if reported == True %}<a href="/maps/{{map.id}}/cancelreport/">Cancel Report</a>
+                                {% else %}<a class="report">Report map</a>
+                                {% endif %}
+                                {% endif %}
+                            </div>
                             {% if request.user.is_superuser or map.user_id == request.user.id %}
                             <div class="map_data_label"></div><div class="map_data_text"><a href="#">Edit map</a></div>
                             <div class="map_data_label"></div><div class="map_data_text"><a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a></div>
@@ -110,4 +130,19 @@
                     else
                     return false ;
                 }
+                $(function() {
+                    $( document ).ready(function() {
+                        $(".reportMap").hide();
+                    });
+                    $(".report").click(function() {
+                        $(".reportMap").hide();
+                        $(".reportMap input[type='checkbox']").prop('checked', false);
+                        $(".reportMap").show(100);
+                    });
+                    $(".reportCopyright").click(function() {
+                        $(".reportMap").hide();
+                        $(".reportMap input[type='checkbox']").prop('checked', true);
+                        $(".reportMap").show(100);
+                    })
+                });
             </script>
