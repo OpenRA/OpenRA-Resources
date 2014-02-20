@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^maps/(?P<arg>\d+)/oramap/?$', views.serveOramap, name='serveOramap'),
     url(r'^maps/(?P<arg>\d+)/oramap/(?P<sync>\w+)/?$', views.serveOramap, name='serverSyncOramap'),
     url(r'^maps/upload/?$', views.uploadMap, name='uploadMap'),
+    url(r'^maps/(?P<arg>\d+)/delete/?$', views.DeleteMap, name='DeleteMap'),
     url(r'^maps/page/(?P<page>\d+)/?$', views.maps, name='maps_paged'),
     url(r'^maps/page/(?P<page>\d+)/filter/(?P<filter>\w+)/?$', views.maps, name='maps_paged_filtered'),
     url(r'^maps/filter/(?P<filter>\w+)/?$', views.maps, name='maps_filtered'),
@@ -63,6 +64,8 @@ urlpatterns = patterns('',
     url(r'^robots\.txt$', RedirectView.as_view(url='/static/robots.txt')),
     url(r'^sitemap\.xml$', RedirectView.as_view(url='/static/sitemap.xml')),
     url(r'^uptime/?$', views.uptime, name="uptime"),
+
+    url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
 
     url(r'^.*$', views.handle404, name='handle404'),
 )

@@ -3,6 +3,7 @@ import math
 import re
 import urllib2
 import datetime
+import shutil
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
@@ -10,13 +11,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.db import connection
 from django.db.models import Count
+from django.utils import timezone
 
 from .forms import UploadMapForm
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openraData import handlers, misc
-from openraData.models import Maps
+from openraData.models import Maps, Screenshots, Comments, Reports
 
 def index(request):
     template = loader.get_template('index.html')
@@ -93,6 +95,26 @@ def maps(request, page=1, filter=""):
     return StreamingHttpResponse(template.render(context))
 
 def displayMap(request, arg):
+    if request.method == 'POST':
+        if request.POST.get('reportReason', "").strip() != "":
+            checkReports = Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name='maps')
+            if not checkReports:
+                infringement = request.POST.get('infringement', False)
+                if infringement == "true":
+                    infringement = True
+                transac = Reports(
+                    user_id = request.user.id,
+                    reason = request.POST['reportReason'].strip(),
+                    ex_id = arg,
+                    ex_name = 'maps',
+                    infringement = infringement,
+                    posted = timezone.now(),
+                )
+                transac.save()
+                return HttpResponseRedirect('/maps/'+arg)
+        elif request.POST.get('mapInfo', False) != False:
+            Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())
+            return HttpResponseRedirect('/maps/'+arg)
     fullPreview = False
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
     try:
@@ -115,6 +137,14 @@ def displayMap(request, arg):
         version = re.findall('Version: (.*)', version)[0]
     except:
         version = "null"
+    reportedByUser = False
+    reports = []
+    reportObject = Reports.objects.filter(ex_id=mapObject.id, ex_name='maps')
+    for item in reportObject:
+        if item.user_id == request.user.id:
+            reportedByUser = True
+            break
+
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -131,6 +161,8 @@ def displayMap(request, arg):
         'license': license,
         'icons': icons,
         'version': version,
+        'reports': reportObject,
+        'reported': reportedByUser,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -244,6 +276,42 @@ def uploadMap(request):
         'uid': uid,
     })
     return StreamingHttpResponse(template.render(context))
+
+def DeleteMap(request, arg):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/maps/')
+    try:
+        mapObject = Maps.objects.get(id=arg.lstrip())
+    except:
+        return HttpResponseRedirect('/maps/')
+    mapTitle = mapObject.title
+    mapAuthor = mapObject.author
+    if mapObject.user_id == request.user.id:
+        path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg.lstrip('0')
+        try:
+            shutil.rmtree(path)
+        except:
+            pass
+        Screenshots.objects.filter(user_id=request.user.id, ex_id=mapObject.id, ex_name='maps').delete()
+        Reports.objects.filter(user_id=request.user.id, ex_id=mapObject.id, ex_name='maps').delete()
+        Comments.objects.filter(user_id=request.user.id, ex_id=mapObject.id, ex_name='maps').delete()
+        mapObject.delete()
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'deleteMap.html',
+        'request': request,
+        'http_host': request.META['HTTP_HOST'],
+        'title': 'Delete Map',
+        'mapTitle': mapTitle,
+        'mapAuthor': mapAuthor,
+    })
+    return StreamingHttpResponse(template.render(context))
+
+def cancelReport(request, name, arg):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/')
+    Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name=name).delete()
+    return HttpResponseRedirect('/'+name+'/'+arg)
 
 def units(request):
     template = loader.get_template('index.html')
