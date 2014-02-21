@@ -59,18 +59,29 @@ def search(request):
     })
     return StreamingHttpResponse(template.render(context))
 
-def ControlPanel(request):
+def ControlPanel(request, page=1, filter=""):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
-    template = loader.get_template('index.html')
+    perPage = 16
+    slice_start = perPage*int(page)-perPage
+    slice_end = perPage*int(page)
     mapObject = Maps.objects.filter(user_id=request.user.id).filter(next_rev=0).distinct("map_hash")
     mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+    amount = len(mapObject)
+    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    mapObject = mapObject[slice_start:slice_end]
+    if len(mapObject) == 0 and int(page) != 1:
+        return HttpResponseRedirect("/panel/")
+    template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'control_panel.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': ' - My Content',
         'maps': mapObject,
+        'page': int(page),
+        'range': [i+1 for i in range(rowsRange)],
+        'amount_maps': amount,
     })
     return StreamingHttpResponse(template.render(context))
 
