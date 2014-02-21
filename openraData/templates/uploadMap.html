@@ -10,10 +10,14 @@
                 });
             </script>
             <div class="upload_container">
-                <form action="/maps/upload/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+                <form action={{ '/maps/upload/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
                     <table class="Table">
                         <tr>
+                            {% if previous_rev == 0 %}
                             <th colspan="2">Upload your oramap file</th>
+                            {% else %}
+                            <th colspan="2">Upload new revision of <a target="_blank" href="/maps/{{previous_rev}}/">{{previous_rev_title}}</a></th>
+                            {% endif %}
                         </tr>
                         <tr>
                             <td>
@@ -36,6 +40,7 @@
                                 <hr />
                             </td>
                         </tr>
+                        {% if previous_rev == 0 %}
                         <tr>
                             <td colspan="2">
                                 <div class="license_cc">
@@ -61,6 +66,7 @@
                                 <hr />
                             </td>
                         </tr>
+                        {% endif %}
                         <tr>
                             <td>
                                 <button type="submit">Upload</button>

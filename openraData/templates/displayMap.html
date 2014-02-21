@@ -74,7 +74,7 @@
                             <table>
                                 <tr>
                                     <th>Prev revision</th>
-                                    <th><a style="text-decoration: underline;" href="#" title="Show all revisions">Revision</a></th>
+                                    <th><a style="text-decoration: underline;" href="/maps/{{map.id}}/revisions/" title="Show all revisions">Revision</a></th>
                                     <th>Next revision</th>
                                 </tr>
                                 <tr>
@@ -86,7 +86,7 @@
                                     <td>{{ map.revision }}</td>
                                     <td>{% if map.next_rev == 0 %}
                                             {%if map.user_id == request.user.id %}
-                                            <a href="#">Upload new revision</a>
+                                            <a href="/maps/upload/{{map.id}}/">Upload new revision</a>
                                             {% else %}
                                             It's the latest revision
                                             {% endif %}

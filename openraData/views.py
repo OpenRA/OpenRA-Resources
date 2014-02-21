@@ -132,7 +132,10 @@ def displayMap(request, arg):
                 misc.send_email_to_admin_OnReport("Item: http://%s  By user_id: %s  Reason: %s  Infringement: %s" % (request.META['HTTP_HOST']+'/maps/'+arg, request.user.id, request.POST['reportReason'].strip(), infringement))
                 return HttpResponseRedirect('/maps/'+arg)
         elif request.POST.get('mapInfo', False) != False:
-            Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())
+            if request.user.is_superuser:
+                Maps.objects.filter(id=arg).update(info=request.POST['mapInfo'].strip())
+            else:
+                Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())
             return HttpResponseRedirect('/maps/'+arg)
     fullPreview = False
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
@@ -270,22 +273,28 @@ def serveOramap(request, arg, sync=""):
         Maps.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
         return response
 
-def uploadMap(request):
+def uploadMap(request, previous_rev=0):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
     uploadingLog = []
     uid = False
+    rev = 1
+    previous_rev_title = ""
+    if previous_rev != 0:
+        mapObject = Maps.objects.filter(id=previous_rev)
+        if mapObject:
+            rev = mapObject[0].revision + 1
+            previous_rev_title = mapObject[0].title
     initial = {'policy_cc': 'cc_yes', 'commercial': 'com_no', 'adaptations': 'adapt_alike'}
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES, initial=initial)
         if form.is_valid():
             uploadingMap = handlers.MapHandlers()
-            uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST)
+            uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST, rev, previous_rev)
             uploadingLog = uploadingMap.LOG
             if uploadingMap.UID:
                 uid = str(uploadingMap.UID)
             form = UploadMapForm(initial=initial)
-
     else:
         form = UploadMapForm(initial=initial)
 
@@ -298,6 +307,8 @@ def uploadMap(request):
         'form': form,
         'uploadingLog': uploadingLog,
         'uid': uid,
+        'previous_rev': previous_rev,
+        'previous_rev_title': previous_rev_title,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -310,15 +321,19 @@ def DeleteMap(request, arg):
         return HttpResponseRedirect('/maps/')
     mapTitle = mapObject.title
     mapAuthor = mapObject.author
-    if mapObject.user_id == request.user.id:
+    if mapObject.user_id == request.user.id or request.user.is_superuser:
         path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
         try:
             shutil.rmtree(path)
         except:
             pass
-        Screenshots.objects.filter(user_id=request.user.id, ex_id=mapObject.id, ex_name='maps').delete()
-        Reports.objects.filter(user_id=request.user.id, ex_id=mapObject.id, ex_name='maps').delete()
-        Comments.objects.filter(user_id=request.user.id, ex_id=mapObject.id, ex_name='maps').delete()
+        Screenshots.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
+        Reports.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
+        Comments.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
+        if mapObject.pre_rev != 0:
+            Maps.objects.filter(id=mapObject.pre_rev).update(next_rev=mapObject.next_rev)
+        if mapObject.next_rev != 0:
+            Maps.objects.filter(id=mapObject.next_rev).update(pre_rev=mapObject.pre_rev)
         mapObject.delete()
     template = loader.get_template('index.html')
     context = RequestContext(request, {
@@ -328,6 +343,33 @@ def DeleteMap(request, arg):
         'title': 'Delete Map',
         'mapTitle': mapTitle,
         'mapAuthor': mapAuthor,
+    })
+    return StreamingHttpResponse(template.render(context))
+
+def MapRevisions(request, arg, page=1):
+    perPage = 20
+    slice_start = perPage*int(page)-perPage
+    slice_end = perPage*int(page)
+    revs = handlers.Revisions('maps')
+    revisions = revs.GetRevisions(arg)
+    mapObject = Maps.objects.filter(id__in=revisions)
+    mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+    amount = len(mapObject)
+    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    mapObject = mapObject[slice_start:slice_end]
+    if len(mapObject) == 0 and int(page) != 1:
+        return HttpResponseRedirect("/maps/")
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'revisionsMap.html',
+        'request': request,
+        'http_host': request.META['HTTP_HOST'],
+        'title': ' - Revisions',
+        'maps': mapObject,
+        'page': int(page),
+        'range': [i+1 for i in range(rowsRange)],
+        'amount': amount,
+        'arg': arg,
     })
     return StreamingHttpResponse(template.render(context))
 

@@ -41,9 +41,18 @@ class MapHandlers():
         self.MapDesc = ""
         self.MapPlayers = 0
 
-        self.revisions = []
-
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
+        if pre_r != 0:
+            mapObject = Maps.objects.filter(id=pre_r, user_id=user_id)
+            if not mapObject:
+                self.LOG.append('Failed. You do not own map for which you want to upload a new revision.')
+                return False
+            if mapObject[0].next_rev != 0:
+                self.LOG.append('Failed. Unable to upload a new revision for map which already has one')
+                return False
+            previous_policy_cc = mapObject[0].policy_cc
+            previous_policy_commercial = mapObject[0].policy_commercial
+            previous_policy_adaptations = mapObject[0].policy_adaptations
         tempname = '/tmp/oramaptemp.oramap'
         with open(tempname, 'wb+') as destination:
             for chunk in f.chunks():
@@ -132,16 +141,21 @@ class MapHandlers():
         cc = False
         commercial = False
         adaptations = ""
-        if post['policy_cc'] == 'cc_yes':
-            cc = True
-            if post['commercial'] == "com_yes":
-                commercial = True
-            if post['adaptations'] == "adapt_yes":
-                adaptations = "yes"
-            elif post['adaptations'] == "adapt_no":
-                adaptations = "no"
-            else:
-                adaptations = "yes and shared alike"
+        if pre_r == 0:
+            if post['policy_cc'] == 'cc_yes':
+                cc = True
+                if post['commercial'] == "com_yes":
+                    commercial = True
+                if post['adaptations'] == "adapt_yes":
+                    adaptations = "yes"
+                elif post['adaptations'] == "adapt_no":
+                    adaptations = "no"
+                else:
+                    adaptations = "yes and shared alike"
+        else:
+            cc = previous_policy_cc
+            commercial = previous_policy_commercial
+            adaptations = previous_policy_adaptations
 
         transac = Maps(
             user = userObject,
@@ -171,6 +185,8 @@ class MapHandlers():
             )
         transac.save()
         self.UID = str(transac.id)
+        if pre_r != 0:
+            Maps.objects.filter(id=pre_r).update(next_rev=transac.id)
 
         self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID + '/'
         if not os.path.exists(self.map_full_path_directory):
@@ -279,40 +295,45 @@ class MapHandlers():
 
 ########## Revisions
 
-def GetRevisions(self, itemid, modelName, seek_next=False):
-    if seek_next:
-        if modelName.lower() == "maps":
+class Revisions():
+
+    def __init__(self, modelName):
+        self.revisions = []
+        self.modelName = modelName
+
+    def GetRevisions(self, itemid, seek_next=False):
+        if seek_next:
+            if self.modelName.lower() == "maps":
+                itemObject = Maps.objects.get(id=itemid)
+            elif self.modelName.lower() == "units":
+                itemObject = Units.objects.get(id=itemid)
+            elif self.modelName.lower() == "mods":
+                itemObject = Mods.objects.get(id=itemid)
+            if itemObject.next_rev == 0:
+                return
+            self.revisions.append(itemObject.next_rev)
+            self.GetRevisions(itemObject.next_rev, True)
+            return
+        self.revisions.insert(0, itemid)
+        if self.modelName.lower() == "maps":
             itemObject = Maps.objects.get(id=itemid)
-        elif modelName.lower() == "units":
+        elif self.modelName.lower() == "units":
             itemObject = Units.objects.get(id=itemid)
-        elif modelName.lower() == "mods":
+        elif self.modelName.lower() == "mods":
+            itemObject = Mods.objects.get(id=itemid)
+        if itemObject.pre_rev == 0:
+            self.GetRevisions(self.revisions[-1], True)
+            return self.revisions
+        self.GetRevisions(itemObject.pre_rev)
+        return self.revisions
+
+    def GetLatestRevisionID(self, itemid):
+        if self.modelName.lower() == "maps":
+            itemObject = Maps.objects.get(id=itemid)
+        elif self.modelName.lower() == "units":
+            itemObject = Units.objects.get(id=itemid)
+        elif self.modelName.lower() == "mods":
             itemObject = Mods.objects.get(id=itemid)
         if itemObject.next_rev == 0:
-            return
-        self.revisions.append(itemObject.next_rev)
-        self.GetRevisions(itemObject.next_rev, True)
-        return
-    self.revisions.insert(0, itemid)
-    if modelName.lower() == "maps":
-        itemObject = Maps.objects.get(id=itemid)
-    elif modelName.lower() == "units":
-        itemObject = Units.objects.get(id=itemid)
-    elif modelName.lower() == "mods":
-        itemObject = Mods.objects.get(id=itemid)
-    if itemObject.pre_rev == 0:
-        self.GetRevisions(self.revisions[-1], modelName, True)
-        return
-    self.GetRevisions(itemObject.pre_rev)
-
-def GetLatestRevisionID(self, itemid, modelName):
-    if modelName.lower() == "maps":
-        itemObject = Maps.objects.get(id=itemid)
-    elif modelName.lower() == "units":
-        itemObject = Units.objects.get(id=itemid)
-    elif modelName.lower() == "mods":
-        itemObject = Mods.objects.get(id=itemid)
-    if itemObject.next_rev == 0:
-        return itemObject.id
-    return self.GetLatestRevisionID(itemObject.next_rev)
-
-##########
+            return itemObject.id
+        return self.GetLatestRevisionID(itemObject.next_rev)
