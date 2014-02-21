@@ -47,6 +47,10 @@ urlpatterns = patterns('',
 
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
     url(r'^panel/mymaps/?$', views.ControlPanel, name='ControlPanel'),
+    url(r'^panel/mymaps/page/(?P<page>\d+)/?$', views.ControlPanel, name='maps_paged'),
+    url(r'^panel/mymaps/page/(?P<page>\d+)/filter/(?P<filter>\w+)/?$', views.ControlPanel, name='maps_paged_filtered'),
+    url(r'^panel/mymaps/filter/(?P<filter>\w+)/?$', views.ControlPanel, name='maps_filtered'),
+    
     url(r'^accounts/profile/?$', views.profile, name='profile'),
     url(r'^accounts/password/?$', views.profile, name='profile'),
     url(r'^accounts/notifications/?$', views.profile, name='profile'),

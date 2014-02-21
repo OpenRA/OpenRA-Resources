@@ -2,7 +2,7 @@
             <nav class="side_nav">
                 <ul>
                     <li><a href="/panel/" {% if '/panel/' == request.path %}{{'class="nav-selected"'}}{% endif %}>Upload</a></li>
-                    <li><a href="/panel/mymaps/" {% if '/panel/mymaps/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Maps ({{ maps|length }})</a></li>
+                    <li><a href="/panel/mymaps/" {% if '/panel/mymaps/' in request.path %}{{'class="nav-selected"'}}{% endif %}>My Maps ({{ amount_maps }})</a></li>
                     <li><a style="opacity: 0.5;" href="#" {% if '/panel/myunits/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Units (0)</a></li>
                     <li><a style="opacity: 0.5;" href="#" {% if '/panel/mymods/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Mods (0)</a></li>
                     <li><a style="opacity: 0.5;" href="#" {% if '/panel/mypalettes/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Palettes (0)</a></li>
@@ -15,7 +15,7 @@
                 <a href="/maps/upload/">Upload</a>
             {% endif %}
             {% if '/panel/mymaps/' in request.path %}
-                {% if amount != 0 %}
+                {% if amount_maps != 0 %}
                 <div id="map_grid">
                 {% for item in maps %}
                     <div id="map_grid_cell">
@@ -28,6 +28,19 @@
                 {% endfor %}
                 </div>
                 <div class="clear"></div>
+                {% if 2 in range %}
+                <div id="paging">
+                    {% for i in range %}
+                    <div id="paging_cell">
+                    {% if i == page %}
+                        <span>{{ i }}</span>
+                    {% else %}
+                        <a href="http://{{http_host}}/panel/mymaps/page/{{i}}">{{ i }}</a>
+                    {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 {% endif %}
             {% endif %}
             </div>

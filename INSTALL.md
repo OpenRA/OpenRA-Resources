@@ -70,6 +70,7 @@ Nginx config for our virtual host (replace PATH where needed):
 ```
 server {
         listen 80;
+        client_max_body_size 10M;
         server_name resource.openra.net;
         access_log /path/to/access.log;
         error_log /path/to/error.log;
