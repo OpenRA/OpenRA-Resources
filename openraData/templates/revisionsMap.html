@@ -1,0 +1,50 @@
+            <h2>Found {{ amount }} revisions. Latest are on top.</h2>
+            {% if amount != 0 %}
+            <div id="map_grid">
+                {% for item in maps %}
+                    <div id="map_grid_cell">
+                        <a href="http://{{http_host}}/maps/{{item.id}}">
+                            <div class="cell-link-container">
+                                <div><img src="/maps/{{item.id}}/minimap" /></div><div>{{ item.title }}</div>
+                            </div>
+                        </a>
+                        <div class="map_tooltip">
+                            <div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
+                            <table>
+                                <tr>
+                                    <td class="tooltip_title">Author: </td>
+                                    <td class="tooltip_value">{{ item.author }} </td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip_title">Uploader: </td>
+                                    <td class="tooltip_value">{{ item.user }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip_title"><b>Revision: </b></td>
+                                    <td class="tooltip_value"><b>{{ item.revision }}</b></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip_title">Players: </td>
+                                    <td class="tooltip_value">{{ item.players }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="clear"></div>
+            </div>
+            {% if 2 in range %}
+            <div id="paging">
+                {% for i in range %}
+                <div id="paging_cell">
+                {% if i == page %}
+                    <span>{{ i }}</span>
+                {% else %}
+                    <a href="http://{{http_host}}/maps/{{arg}}/revisions/page/{{i}}">{{ i }}</a>
+                {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="clear"></div>
+            {% endif %}
