@@ -46,9 +46,24 @@ hr {
 .clear {
   clear: both;
 }
+.left {
+  float: left;
+}
+.right {
+  float: right;
+}
+
+a {
+  text-decoration: none;
+  color: #95d5f4;
+}
+
+a:hover {
+  text-decoration: underline;
+}
 
 a, a:visited { 
-  color: white;
+  color: #95d5f4;
 }
 
 a img {
@@ -140,6 +155,7 @@ div#br {
   min-height: 170px;
   width: 138px;
   position: relative;
+  color: #fff;
 }
 
 .cell-link-container {
@@ -169,9 +185,9 @@ div#br {
   margin: 5px auto;
 }
 
-#rssfeed a { text-decoration: none; }
-#rssfeed a:visited { text-decoration: none; }
-#rssfeed a:hover { text-decoration: none; }
+#rssfeed a { text-decoration: none; color: #fff; }
+#rssfeed a:visited { text-decoration: none; color: #fff; }
+#rssfeed a:hover { text-decoration: none; color: #fff; }
 
 .feed {
   margin: 0px 0px;
@@ -244,6 +260,7 @@ div#br {
 }
 
 #nav a { 
+  color: #fff;
   text-decoration: none;
   font: 17px Cambria, Georgia, Times New Roman, Serif;
  }
@@ -290,14 +307,14 @@ div#br {
   text-align: left;
   position: relative;
   background: url("/static/images/subNavBg.png");
-  border: 2px solid #74c2e7;
+  border: 1px solid #74c2e7;
   box-shadow: 0px 0px 10px #000;
 }
 
 .arrow_box:after, .arrow_box:before {
   bottom: 100%;
   left: 9%;
-  border: solid transparent;
+  border: 1px solid transparent;
   content: " ";
   height: 0;
   width: 0;
@@ -308,8 +325,8 @@ div#br {
 .arrow_box:after {
   border-color: rgba(136, 183, 213, 0);
   border-bottom-color: #20456C;
-  border-width: 6px;
-  margin-left: -6px;
+  border-width: 8px;
+  margin-left: -8px;
 }
 
 .arrow_box:before {
@@ -331,6 +348,10 @@ div#br {
   line-height: 35px;
 }
 
+#footer a {
+  color: #fff;
+}
+
 .copyright {
   margin-left: 223px;
   height: 100%;
@@ -343,26 +364,10 @@ div#br {
   float: right;
 }
 
-.FAQ a {
-  text-decoration: none;
-}
-
-.FAQ a:hover {
-  text-decoration: underline;
-}
-
 .Links {
   width: 40px;
   float: right;
   margin-right: 10px;
-}
-
-.Links a {
-  text-decoration: none;
-}
-
-.Links a:hover {
-  text-decoration: underline;
 }
 
 .link-container h3 {
@@ -642,6 +647,7 @@ p.registerInfo {
       }
         .side_nav a {
           text-decoration: none;
+          color: #fff;
         }
         .side_nav a:hover {
           border-bottom: 2px solid #74c2e7;
@@ -676,15 +682,17 @@ p.registerInfo {
     margin: 0;
   }
     input[type="password"], input[type="text"], input[type="email"] {
-      background: rgba(32, 44, 69, 0.4);
+      //background: rgba(32, 44, 69, 0.4);
+      background: #204770;
       border: 2px solid #74c2e7;
       padding: 2px;
       color: #fff;
       width: 150px;
     }
-    button[type="submit"] {
+    button[type="submit"], .button, .button:visited {
       border: 1px solid #dfdfdf;
-      background: dfdfdf;
+      background: #dfdfdf;
+      color: #000;
       padding: 4px 6px;
     }
     #changePasswordForm label {
@@ -699,10 +707,11 @@ p.registerInfo {
     font-size: 16px;
     line-height: 16px;
   }
-  button[type="submit"]:hover {
+  button[type="submit"]:hover, .button:hover {
     box-shadow: inset 2px 2px 10px #777;
+    text-decoration: none;
   }
-  button[type="submit"]:active {
+  button[type="submit"]:active, .button:active {
     box-shadow: inset 2px 2px 10px #555;
     outline: none;
   }
@@ -721,7 +730,7 @@ p.registerInfo {
     height: 16px;
     top: 0;
       left: 0;
-    background: transparent;
+    background: #204770;
     border: 2px solid #74c2e7;
   }
   .checkbox label:after {
@@ -772,7 +781,7 @@ p.registerInfo {
   font: 12px Helvetica,arial,freesans,clean,sans-serif;
   text-align: left;
 
-  background: url("/static/images/subNavBg.png") repeat scroll 0% 0% transparent;;
+  background: url("/static/images/subNavBg.png") repeat scroll 0% 0% transparent;
   border: 1px solid #74c2e7;
   box-shadow: 2px 2px 10px #000;
 }
@@ -808,125 +817,178 @@ p.registerInfo {
 
 
 /* displayMap template */
-
 #map_data_container {
   padding: 30px 0 0;
 }
   .left_map_content {
     float: left;
     position: relative;
-    width: 63%;
+    width: 67%;
+    padding: 0 20px 0 0;
   }
-    .map_title {
+    .left_map_content .map_title {
+      width: 280px;
+      height: 166px;
+
+      position: relative;
+      text-align: right;
+      padding: 0 20px 0 0;
+
+      font: 14px arial;
+      line-height: 14px;
+    }
+      .left_map_content .map_title .title {
+        font-size: 22px;
+        line-height: 20px;
+      }
+      .left_map_content .map_title .author {
+        font-size: 12px;
+        line-height: 10px;
+        padding: 4px 0 0 0;
+      }
+      .left_map_content .map_title .map_download {
+        font-size: 12px;
+        line-height: 14px;
+        margin: 40px 0 0;
+      }
+        .map_title .map_download .button {
+          padding: 6px 8px;
+        }
+      .left_map_content .map_title .notification_container {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+
+        width: 120px;
+        height: 130px;
+        text-align: left;
+      }
+        .notification_container .notification {
+          background: #0a93d7;
+          margin: 0 0 12px;
+          padding: 8px 0px;
+          text-align: center;
+          cursor: pointer;
+          position: relative;
+        }
+        .notification_container .map_attention {
+          background: #800000;
+        }
+        .notification_container .map_advanced {
+
+        }
+        .notification_container .map_lua {
+
+        }
+          .notification_container .notification_tooltip {
+            display: none;
+            text-align: left;
+            color: #f5f5f5;
+            padding: 6px;
+            position: absolute;
+            z-index: 11;
+            right: -240px;
+            top: -100%;
+            width: 230px;
+            min-height: 60px;
+            font-size: 12px;
+            line-height: 16px;
+            background: url("/static/images/subNavBg.png") repeat scroll 0% 0% transparent;
+            border: 1px solid #74c2e7;
+            box-shadow: 2px 2px 10px #000;
+          }
+          .notification_container .notification:hover .notification_tooltip {
+            display: block;
+          }
+          .notification_container .notification:hover {
+            
+          }
+    .left_map_content .map_image_container {
+      width: 160px;
+      height: 160px;
+      display: table;
+
       position: relative;
       text-align: center;
-      padding: 0 0 2px 0;
-
-      border-bottom: 2px solid #74c2e7;
-
-      font: 24px arial;
-      line-height: 24px;
+      border: 2px dashed #74c2e7;
     }
+      .left_map_content .map_image_container .map_image {
+        vertical-align:middle;
+        display: table-cell;
+      }
+        .left_map_content .map_image_container .map_image img {
+        }
+    .map_hash {
+      text-align: right;
+      padding: 10px 0 0;
+    }
+      .map_hash span {
+        padding: 0 30px 0 0;
+      }
     .map_description {
       position: relative;
+      min-height: 100px;
     }
-    .map_options {
-      position: relative;
-      border-bottom: 2px solid #74c2e7;
-      padding: 8px 0;
+      .map_info {
+        min-height: 20px;
+      }
+    .map_revisions {
+      text-align: center;
     }
+    .map_license {
+      min-height: 120px;
+    }
+      .license_img {
+        padding: 3px 0 0;
+      }
+      .license_text {
+        width: 370px;
+        padding: 0 0 0 8px;
+        line-height: 18px;
+      }
+      .reportMap {
+        display: none;
+        position: absolute;
+      }
+        .reportMap label {
+          font-size: 0.9em;
+        }
+    .map_screenshots {
+      min-height: 140px;
+    }
+
   .right_map_content {
     float: right;
     position: relative;
-    width: 35%;
+    width: 30%;
   }
-    .right_map_content .map_image_container {
-      position: relative;
-      height: 184px;
+    .right_map_content .map_data_label {
+      width: 43%;
+      display: inline-block;
+      color: #eee;
+      text-align: left;
+      padding: 0 0 1px;
     }
-      .right_map_content .map_image {
-        width: 100%;
+    .right_map_content .map_data_text {
+      width: 55%;
+      display: inline-block;
+      color: #f0f0f0;
+      text-align: left;
+      padding: 0 0 1px;
+    }
+      .editMapInfo, .allReports {
+        display: none;
         position: absolute;
-        bottom: 0;
-        text-align: center;
+        bottom: 0px;
       }
-    .right_map_content .map_dl {
-      position: relative;
-      padding: 10px 0;
+    .right_map_content .more_from_uploader {
+      display: none;
+      margin: 40px 0 0;
     }
-  .bottom_map_content {
-    padding: 10px 0;
-  }
-    .bottom_map_content .left_map_content {
-      width: 63%;
-      border-top: 2px solid #74c2e7;
+    .editMapInfoShow, .report, .reportCopyright, .allReportsShow {
+      cursor: pointer;
     }
-      .bottom_map_content .left_map_content .map_extra {
-        font: 10px arial;
-      }
-      .bottom_map_content .left_map_content table {
-        text-align: center;
-      }
-    .bottom_map_content .right_map_content {
-      width: 35%;
-      font-size: 12px;
-      line-height: 20px;
-      text-align: right;
-    }
-      .bottom_map_content .map_data_label {
-        width: 32%;
-        display: inline-block;
-        color: #eee;
-        text-align: left;
-      }
-      .bottom_map_content .map_data_text {
-        width: 60%;
-        display: inline-block;
-        color: #f0f0f0;
-        text-align: left;
-      }
 
-#map_data_container .map_label {
-  display: block;
-  position: absolute;
-  left: -60px;
-  margin: 8px 0 0;
-
-  transform: rotate(90deg);
-  -webkit-transform: rotate(90deg);
-  -ms-transform: rotate(90deg);
-}
-
-#map_data_container .cclImg {
-  position: absolute;
-  left: -72px;
-  margin: 10px 0 0;
-
-  transform: rotate(90deg);
-  -webkit-transform: rotate(90deg);
-  -ms-transform: rotate(90deg);
-}
-
-#map_data_container a {
-  color: #dfdfdf;
-  text-decoration: none;
-}
-#map_data_container a:hover {
-  text-decoration: underline;
-}
-
-.reportMap {
-  display: none;
-}
-  .reportMap label {
-    font-size: 0.9em;
-  }
-.editMapInfo, .allReports {
-  display: none;
-}
-.editMapInfoShow, .report, .reportCopyright, .allReportsShow {
-  cursor: pointer;
-}
 
 /* Panel content */
 #panel_content {
