@@ -145,8 +145,8 @@
                         <div class="cSHP"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
                     </div>
 
+                    {% if license %}
                     <div class="map_license cBlock">
-                        {% if license %}
                         <div>
                             <div class="license_img left">
                                 <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">
@@ -161,8 +161,8 @@
                             {% endif %}
                         {% endif %}
                         </div>
-                        {% endif %}
                     </div>
+                    {% endif %}
                 </div>
 
                 <div class="right_map_content">

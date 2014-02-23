@@ -1049,8 +1049,8 @@ p.registerInfo {
       margin: 15px 0 0;
     }
       .map_hash h5 {
-        display: inline-block;
-        padding: 0 108px 0 0;
+        position: absolute;
+        left: 10px;
       }
     .map_description {
       position: relative;
@@ -1191,7 +1191,7 @@ p.registerInfo {
 /* Panel content */
 #panel_content {
   min-height: 300px;
-  padding: 10px 0 0;
+  padding: 10px 0;
 }
   #panel_content .side_nav {
     width: 140px;
