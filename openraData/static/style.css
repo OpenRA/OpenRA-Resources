@@ -31,6 +31,11 @@ h3 {
   font-size: 125%;
 }
 
+h5 {
+  margin: 0;
+  font-size: 1em;
+}
+
 hr {
   border: 0;
   height: 2px;
@@ -52,6 +57,137 @@ hr {
 .right {
   float: right;
 }
+
+.cBlock {
+  border: 2px solid #74c2e7;
+  padding: 8px;
+  margin: 12px 0 0;
+  background: rgba(32, 44, 69, 0.4);
+}
+
+/* Popup */
+.popup {
+  display: none;
+  position: absolute;
+  z-index: 1001;
+  top: 100px;
+  left: 30%;
+  width: 400px;
+  min-height: 220px;
+  padding: 10px 10px 40px 10px;
+
+  background-color: #255f91;
+  border: 2px solid #74c2e7;
+  border-radius: 3px;
+}
+  .popup textarea {
+    width: 98%;
+    height: 98px;
+
+    background: #294364;
+    border: 2px solid #74c2e7;
+    padding: 2px;
+    color: #fff;
+    font-family: Arial,helvetica,freesans,clean,sans-serif;
+  }
+  .popup .checkboxRow {
+    padding: 10px 0;
+  }
+  .popup button[type="submit"] {
+    width: 95%;
+    position: absolute;
+    bottom: 8px;
+    left: 10px;
+  }
+  .popup h3 {
+    text-align: center;
+  }
+  .popup .closePopup {
+    width: 30px;
+    height: 30px;
+
+    position: absolute;
+    right: -12px;
+    top: -12px;
+    background: #800000;
+    border-radius: 8px;
+    border: 2px solid #74c2e7;
+  }
+    .popup .closePopup .x {
+      top: 6px;
+      left: 5px;
+    }
+    .popup .closePopup:hover {
+      box-shadow: inset 2px 2px 10px #000;
+    }
+
+/* Popup overlay */
+#overlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+}
+
+/* Symbol magic */
+label.tick {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  /*
+    Might require top and left value
+    find .notification label.tick to use
+    as an example.
+   */
+}
+  label.tick:after {
+    opacity: 1;
+    content: '';
+    position: absolute;
+    width: 11px;
+    height: 4px;
+    top: 3px;
+    left: 2px;
+    border: 3px solid #fff;
+    border-top: none;
+    border-right: none;
+
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+label.x {
+  cursor: pointer;
+  height: 16px;
+  width: 18px;
+  position: absolute;
+  /*
+    Might require top and left value
+    find .notification label.tick to use
+    as an example.
+   */
+}
+  label.x:after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    content: "\d7";
+    font-size: 34px; 
+    color: #FFF;
+    line-height: 16px;
+    text-align: center;
+  }
+
 
 a {
   text-decoration: none;
@@ -85,10 +221,6 @@ table tr td {
   font-size: 0.9em;
 }
 
-div#br {
-  padding-top: 20px;
-}
-
 #paging {
   text-align: center;
   display: table;
@@ -96,7 +228,7 @@ div#br {
 }
 
 #paging_cell {
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
+  background: rgba(32, 44, 69, 0.4);
   border: 1px solid #74c2e7;
   display: table-column;
   float: left;
@@ -141,19 +273,19 @@ div#br {
 }
 
 #map_grid_cell {
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
-  border: 1px solid #74c2e7;
+  background: rgba(32, 44, 69, 0.4);
+  border: 2px solid #74c2e7;
   display: table-column;
   float: left;
   margin-top: -1px;
-  margin-left: -1px;
+  margin-left: -2px;
   position: relative;
 }
 
 #map_grid_cell a {
   display: block;
   min-height: 170px;
-  width: 138px;
+  width: 136px;
   position: relative;
   color: #fff;
 }
@@ -176,7 +308,7 @@ div#br {
 
 #map_grid_cell img {
   max-width: 120px;
-  max-height: 135px;
+  max-height: 130px;
   padding: 8px;
 }
 
@@ -215,7 +347,7 @@ div#br {
 #header {
   height: 66px;
   border-bottom: solid 3px #74c2e7;
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
+  background: rgba(32, 44, 69, 0.4);
 }
 
 #header h1 {
@@ -307,14 +439,14 @@ div#br {
   text-align: left;
   position: relative;
   background: url("/static/images/subNavBg.png");
-  border: 1px solid #74c2e7;
+  border: 2px solid #74c2e7;
   box-shadow: 0px 0px 10px #000;
 }
 
 .arrow_box:after, .arrow_box:before {
   bottom: 100%;
   left: 9%;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   content: " ";
   height: 0;
   width: 0;
@@ -325,8 +457,8 @@ div#br {
 .arrow_box:after {
   border-color: rgba(136, 183, 213, 0);
   border-bottom-color: #20456C;
-  border-width: 8px;
-  margin-left: -8px;
+  border-width: 6px;
+  margin-left: -6px;
 }
 
 .arrow_box:before {
@@ -343,7 +475,7 @@ div#br {
   font-size: 0.7em; 
   text-align: center;
   border-top: solid 3px #74c2e7;
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
+  background: rgba(32, 44, 69, 0.4);
   font: 11px Cambria, Georgia, Times New Roman, Serif;
   line-height: 35px;
 }
@@ -477,7 +609,7 @@ div#br {
   margin: 0px;
   padding: 0px;
   border: medium none;
-  background: none repeat scroll 0% 0% transparent;
+  background: transparent;
   position: absolute;
   z-index: 9;
 }
@@ -504,7 +636,7 @@ td, th, tr {
 
 div#outer {
   box-shadow: 0px 0px 10px #000;
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
+  background: rgba(32, 44, 69, 0.4);
   border: 2px solid #74c2e7;
   display: table;
   font-size: 0.9em;
@@ -546,7 +678,7 @@ p.registerInfo {
 /* Login Page */
 
 .frame {
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
+  background: rgba(32, 44, 69, 0.4);
   border: 2px solid #74c2e7;
 }
 
@@ -606,7 +738,7 @@ p.registerInfo {
 }
 
 #uptime {
-  background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4);
+  background: rgba(32, 44, 69, 0.4);
   text-align: center;
   border: 2px solid #74c2e7;
   padding-top: 20px;
@@ -723,39 +855,23 @@ p.registerInfo {
   position: relative;
   margin: 0 10px 0 0;
 }
-  .checkbox label {
+  .checkbox label.tick {
     cursor: pointer;
     position: absolute;
     width: 16px;
     height: 16px;
     top: 0;
-      left: 0;
+    left: 0;
     background: #204770;
     border: 2px solid #74c2e7;
   }
-  .checkbox label:after {
+  .checkbox label.tick:after {
     opacity: 0;
-    content: '';
-    position: absolute;
-    width: 11px;
-    height: 4px;
-    background: rgba(0, 0, 0, 0.1);
-    top: 3px;
-    left: 2px;
-    border: 3px solid #fff;
-    border-top: none;
-    border-right: none;
-
-    -webkit-transform: rotate(-45deg);
-    -moz-transform: rotate(-45deg);
-    -o-transform: rotate(-45deg);
-    -ms-transform: rotate(-45deg);
-    transform: rotate(-45deg);
   }
-  .checkbox label:hover::after {
+  .checkbox label.tick:hover::after {
     opacity: 0.2;
   }
-  .checkbox input[type=checkbox]:checked + label:after {
+  .checkbox input[type=checkbox]:checked + label.tick:after {
     opacity: 1;
   }
   .checkbox input[type=checkbox] {
@@ -781,8 +897,8 @@ p.registerInfo {
   font: 12px Helvetica,arial,freesans,clean,sans-serif;
   text-align: left;
 
-  background: url("/static/images/subNavBg.png") repeat scroll 0% 0% transparent;
-  border: 1px solid #74c2e7;
+  background: url("/static/images/subNavBg.png") #204770;
+  border: 2px solid #74c2e7;
   box-shadow: 2px 2px 10px #000;
 }
   .map_tooltip table {
@@ -818,7 +934,7 @@ p.registerInfo {
 
 /* displayMap template */
 #map_data_container {
-  padding: 30px 0 0;
+  padding: 30px 0 20px;
 }
   .left_map_content {
     float: left;
@@ -832,7 +948,7 @@ p.registerInfo {
 
       position: relative;
       text-align: right;
-      padding: 0 20px 0 0;
+      padding: 0 25px 0 0;
 
       font: 14px arial;
       line-height: 14px;
@@ -842,8 +958,6 @@ p.registerInfo {
         line-height: 20px;
       }
       .left_map_content .map_title .author {
-        font-size: 12px;
-        line-height: 10px;
         padding: 4px 0 0 0;
       }
       .left_map_content .map_title .map_download {
@@ -854,55 +968,65 @@ p.registerInfo {
         .map_title .map_download .button {
           padding: 6px 8px;
         }
-      .left_map_content .map_title .notification_container {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-
-        width: 120px;
-        height: 130px;
+    .left_map_content .notification_container {
+      position: relative;
+      text-align: right;
+      padding: 12px 0;
+    }
+      .notification_container .notification {
+        width: 88px;
+        background: #0a93d7;
+        padding: 6px 20px;
+        margin: 0 0 0 4px;
         text-align: left;
+        cursor: pointer;
+        position: relative;
+        display: inline-block;
       }
-        .notification_container .notification {
-          background: #0a93d7;
-          margin: 0 0 12px;
-          padding: 8px 0px;
-          text-align: center;
-          cursor: pointer;
-          position: relative;
+        .notification .notification_label {
+          padding: 0 0 0 20px;
         }
-        .notification_container .map_attention {
-          background: #800000;
+        .notification label.tick {
+          top: 6px;
+          left: 8px;
         }
-        .notification_container .map_advanced {
+        .notification .x {
+          top: 7px;
+          left: 8px;
+        }
+      .notification_container .map_attention {
+        background: #800000;
+      }
+      .notification_container .map_advanced {
 
-        }
-        .notification_container .map_lua {
+      }
+      .notification_container .map_lua {
 
+      }
+        .notification_container .notification_tooltip {
+          cursor: default;
+          display: none;
+          text-align: left;
+          color: #f5f5f5;
+          padding: 6px;
+          position: absolute;
+          z-index: 11;
+          left: -50%;
+          bottom: -104px;
+          width: 230px;
+          min-height: 90px;
+          font-size: 12px;
+          line-height: 16px;
+          background: url("/static/images/subNavBg.png") #204770;
+          border: 2px solid #74c2e7;
+          box-shadow: 0px 0px 10px #000;
         }
-          .notification_container .notification_tooltip {
-            display: none;
-            text-align: left;
-            color: #f5f5f5;
-            padding: 6px;
-            position: absolute;
-            z-index: 11;
-            right: -240px;
-            top: -100%;
-            width: 230px;
-            min-height: 60px;
-            font-size: 12px;
-            line-height: 16px;
-            background: url("/static/images/subNavBg.png") repeat scroll 0% 0% transparent;
-            border: 1px solid #74c2e7;
-            box-shadow: 2px 2px 10px #000;
-          }
-          .notification_container .notification:hover .notification_tooltip {
-            display: block;
-          }
-          .notification_container .notification:hover {
-            
-          }
+        .notification_container .notification:hover .notification_tooltip {
+          display: block;
+        }
+        .notification_container .notification:hover {
+          
+        }
     .left_map_content .map_image_container {
       width: 160px;
       height: 160px;
@@ -917,13 +1041,14 @@ p.registerInfo {
         display: table-cell;
       }
         .left_map_content .map_image_container .map_image img {
+          max-width: 160px;
+          max-height: 160px;
         }
     .map_hash {
       text-align: right;
-      padding: 10px 0 0;
     }
       .map_hash span {
-        padding: 0 30px 0 0;
+        padding: 0 50px 0 0;
       }
     .map_description {
       position: relative;
@@ -936,26 +1061,51 @@ p.registerInfo {
       text-align: center;
     }
     .map_license {
-      min-height: 120px;
     }
       .license_img {
         padding: 3px 0 0;
       }
       .license_text {
-        width: 370px;
+        width: 352px;
         padding: 0 0 0 8px;
         line-height: 18px;
       }
       .reportMap {
-        display: none;
-        position: absolute;
+
       }
         .reportMap label {
           font-size: 0.9em;
         }
     .map_screenshots {
-      min-height: 140px;
+      min-height: 124px;
+      text-align: center;
     }
+      .map_screenshots h5 {
+        text-align: left;
+      }
+      .map_screenshots .cScreenshot {
+        display: inline-block;
+        margin: 10px 6px 0;
+      }
+        .map_screenshots .cScreenshot img {
+          max-width: 96px;
+          max-height: 96px;
+        }
+    .map_shp {
+      min-height: 84px;
+    }
+      .map_shp .cSHP {
+        display: inline-block;
+        margin: 10px;
+        border: 1px solid #74c2e7;
+        width: 60px;
+        height: 60px;
+        text-align: center;
+      }
+        .map_shp img {
+          max-width: 60px;
+          max-height: 60px;
+        }
 
   .right_map_content {
     float: right;
@@ -976,15 +1126,61 @@ p.registerInfo {
       text-align: left;
       padding: 0 0 1px;
     }
-      .editMapInfo, .allReports {
-        display: none;
-        position: absolute;
-        bottom: 0px;
+      .editMapInfo {
       }
-    .right_map_content .more_from_uploader {
-      display: none;
-      margin: 40px 0 0;
+      .allReports {
+      }
+        .reportRow {
+          margin: 0 0 20px;
+        }
+          .reportUser {
+
+          }
+          .reportMsg {
+            position: relative;
+            background: #294364;
+            border: 2px solid #74c2e7;
+
+            margin: 10px 0 0 0;
+            padding: 6px;
+          }
+          .reportMsg:after, .reportMsg:before {
+            bottom: 100%;
+            left: 20px;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+          }
+          .reportMsg:after {
+            border-color: rgba(136, 183, 213, 0);
+            border-bottom-color: #294364;
+            border-width: 8px;
+            margin-left: -8px;
+          }
+          .reportMsg:before {
+            border-color: rgba(194, 225, 245, 0);
+            border-bottom-color: #74c2e7;
+            border-width: 10px;
+            margin-left: -10px;
+          }
+    .right_map_content .side_img_links {
+      margin: 30px 0 0;
     }
+      .side_img_links .side_img_link {
+        display: inline-block;
+        border: 1px dashed #74c2e7;
+        width: 80px;
+        height: 80px;
+        margin: 10px 10px 0 0;
+        text-align: center;
+      }
+        .side_img_links .side_img_link img {
+          max-width: 80px;
+          max-height: 80px;
+        }
     .editMapInfoShow, .report, .reportCopyright, .allReportsShow {
       cursor: pointer;
     }
