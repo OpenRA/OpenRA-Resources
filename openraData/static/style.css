@@ -969,10 +969,6 @@ p.registerInfo {
           padding: 6px 16px;
         }
     .left_map_content .notification_container {
-/*      position: relative;
-      text-align: right;
-      padding: 12px 0;*/
-
       position: absolute;
       top: 54px;
     }
@@ -984,7 +980,6 @@ p.registerInfo {
         text-align: left;
         cursor: pointer;
         position: relative;
-        /*display: inline-block;*/
       }
         .notification .notification_label {
           padding: 0 0 0 20px;
@@ -1001,10 +996,8 @@ p.registerInfo {
         background: #800000;
       }
       .notification_container .map_advanced {
-
       }
       .notification_container .map_lua {
-
       }
         .notification_container .notification_tooltip {
           cursor: default;
@@ -1028,7 +1021,6 @@ p.registerInfo {
           display: block;
         }
         .notification_container .notification:hover {
-          
         }
     .left_map_content .map_image_container {
       width: 160px;
