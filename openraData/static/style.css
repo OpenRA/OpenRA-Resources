@@ -960,28 +960,31 @@ p.registerInfo {
       .left_map_content .map_title .author {
         padding: 4px 0 0 0;
       }
-      .left_map_content .map_title .map_download {
+       .map_download {
         font-size: 12px;
         line-height: 14px;
-        margin: 40px 0 0;
+        margin: 8px 0 20px;
       }
-        .map_title .map_download .button {
-          padding: 6px 8px;
+        .map_download .button {
+          padding: 6px 16px;
         }
     .left_map_content .notification_container {
-      position: relative;
+/*      position: relative;
       text-align: right;
-      padding: 12px 0;
+      padding: 12px 0;*/
+
+      position: absolute;
+      top: 54px;
     }
       .notification_container .notification {
         width: 88px;
         background: #0a93d7;
         padding: 6px 20px;
-        margin: 0 0 0 4px;
+        margin: 0 0 10px 4px;
         text-align: left;
         cursor: pointer;
         position: relative;
-        display: inline-block;
+        /*display: inline-block;*/
       }
         .notification .notification_label {
           padding: 0 0 0 20px;
@@ -1011,8 +1014,8 @@ p.registerInfo {
           padding: 6px;
           position: absolute;
           z-index: 11;
-          left: -50%;
-          bottom: -104px;
+          left: 128px;
+          top: -110%;
           width: 230px;
           min-height: 90px;
           font-size: 12px;
@@ -1032,23 +1035,30 @@ p.registerInfo {
       height: 160px;
       display: table;
 
+      padding: 0;
+      margin: 0;
+
       position: relative;
-      text-align: center;
       border: 2px dashed #74c2e7;
     }
       .left_map_content .map_image_container .map_image {
         vertical-align:middle;
         display: table-cell;
+        border-spacing: 0;
       }
         .left_map_content .map_image_container .map_image img {
           max-width: 160px;
           max-height: 160px;
+          display: block;
+          margin: 0 auto;
         }
     .map_hash {
       text-align: right;
+      margin: 15px 0 0;
     }
-      .map_hash span {
-        padding: 0 50px 0 0;
+      .map_hash h5 {
+        display: inline-block;
+        padding: 0 108px 0 0;
       }
     .map_description {
       position: relative;
