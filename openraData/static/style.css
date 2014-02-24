@@ -1180,6 +1180,7 @@ p.registerInfo {
         height: 80px;
         margin: 10px 10px 0 0;
         text-align: center;
+        line-height: 80px;
       }
         .side_img_links .side_img_link img {
           max-width: 80px;
