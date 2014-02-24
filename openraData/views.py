@@ -36,7 +36,7 @@ def logoutView(request):
     return HttpResponseRedirect('/')
 
 def feed(request):
-    mapObject = Maps.objects.order_by("posted")[0:20]
+    mapObject = Maps.objects.order_by("-posted")[0:20]
     d = datetime.datetime.utcnow()
     lastBuildDate = d.isoformat("T")
     template = loader.get_template('feed.html')

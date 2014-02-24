@@ -15,11 +15,12 @@
 		http://{{http_host}}/maps/{{item.id}}/
 		</link>
 		<description>
+		<![CDATA[<img align="left" hspace="5" src="http://{{http_host}}/maps/{{item.id}}/minimap"/>
 		{{item.description}}<br />Mod: {{item.game_mod}}<br />Revision: {{item.revision}}
 		{% if item.info != "" %}
 		<br />
 		Info by uploader: {{item.info}}
-		{% endif %}
+		{% endif %} ]]>
 		</description>
 		<pubDate>{{item.posted}}</pubDate>
 		<author>
