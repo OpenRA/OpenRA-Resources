@@ -1185,6 +1185,7 @@ p.registerInfo {
         .side_img_links .side_img_link img {
           max-width: 80px;
           max-height: 80px;
+          vertical-align: middle;
         }
     .editMapInfoShow, .report, .reportCopyright, .allReportsShow {
       cursor: pointer;
