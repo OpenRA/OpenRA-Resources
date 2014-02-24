@@ -20,12 +20,12 @@
                     <div class="clear"></div>
 
                     <div class="notification_container">
-                        {% if map.next_rev != 0 or map.downloading == False or map.requires_upgrade == True %}
+                        {% if map.downloading == False or map.requires_upgrade == True %}
                         <div class="notification map_attention">
                             <label class="x"></label>
                             <div class="notification_label">Attention!</div>
                             <div class="notification_tooltip">
-                                <div>This map can't be automatcially downloaded by OpenRA game!<br />
+                                <div>This map can't be automatcially downloaded by OpenRA game!</div>
                                 {% if map.downloading == False %}
                                     <p>Reason: Too many reports</p>
                                 {% endif %}
