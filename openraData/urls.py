@@ -40,10 +40,15 @@ urlpatterns = patterns('',
 
     url(r'^replays/?$', views.replays, name='replays'),
 
+    url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
+
     url(r'^accounts/register/?$', RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),
         name='registration_register'), 
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^logout/?$', views.logoutView, name='logoutView'),
+    url(r'^accounts/profile/?$', views.profile, name='profile'),
+    url(r'^accounts/password/?$', views.profile, name='profile'),
+    url(r'^accounts/notifications/?$', views.profile, name='profile'),
 
     url(r'^news/feed/?$', views.feed, name='feed'),
     url(r'^search/', views.search, name='search'),
@@ -54,9 +59,6 @@ urlpatterns = patterns('',
     url(r'^panel/mymaps/page/(?P<page>\d+)/filter/(?P<filter>\w+)/?$', views.ControlPanel, name='maps_paged_filtered'),
     url(r'^panel/mymaps/filter/(?P<filter>\w+)/?$', views.ControlPanel, name='maps_filtered'),
     
-    url(r'^accounts/profile/?$', views.profile, name='profile'),
-    url(r'^accounts/password/?$', views.profile, name='profile'),
-    url(r'^accounts/notifications/?$', views.profile, name='profile'),
     url(r'^faq/?$', views.faq, name='faq'),
     url(r'^links/?$', views.links, name='links'),
     
@@ -73,7 +75,7 @@ urlpatterns = patterns('',
     url(r'^sitemap\.xml$', RedirectView.as_view(url='/static/sitemap.xml')),
     url(r'^uptime/?$', views.uptime, name="uptime"),
 
-    url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
+    url(r'lintcheck/?$', views.triggerLint, name="LintCheck"),
 
     url(r'^.*$', views.handle404, name='handle404'),
 )

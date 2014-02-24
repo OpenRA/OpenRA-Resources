@@ -4,6 +4,7 @@ import re
 import urllib2
 import datetime
 import shutil
+import multiprocessing
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
@@ -17,7 +18,7 @@ from .forms import UploadMapForm
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from openraData import handlers, misc
+from openraData import handlers, misc, triggers
 from openraData.models import Maps, Screenshots, Comments, Reports
 
 def index(request):
@@ -556,5 +557,23 @@ def uptime(request):
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': ' - Uptime',
+    })
+    return StreamingHttpResponse(template.render(context))
+
+def triggerLint(request):
+    if not request.user.is_superuser:
+        return HttpResponseRedirect('/')
+    mapObject = Maps.objects.all()
+    amount = len(mapObject)
+    p = multiprocessing.Process(target=triggers.LintCheck, args=(mapObject,), name='LintCheck')
+    p.start()
+
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'lintcheck.html',
+        'request': request,
+        'http_host': request.META['HTTP_HOST'],
+        'title': ' - Lint Check',
+        'amount': amount,
     })
     return StreamingHttpResponse(template.render(context))
