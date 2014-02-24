@@ -961,6 +961,9 @@ p.registerInfo {
       .left_map_content .map_title .author {
         padding: 4px 0 0 0;
       }
+      .left_map_content .map_title .maptype {
+        padding: 4px 0 0 0;
+      }
        .map_download {
         font-size: 12px;
         line-height: 14px;
@@ -1124,6 +1127,7 @@ p.registerInfo {
       text-align: left;
       padding: 0 0 1px;
       vertical-align: top;
+      font-size: 0.9em;
     }
     .right_map_content .map_data_text {
       width: 55%;
@@ -1131,6 +1135,7 @@ p.registerInfo {
       color: #f0f0f0;
       text-align: left;
       padding: 0 0 1px;
+      font-size: 0.9em;
     }
       .editMapInfo {
       }
@@ -1174,6 +1179,7 @@ p.registerInfo {
           }
     .right_map_content .side_img_links {
       margin: 30px 0 0;
+      font-size: 0.9em;
     }
       .side_img_links .side_img_link {
         display: inline-block;

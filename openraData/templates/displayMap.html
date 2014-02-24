@@ -5,6 +5,7 @@
                         <div>
                             <div class="title">{{ map.title }}</div>
                             <div class="author">by {{ map.author }}</div>
+                            <div class="maptype">{{ map.map_type }}</div>
                         </div>
                     </div>
 
@@ -172,11 +173,10 @@
                     <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
                     <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
                     <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>
-                    <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type }}</div>
                     <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.width }} x {{ map.height }}</div>
                     <div class="map_data_label">Max Players:</div><div class="map_data_text">{{ map.players }}</div>
                     <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
-                    <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
+                    <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div><br /><br />
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
                     <div class="map_data_label">Downloaded</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
                     <div class="map_data_label"><a href="#">Show yaml</a></div>
@@ -195,6 +195,9 @@
                     </div>
                     <div class="map_data_text">
                         <a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a>
+                    </div>
+                    <div class="map_data_text">
+                        <a href="#">Upload Screenshot</a>
                     </div>
                     {% endif %}
 
