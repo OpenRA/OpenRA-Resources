@@ -961,9 +961,6 @@ p.registerInfo {
       .left_map_content .map_title .author {
         padding: 4px 0 0 0;
       }
-      .left_map_content .map_title .maptype {
-        padding: 4px 0 0 0;
-      }
        .map_download {
         font-size: 12px;
         line-height: 14px;
@@ -1107,7 +1104,7 @@ p.registerInfo {
         width: 60px;
         height: 60px;
         text-align: center;
-        line-height: 59px;
+        line-height: 57px;
       }
         .map_shp img {
           max-width: 60px;
