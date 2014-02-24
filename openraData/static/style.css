@@ -279,7 +279,7 @@ table tr td {
   border: 2px solid #74c2e7;
   display: table-column;
   float: left;
-  margin-top: -1px;
+  margin-top: -2px;
   margin-left: -2px;
   position: relative;
 }
@@ -1107,7 +1107,7 @@ p.registerInfo {
         width: 60px;
         height: 60px;
         text-align: center;
-        line-height: 60px;
+        line-height: 59px;
       }
         .map_shp img {
           max-width: 60px;
@@ -1188,7 +1188,7 @@ p.registerInfo {
         height: 80px;
         margin: 10px 10px 0 0;
         text-align: center;
-        line-height: 80px;
+        line-height: 76px;
       }
         .side_img_links .side_img_link img {
           max-width: 80px;
