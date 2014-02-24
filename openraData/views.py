@@ -209,7 +209,7 @@ def serveRender(request, arg):
     else:
         serveImage = path + os.sep + render
         response = StreamingHttpResponse(open(serveImage), content_type='image/png')
-        response['Content-Disposition'] = 'attachment; filename = "%s"' % render
+        response['Content-Disposition'] = 'attachment; filename = %s' % render
         return response
 
 def serveMinimap(request, arg):
@@ -229,7 +229,7 @@ def serveMinimap(request, arg):
     else:
         serveImage = path + os.sep + minimap
     response = StreamingHttpResponse(open(serveImage), content_type='image/png')
-    response['Content-Disposition'] = 'attachment; filename = "%s"' % minimap
+    response['Content-Disposition'] = 'attachment; filename = %s' % minimap
     return response
 
 def serveLintLog(request, arg):
@@ -248,7 +248,7 @@ def serveLintLog(request, arg):
     else:
         serveLog = path + os.sep + lintlog
         response = StreamingHttpResponse(open(serveLog), content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename = "%s"' % lintlog
+        response['Content-Disposition'] = 'attachment; filename = %s' % lintlog
         return response
 
 def serveOramap(request, arg, sync=""):
@@ -269,7 +269,7 @@ def serveOramap(request, arg, sync=""):
         if sync == "sync":
                 oramap = arg + ".oramap"
         response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename = "%s"' % oramap
+        response['Content-Disposition'] = 'attachment; filename = %s' % oramap
         Maps.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
         return response
 
