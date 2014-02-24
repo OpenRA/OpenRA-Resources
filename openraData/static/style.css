@@ -1051,7 +1051,7 @@ p.registerInfo {
     }
       .map_hash h5 {
         position: absolute;
-        left: 10px;
+        left: 100px;
       }
     .map_description {
       position: relative;
