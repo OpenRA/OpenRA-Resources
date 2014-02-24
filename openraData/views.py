@@ -170,7 +170,6 @@ def displayMap(request, arg):
             pass
         if item.user_id == request.user.id:
             reportedByUser = True
-            break
 
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)

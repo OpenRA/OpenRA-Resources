@@ -1,175 +1,259 @@
             <div id="map_data_container">
                 <div class="left_map_content">
-                    <div class="map_title">{{ map.title }}</div>
-                    {% if map.advanced_map %}
-                    <div class="map_options">Map is <b>Advanced</b> 
-                        {% if map.lua %}
-                            and contains <b>Lua</b> logic
-                        {% endif %}
+
+                    <div class="map_title left">
+                        <div>
+                            <div class="title">{{ map.title }}</div>
+                            <div class="author">by {{ map.author }}</div>
+                        </div>
                     </div>
-                    {% endif %}
-                    <div class="map_description">
-                        <div class="map_label">Description</div>
-                        <p>{{ map.description|default:"No description :(" }}</p>
-                    </div>
-                    <div class="map_info">{{ map.info|default:"" }}</div>
-                    <div class="editMapInfo">
-                        <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
-                            <input type="text" name="mapInfo" value="{{map.info}}">
-                            <button type="submit">Edit</button>
-                        </form>
-                    </div>
-                </div>
-                <div class="right_map_content">
-                    <div class="map_image_container">
+
+                    <div class="map_image_container left">
                         <div class="map_image">
                         {% if fullPreview %}
                             <a href={{ '/maps/' }}{{ arg }}{{ '/render' }}><img src={{ '/maps/' }}{{ arg }}{{ '/render' }} /></a>
                         {% else %}
                             <img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} />
                         {% endif %}
-                            <div class="map_dl">
-                                <a href={{ '/maps/' }}{{ arg }}{{ '/oramap' }}>>>> Download mapfile <<<</a>
-                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="clear"></div>
+                    <div class="clear"></div>
 
-                <div class="bottom_map_content">
-                    <div class="left_map_content">
+                    <div class="notification_container">
+                        {% if map.next_rev != 0 or map.downloading == False or map.requires_upgrade == True %}
+                        <div class="notification map_attention">
+                            <label class="x"></label>
+                            <div class="notification_label">Attention!</div>
+                            <div class="notification_tooltip">
+                                <div>This map can't be automatcially downloaded by OpenRA game!<br />
+                                {% if map.downloading == False %}
+                                    <p>Reason: Too many reports</p>
+                                {% endif %}
+                                {% if map.requires_upgrade == True %}
+                                    <p>Reason: Requires upgrade, see <a href="/maps/{{arg}}/lintlog">lintlog</a> (Failed for version: {{version}})</p></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if map.advanced_map %}
+                        <div class="notification map_advanced">
+                            <label class="tick"></label>
+                            <div class="notification_label">Advanced</div>
+                            <div class="notification_tooltip">
+                                <div>This map is advanced.</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if map.lua %}
+                        <div class="notification map_lua">
+                            <label class="tick"></label>
+                            <div class="notification_label">Lua map</div>
+                            <div class="notification_tooltip">
+                                <div>This map has lua logic.</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="map_hash">
+                        <div><h5>Hash:</h5> {{ map.map_hash }}</div>
+                    </div>
+
+                    <div class="map_description cBlock">
                         <div>
-                            {% if license %}
-                            <div class="cclImg">
+                            <h5>Description:</h5>
+                            <p>{{ map.description|default:"No description :(" }}</p>
+                        </div>
+                        <div class="map_info">
+                            <p>{{ map.info|default:"" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="editMapInfo popup">
+                            <div class="closePopup"><label class="x"></label></div>
+                            <h3>Edit map info</h3>
+                            <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+                                <div><textarea name="mapInfo" placeholder="Map info">{{map.info}}</textarea></div>
+                                <div><button type="submit">Submit</button></div>
+                            </form>
+                        </div>
+                    
+                        <div class="allReports popup">
+                            <div class="closePopup"><label class="x"></label></div>
+                            <h3>Reports of {{ map.title }}</h3>
+                            {% for item in reports %}
+                            <div class="reportRow">
+                                <div class="reportUser">{{item.0}} reported on {{item.3}} {% if item.2 == True %} ( &copy; ){% endif %}</div>
+                                <div class="reportMsg">{{item.1}}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="reportMap popup">
+                            <div class="closePopup"><label class="x"></label></div>
+                            <h3>Report this map</h3>
+                            <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+                                <div><textarea name="reportReason" placeholder="Reason"></textarea></div>
+                                {% if license %}<div class="checkboxRow"><label>Infringement: </label><input type="checkbox" name="infringement" value="true"></div>{% endif %}
+                                <div><button type="submit">Submit</button></div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="map_revisions cBlock">
+                        <table>
+                            <tr>
+                                <th>Previous revision</th>
+                                <th><a href="/maps/{{map.id}}/revisions/" title="Show all revisions">Revision</a></th>
+                                <th>Next revision</th>
+                            </tr>
+                            <tr>
+                                <td>{% if map.pre_rev == 0 %}
+                                    It's the first revision
+                                    {% else %}
+                                        <a href="/maps/{{map.pre_rev}}/"><img src="/maps/{{map.pre_rev}}/minimap" /></a>
+                                    {% endif %}
+                                </td>
+                                <td>{{ map.revision }}</td>
+                                <td>{% if map.next_rev == 0 %}
+                                        {%if map.user_id == request.user.id %}
+                                        <a href="/maps/upload/{{map.id}}/">Upload new revision</a>
+                                        {% else %}
+                                        It's the latest revision
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="/maps/{{map.next_rev}}/"><img src="/maps/{{map.next_rev}}/minimap" /></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="map_screenshots cBlock">
+                        <h5>Screenshots:</h5>
+                        <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                    </div>
+
+                    <div class="map_shp cBlock">
+                        <h5>Preview of embeded SHP files:</h5>
+                        <div class="cSHP"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="cSHP"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                    </div>
+
+                    {% if license %}
+                    <div class="map_license cBlock">
+                        <div>
+                            <div class="license_img left">
                                 <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">
                                     <img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/{{icons}}/4.0/88x31.png" />
                                 </a>
                             </div>
-                            <p>This work is licensed under a <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">Creative Commons {{license}}</a>.</p>
-                            {% if request.user.is_authenticated %}
-                                {% if reported == False %}
-                                <p><a class="reportCopyright">Report copyright infringement</a></p>
-                                {% endif %}
+                            <div class="license_text left">This work is licensed under a <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">Creative Commons {{license}}</a>.</div>
+                            <div class="clear"></div>
+                        {% if request.user.is_authenticated %}
+                            {% if reported == False %}
+                            <br /><a class="reportCopyright">Report copyright infringement</a>
                             {% endif %}
-                            <div class="reportMap">
-                                <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
-                                    <label>Infringement: </label><input type="checkbox" name="infringement" value="true">
-                                    <label>Reason: </label><input type="text" name="reportReason">
-                                    <button type="submit">Report</button>
-                                </form>
-                            </div>
-                            <hr />
-                            {% endif %}
-                        </div>
-                        {% if map.next_rev != 0 or map.downloading == False or map.requires_upgrade == True %}
-                        <div>
-                            <p><b>Attention!</b> Map can't be automatcially downloaded by OpenRA game!<br />
-                                {% if map.downloading == False %}<p>Reason: Too many reports</p>{% endif %}
-                                {% if map.requires_upgrade == True %}<p>Reason: Requires upgrade, see <a style="text-decoration: underline;" href="/maps/{{arg}}/lintlog">lintlog</a> (Failed for version: {{version}})</p>{% endif %}
-                        </div>
-                        {% else %}
-                        <p>This map is in pristine condition. :)</p>
                         {% endif %}
-                        <div>
-                            <table>
-                                <tr>
-                                    <th>Prev revision</th>
-                                    <th><a style="text-decoration: underline;" href="/maps/{{map.id}}/revisions/" title="Show all revisions">Revision</a></th>
-                                    <th>Next revision</th>
-                                </tr>
-                                <tr>
-                                    <td>{% if map.pre_rev == 0 %}
-                                        It's the first revision
-                                        {% else %}
-                                            <a href="/maps/{{map.pre_rev}}/"><img src="/maps/{{map.pre_rev}}/minimap" /></a>
-                                        {% endif %}</td>
-                                    <td>{{ map.revision }}</td>
-                                    <td>{% if map.next_rev == 0 %}
-                                            {%if map.user_id == request.user.id %}
-                                            <a href="/maps/upload/{{map.id}}/">Upload new revision</a>
-                                            {% else %}
-                                            It's the latest revision
-                                            {% endif %}
-                                        {% else %}
-                                            <a href="/maps/{{map.next_rev}}/"><img src="/maps/{{map.next_rev}}/minimap" /></a>
-                                        {% endif %}</td>
-                                </tr>
-                                <tr><th colspan="3">Hash</th></tr>
-                                <tr><td colspan="3">{{ map.map_hash }}</td></tr>
-                            </table>
-                        </div>
-                        <div class="allReports">
-                            <hr />
-                            <p>Reports:</p>
-                                {% for item in reports %}
-                                <p>{{item.3}} by {{item.0}}{% if item.2 == True %} (copyright infringement){% endif %}: {{item.1}}</p>
-                                {% endfor %}
                         </div>
                     </div>
-                    <div class="right_map_content">
-                        <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
-                        <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
-                        <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>
-                        <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type }}</div>
-                        <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.width }} x {{ map.height }}</div>
-                        <div class="map_data_label">Max Players:</div><div class="map_data_text">{{ map.players }}</div>
-                        <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
-                        <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
-                        <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
-                        <div class="map_data_label">Downloaded</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
-                        <div class="map_data_label"></div><div class="map_data_text"><a href="#">Show yaml</a></div>
-                        <div class="map_data_label"></div><div class="map_data_text">
-                            {% if request.user.is_authenticated %}
-                            {% if reported == True %}<a href="/maps/{{map.id}}/cancelreport/">Cancel Report</a>{% if reports %} (<a class="allReportsShow">See reports</a>){% endif %}
-                            {% else %}<a class="report">Report map</a>{% if reports %} (<a class="allReportsShow">See reports</a>){% endif %}
-                            {% endif %}
-                            {% endif %}
-                        </div>
-                        {% if request.user.is_superuser or map.user_id == request.user.id %}
-                        <div class="map_data_label"></div><div class="map_data_text"><a class="editMapInfoShow">Edit map Info</a></div>
-                        <div class="map_data_label"></div><div class="map_data_text"><a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a></div>
-                        {% endif %}
-                    </div>
-                    <div class="clear"></div>
+                    {% endif %}
                 </div>
+
+                <div class="right_map_content">
+                    <div class="map_download">
+                        <a href={{ '/maps/' }}{{ arg }}{{ '/oramap' }} class="button">Download</a>
+                    </div>
+                    <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
+                    <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
+                    <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>
+                    <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type }}</div>
+                    <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.width }} x {{ map.height }}</div>
+                    <div class="map_data_label">Max Players:</div><div class="map_data_text">{{ map.players }}</div>
+                    <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
+                    <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
+                    <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
+                    <div class="map_data_label">Downloaded</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
+                    <div class="map_data_label"><a href="#">Show yaml</a></div>
+                    <div class="map_data_text">
+                    {% if request.user.is_authenticated %}
+                        {% if reported == True %}
+                            <a href="/maps/{{map.id}}/cancelreport/">Cancel Report</a>{% if reports %} (<a class="allReportsShow">See reports</a>){% endif %}
+                        {% else %}
+                            <a class="report">Report map</a>{% if reports %}<br />(<a class="allReportsShow">See reports</a>){% endif %}
+                        {% endif %}
+                    {% endif %}
+                    </div>
+                    {% if request.user.is_superuser or map.user_id == request.user.id %}
+                    <div class="map_data_label">
+                        <a class="editMapInfoShow">Edit map Info</a>
+                    </div>
+                    <div class="map_data_text">
+                        <a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a>
+                    </div>
+                    {% endif %}
+
+                    <div class="side_img_links">
+                        <div>More from <a href="">{{ map.author }}</a>:</div>
+                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                    </div>
+
+                    <div class="side_img_links">
+                        <div>Similar maps:</div>
+                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                    </div>
+                </div>
+                <div class="clear"></div>
             </div>
+
             <script>
                 function confirmDelete()
                 {
-                    var agree = confirm('Are you sure you want to delete this map?');
-                    if (agree)
-                        return true;
-                    else
-                        return false;
+                    var agree = confirm('Are you sure you want to delete this map?')
+                    if (agree) return true
+                    else return false
                 }
                 $(function() {
-                    $(".report").click(function() {
-                        if ( $(".reportMap").is(':visible') )
-                            $(".reportMap").hide(100);
-                        else {
-                            $(".reportMap input[type='checkbox']").prop('checked', false);
-                            $(".reportMap").show(100);
-                        }
-                    });
-                    $(".reportCopyright").click(function() {
-                        if ( $(".reportMap").is(':visible') )
-                            $(".reportMap").hide(100);
-                        else {
-                            $(".reportMap input[type='checkbox']").prop('checked', true);
-                            $(".reportMap").show(100);
-                        }
-                    });
-                    $(".editMapInfoShow").click(function() {
-                        if ( $(".editMapInfo").is(':visible') )
-                            $(".editMapInfo").hide(100);
-                        else
-                            $(".editMapInfo").show(100);
-                    });
-                    $(".allReportsShow").click(function() {
-                        if ( $(".allReports").is(':visible') )
-                            $(".allReports").hide(100);
-                        else
-                            $(".allReports").show(100);
-                    });
-                });
+                    $("#overlay").on("click", function() {
+                        $(this).hide()
+                        $(".popup").hide()
+                    })
+
+                    $(".closePopup").on("click", function() {
+                        $("#overlay").hide()
+                        $(".popup").hide()
+                    })
+
+                    $(".report").on("click", function() {
+                        $(".reportMap input[type='checkbox']").prop('checked', false)
+                        $(".reportMap").show().children().children().children('textarea').focus()
+                        $("#overlay").show()
+                    })
+
+                    $(".reportCopyright").on("click", function() {
+                        $(".reportMap input[type='checkbox']").prop('checked', true)
+                        $(".reportMap").show().children().children().children('textarea').focus()
+                        $("#overlay").show()
+                    })
+
+                    $(".editMapInfoShow").on("click", function() {
+                        $(".editMapInfo").show().children().children().children('textarea').focus()
+                        $("#overlay").show()
+                    })
+
+                    $(".allReportsShow").on("click", function() {
+                        $(".allReports").show()
+                        $("#overlay").show()
+                    })
+                })
             </script>
