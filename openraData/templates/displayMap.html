@@ -78,7 +78,7 @@
                                 <div><button type="submit">Submit</button></div>
                             </form>
                         </div>
-                    {% if license %}
+                    
                         <div class="allReports popup">
                             <div class="closePopup"><label class="x"></label></div>
                             <h3>Reports of {{ map.title }}</h3>
@@ -95,11 +95,10 @@
                             <h3>Report this map</h3>
                             <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
                                 <div><textarea name="reportReason" placeholder="Reason"></textarea></div>
-                                <div class="checkboxRow"><label>Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
+                                {% if license %}<div class="checkboxRow"><label>Infringement: </label><input type="checkbox" name="infringement" value="true"></div>{% endif %}
                                 <div><button type="submit">Submit</button></div>
                             </form>
                         </div>
-                    {% endif %}
                     </div>
 
                     <div class="map_revisions cBlock">

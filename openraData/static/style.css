@@ -24,11 +24,13 @@ h1 {
 h2, h3 {
   font-size: 175%;
   font-family: Helvetica,arial,freesans,clean,sans-serif;
-  margin: 10px 0;
+  margin: 0 0 10px;
+  line-height: 20px;
 }
 
 h3 {
   font-size: 125%;
+  margin: 0 0 15px;
 }
 
 h5 {
@@ -361,7 +363,7 @@ table tr td {
 }
 
 #content {
-  padding: 0px 50px;
+  padding: 10px 50px;
   position: relative;
   min-height: 360px;
 }
@@ -478,6 +480,7 @@ table tr td {
   background: rgba(32, 44, 69, 0.4);
   font: 11px Cambria, Georgia, Times New Roman, Serif;
   line-height: 35px;
+  margin: 15px 0 0;
 }
 
 #footer a {
@@ -550,7 +553,6 @@ table tr td {
   left:0;
   z-index:8;
   padding: 0;
-  margin: 10px 0;
   border: solid 2px #74c2e7;
 }
 
@@ -760,7 +762,7 @@ p.registerInfo {
 
 #profile_container {
   min-height: 300px;
-  padding: 10px 0 20px;
+  padding: 0 0 20px;
 }
   .side_nav {
     float: left;
@@ -934,7 +936,6 @@ p.registerInfo {
 
 /* displayMap template */
 #map_data_container {
-  padding: 30px 0 20px;
 }
   .left_map_content {
     float: left;
@@ -1191,7 +1192,6 @@ p.registerInfo {
 /* Panel content */
 #panel_content {
   min-height: 300px;
-  padding: 10px 0;
 }
   #panel_content .side_nav {
     width: 140px;
