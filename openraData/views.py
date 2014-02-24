@@ -66,8 +66,7 @@ def ControlPanel(request, page=1, filter=""):
     perPage = 16
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
-    mapObject = Maps.objects.filter(user_id=request.user.id).filter(next_rev=0).distinct("map_hash")
-    mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+    mapObject = Maps.objects.filter(user_id=request.user.id).filter(next_rev=0).order_by('-posted')
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
@@ -90,7 +89,7 @@ def maps(request, page=1, filter=""):
     perPage = 20
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
-    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash').order_by('map_hash', '-posted')
     mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
@@ -352,8 +351,7 @@ def MapRevisions(request, arg, page=1):
     slice_end = perPage*int(page)
     revs = handlers.Revisions('maps')
     revisions = revs.GetRevisions(arg)
-    mapObject = Maps.objects.filter(id__in=revisions)
-    mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+    mapObject = Maps.objects.filter(id__in=revisions).order_by('-posted')
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
