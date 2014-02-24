@@ -44,7 +44,7 @@ def feed(request):
     context = RequestContext(request, {
         'request': request,
         'http_host': request.META['HTTP_HOST'],
-        'title': 'OpenRA Resource Center - Rss Feed',
+        'title': 'OpenRA Resource Center - RSS Feed',
         'lastBuildDate': lastBuildDate,
         'mapObject': mapObject,
     })
