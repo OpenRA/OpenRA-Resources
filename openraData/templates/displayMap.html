@@ -57,7 +57,7 @@
                     </div>
 
                     <div class="map_hash">
-                        <div><h5>Hash:</h5> {{ map.map_hash }}</div>
+                        <div><h5>Hash:</h5> <span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span></div>
                     </div>
 
                     <div class="map_description cBlock">
@@ -257,4 +257,15 @@
                         $("#overlay").show()
                     })
                 })
+                function selectText(containerid) {
+                    if (document.selection) {
+                        var range = document.body.createTextRange();
+                        range.moveToElementText(document.getElementById(containerid));
+                        range.select();
+                    } else if (window.getSelection) {
+                        var range = document.createRange();
+                        range.selectNode(document.getElementById(containerid));
+                        window.getSelection().addRange(range);
+                    }
+                }
             </script>
