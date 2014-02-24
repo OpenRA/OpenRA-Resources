@@ -25,13 +25,14 @@
                             <label class="x"></label>
                             <div class="notification_label">Attention!</div>
                             <div class="notification_tooltip">
-                                <div>This map can't be automatcially downloaded by OpenRA game!</div>
+                                <div>This map can't be automatcially downloaded by OpenRA game!
                                 {% if map.downloading == False %}
                                     <p>Reason: Too many reports</p>
                                 {% endif %}
                                 {% if map.requires_upgrade == True %}
-                                    <p>Reason: Requires upgrade, see <a href="/maps/{{arg}}/lintlog">lintlog</a> (Failed for version: {{version}})</p></div>
+                                    <p>Reason: Requires upgrade, see <a href="/maps/{{arg}}/lintlog">lintlog</a> (Failed for version: {{version}})</p>
                                 {% endif %}
+                                </div>
                             </div>
                         </div>
                         {% endif %}
