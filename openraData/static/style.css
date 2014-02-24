@@ -279,7 +279,7 @@ table tr td {
   border: 2px solid #74c2e7;
   display: table-column;
   float: left;
-  margin-top: -1px;
+  margin-top: -2px;
   margin-left: -2px;
   position: relative;
 }
@@ -961,6 +961,9 @@ p.registerInfo {
       .left_map_content .map_title .author {
         padding: 4px 0 0 0;
       }
+      .left_map_content .map_title .maptype {
+        padding: 4px 0 0 0;
+      }
        .map_download {
         font-size: 12px;
         line-height: 14px;
@@ -1104,10 +1107,12 @@ p.registerInfo {
         width: 60px;
         height: 60px;
         text-align: center;
+        line-height: 59px;
       }
         .map_shp img {
           max-width: 60px;
           max-height: 60px;
+          vertical-align: middle;
         }
 
   .right_map_content {
@@ -1122,6 +1127,7 @@ p.registerInfo {
       text-align: left;
       padding: 0 0 1px;
       vertical-align: top;
+      font-size: 0.9em;
     }
     .right_map_content .map_data_text {
       width: 55%;
@@ -1129,6 +1135,7 @@ p.registerInfo {
       color: #f0f0f0;
       text-align: left;
       padding: 0 0 1px;
+      font-size: 0.9em;
     }
       .editMapInfo {
       }
@@ -1172,6 +1179,7 @@ p.registerInfo {
           }
     .right_map_content .side_img_links {
       margin: 30px 0 0;
+      font-size: 0.9em;
     }
       .side_img_links .side_img_link {
         display: inline-block;
@@ -1180,7 +1188,7 @@ p.registerInfo {
         height: 80px;
         margin: 10px 10px 0 0;
         text-align: center;
-        line-height: 80px;
+        line-height: 76px;
       }
         .side_img_links .side_img_link img {
           max-width: 80px;

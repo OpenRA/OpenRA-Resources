@@ -513,7 +513,7 @@ def handle404(request):
 def profile(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
-    mapObject = Maps.objects.filter(user_id=request.user.id)
+    mapObject = Maps.objects.filter(user_id=request.user.id,next_rev=0)
     amountMaps = len(mapObject)
     ifsocial = False
     social = SocialAccount.objects.filter(user=request.user.id)
