@@ -1051,7 +1051,7 @@ p.registerInfo {
     }
       .map_hash h5 {
         position: absolute;
-        left: 10px;
+        left: 100px;
       }
     .map_description {
       position: relative;
@@ -1121,6 +1121,7 @@ p.registerInfo {
       color: #eee;
       text-align: left;
       padding: 0 0 1px;
+      vertical-align: top;
     }
     .right_map_content .map_data_text {
       width: 55%;
@@ -1179,10 +1180,12 @@ p.registerInfo {
         height: 80px;
         margin: 10px 10px 0 0;
         text-align: center;
+        line-height: 80px;
       }
         .side_img_links .side_img_link img {
           max-width: 80px;
           max-height: 80px;
+          vertical-align: middle;
         }
     .editMapInfoShow, .report, .reportCopyright, .allReportsShow {
       cursor: pointer;

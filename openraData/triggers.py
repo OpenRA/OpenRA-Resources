@@ -1,5 +1,6 @@
 import os
 import shutil
+from subprocess import Popen, PIPE
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count
@@ -44,6 +45,27 @@ def PushMapsToRsyncDirs():
 				break
 		continue
 
-def LintCheck():
-	# weekly, this function performs a Lint Check for all existing maps
-	pass
+def LintCheck(mapObject):
+	# this function performs a Lint Check for all existing maps
+	cwd = os.getcwd()
+	os.chdir(settings.OPENRA_PATH)
+
+	for item in mapObject:
+		path = cwd + os.sep + __name__.split('.')[0] + '/data/maps/' + str(item.id) + os.sep
+		listdir = os.listdir(path)
+		map_file = ""
+		for filename in listdir:
+			if filename.endswith('.oramap'):
+				map_file = filename
+				break
+		if map_file == "":
+			continue
+		command = 'mono OpenRA.Lint.exe ' + item.game_mod.lower() + ' ' + path + map_file
+		proc = Popen(command.split(), stdout=PIPE).communicate()
+		if proc[0].strip() == "":
+			if item.requires_upgrade:
+				Maps.objects.filter(id=item.id).update(requires_upgrade=False)
+		else:
+			if not item.requires_upgrade:
+				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
+	return True
