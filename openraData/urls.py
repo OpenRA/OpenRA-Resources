@@ -25,6 +25,8 @@ urlpatterns = patterns('',
     url(r'^maps/page/(?P<page>\d+)/filter/(?P<filter>\w+)/?$', views.maps, name='maps_paged_filtered'),
     url(r'^maps/filter/(?P<filter>\w+)/?$', views.maps, name='maps_filtered'),
     url(r'^maps/(?P<arg>\d+)/yaml/?$', views.serveYaml, name='printYaml'),
+    url(r'^maps/(?P<arg>\d+)/rules/?$', views.serveYamlRules, name='printYamlRules'),
+    url(r'^maps/(?P<arg>\d+)/lua/(?P<name>\w+)/?$', views.serveLua, name='printLua'),
 
     url(r'^units/?$', views.units, name='units'),
     url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),

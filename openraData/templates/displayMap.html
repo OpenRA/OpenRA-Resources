@@ -30,7 +30,7 @@
                                     <p>Reason: Too many reports</p>
                                 {% endif %}
                                 {% if map.requires_upgrade == True %}
-                                    <p>Reason: Requires upgrade, see <a href="/maps/{{arg}}/lintlog">lintlog</a> (Failed for version: {{version}})</p>
+                                    <p>Reason: Requires upgrade, see <a class="showLintLog">lintlog</a> (Failed for version: {{version}})</p>
                                 {% endif %}
                                 </div>
                             </div>
@@ -39,9 +39,9 @@
                         {% if map.advanced_map %}
                         <div class="notification map_advanced">
                             <label class="tick"></label>
-                            <div class="notification_label">Advanced</div>
+                            <div class="notification_label printRulesShow">Advanced</div>
                             <div class="notification_tooltip">
-                                <div>This map is advanced.</div>
+                                <div>This map is advanced.<br /><br />Click to see custom Rules.</div>
                             </div>
                         </div>
                         {% endif %}
@@ -50,7 +50,11 @@
                             <label class="tick"></label>
                             <div class="notification_label">Lua map</div>
                             <div class="notification_tooltip">
-                                <div>This map has lua logic.</div>
+                                <div>This map has lua logic.
+                                    {% for item in luaNames %}
+                                    <p><a class="printLua" title="{{item}}">print</a> {{item}}.lua or <a href="/maps/{{map.id}}/lua/{{item}}/">download</a></p>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                         {% endif %}
@@ -266,6 +270,54 @@
                     $(".printYamlShow").on("click", function() {
                         $.ajax({
                             url : "/maps/{{map.id}}/yaml/",
+                            dataType: "text",
+                            success : function (data) {
+                                $(".printYaml").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
+                                $(".closePopup").on("click", function() {
+                                    $("#overlay").hide()
+                                    $(".popup").hide()
+                                });
+                            }
+                        });
+                        $(".printYaml").show()
+                        $("#overlay").show()
+                    })
+
+                    $(".printRulesShow").on("click", function() {
+                        $.ajax({
+                            url : "/maps/{{map.id}}/rules/",
+                            dataType: "text",
+                            success : function (data) {
+                                $(".printYaml").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
+                                $(".closePopup").on("click", function() {
+                                    $("#overlay").hide()
+                                    $(".popup").hide()
+                                });
+                            }
+                        });
+                        $(".printYaml").show()
+                        $("#overlay").show()
+                    })
+
+                    $(".showLintLog").on("click", function() {
+                        $.ajax({
+                            url : "/maps/{{map.id}}/lintlog/",
+                            dataType: "text",
+                            success : function (data) {
+                                $(".printYaml").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
+                                $(".closePopup").on("click", function() {
+                                    $("#overlay").hide()
+                                    $(".popup").hide()
+                                });
+                            }
+                        });
+                        $(".printYaml").show()
+                        $("#overlay").show()
+                    })
+
+                    $(".printLua").on("click", function() {
+                        $.ajax({
+                            url : "/maps/{{map.id}}/lua/" + this.title,
                             dataType: "text",
                             success : function (data) {
                                 $(".printYaml").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));

@@ -1191,7 +1191,7 @@ p.registerInfo {
           max-height: 80px;
           vertical-align: middle;
         }
-    .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow {
+    .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua {
       cursor: pointer;
     }
 
