@@ -272,6 +272,12 @@ def serveOramap(request, arg, sync=""):
         Maps.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
         return response
 
+def serveYaml(request, arg):
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
+    response = StreamingHttpResponse(open(path), content_type='application/plain')
+    response['Content-Disposition'] = 'attachment; filename = map.yaml'
+    return response
+
 def uploadMap(request, previous_rev=0):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
