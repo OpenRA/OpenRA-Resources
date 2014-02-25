@@ -9,7 +9,7 @@ from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.db import connection
 from django.db.models import Count
 from django.utils import timezone
@@ -151,8 +151,8 @@ def displayMap(request, arg):
         mapObject = Maps.objects.get(id=arg)
     except:
         return HttpResponseRedirect('/')
-    path = misc.addSlash(settings.OPENRA_PATH)
-    versionFile = open(path + 'mods/ra/mod.yaml', 'r')
+    verpath = misc.addSlash(settings.OPENRA_PATH)
+    versionFile = open(verpath + 'mods/ra/mod.yaml', 'r')
     version = versionFile.read()
     versionFile.close()
     try:
@@ -170,6 +170,12 @@ def displayMap(request, arg):
             pass
         if item.user_id == request.user.id:
             reportedByUser = True
+
+    luaNames = []
+    listContent = os.listdir(path + '/content/')
+    for fn in listContent:
+        if fn.endswith('.lua'):
+            luaNames.append(os.path.splitext(fn)[0])
 
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
@@ -189,6 +195,7 @@ def displayMap(request, arg):
         'version': version,
         'reports': reports,
         'reported': reportedByUser,
+        'luaNames': luaNames,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -271,6 +278,43 @@ def serveOramap(request, arg, sync=""):
         response['Content-Disposition'] = 'attachment; filename = %s' % oramap
         Maps.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
         return response
+
+def serveYaml(request, arg):
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
+    response = StreamingHttpResponse(open(path), content_type='application/plain')
+    response['Content-Disposition'] = 'attachment; filename = map.yaml'
+    return response
+
+def serveYamlRules(request, arg):
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
+    result = ""
+    start = False
+    fn = open(path, 'r')
+    lines = fn.readlines()
+    fn.close()
+    for line in lines:
+        if "Rules:" in line:
+            start = True
+        if start:
+            result += line
+    response = StreamingHttpResponse(result, content_type='application/plain')
+    response['Content-Disposition'] = 'attachment; filename = advanced.%s' % arg
+    return response
+
+def serveLua(request, arg, name):
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/'
+    fname = ""
+    listdir = os.listdir(path)
+    for fn in listdir:
+        if fn.endswith('.lua'):
+            if os.path.splitext(fn)[0] == name:
+                fname = fn
+                break
+    if fname == "":
+        raise Http404
+    response = StreamingHttpResponse(open(path+fname), content_type='application/plain')
+    response['Content-Disposition'] = 'attachment; filename = %s' % fname
+    return response
 
 def uploadMap(request, previous_rev=0):
     if not request.user.is_authenticated():
