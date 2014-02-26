@@ -25,7 +25,7 @@
                             <label class="x"></label>
                             <div class="notification_label">Attention!</div>
                             <div class="notification_tooltip">
-                                <div>This map can't be automatcially downloaded by OpenRA game!
+                                <div>This map can't be automatically downloaded by OpenRA game!
                                 {% if map.downloading == False %}
                                     <p>Reason: Too many reports</p>
                                 {% endif %}
@@ -52,7 +52,7 @@
                             <div class="notification_tooltip">
                                 <div>This map has lua logic.
                                     {% for item in luaNames %}
-                                    <p><a class="printLua" title="{{item}}">print</a> {{item}}.lua or <a href="/maps/{{map.id}}/lua/{{item}}/">download</a></p>
+                                    <p><a class="printLua" title="{{item}}">show</a> {{item}}.lua or <a href="/maps/{{map.id}}/lua/{{item}}/">download</a></p>
                                     {% endfor %}
                                 </div>
                             </div>
@@ -193,6 +193,10 @@
                             <a href="/maps/{{map.id}}/cancelreport/">Cancel Report</a>{% if reports %} (<a class="allReportsShow">See reports</a>){% endif %}
                         {% else %}
                             <a class="report">Report map</a>{% if reports %}<br />(<a class="allReportsShow">See reports</a>){% endif %}
+                        {% endif %}
+                    {% else %}
+                        {% if reports %}
+                            <a class="allReportsShow">See reports</a>
                         {% endif %}
                     {% endif %}
                     </div>
