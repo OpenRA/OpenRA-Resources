@@ -16,10 +16,13 @@
 		</link>
 		<description>
 		<![CDATA[<img align="left" hspace="5" src="http://{{http_host}}/maps/{{item.id}}/minimap"/>
-		{{item.description}}<br />Mod: {{item.game_mod}}<br />Revision: {{item.revision}}
+		{% if item.description != "" %}Description: {{item.description}}<br />{% endif %}Mod: {{item.game_mod}}<br />Type: {{item.map_type}}<br />Revision: {{item.revision}}<br />Max Players: {{item.players}}<br />Tileset: {{item.tileset}}<br />Hash: {{item.map_hash}}
 		{% if item.info != "" %}
 		<br />
 		Info by uploader: {{item.info}}
+		{% endif %}
+		{% if item.advanced == True %}
+		<br /><br />Map is advanced{% if item.lua == True %} and contains Lua logic{% endif %}
 		{% endif %} ]]>
 		</description>
 		<pubDate>{{item.posted}}</pubDate>

@@ -5,6 +5,7 @@ import urllib2
 import datetime
 import shutil
 import multiprocessing
+import random
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
@@ -109,6 +110,31 @@ def maps(request, page=1, filter=""):
     })
     return StreamingHttpResponse(template.render(context))
 
+def mapsFromAuthor(request, author, page=1):
+    perPage = 20
+    slice_start = perPage*int(page)-perPage
+    slice_end = perPage*int(page)
+    mapObject = Maps.objects.filter(next_rev=0, author=author.replace("%20", " ")).distinct('map_hash').order_by('map_hash', '-posted')
+    mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+    amount = len(mapObject)
+    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    mapObject = mapObject[slice_start:slice_end]
+    if len(mapObject) == 0 and int(page) != 1:
+        return HttpResponseRedirect("/maps/author/%s/" % author)
+    template = loader.get_template('index.html')
+    context = RequestContext(request, {
+        'content': 'mapsFromAuthor.html',
+        'request': request,
+        'http_host': request.META['HTTP_HOST'],
+        'title': ' - Maps From ' + author,
+        'maps': mapObject,
+        'page': int(page),
+        'range': [i+1 for i in range(rowsRange)],
+        'amount': amount,
+        'author': author,
+    })
+    return StreamingHttpResponse(template.render(context))
+
 def displayMap(request, arg):
     if request.method == 'POST':
         if request.POST.get('reportReason', "").strip() != "":
@@ -178,7 +204,11 @@ def displayMap(request, arg):
             luaNames.append(os.path.splitext(fn)[0])
 
     mapsFromAuthor = Maps.objects.filter(author=mapObject.author,next_rev=0).exclude(id=mapObject.id).distinct('map_hash').order_by('map_hash', '-posted').exclude(map_hash=mapObject.map_hash)
-    
+    if len(mapsFromAuthor) >= 6:
+        mapsFromAuthor = random.sample(mapsFromAuthor, 6)
+    else:
+        mapsFromAuthor = random.sample(mapsFromAuthor, len(mapsFromAuthor))
+
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -403,7 +433,7 @@ def MapRevisions(request, arg, page=1):
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
-        return HttpResponseRedirect("/maps/")
+        return HttpResponseRedirect("/maps/%s/revisions/" % arg)
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'revisionsMap.html',

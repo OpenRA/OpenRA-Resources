@@ -214,7 +214,7 @@
 
                     <div class="side_img_links">
                         {% if mapsFromAuthor %}
-                        <div>More from <a href="">{{ map.author }}</a>:</div>
+                        <div>More from <a href="/maps/author/{{map.author}}/">{{ map.author }}</a>:</div>
                         {% for item in mapsFromAuthor %}
                             <div class="side_img_link"><a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a></div>
                         {% endfor %}
