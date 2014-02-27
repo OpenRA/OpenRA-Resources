@@ -77,8 +77,8 @@ hr {
   width: 400px;
   min-height: 220px;
   padding: 10px 10px 40px 10px;
-
-  background-color: #255f91;
+  background-image: url('/static/images/bg.svg'); 
+  /* background-color: #255f91; */
   border: 2px solid #74c2e7;
   border-radius: 3px;
 }
@@ -105,13 +105,13 @@ hr {
     text-align: center;
   }
   .popup .closePopup {
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     position: absolute;
-    right: -12px;
-    top: -12px;
+    right: 5px;
+    top: 5px;
     background: #800000;
-    border-radius: 8px;
+    border-radius: 3px;
     border: 2px solid #74c2e7;
   }
     .popup .closePopup .x {
@@ -178,17 +178,21 @@ label.x {
 }
   label.x:after {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    /* top: 0; */
+    bottom: 7px;
+    /* left: 0; */
+    right: 4px;
     content: "\d7";
-    font-size: 34px; 
+    font-size: 30px; 
     color: #FFF;
-    line-height: 16px;
+    line-height: 11px;
     text-align: center;
   }
 
+ .darkerpopupbg {
+    background: none repeat scroll 0% 0% rgba(32, 44, 69, 0.4); 
+}
+  
 
 a {
   text-decoration: none;
