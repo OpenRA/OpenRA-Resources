@@ -213,11 +213,12 @@
                     {% endif %}
 
                     <div class="side_img_links">
+                        {% if mapsFromAuthor %}
                         <div>More from <a href="">{{ map.author }}</a>:</div>
-                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        {% for item in mapsFromAuthor %}
+                            <div class="side_img_link"><a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a></div>
+                        {% endfor %}
+                        {% endif %}
                     </div>
 
                     <div class="side_img_links">

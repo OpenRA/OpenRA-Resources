@@ -177,6 +177,8 @@ def displayMap(request, arg):
         if fn.endswith('.lua'):
             luaNames.append(os.path.splitext(fn)[0])
 
+    mapsFromAuthor = Maps.objects.filter(author=mapObject.author,next_rev=0).exclude(id=mapObject.id).distinct('map_hash').order_by('map_hash', '-posted').exclude(map_hash=mapObject.map_hash)
+    
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -196,6 +198,7 @@ def displayMap(request, arg):
         'reports': reports,
         'reported': reportedByUser,
         'luaNames': luaNames,
+        'mapsFromAuthor': mapsFromAuthor,
     })
     return StreamingHttpResponse(template.render(context))
 
