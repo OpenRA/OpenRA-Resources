@@ -96,18 +96,16 @@
                         </div>
 
                         <div class="reportMap popup">
-                            <div class="darkerpopupbg">  
-                                <div class="closePopup"><label class="x"></label></div>                                                      
-                                    <h3>Report this map</h3>
-                                    <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
-                                        <div><textarea name="reportReason" placeholder="Reason"></textarea></div>
-                                        {% if license %}<div class="checkboxRow"><label>Infringement: </label><input type="checkbox" name="infringement" value="true"></div>{% endif %}
-                                        <div><button type="submit">Submit</button></div>
-                                    </form>
-                            </div>
+                            <div class="closePopup"><label class="x"></label></div>                                                      
+                            <h3>Report this map</h3>
+                            <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+                                <div><textarea name="reportReason" placeholder="Reason"></textarea></div>
+                                {% if license %}<div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>{% endif %}
+                                <div><button type="submit">Submit</button></div>
+                            </form>
                         </div>
 
-                        <div class="printYaml popup" style="width: 580px; left: 10%; margin-top: -100px; font-size: 0.9em;">
+                        <div class="printMisc popup" style="width: 580px; left: 10%; margin-top: -100px; font-size: 0.9em;"><div class="popupContainer"></div>
                         </div>
                     </div>
 
@@ -275,66 +273,70 @@
                     })
 
                     $(".printYamlShow").on("click", function() {
+                        $(".popupContainer").empty()
                         $.ajax({
                             url : "/maps/{{map.id}}/yaml/",
                             dataType: "text",
                             success : function (data) {
-                                $(".printYaml").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
+                                $(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
                                 $(".closePopup").on("click", function() {
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
                             }
                         });
-                        $(".printYaml").show()
+                        $(".printMisc").show()
                         $("#overlay").show()
                     })
 
                     $(".printRulesShow").on("click", function() {
+                        $(".popupContainer").empty()
                         $.ajax({
                             url : "/maps/{{map.id}}/rules/",
                             dataType: "text",
                             success : function (data) {
-                                $(".printYaml").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
+                                $(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
                                 $(".closePopup").on("click", function() {
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
                             }
                         });
-                        $(".printYaml").show()
+                        $(".printMisc").show()
                         $("#overlay").show()
                     })
 
                     $(".showLintLog").on("click", function() {
+                        $(".popupContainer").empty()
                         $.ajax({
                             url : "/maps/{{map.id}}/lintlog/",
                             dataType: "text",
                             success : function (data) {
-                                $(".printYaml").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
+                                $(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
                                 $(".closePopup").on("click", function() {
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
                             }
                         });
-                        $(".printYaml").show()
+                        $(".printMisc").show()
                         $("#overlay").show()
                     })
 
                     $(".printLua").on("click", function() {
+                        $(".popupContainer").empty()
                         $.ajax({
                             url : "/maps/{{map.id}}/lua/" + this.title,
                             dataType: "text",
                             success : function (data) {
-                                $(".printYaml").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
+                                $(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
                                 $(".closePopup").on("click", function() {
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
                             }
                         });
-                        $(".printYaml").show()
+                        $(".printMisc").show()
                         $("#overlay").show()
                     })
                 })
