@@ -96,13 +96,15 @@
                         </div>
 
                         <div class="reportMap popup">
-                            <div class="closePopup"><label class="x"></label></div>
-                            <h3>Report this map</h3>
-                            <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
-                                <div><textarea name="reportReason" placeholder="Reason"></textarea></div>
-                                {% if license %}<div class="checkboxRow"><label>Infringement: </label><input type="checkbox" name="infringement" value="true"></div>{% endif %}
-                                <div><button type="submit">Submit</button></div>
-                            </form>
+                            <div class="darkerpopupbg">  
+                                <div class="closePopup"><label class="x"></label></div>                                                      
+                                    <h3>Report this map</h3>
+                                    <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+                                        <div><textarea name="reportReason" placeholder="Reason"></textarea></div>
+                                        {% if license %}<div class="checkboxRow"><label>Infringement: </label><input type="checkbox" name="infringement" value="true"></div>{% endif %}
+                                        <div><button type="submit">Submit</button></div>
+                                    </form>
+                            </div>
                         </div>
 
                         <div class="printYaml popup" style="width: 580px; left: 10%; margin-top: -100px; font-size: 0.9em;">
