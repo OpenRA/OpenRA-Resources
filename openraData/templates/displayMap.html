@@ -221,13 +221,14 @@
                         {% endif %}
                     </div>
 
+                    {% if similarMaps %}
                     <div class="side_img_links">
                         <div>Similar maps:</div>
-                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="side_img_link"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        {% for item in similarMaps %}
+                        <div class="side_img_link"><a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a></div>
+                        {% endfor %}
                     </div>
+                    {% endif %}
                 </div>
                 <div class="clear"></div>
             </div>
