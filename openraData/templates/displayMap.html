@@ -4,7 +4,7 @@
                     <div class="map_title left">
                         <div>
                             <div class="title">{{ map.title }}</div>
-                            <div class="author">{{ map.map_type }} - by {{ map.author }}</div>
+                            <div class="author">by {{ map.author }}</div>
                         </div>
                     </div>
 
@@ -138,6 +138,7 @@
                         </table>
                     </div>
                     
+                    {% if screenshots %}
                     <div class="map_screenshots cBlock">
                         <h5>Screenshots:</h5>
                         <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
@@ -145,12 +146,15 @@
                         <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
                         <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
                     </div>
+                    {% endif %}
 
+                    {% if shp_previews %}
                     <div class="map_shp cBlock">
                         <h5>Preview of embeded SHP files:</h5>
                         <div class="cSHP"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
                         <div class="cSHP"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
                     </div>
+                    {% endif %}
 
                     {% if license %}
                     <div class="map_license cBlock">
@@ -177,9 +181,9 @@
                         <a href={{ '/maps/' }}{{ arg }}{{ '/oramap' }} class="button">Download</a>
                     </div>
                     <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
+                    <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>
                     <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
                     <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>
-                    <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.width }} x {{ map.height }}</div>
                     <div class="map_data_label">Max Players:</div><div class="map_data_text">{{ map.players }}</div>
                     <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
                     <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div><br /><br />
