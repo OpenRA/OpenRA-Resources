@@ -209,6 +209,8 @@ def displayMap(request, arg):
     else:
         mapsFromAuthor = random.sample(mapsFromAuthor, len(mapsFromAuthor))
 
+    similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(id=mapObject.id)[0:6]
+    
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -229,6 +231,7 @@ def displayMap(request, arg):
         'reported': reportedByUser,
         'luaNames': luaNames,
         'mapsFromAuthor': mapsFromAuthor,
+        'similarMaps': similarMaps,
     })
     return StreamingHttpResponse(template.render(context))
 
