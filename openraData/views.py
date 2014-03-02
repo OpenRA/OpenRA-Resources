@@ -247,9 +247,11 @@ def displayMap(request, arg):
     })
     return StreamingHttpResponse(template.render(context))
 
-def deleteScreenshot(request, arg, itemid):
+def deleteScreenshot(request, itemid):
     scObject = Screenshots.objects.filter(id=itemid)
     if scObject:
+        arg = str(scObject[0].ex_id)
+        name = scObject[0].ex_name
         if request.user.is_superuser or scObject[0].user_id == request.user.id:
             path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid
             try:
@@ -257,20 +259,21 @@ def deleteScreenshot(request, arg, itemid):
             except:
                 pass
             scObject[0].delete()
-    return HttpResponseRedirect("/maps/"+arg+"/")
+            return HttpResponseRedirect("/"+name+"/"+arg)
+    return HttpResponseRedirect("/")
 
-def serveScreenshot(request, arg='0', itemid='0', imgtype=""):
+def serveScreenshot(request, itemid, itemname=""):
     image = ""
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid
     Dir = os.listdir(path)
     for fn in Dir:
         if "-mini." in fn:
-            if imgtype == "mini" or arg == '0':
+            if itemname == "mini":
                 image = path + "/" + fn
                 mime = fn.split('.')[1]
                 break
         else:
-            if imgtype == "":
+            if itemname == "":
                 image = path + "/" + fn
                 mime = fn.split('.')[1]
                 break
