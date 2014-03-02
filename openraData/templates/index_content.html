@@ -1,44 +1,58 @@
-        <div id="mainleft">
-            <div id="screenshot">
-                {% for item in screenshots %}
-                <img src="/screenshots/{{item.id}}/mini/" alt="screenshot" />
-                {% endfor %}
+        <div class="top_content">
+            <div id="mainleft">
+                <div id="screenshot">
+                    {% for item in screenshots %}
+                    <a href="/{{item.ex_name}}/{{item.ex_id}}/">
+                        <img src="/screenshots/{{item.id}}/mini/" alt="screenshot" style="opacity: 0;" />
+                    </a>
+                    {% endfor %}
+                </div>
             </div>
+
+            <div>
+                <h2>Share your Content!</h2>
+            </div>
+
+            <div>
+                <p>OpenRA is a free and open-source RTS game engine that lets you play re-balanced games like 
+                C&amp;C Red Alert, C&amp;C Tiberian Dawn, Dune 2000...</p>
+                
+                <p>The engine allows players to create new mods, add modified versions of units, buildings etc.
+                It also offers advanced features for creating maps and missions.</p>
+            </div>
+            <div class="clear"></div>
         </div>
 
         <div>
-            <h2>Share your Content!</h2>
-        </div>
-
-        <div>
-            <p>OpenRA is a free and open-source RTS game engine that lets you play re-balanced games like 
-            C&amp;C Red Alert, C&amp;C Tiberian Dawn, Dune 2000...</p>
-            
-            <p>The engine allows players to create new mods, add modified versions of units, buildings etc.
-            It also offers advanced features for creating maps and missions.</p>
-            <br />
             <p>If you created a new map and want to play it with other players, you just have to:<br />
             - upload it here<br />
             - create a new game and select your new map<br />
             - other players, joining it, will automatically download the map directly from this website<br /><br />
             Note: some OpenRA dedicated servers synchronize maps with this site's API to help your easier distribute maps and missions!</p>
         </div>
+
         <script>
             function nextSlide() {
-                var x = $('#screenshot img:not(.active)');
-                return $(x[Math.floor(Math.random() * x.length)]);
+                var x = $('#screenshot img:not(.active)')
+                return $(x[Math.floor(Math.random() * x.length)])
             }
 
             function slideSwitch() {
-                var active = $('#screenshot img.active');
+                var active = $('#screenshot img.active')
                 if (active.length == 0)
-                    active = nextSlide();
-                var next = nextSlide();
-                active.addClass('last-active');
-                next.css({opacity: 0.0}).addClass('active').animate({opacity: 1.0}, 1000, function() {
-                  active.removeClass('active last-active');
-                });
+                    active = nextSlide()
+                var next = nextSlide()
+                active.addClass('last-active')
+
+                $("img.last-active").animate({opacity: 0.0}, 1000, function() {
+                    next.css({opacity: 0.0}).addClass('active').animate({opacity: 1.0}, 1000, function() {
+                      active.removeClass('active last-active')
+                    })
+                })
             }
 
-            $(function() { setInterval("slideSwitch()", 14000); });
+            $(function() { 
+                $("#screenshot img:first").css({opacity: 1.0})
+                setInterval("slideSwitch()", 14000);
+            })
         </script>
