@@ -5,6 +5,8 @@ import string
 import re
 from subprocess import Popen, PIPE
 import multiprocessing
+import PIL
+from PIL import Image
 
 from django.conf import settings
 from django.utils import timezone
@@ -337,3 +339,46 @@ class Revisions():
         if itemObject.next_rev == 0:
             return itemObject.id
         return self.GetLatestRevisionID(itemObject.next_rev)
+
+def addScreenshot(f, arg, user_id, item):
+    if item == 'map':
+        Object = Maps.objects.filter(id=arg)
+        if not Object:
+            return False
+        if Object[0].user_id != user_id:
+            return False
+    else:
+        return False
+    tempname = '/tmp/screenshot.temp'
+    with open(tempname, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+
+    command = 'file -b --mime-type %s' % tempname
+    proc = Popen(command.split(), stdout=PIPE).communicate()
+    mimetype = proc[0].strip()
+    if mimetype not in ['image/jpeg','image/png','image/gif']:
+        return False
+
+    userObject = User.objects.get(pk=user_id)
+    transac = Screenshots(
+        user = userObject,
+        ex_id = int(arg),
+        ex_name = item+"s",
+        posted =  timezone.now(),
+        map_preview = False,
+        )
+    transac.save()
+
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + str(transac.id) + '/'
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    shutil.move(tempname, path + arg + "." + mimetype.split('/')[1])
+
+    basewidth = 150
+    img = Image.open(path + arg + "." + mimetype.split('/')[1])
+    wpercent = (basewidth/float(img.size[0]))
+    hsize = int((float(img.size[1])*float(wpercent)))
+    img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+    img.save(path + arg + "-mini." + mimetype.split('/')[1])

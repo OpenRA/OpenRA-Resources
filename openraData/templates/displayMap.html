@@ -107,6 +107,7 @@
 
                         <div class="printMisc popup" style="width: 580px; left: 10%; margin-top: -100px; font-size: 0.9em;"><div class="popupContainer"></div>
                         </div>
+                        <div class="addScreenshotForm popup"></div>
                     </div>
 
                     <div class="map_revisions cBlock">
@@ -141,10 +142,9 @@
                     {% if screenshots %}
                     <div class="map_screenshots cBlock">
                         <h5>Screenshots:</h5>
-                        <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="cScreenshot"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        {% for item in screenshots %}
+                        <div class="cScreenshot"><a href="/maps/{{arg}}/screenshot/{{item.id}}/"><img src="/maps/{{arg}}/screenshot/{{item.id}}/mini/" /></a><a href="/maps/{{arg}}/screenshot/{{item.id}}/delete/">delete</a></div>
+                        {% endfor %}
                     </div>
                     {% endif %}
 
@@ -212,7 +212,7 @@
                         <a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a>
                     </div>
                     <div class="map_data_text">
-                        <a href="#">Upload Screenshot</a>
+                        <a class="addScreenshot">Add Screenshot</a>
                     </div>
                     {% endif %}
 
@@ -342,6 +342,23 @@
                             }
                         });
                         $(".printMisc").show()
+                        $("#overlay").show()
+                    })
+
+                    $(".addScreenshot").on("click", function() {
+                        $(".addScreenshotForm").empty()
+                        $.ajax({
+                            url : "/maps/{{map.id}}/addmapsc/" + this.title,
+                            dataType: "text",
+                            success : function (data) {
+                                $(".addScreenshotForm").html(data);
+                                $(".closePopup").on("click", function() {
+                                    $("#overlay").hide()
+                                    $(".popup").hide()
+                                });
+                            }
+                        });
+                        $(".addScreenshotForm").show()
                         $("#overlay").show()
                     })
                 })
