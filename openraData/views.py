@@ -24,12 +24,14 @@ from openraData import handlers, misc, triggers
 from openraData.models import Maps, Screenshots, Comments, Reports
 
 def index(request):
+    scObject = Screenshots.objects.order_by('-posted')[0:3]
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'index_content.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': '',
+        'screenshots': scObject,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -257,13 +259,13 @@ def deleteScreenshot(request, arg, itemid):
             scObject[0].delete()
     return HttpResponseRedirect("/maps/"+arg+"/")
 
-def serveScreenshot(request, arg, itemid, imgtype=""):
+def serveScreenshot(request, arg='0', itemid='0', imgtype=""):
     image = ""
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid
     Dir = os.listdir(path)
     for fn in Dir:
-        if fn.startswith(arg + "-mini."):
-            if imgtype == "mini":
+        if "-mini." in fn:
+            if imgtype == "mini" or arg == '0':
                 image = path + "/" + fn
                 mime = fn.split('.')[1]
                 break

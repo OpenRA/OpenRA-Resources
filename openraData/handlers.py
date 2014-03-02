@@ -376,7 +376,7 @@ def addScreenshot(f, arg, user_id, item):
 
     shutil.move(tempname, path + arg + "." + mimetype.split('/')[1])
 
-    basewidth = 150
+    basewidth = 250
     img = Image.open(path + arg + "." + mimetype.split('/')[1])
     wpercent = (basewidth/float(img.size[0]))
     hsize = int((float(img.size[1])*float(wpercent)))

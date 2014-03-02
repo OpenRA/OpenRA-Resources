@@ -44,6 +44,7 @@ urlpatterns = patterns('',
     url(r'^palettes/upload/?$', views.uploadPalette, name='uploadPalette'),
 
     url(r'^screenshots/?$', views.screenshots, name='screenshots'),
+    url(r'^screenshots/(?P<itemid>\d+)/?$', views.serveScreenshot, name='serverScreenshot'),
 
     url(r'^assets/?$', views.assets, name='assets'),
 

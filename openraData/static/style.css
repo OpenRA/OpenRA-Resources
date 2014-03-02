@@ -557,6 +557,7 @@ table tr td {
   z-index:8;
   padding: 0;
   border: solid 2px #74c2e7;
+  max-width: 250px;
 }
 
 #screenshot IMG.active {
