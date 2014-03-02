@@ -557,6 +557,7 @@ table tr td {
   z-index:8;
   padding: 0;
   border: solid 2px #74c2e7;
+  max-width: 250px;
 }
 
 #screenshot IMG.active {
@@ -1195,7 +1196,7 @@ p.registerInfo {
           max-height: 80px;
           vertical-align: middle;
         }
-    .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua, .showLintLog {
+    .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua, .showLintLog, .addScreenshot {
       cursor: pointer;
     }
 
@@ -1210,3 +1211,9 @@ p.registerInfo {
   #panel_content .side_nav_content {
     margin: 0 0 0 140px;
   }
+
+.addScreenshotForm {
+  font-size 0.9em;
+  float: right;
+  padding-top: 50px;
+}

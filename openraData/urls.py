@@ -19,6 +19,10 @@ urlpatterns = patterns('',
     url(r'^maps/upload/?$', views.uploadMap, name='uploadMap'),
     url(r'^maps/upload/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
     url(r'^maps/(?P<arg>\d+)/delete/?$', views.DeleteMap, name='DeleteMap'),
+    url(r'^maps/(?P<arg>\d+)/add(?P<item>\w+)sc/?$', views.addScreenshot, name='addScreenshot'),
+    url(r'^maps/(?P<arg>\d+)/screenshot/(?P<itemid>\d+)/delete/?$', views.deleteScreenshot, name='deleteScreenshot'),
+    url(r'^maps/(?P<arg>\d+)/screenshot/(?P<itemid>\d+)/?$', views.serveScreenshot, name='serverScreenshot'),
+    url(r'^maps/(?P<arg>\d+)/screenshot/(?P<itemid>\d+)/(?P<imgtype>\w+)/?$', views.serveScreenshot, name='serverScreenshot'),
     url(r'^maps/(?P<arg>\d+)/revisions/?$', views.MapRevisions, name='MapRevisions'),
     url(r'^maps/(?P<arg>\d+)/revisions/page/(?P<page>\d+)/?$', views.MapRevisions, name='MapRevisions'),
     url(r'^maps/author/(?P<author>[^/]+)/?$', views.mapsFromAuthor, name='mapsFromAuthor'),
@@ -40,6 +44,7 @@ urlpatterns = patterns('',
     url(r'^palettes/upload/?$', views.uploadPalette, name='uploadPalette'),
 
     url(r'^screenshots/?$', views.screenshots, name='screenshots'),
+    url(r'^screenshots/(?P<itemid>\d+)/?$', views.serveScreenshot, name='serverScreenshot'),
 
     url(r'^assets/?$', views.assets, name='assets'),
 

@@ -6,6 +6,7 @@ That's just our preference, so if you deploy it, you can choose any Database you
 ```
 python (version 2)
 python-psycopg2  (postgresql module)
+python-imaging
 python-openid
 python-requests
 python-requests-oauthlib

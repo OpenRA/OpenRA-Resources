@@ -16,6 +16,7 @@ from django.db.models import Count
 from django.utils import timezone
 
 from .forms import UploadMapForm
+from .forms import AddScreenshotForm
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
@@ -23,12 +24,14 @@ from openraData import handlers, misc, triggers
 from openraData.models import Maps, Screenshots, Comments, Reports
 
 def index(request):
+    scObject = Screenshots.objects.order_by('-posted')[0:3]
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'index_content.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': '',
+        'screenshots': scObject,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -163,6 +166,10 @@ def displayMap(request, arg):
             else:
                 Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())
             return HttpResponseRedirect('/maps/'+arg)
+        elif request.FILES.get('scfile', False) != False:
+            form = AddScreenshotForm(request.POST, request.FILES)
+            if form.is_valid():
+                handlers.addScreenshot(request.FILES['scfile'], arg, request.user.id, 'map')
     fullPreview = False
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
@@ -211,7 +218,7 @@ def displayMap(request, arg):
 
     similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(id=mapObject.id)[0:6]
     
-    screenshots = []
+    screenshots = Screenshots.objects.filter(ex_name="maps",ex_id=arg)
     shp_previews = []
 
     license, icons = misc.selectLicenceInfo(mapObject)
@@ -239,6 +246,39 @@ def displayMap(request, arg):
         'shp_previews': shp_previews,
     })
     return StreamingHttpResponse(template.render(context))
+
+def deleteScreenshot(request, arg, itemid):
+    scObject = Screenshots.objects.filter(id=itemid)
+    if scObject:
+        if request.user.is_superuser or scObject[0].user_id == request.user.id:
+            path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid
+            try:
+                shutil.rmtree(path)
+            except:
+                pass
+            scObject[0].delete()
+    return HttpResponseRedirect("/maps/"+arg+"/")
+
+def serveScreenshot(request, arg='0', itemid='0', imgtype=""):
+    image = ""
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid
+    Dir = os.listdir(path)
+    for fn in Dir:
+        if "-mini." in fn:
+            if imgtype == "mini" or arg == '0':
+                image = path + "/" + fn
+                mime = fn.split('.')[1]
+                break
+        else:
+            if imgtype == "":
+                image = path + "/" + fn
+                mime = fn.split('.')[1]
+                break
+    if image == "":
+        return StreamingHttpResponse("")
+    response = StreamingHttpResponse(open(image), content_type='image/'+mime)
+    response['Content-Disposition'] = 'attachment; filename = %s' % fn
+    return response
 
 def serveRender(request, arg):
     render = ""
@@ -427,6 +467,21 @@ def DeleteMap(request, arg):
         'title': 'Delete Map',
         'mapTitle': mapTitle,
         'mapAuthor': mapAuthor,
+    })
+    return StreamingHttpResponse(template.render(context))
+
+def addScreenshot(request, arg, item):
+    if item == 'map':
+        Object = Maps.objects.filter(id=arg)
+    if Object[0].user_id != request.user.id:
+        return StreamingHttpResponse("")
+    form = AddScreenshotForm()
+    template = loader.get_template('addScreenshotForm.html')
+    context = RequestContext(request, {
+        'request': request,
+        'http_host': request.META['HTTP_HOST'],
+        'arg': arg,
+        'form': form,
     })
     return StreamingHttpResponse(template.render(context))
 

@@ -1,6 +1,8 @@
         <div id="mainleft">
             <div id="screenshot">
-                <img width="250" height="150" src="" alt="screenshot" />
+                {% for item in screenshots %}
+                <img src="/screenshots/{{item.id}}/" alt="screenshot" />
+                {% endfor %}
             </div>
         </div>
 
