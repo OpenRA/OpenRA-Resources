@@ -545,6 +545,10 @@ table tr td {
   height:200px;
 }
 
+.top_content {
+  padding: 0 0 20px 0;
+}
+
 #screenshot {
   position:relative;
   height:350px;
