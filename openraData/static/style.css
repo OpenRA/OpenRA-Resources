@@ -546,7 +546,7 @@ table tr td {
 }
 
 .top_content {
-  padding: 0 0 20px 0;
+  padding: 0 0 5px 0;
 }
 
 #screenshot {
@@ -1217,7 +1217,7 @@ p.registerInfo {
   }
 
 .addScreenshotForm {
-  font-size 0.9em;
+  font-size: 0.9em;
   float: right;
   padding-top: 50px;
 }
