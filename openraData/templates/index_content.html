@@ -2,7 +2,9 @@
             <div id="mainleft">
                 <div id="screenshot">
                     {% for item in screenshots %}
-                    <img src="/screenshots/{{item.id}}/mini/" alt="screenshot" style="opacity: 0;" />
+                    <a href="/{{item.ex_name}}/{{item.ex_id}}/">
+                        <img src="/screenshots/{{item.id}}/mini/" alt="screenshot" style="opacity: 0;" />
+                    </a>
                     {% endfor %}
                 </div>
             </div>
