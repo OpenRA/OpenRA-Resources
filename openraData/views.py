@@ -24,7 +24,7 @@ from openraData import handlers, misc, triggers
 from openraData.models import Maps, Screenshots, Comments, Reports
 
 def index(request):
-    scObject = Screenshots.objects.order_by('-posted')[0:3]
+    scObject = Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'index_content.html',
