@@ -143,9 +143,9 @@
                     <div class="map_screenshots cBlock">
                         <h5>Screenshots:</h5>
                         {% for item in screenshots %}
-                        <div class="cScreenshot"><a href="/maps/{{arg}}/screenshot/{{item.id}}/"><img src="/maps/{{arg}}/screenshot/{{item.id}}/mini/" /></a>
+                        <div class="cScreenshot"><a href="/screenshots/{{item.id}}/"><img src="/screenshots/{{item.id}}/mini/" /></a>
                             {% if request.user.id == item.user_id or request.user.is_superuser %}
-                            <a href="/maps/{{arg}}/screenshot/{{item.id}}/delete/">delete</a>
+                            <a href="/screenshots/{{item.id}}/delete/">delete</a>
                             {% endif %}
                         </div>
                         {% endfor %}
