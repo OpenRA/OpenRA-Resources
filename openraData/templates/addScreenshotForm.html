@@ -1,4 +1,4 @@
-            {% if user.is_authenticated %}
+            {% if request.user.is_authenticated %}
             <div class="upload_container">
                 <form action="/maps/{{arg}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
                 	<h3>Upload screenshot of your map</h3>

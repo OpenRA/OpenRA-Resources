@@ -345,7 +345,7 @@ def addScreenshot(f, arg, user_id, item):
         Object = Maps.objects.filter(id=arg)
         if not Object:
             return False
-        if Object[0].user_id != user_id:
+        if not (Object[0].user_id == user_id.id or user_id.is_superuser):
             return False
     else:
         return False
@@ -360,7 +360,7 @@ def addScreenshot(f, arg, user_id, item):
     if mimetype not in ['image/jpeg','image/png','image/gif']:
         return False
 
-    userObject = User.objects.get(pk=user_id)
+    userObject = User.objects.get(pk=Object[0].user_id)
     transac = Screenshots(
         user = userObject,
         ex_id = int(arg),

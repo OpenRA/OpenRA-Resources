@@ -290,7 +290,7 @@ table tr td {
 #map_grid_cell a {
   display: block;
   min-height: 170px;
-  width: 136px;
+  width: 137px;
   position: relative;
   color: #fff;
 }
@@ -303,7 +303,11 @@ table tr td {
 
 .cell-link-container div {
   text-align: center;
-  width: 138px;
+  width: 137px;
+}
+
+.cell-link-container div.link_title {
+  width: 135px;
 }
 
 #map_grid_cell:hover {
