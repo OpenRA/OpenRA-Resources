@@ -169,7 +169,7 @@ def displayMap(request, arg):
         elif request.FILES.get('scfile', False) != False:
             form = AddScreenshotForm(request.POST, request.FILES)
             if form.is_valid():
-                handlers.addScreenshot(request.FILES['scfile'], arg, request.user.id, 'map')
+                handlers.addScreenshot(request.FILES['scfile'], arg, request.user, 'map')
     fullPreview = False
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
@@ -476,7 +476,7 @@ def DeleteMap(request, arg):
 def addScreenshot(request, arg, item):
     if item == 'map':
         Object = Maps.objects.filter(id=arg)
-    if Object[0].user_id != request.user.id:
+    if not (Object[0].user_id == request.user.id or request.user.is_superuser):
         return StreamingHttpResponse("")
     form = AddScreenshotForm()
     template = loader.get_template('addScreenshotForm.html')
