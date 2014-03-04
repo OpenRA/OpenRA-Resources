@@ -83,6 +83,7 @@ class MapHandlers():
         if mimetype == 'text/plain':
             if not self.LegacyImport(tempname):
                 self.LOG.append('Failed to import legacy map.')
+                misc.send_email_to_admin_OnMapFail(tempname)
                 return False
             tempname = settings.OPENRA_PATH + self.legacy_name
             name = os.path.splitext(name)[0] + '.oramap'
