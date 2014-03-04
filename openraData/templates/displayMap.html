@@ -152,11 +152,12 @@
                     </div>
                     {% endif %}
 
-                    {% if shp_previews %}
+                    {% if shpNames %}
                     <div class="map_shp cBlock">
                         <h5>Preview of embeded SHP files:</h5>
-                        <div class="cSHP"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
-                        <div class="cSHP"><img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} /></div>
+                        {% for item in shpNames %}
+                        <div class="cSHP"><img src="/maps/{{arg}}/shp/{{item}}" /></div>
+                        {% endfor %}
                     </div>
                     {% endif %}
 
