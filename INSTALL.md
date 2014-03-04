@@ -6,10 +6,11 @@ That's just our preference, so if you deploy it, you can choose any Database you
 ```
 python (version 2)
 python-psycopg2  (postgresql module)
-python-imaging
+python-pgmagick
 python-openid
 python-requests
 python-requests-oauthlib
+imagemagick
 Django python Web Framework version 1.6
 mono 2.10 +
 OpenRA.Utility and OpenRA.Lint

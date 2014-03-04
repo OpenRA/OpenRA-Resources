@@ -210,6 +210,12 @@ def displayMap(request, arg):
         if fn.endswith('.lua'):
             luaNames.append(os.path.splitext(fn)[0])
 
+    shpNames = []
+    listContent = os.listdir(path + '/content/')
+    for fn in listContent:
+        if fn.endswith('.shp.gif'):
+            shpNames.append(fn.split('.shp.gif')[0])
+
     mapsFromAuthor = Maps.objects.filter(author=mapObject.author,next_rev=0).exclude(id=mapObject.id).distinct('map_hash').order_by('map_hash', '-posted').exclude(map_hash=mapObject.map_hash)
     if len(mapsFromAuthor) >= 6:
         mapsFromAuthor = random.sample(mapsFromAuthor, 6)
@@ -219,7 +225,6 @@ def displayMap(request, arg):
     similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(id=mapObject.id)[0:6]
     
     screenshots = Screenshots.objects.filter(ex_name="maps",ex_id=arg)
-    shp_previews = []
 
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
@@ -243,7 +248,7 @@ def displayMap(request, arg):
         'mapsFromAuthor': mapsFromAuthor,
         'similarMaps': similarMaps,
         'screenshots': screenshots,
-        'shp_previews': shp_previews,
+        'shpNames': shpNames,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -397,6 +402,21 @@ def serveLua(request, arg, name):
     if fname == "":
         raise Http404
     response = StreamingHttpResponse(open(path+fname), content_type='application/plain')
+    response['Content-Disposition'] = 'attachment; filename = %s' % fname
+    return response
+
+def serveMapSHP(request, arg, name):
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/'
+    fname = ""
+    listdir = os.listdir(path)
+    for fn in listdir:
+        if fn.endswith('.shp.gif'):
+            if fn.split('.shp.gif')[0] == name:
+                fname = fn
+                break
+    if fname == "":
+        raise Http404
+    response = StreamingHttpResponse(open(path+fname), content_type='image/gif')
     response['Content-Disposition'] = 'attachment; filename = %s' % fname
     return response
 

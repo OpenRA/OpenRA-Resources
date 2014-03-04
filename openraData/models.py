@@ -20,7 +20,7 @@ class Maps(models.Model):
     title               = models.CharField(max_length=200)
     description         = models.CharField(max_length=2000)
     info                = models.CharField(max_length=2000)
-    author              = models.CharField(max_length=40)
+    author              = models.CharField(max_length=60)
     map_type            = models.CharField(max_length=40)
     players             = models.IntegerField(default=0)
     game_mod            = models.CharField(max_length=16)
@@ -50,7 +50,7 @@ class Units(models.Model):
 
     user                = models.ForeignKey(User)
     title               = models.CharField(max_length=200)
-    info                = models.CharField(max_length=400)
+    info                = models.CharField(max_length=2000)
     unit_type           = models.CharField(max_length=16)
     category            = models.CharField(max_length=16)
     palette             = models.CharField(max_length=16)
@@ -104,7 +104,7 @@ class Palettes(models.Model):
 
     user                = models.ForeignKey(User)
     title               = models.CharField(max_length=200)
-    info                = models.CharField(max_length=400)
+    info                = models.CharField(max_length=2000)
     used                = models.IntegerField(default=0)
     posted              = models.DateTimeField('date published')
 
@@ -114,7 +114,7 @@ class Reports(models.Model):
         verbose_name = 'Report'
 
     user                = models.ForeignKey(User)
-    reason              = models.CharField(max_length=400)
+    reason              = models.CharField(max_length=2000)
     ex_id               = models.IntegerField(default=0)
     ex_name             = models.CharField(max_length=16)
     infringement        = models.BooleanField(default=False)

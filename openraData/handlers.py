@@ -5,8 +5,7 @@ import string
 import re
 from subprocess import Popen, PIPE
 import multiprocessing
-import PIL
-from PIL import Image
+from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 
 from django.conf import settings
 from django.utils import timezone
@@ -213,6 +212,9 @@ class MapHandlers():
         p = multiprocessing.Process(target=triggers.PushMapsToRsyncDirs, args=(), name='triggers')
         p.start()
 
+        shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(), name='shppreview')
+        shp.start()
+
     def UnzipMap(self):
         z = zipfile.ZipFile(self.map_full_path_filename, mode='a')
         z.extractall(self.map_full_path_directory + 'content/')
@@ -284,6 +286,29 @@ class MapHandlers():
             self.flushLog( ["Failed to generate fullpreview for this file."] )
 
         os.chdir(self.currentDirectory)
+
+    def GenerateSHPpreview(self):
+        Dir = os.listdir(self.map_full_path_directory+'content/')
+        for fn in Dir:
+            if fn.endswith('.shp'):
+                os.mkdir(self.map_full_path_directory+'content/png/')
+                os.chdir(self.map_full_path_directory+'content/png/')
+                command = 'mono %sOpenRA.Utility.exe --png %s %s' % (settings.OPENRA_PATH, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+                proc = Popen(command.split(), stdout=PIPE).communicate()
+                self.flushLog(proc)
+                pngsdir = os.listdir(self.map_full_path_directory+'content/png/')
+                imglist = []
+                for pngfn in pngsdir:
+                    if pngfn.endswith('.png'):
+                        imglist.append(pngfn)
+                imglist.sort()
+                imgs = ImageList()
+                for img in imglist:
+                    imgs.append(Image(self.map_full_path_directory+'content/png/'+img))
+                imgs.animationDelayImages(50)
+                imgs.writeImages(self.map_full_path_directory+'content/'+fn+'.gif')
+                os.chdir(self.currentDirectory)
+                shutil.rmtree(self.map_full_path_directory+'content/png/')
 
     def flushLog(self, output=[], lint=""):
         logfile = open(self.map_full_path_directory + lint + "log", "a")
@@ -376,9 +401,18 @@ def addScreenshot(f, arg, user_id, item):
 
     shutil.move(tempname, path + arg + "." + mimetype.split('/')[1])
 
-    basewidth = 250
-    img = Image.open(path + arg + "." + mimetype.split('/')[1])
-    wpercent = (basewidth/float(img.size[0]))
-    hsize = int((float(img.size[1])*float(wpercent)))
-    img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-    img.save(path + arg + "-mini." + mimetype.split('/')[1])
+    command = 'identify -format "%w,%h" {0}'.format(path + arg + "." + mimetype.split('/')[1])
+    proc = Popen(command.split(), stdout=PIPE).communicate()
+    details = proc[0].strip().strip('"').split(',')
+
+    im = Image(Blob(open(path + arg + "." + mimetype.split('/')[1]).read()), Geometry(int(details[0]),int(details[1])))
+    
+    scaleH = int(details[0]) / 100.0
+    scaleH = 250 / scaleH
+    scaleH = int(details[1]) / 100.0 * scaleH
+
+    im.quality(100)
+    im.filterType(FilterTypes.SincFilter)
+    im.scale('250x%s' % scaleH)
+    im.sharpen(1.0)
+    im.write(str(path + arg + "-mini." + mimetype.split('/')[1]))
