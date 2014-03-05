@@ -28,7 +28,7 @@ def PushMapsToRsyncDirs():
 		shutil.rmtree(RSYNC_MAP_PATH)
 	for mod in mods:
 		os.makedirs(RSYNC_MAP_PATH + mod.lower())
-	mapObject = Maps.objects.filter(next_rev=0,requires_upgrade=False,downloading=True,players__gte=1).distinct("map_hash")
+	mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1).distinct("map_hash")
 	site_path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/'
 	if os.path.exists(RSYNC_MAP_API_PATH):
 		shutil.rmtree(RSYNC_MAP_API_PATH)
@@ -38,9 +38,10 @@ def PushMapsToRsyncDirs():
 		for fname in listd:
 			if fname.endswith('.oramap'):
 				src = site_path + str(item.id) + '/' + fname
-				dest_maps = RSYNC_MAP_PATH + item.game_mod.lower() + '/' + str(item.id) + '.oramap' 
+				if item.next_rev == 0:
+					dest_maps = RSYNC_MAP_PATH + item.game_mod.lower() + '/' + str(item.id) + '.oramap'
+					os.link(src, dest_maps)
 				dest_api_maps = RSYNC_MAP_API_PATH + item.map_hash + '_' + os.path.splitext(fname)[0] + '-' + str(item.revision) + '.oramap'
-				os.link(src, dest_maps)
 				os.link(src, dest_api_maps)
 				break
 		continue
@@ -69,3 +70,6 @@ def LintCheck(mapObject):
 			if not item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
 	return True
+
+def ReadYamlAgain():
+	pass
