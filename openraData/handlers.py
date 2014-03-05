@@ -32,6 +32,7 @@ class MapHandlers():
         self.currentDirectory = os.getcwd() + os.sep    # web root
         self.UID = False
         self.LOG = []
+        self.legacy_name = ""
 
         self.MapMod = ""
         self.MapTitle = ""
@@ -54,7 +55,7 @@ class MapHandlers():
             previous_policy_cc = mapObject[0].policy_cc
             previous_policy_commercial = mapObject[0].policy_commercial
             previous_policy_adaptations = mapObject[0].policy_adaptations
-        tempname = '/tmp/oramaptemp.oramap'
+        tempname = '/tmp/openramap'
         with open(tempname, 'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
@@ -62,9 +63,10 @@ class MapHandlers():
         command = 'file -b --mime-type %s' % tempname
         proc = Popen(command.split(), stdout=PIPE).communicate()
         mimetype = proc[0].strip()
-        if mimetype != 'application/zip' or os.path.splitext(f.name)[1] != '.oramap':
-            self.LOG.append('Failed. Unsupported file type.')
-            return False
+        if not (mimetype == 'application/zip' and os.path.splitext(f.name)[1].lower() == '.oramap'):
+            if not (mimetype == 'text/plain' and os.path.splitext(f.name)[1].lower() == '.mpr'):
+                self.LOG.append('Failed. Unsupported file type.')
+                return False
 
         name = f.name
         badChars = ": ; < > @ $ # & ( ) % '".split()
@@ -77,6 +79,14 @@ class MapHandlers():
             if bc not in ['.','-']:
                 self.LOG.append('Failed. Your filename is bogus; rename and try again.')
                 return False
+
+        if mimetype == 'text/plain':
+            if not self.LegacyImport(tempname):
+                self.LOG.append('Failed to import legacy map.')
+                misc.send_email_to_admin_OnMapFail(tempname)
+                return False
+            tempname = settings.OPENRA_PATH + self.legacy_name
+            name = os.path.splitext(name)[0] + '.oramap'
 
         z = zipfile.ZipFile(tempname, mode='a')
         yamlData = ""
@@ -161,13 +171,13 @@ class MapHandlers():
         transac = Maps(
             user = userObject,
             title = self.MapTitle,
-            description = self.MapDesc,
-            info = post['info'],
-            author = self.MapAuthor,
-            map_type = self.MapType,
+            description = self.MapDesc.strip(),
+            info = post['info'].strip(),
+            author = self.MapAuthor.strip(),
+            map_type = self.MapType.strip(),
             players = self.MapPlayers,
             game_mod = self.MapMod,
-            map_hash = self.maphash,
+            map_hash = self.maphash.strip(),
             width = self.MapSize.split(',')[0],
             height = self.MapSize.split(',')[1],
             tileset = self.MapTileset,
@@ -309,6 +319,24 @@ class MapHandlers():
                 imgs.writeImages(self.map_full_path_directory+'content/'+fn+'.gif')
                 os.chdir(self.currentDirectory)
                 shutil.rmtree(self.map_full_path_directory+'content/png/')
+
+    def LegacyImport(self, mapPath):
+        os.chdir(settings.OPENRA_PATH)
+        for mod in ['ra','cnc','d2k','ts']:
+            command = 'mono OpenRA.Utility.exe --map-import %s %s' % (mod, mapPath)
+            proc = Popen(command.split(), stdout=PIPE).communicate()
+            self.LOG.append([proc[0]])
+            if "Error" in proc[0] or "Unknown" in proc[0]:
+                continue
+            else:
+                if "saved" in proc[0]:
+                    self.legacy_name = proc[0].split(' saved')[0]
+                    os.chdir(self.currentDirectory)
+                    return True
+                else:
+                    continue
+        os.chdir(self.currentDirectory)
+        return False
 
     def flushLog(self, output=[], lint=""):
         logfile = open(self.map_full_path_directory + lint + "log", "a")

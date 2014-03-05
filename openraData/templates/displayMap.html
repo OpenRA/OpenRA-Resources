@@ -20,11 +20,14 @@
                     <div class="clear"></div>
 
                     <div class="notification_container">
-                        {% if map.downloading == False or map.requires_upgrade == True %}
+                        {% if map.downloading == False or map.requires_upgrade == True or map.players == 0 %}
                         <div class="notification map_attention">
                             <label class="x"></label>
                             <div class="notification_label">Attention!</div>
                             <div class="notification_tooltip">
+                                {% if map.players == 0 %}
+                                <div>Map in unplayable! Max slots: 0</div>
+                                {% else %}
                                 <div>This map can't be automatically downloaded by OpenRA game!
                                 {% if map.downloading == False %}
                                     <p>Reason: Too many reports</p>
@@ -33,6 +36,7 @@
                                     <p>Reason: Requires upgrade, see <a class="showLintLog">lintlog</a> (Failed for version: {{version}})</p>
                                 {% endif %}
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
                         {% endif %}
