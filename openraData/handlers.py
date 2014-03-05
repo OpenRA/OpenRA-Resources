@@ -33,6 +33,7 @@ class MapHandlers():
         self.UID = False
         self.LOG = []
         self.legacy_name = ""
+        self.legacy_map = False
 
         self.MapMod = ""
         self.MapTitle = ""
@@ -42,6 +43,7 @@ class MapHandlers():
         self.MapSize = ""
         self.MapDesc = ""
         self.MapPlayers = 0
+        self.Bounds = ""
 
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
         if pre_r != 0:
@@ -55,7 +57,7 @@ class MapHandlers():
             previous_policy_cc = mapObject[0].policy_cc
             previous_policy_commercial = mapObject[0].policy_commercial
             previous_policy_adaptations = mapObject[0].policy_adaptations
-        tempname = '/tmp/openramap'
+        tempname = '/tmp/openramap.oramap'
         with open(tempname, 'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
@@ -85,8 +87,9 @@ class MapHandlers():
                 self.LOG.append('Failed to import legacy map.')
                 misc.send_email_to_admin_OnMapFail(tempname)
                 return False
-            tempname = settings.OPENRA_PATH + self.legacy_name
+            shutil.move(settings.OPENRA_PATH + self.legacy_name, tempname)
             name = os.path.splitext(name)[0] + '.oramap'
+            self.legacy_map = True
 
         z = zipfile.ZipFile(tempname, mode='a')
         yamlData = ""
@@ -132,6 +135,8 @@ class MapHandlers():
                 self.MapDesc = line[12:].strip().replace("'", "''")
             if line[0:7] == "MapSize":
                 self.MapSize = line[8:].strip()
+            if line[0:6] == "Bounds":
+                self.Bounds = line[7:].strip()
             if line.strip()[0:8] == "Playable":
                 state = line.split(':')[1]
                 if state.strip().lower() in ['true', 'on', 'yes', 'y']:
@@ -180,7 +185,9 @@ class MapHandlers():
             map_hash = self.maphash.strip(),
             width = self.MapSize.split(',')[0],
             height = self.MapSize.split(',')[1],
+            bounds = self.Bounds,
             tileset = self.MapTileset,
+            legacy_map = self.legacy_map,
             revision = rev,
             pre_rev = pre_r,
             next_rev = 0,

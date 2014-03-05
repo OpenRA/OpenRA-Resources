@@ -24,10 +24,12 @@ class Maps(models.Model):
     map_type            = models.CharField(max_length=100)
     players             = models.IntegerField(default=0)
     game_mod            = models.CharField(max_length=100)
-    map_hash            = models.CharField(max_length=100)
+    map_hash            = models.CharField(max_length=200)
     width               = models.CharField(max_length=16)
     height              = models.CharField(max_length=16)
+    bounds              = models.CharField(max_length=50,default="")
     tileset             = models.CharField(max_length=50)
+    legacy_map          = models.BooleanField(default=False)
     revision            = models.IntegerField(default=1)
     pre_rev             = models.IntegerField(default=0)
     next_rev            = models.IntegerField(default=0)
@@ -50,7 +52,7 @@ class Units(models.Model):
 
     user                = models.ForeignKey(User)
     title               = models.CharField(max_length=200)
-    info                = models.CharField(max_length=2000)
+    info                = models.CharField(max_length=400)
     unit_type           = models.CharField(max_length=16)
     category            = models.CharField(max_length=16)
     palette             = models.CharField(max_length=16)
@@ -104,7 +106,7 @@ class Palettes(models.Model):
 
     user                = models.ForeignKey(User)
     title               = models.CharField(max_length=200)
-    info                = models.CharField(max_length=2000)
+    info                = models.CharField(max_length=400)
     used                = models.IntegerField(default=0)
     posted              = models.DateTimeField('date published')
 
@@ -114,7 +116,7 @@ class Reports(models.Model):
         verbose_name = 'Report'
 
     user                = models.ForeignKey(User)
-    reason              = models.CharField(max_length=4000)
+    reason              = models.CharField(max_length=400)
     ex_id               = models.IntegerField(default=0)
     ex_name             = models.CharField(max_length=16)
     infringement        = models.BooleanField(default=False)

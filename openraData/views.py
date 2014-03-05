@@ -427,17 +427,19 @@ def uploadMap(request, previous_rev=0):
     uid = False
     rev = 1
     previous_rev_title = ""
+    user_id = request.user.id
     if previous_rev != 0:
         mapObject = Maps.objects.filter(id=previous_rev)
         if mapObject:
             rev = mapObject[0].revision + 1
             previous_rev_title = mapObject[0].title
+            user_id = mapObject[0].user_id
     initial = {'policy_cc': 'cc_yes', 'commercial': 'com_no', 'adaptations': 'adapt_alike'}
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES, initial=initial)
         if form.is_valid():
             uploadingMap = handlers.MapHandlers()
-            uploadingMap.ProcessUploading(request.user.id, request.FILES['file'], request.POST, rev, previous_rev)
+            uploadingMap.ProcessUploading(user_id, request.FILES['file'], request.POST, rev, previous_rev)
             uploadingLog = uploadingMap.LOG
             if uploadingMap.UID:
                 uid = str(uploadingMap.UID)
