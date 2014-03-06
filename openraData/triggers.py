@@ -1,5 +1,6 @@
 import os
 import shutil
+from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from subprocess import Popen, PIPE
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -9,13 +10,16 @@ from openraData import misc
 
 # Map Triggers
 
-def recalculate_hashes():
+def map_upgrade(mapObject):
+    # this function upgrades all existings maps using OpenRA.Utility
+    pass
+
+def recalculate_hash(mapObject):
     # this function recalculates hashes for all existing maps and updates DB
     pass
 
-def map_upgrade():
-    # this function upgrades all existings maps using OpenRA.Utility and triggers recalculate_hashes() function
-    pass
+def ReadYamlAgain(mapObject):
+	pass
 
 def PushMapsToRsyncDirs():
 	# this function syncs rsync directories with fresh list of maps, triggered by uploading a new map
@@ -74,5 +78,29 @@ def LintCheck(mapObject, http_host):
 					misc.send_email_to_user_OnLint(userObject.email, "Lint check failed for one of your maps: http://"+http_host+"/maps/"+str(item.id)+"/")
 	return True
 
-def ReadYamlAgain():
-	pass
+def GenerateSHPpreview(mapObject):
+	# generates gif preview of shp files for every mapObject in list of objects
+	currentDirectory = os.getcwd()
+	for item in mapObject:
+		path = os.getcwd() + os.sep + 'openraData/data/maps/' + str(item.id) + os.sep
+		Dir = os.listdir(path + 'content/')
+		for fn in Dir:
+			if fn.endswith('.shp'):
+				os.mkdir(path + 'content/png/')
+				os.chdir(path + 'content/png/')
+				command = 'mono %sOpenRA.Utility.exe --png %s %s' % (settings.OPENRA_PATH, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+				proc = Popen(command.split(), stdout=PIPE).communicate()
+				pngsdir = os.listdir(path + 'content/png/')
+				imglist = []
+				for pngfn in pngsdir:
+					if pngfn.endswith('.png'):
+						imglist.append(pngfn)
+				imglist.sort()
+				imgs = ImageList()
+				for img in imglist:
+					imgs.append(Image(path+'content/png/'+img))
+				imgs.animationDelayImages(50)
+				imgs.writeImages(path+'content/'+fn+'.gif')
+				os.chdir(currentDirectory)
+				shutil.rmtree(path+'content/png/')
+	return True
