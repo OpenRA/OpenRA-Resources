@@ -69,6 +69,7 @@ def recalculate_hash(mapObject):
 			filename = fn
 			break
 	if filename == "":
+		os.chdir(currentDirectory)
 		return "none"
 	command = 'mono OpenRA.Utility.exe --map-hash ' + path + filename
 	proc = Popen(command.split(), stdout=PIPE).communicate()
