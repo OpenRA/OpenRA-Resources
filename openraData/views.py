@@ -728,7 +728,7 @@ def triggerLint(request):
         return HttpResponseRedirect('/')
     mapObject = Maps.objects.all()
     amount = len(mapObject)
-    p = multiprocessing.Process(target=triggers.LintCheck, args=(mapObject,), name='LintCheck')
+    p = multiprocessing.Process(target=triggers.LintCheck, args=(mapObject,request.META['HTTP_HOST'],), name='LintCheck')
     p.start()
 
     template = loader.get_template('index.html')

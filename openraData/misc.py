@@ -51,3 +51,11 @@ def send_email_to_admin_OnReport(body):
                           [settings.ADMIN_EMAIL], connection=connection)
 	email.send()
 	connection.close()
+
+def send_email_to_user_OnLint(email_addr, body):
+	connection = mail.get_connection()
+	connection.open()
+	email = mail.EmailMessage('OpenRA Resource Center - Lint failed', body, email_addr,
+						  [email_addr], connection=connection)
+	email.send()
+	connection.close()

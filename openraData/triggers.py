@@ -46,7 +46,7 @@ def PushMapsToRsyncDirs():
 				break
 		continue
 
-def LintCheck(mapObject):
+def LintCheck(mapObject, http_host):
 	# this function performs a Lint Check for all existing maps
 	cwd = os.getcwd()
 	os.chdir(settings.OPENRA_PATH)
@@ -69,6 +69,9 @@ def LintCheck(mapObject):
 		else:
 			if not item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
+				userObject = User.objects.get(pk=item.user_id)
+				if userObject.email != "":
+					misc.send_email_to_user_OnLint(userObject.email, "Lint check failed for one of your maps: http://"+http_host+"/maps/"+str(item.id)+"/")
 	return True
 
 def ReadYamlAgain():
