@@ -333,13 +333,13 @@ def serveLintLog(request, arg):
     try:
         mapDir = os.listdir(path)
     except:
-        return HttpResponseRedirect("/")
+        return StreamingHttpResponse("")
     for filename in mapDir:
         if filename == "lintlog":
             lintlog = filename
             break
     if lintlog == "":
-        return HttpResponseRedirect('/maps/'+arg)
+        return StreamingHttpResponse("")
     else:
         serveLog = path + os.sep + lintlog
         response = StreamingHttpResponse(open(serveLog), content_type='text/plain')
@@ -720,23 +720,5 @@ def uptime(request):
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': ' - Uptime',
-    })
-    return StreamingHttpResponse(template.render(context))
-
-def triggerLint(request):
-    if not request.user.is_superuser:
-        return HttpResponseRedirect('/')
-    mapObject = Maps.objects.all()
-    amount = len(mapObject)
-    p = multiprocessing.Process(target=triggers.LintCheck, args=(mapObject,), name='LintCheck')
-    p.start()
-
-    template = loader.get_template('index.html')
-    context = RequestContext(request, {
-        'content': 'lintcheck.html',
-        'request': request,
-        'http_host': request.META['HTTP_HOST'],
-        'title': ' - Lint Check',
-        'amount': amount,
     })
     return StreamingHttpResponse(template.render(context))
