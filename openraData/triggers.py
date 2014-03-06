@@ -1,25 +1,144 @@
 import os
 import shutil
+import zipfile
+import string
 from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from subprocess import Popen, PIPE
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count
-from openraData.models import Maps
+from django.utils import timezone
+from openraData.models import Maps, Screenshots
 from openraData import misc
 
 # Map Triggers
 
-def map_upgrade(mapObject):
-    # this function upgrades all existings maps using OpenRA.Utility
-    pass
+def map_upgrade(mapObject, engine, http_host):
+	currentDirectory = os.getcwd() + os.sep
+	for item in mapObject:
+		os.chdir(settings.OPENRA_PATH)
+		path = currentDirectory + 'openraData/data/maps/' + str(item.id) + '/'
+		filename = ""
+		Dir = os.listdir(path)
+		for fn in Dir:
+			if fn.endswith('.oramap'):
+				filename = fn
+				break
+		if filename == "":
+			continue
+		command = 'mono OpenRA.Utility.exe --upgrade-map %s %s' % (path+filename, engine)
+		print(command)
+		proc = Popen(command.split(), stdout=PIPE).communicate()
+		os.chdir(currentDirectory)
+
+		maphash = recalculate_hash(item)
+		lint_passed = not LintCheck([item], http_host)
+
+		if not UnzipMap(item):
+			print("failed to unzip %s" % item.id)
+			continue
+		map_data_ordered = ReadYamlAgain(item)
+		if len(map_data_ordered) == 0:
+			print("readyamlagain: failed to read map or map.yaml")
+			continue
+
+		Maps.objects.filter(id=item.id).update(map_hash=maphash)
+		Maps.objects.filter(id=item.id).update(requires_upgrade=lint_passed)
+		Maps.objects.filter(id=item.id).update(game_mod=map_data_ordered['game_mod'])
+		Maps.objects.filter(id=item.id).update(title=map_data_ordered['title'])
+		Maps.objects.filter(id=item.id).update(author=map_data_ordered['author'])
+		Maps.objects.filter(id=item.id).update(tileset=map_data_ordered['tileset'])
+		Maps.objects.filter(id=item.id).update(map_type=map_data_ordered['map_type'])
+		Maps.objects.filter(id=item.id).update(description=map_data_ordered['description'])
+		Maps.objects.filter(id=item.id).update(players=map_data_ordered['players'])
+		Maps.objects.filter(id=item.id).update(bounds=map_data_ordered['bounds'])
+		Maps.objects.filter(id=item.id).update(width=map_data_ordered['width'])
+		Maps.objects.filter(id=item.id).update(height=map_data_ordered['height'])
+	os.chdir(currentDirectory)
+	return True
 
 def recalculate_hash(mapObject):
-    # this function recalculates hashes for all existing maps and updates DB
-    pass
+	currentDirectory = os.getcwd() + os.sep
+	os.chdir(settings.OPENRA_PATH)
+
+	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + '/'
+	filename = ""
+	Dir = os.listdir(path)
+	for fn in Dir:
+		if fn.endswith('.oramap'):
+			filename = fn
+			break
+	if filename == "":
+		return "none"
+	command = 'mono OpenRA.Utility.exe --map-hash ' + path + filename
+	proc = Popen(command.split(), stdout=PIPE).communicate()
+	maphash = proc[0].strip()
+	os.chdir(currentDirectory)
+	return maphash
 
 def ReadYamlAgain(mapObject):
-	pass
+	currentDirectory = os.getcwd() + os.sep
+	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + '/'
+	filename = ""
+	Dir = os.listdir(path)
+	for fn in Dir:
+		if fn.endswith('.oramap'):
+			filename = fn
+			break
+	if filename == "":
+		return {}
+	z = zipfile.ZipFile(path + filename, mode='a')
+	yamlData = ""
+	for zfn in z.namelist():
+		if zfn == "map.yaml":
+			mapbytes = z.read(zfn)
+			yamlData = mapbytes.decode("utf-8")
+			break
+	z.close()
+	if yamlData == "":
+		return {}
+	map_data_ordered = {}
+	map_data_ordered['players'] = 0
+	map_data_ordered['description'] = ""
+	for line in string.split(yamlData, '\n'):
+		if line[0:5] == "Title":
+			map_data_ordered['title'] = line[6:].strip().replace("'", "''")
+		if line[0:11] == "RequiresMod":
+			map_data_ordered['game_mod'] = line[12:].strip().lower()
+		if line[0:6] == "Author":
+			map_data_ordered['author'] = line[7:].strip().replace("'", "''")
+		if line[0:7] == "Tileset":
+			map_data_ordered['tileset'] = line[8:].strip().lower()
+		if line[0:4] == "Type":
+			map_data_ordered['map_type'] = line[5:].strip()
+		if line[0:11] == "Description":
+			map_data_ordered['description'] = line[12:].strip().replace("'", "''")
+		if line[0:7] == "MapSize":
+			map_data_ordered['width'] = line[8:].strip().split(',')[0]
+			map_data_ordered['height'] = line[8:].strip().split(',')[1]
+		if line[0:6] == "Bounds":
+			map_data_ordered['bounds'] = line[7:].strip()
+		if line.strip()[0:8] == "Playable":
+			state = line.split(':')[1]
+			if state.strip().lower() in ['true', 'on', 'yes', 'y']:
+				map_data_ordered['players'] += 1
+	return map_data_ordered
+
+def UnzipMap(mapObject):
+	currentDirectory = os.getcwd() + os.sep
+	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + '/'
+	filename = ""
+	Dir = os.listdir(path)
+	for fn in Dir:
+		if fn.endswith('.oramap'):
+			filename = fn
+			break
+	if filename == "":
+		return False
+	z = zipfile.ZipFile(path + filename, mode='a')
+	z.extractall(path + 'content/')
+	z.close()
+	return True
 
 def PushMapsToRsyncDirs():
 	# this function syncs rsync directories with fresh list of maps, triggered by uploading a new map
@@ -54,6 +173,7 @@ def LintCheck(mapObject, http_host):
 	# this function performs a Lint Check for all existing maps
 	cwd = os.getcwd()
 	os.chdir(settings.OPENRA_PATH)
+	status = False
 
 	for item in mapObject:
 		path = cwd + os.sep + __name__.split('.')[0] + '/data/maps/' + str(item.id) + os.sep
@@ -68,15 +188,18 @@ def LintCheck(mapObject, http_host):
 		command = 'mono OpenRA.Lint.exe ' + item.game_mod.lower() + ' ' + path + map_file
 		proc = Popen(command.split(), stdout=PIPE).communicate()
 		if proc[0].strip() == "":
+			status = True
 			if item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=False)
 		else:
+			status = False
 			if not item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
 				userObject = User.objects.get(pk=item.user_id)
 				if userObject.email != "":
 					misc.send_email_to_user_OnLint(userObject.email, "Lint check failed for one of your maps: http://"+http_host+"/maps/"+str(item.id)+"/")
-	return True
+	os.chdir(cwd)
+	return status
 
 def GenerateSHPpreview(mapObject):
 	# generates gif preview of shp files for every mapObject in list of objects
@@ -104,3 +227,57 @@ def GenerateSHPpreview(mapObject):
 				os.chdir(currentDirectory)
 				shutil.rmtree(path+'content/png/')
 	return True
+
+def GenerateMinimap(mapObject):
+	currentDirectory = os.getcwd() + os.sep
+	os.chdir(settings.OPENRA_PATH)
+	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + os.sep
+	filename = ""
+	Dir = os.listdir(path)
+	for fn in Dir:
+		if fn.endswith('.oramap'):
+			filename = fn
+			break
+	if filename == "":
+		os.chdir(currentDirectory)
+		return False
+	command = 'mono OpenRA.Utility.exe --map-preview ' + path + filename
+	proc = Popen(command.split(), stdout=PIPE).communicate()
+	try:
+		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
+		os.chdir(currentDirectory)
+		return True
+	except:
+		os.chdir(currentDirectory)
+		return False
+
+def GenerateFullPreview(mapObject, userObject):
+	currentDirectory = os.getcwd() + os.sep
+	os.chdir(settings.OPENRA_PATH)
+	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + os.sep
+	filename = ""
+	Dir = os.listdir(path)
+	for fn in Dir:
+		if fn.endswith('.oramap'):
+			filename = fn
+			break
+	if filename == "":
+		os.chdir(currentDirectory)
+		return False
+	command = 'mono OpenRA.Utility.exe --full-preview ' + path + filename
+	proc = Popen(command.split(), stdout=PIPE).communicate()
+	try:
+		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")
+		transac = Screenshots(
+				user = userObject,
+				ex_id = mapObject.id,
+				ex_name = "maps",
+				posted =  timezone.now(),
+				map_preview = True,
+				)
+		transac.save()
+		os.chdir(currentDirectory)
+		return True
+	except:
+		os.chdir(currentDirectory)
+		return False

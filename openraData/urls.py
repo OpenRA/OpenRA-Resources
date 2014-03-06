@@ -85,7 +85,5 @@ urlpatterns = patterns('',
     url(r'^sitemap\.xml$', RedirectView.as_view(url='/static/sitemap.xml')),
     url(r'^uptime/?$', views.uptime, name="uptime"),
 
-    url(r'lintcheck/?$', views.triggerLint, name="LintCheck"),
-
     url(r'^.*$', views.handle404, name='handle404'),
 )
