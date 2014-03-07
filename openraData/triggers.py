@@ -187,6 +187,7 @@ def LintCheck(mapObject, http_host):
 		if map_file == "":
 			continue
 		command = 'mono OpenRA.Lint.exe ' + item.game_mod.lower() + ' ' + path + map_file
+		print(command)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
 		if proc[0].strip() == "":
 			status = True
@@ -194,6 +195,10 @@ def LintCheck(mapObject, http_host):
 				Maps.objects.filter(id=item.id).update(requires_upgrade=False)
 		else:
 			status = False
+			print(proc)
+			lintlog = open(path+'lintlog','w')
+			lintlog.write(proc[0])
+			lintlog.close()
 			if not item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
 				userObject = User.objects.get(pk=item.user_id)
