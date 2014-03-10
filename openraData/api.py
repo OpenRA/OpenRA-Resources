@@ -20,12 +20,14 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
     # get detailed map info by title
     if arg == "title":
         title = value.lower()
-        try:
-            mapObject = Maps.objects.get(title__icontains=title)
-        except:
+        mapObject = Maps.objects.filter(title__icontains=title)
+        if not mapObject:
             raise Http404
-        response_data = serialize_basic_map_info(mapObject)
-        return StreamingHttpResponse(json.dumps(response_data), content_type="application/json")
+        json_response = []
+        for item in mapObject:
+            response_data = serialize_basic_map_info(item)
+            json_response.append(response_data)
+        return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
     
     # get detailed map info by hash
     elif arg == "hash":
@@ -35,7 +37,8 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         except:
             raise Http404
         response_data = serialize_basic_map_info(mapObject)
-        return StreamingHttpResponse(json.dumps(response_data), content_type="application/json")
+        json_response = [response_data]
+        return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
     
     # get URL of map by hash
     elif arg == "url":
@@ -54,7 +57,8 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         response_data['map_hash'] = mapObject.map_hash
         response_data['revision'] = mapObject.revision
         response_data['last_revision'] = last_revision
-        return StreamingHttpResponse(json.dumps(response_data), content_type="application/json")
+        json_response = [response_data]
+        return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
     
     # get minimap preview by hash (represented in JSON by encoded into base64)
     elif arg == "minimap":
@@ -77,7 +81,8 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
         response_data['map_hash'] = mapObject.map_hash
         response_data['revision'] = mapObject.revision
         response_data['last_revision'] = last_revision
-        return StreamingHttpResponse(json.dumps(response_data), content_type="application/json")
+        json_response = [response_data]
+        return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
     
     # get detailed map info + encoded minimap + URL for a range of maps (supports filters)
     elif arg == "list":
@@ -113,16 +118,15 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
                         pass
         except:
             raise Http404
-        basic_response = []
+        json_response = []
         for item in mapObject:
             minimap = get_minimap(item.id, True)
             url = get_url(request, item.id)
             response_data = serialize_basic_map_info(item)
             response_data['minimap'] = minimap
             response_data['url'] = url
-            basic_response.append(response_data)
-
-        return StreamingHttpResponse(json.dumps(basic_response), content_type="application/json")
+            json_response.append(response_data)
+        return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
 
     elif arg == "sync":
         mod = value
