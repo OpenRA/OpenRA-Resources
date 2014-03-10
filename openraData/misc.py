@@ -1,5 +1,6 @@
 from django.core import mail
 from django.conf import settings
+from django.contrib.auth.models import User
 
 def selectLicenceInfo(itemObject):
 	creative_commons = itemObject.policy_cc
@@ -44,11 +45,24 @@ def send_email_to_admin_OnMapFail(tempname):
 	email.send()
 	connection.close()
 
-def send_email_to_admin_OnReport(body):
+def send_email_to_admin_OnReport(args):
 	connection = mail.get_connection()
 	connection.open()
+	body = "Item: http://%s  By user_id: %s  Reason: %s  Infringement: %s" % (args['addr'], args['user_id'], args['reason'], args['infringement'])
 	email = mail.EmailMessage('OpenRA Resource Center - New Report', body, settings.ADMIN_EMAIL,
                           [settings.ADMIN_EMAIL], connection=connection)
+	email.send()
+	connection.close()
+
+def send_email_to_user_OnReport(args):
+	mail_addr = User.objects.get(pk=args['owner_id']).email
+	if mail_addr == "":
+		return False
+	connection = mail.get_connection()
+	connection.open()
+	body = "Your %s has been reported: %s  |  Reason: %s" % (args['resource_type'], args['addr'], args['reason'])
+	email = mail.EmailMessage('OpenRA Resource Center - Your content has been reported', body, mail_addr,
+                          [mail_addr], connection=connection)
 	email.send()
 	connection.close()
 

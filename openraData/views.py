@@ -158,7 +158,8 @@ def displayMap(request, arg):
                     posted = timezone.now(),
                 )
                 transac.save()
-                misc.send_email_to_admin_OnReport("Item: http://%s  By user_id: %s  Reason: %s  Infringement: %s" % (request.META['HTTP_HOST']+'/maps/'+arg, request.user.id, request.POST['reportReason'].strip(), infringement))
+                misc.send_email_to_admin_OnReport({'addr':request.META['HTTP_HOST']+'/maps/'+arg, 'user_id':request.user.id, 'reason':request.POST['reportReason'].strip(), 'infringement':infringement,})
+                misc.send_email_to_user_OnReport({'addr':request.META['HTTP_HOST']+'/maps/'+arg, 'owner_id':Maps.objects.get(id=arg).user_id, 'reason':request.POST['reportReason'].strip(), 'resource_type':'map',})
                 return HttpResponseRedirect('/maps/'+arg)
         elif request.POST.get('mapInfo', False) != False:
             if request.user.is_superuser:
