@@ -1,3 +1,4 @@
+            {% load customTags %}
             <div id="map_data_container">
                 <div class="left_map_content">
 
@@ -71,10 +72,16 @@
                     <div class="map_description cBlock">
                         <div>
                             <h5>Description:</h5>
-                            <p>{{ map.description|default:"No description :(" }}</p>
+                            {% autoescape off %}
+                            <p>{{ map.description|strip_tags|convert_links|default:"No description :(" }}</p>
+                            {% endautoescape %}
                         </div>
                         <div class="map_info">
-                            <p>{{ map.info|linebreaks }}</p>
+                            {% if map.info %}
+                            {% autoescape off %}
+                            <p>{{ map.info|strip_tags|convert_links|linebreaks }}</p>
+                            {% endautoescape %}
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -94,7 +101,9 @@
                             {% for item in reports %}
                             <div class="reportRow">
                                 <div class="reportUser">{{item.0}} reported on {{item.3}} {% if item.2 == True %} ( &copy; ){% endif %}</div>
-                                <div class="reportMsg">{{item.1}}</div>
+                                {% autoescape off %}
+                                <div class="reportMsg">{{item.1|strip_tags|convert_links}}</div>
+                                {% endautoescape %}
                             </div>
                             {% endfor %}
                         </div>
