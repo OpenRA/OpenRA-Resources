@@ -1160,7 +1160,7 @@ p.registerInfo {
             position: relative;
             background: #294364;
             border: 2px solid #74c2e7;
-
+            word-wrap: break-word;
             margin: 10px 0 0 0;
             padding: 6px;
           }

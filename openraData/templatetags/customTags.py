@@ -5,7 +5,7 @@ from django import template
 register = template.Library()
 
 def convert_links(value):
-	value = re.sub(r'(?P<urlmatch>https?:\/\/[^ ][^<][^\n][^\r]*)', '<a href="\g<urlmatch>" target=_blank>\g<urlmatch></a>', value)
+	value = re.sub(r'(?P<urlmatch>https?:\/\/[^ <\n\r]*)', '<a href="\g<urlmatch>" target=_blank>\g<urlmatch></a>', value)
 	return value
 
 register.filter('convert_links', convert_links)
