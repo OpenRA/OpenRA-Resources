@@ -100,7 +100,7 @@
                             <h3>Reports of {{ map.title }}</h3>
                             {% for item in reports %}
                             <div class="reportRow">
-                                <div class="reportUser">{{item.0}} reported on {{item.3}} {% if item.2 == True %} ( &copy; ){% endif %}</div>
+                                <div class="reportUser">{{item.0}} reported on {{item.3}} {% if item.2 == True %} ( &copy; ){% endif %}{% if reported and item.0 == request.user.username %} (<a href="/maps/{{map.id}}/cancelreport/">cancel</a>){% endif %}</div>
                                 {% autoescape off %}
                                 <div class="reportMsg">{{item.1|strip_tags|convert_links}}</div>
                                 {% endautoescape %}
@@ -158,7 +158,7 @@
                         {% for item in screenshots %}
                         <div class="cScreenshot"><a href="/screenshots/{{item.id}}/"><img src="/screenshots/{{item.id}}/mini/" /></a>
                             {% if request.user.id == item.user_id or request.user.is_superuser %}
-                            <a href="/screenshots/{{item.id}}/delete/">delete</a>
+                                <br /><span style="font-size: 0.8em; text-align: justify;"><a href="/screenshots/{{item.id}}/delete/" onClick='return confirmDelete("screenshot")'>delete</a></span>
                             {% endif %}
                         </div>
                         {% endfor %}
@@ -207,31 +207,38 @@
                     <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div><br /><br />
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
                     <div class="map_data_label">Downloaded</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
-                    <div class="map_data_label"><a class="printYamlShow">Show yaml</a>
+                    <div class="map_data_label"><a class="printYamlShow">show yaml</a>
                     </div>
-                    <div class="map_data_text">
+                    <div class="map_data_text"></div>
                     {% if request.user.is_authenticated %}
-                        {% if reported == True %}
-                            <a href="/maps/{{map.id}}/cancelreport/">Cancel Report</a>{% if reports %} (<a class="allReportsShow">See reports</a>){% endif %}
-                        {% else %}
-                            <a class="report">Report map</a>{% if reports %}<br />(<a class="allReportsShow">See reports</a>){% endif %}
+                        {% if reported == False %}
+                        <div class="map_data_label"><a class="report">report map</a></div>
+                        <div class="map_data_text"></div>
+                        {% endif %}
+                        {% if reports %}
+                            <div class="map_data_label"><a class="allReportsShow">show reports</a></div>
+                            <div class="map_data_text"></div>
                         {% endif %}
                     {% else %}
                         {% if reports %}
-                            <a class="allReportsShow">See reports</a>
+                            <div class="map_data_label"><a class="allReportsShow">show reports</a></div>
+                            <div class="map_data_text"></div>
                         {% endif %}
                     {% endif %}
-                    </div>
                     {% if request.user.is_superuser or map.user_id == request.user.id %}
                     <div class="map_data_label">
-                        <a class="editMapInfoShow">Edit map Info</a>
+                        <a class="editMapInfoShow">edit map info</a>
                     </div>
-                    <div class="map_data_text">
-                        <a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete()'>Delete {%if map.user_id == request.user.id %}my {% endif %}map</a>
+                    <div class="map_data_text"></div>
+                    <div class="map_data_label">
+                        <a class="addScreenshot">add screenshot</a>
                     </div>
-                    <div class="map_data_text">
-                        <a class="addScreenshot">Add Screenshot</a>
+                    <div class="map_data_text"></div>
+                    <br /><br />
+                    <div class="map_data_label">
+                        <a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete("map")'>delete {%if map.user_id == request.user.id %}my {% endif %}map</a>
                     </div>
+                    <div class="map_data_text"></div>
                     {% endif %}
 
                     <div class="side_img_links">
@@ -256,9 +263,9 @@
             </div>
 
             <script>
-                function confirmDelete()
+                function confirmDelete(what)
                 {
-                    var agree = confirm('Are you sure you want to delete this map?')
+                    var agree = confirm('Are you sure you want to delete this '+what+'?')
                     if (agree) return true
                     else return false
                 }
