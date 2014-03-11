@@ -198,7 +198,7 @@
                     <div class="map_download">
                         <a href={{ '/maps/' }}{{ arg }}{{ '/oramap' }} class="button">Download</a>
                     </div>
-                    <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
+                    <div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
                     <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>
                     <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
                     <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>

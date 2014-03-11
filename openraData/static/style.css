@@ -317,7 +317,7 @@ table tr td {
 
 #map_grid_cell img {
   max-width: 120px;
-  max-height: 130px;
+  max-height: 116px;
   padding: 8px;
 }
 
@@ -925,14 +925,21 @@ p.registerInfo {
     padding: 2px 0;
     font: 12px Arial;
   }
-  .map_tooltip .mod_cnc {
-    color: #d7c998;
+  .mod_cnc {
+    color: #76f69a;
+    font-weight: bold;
   }
-  .map_tooltip .mod_ra {
+  .mod_ra {
     color: #ff0000;
+    font-weight: bold;
   }
-  .map_tooltip .mod_d2k {
+  .mod_d2k {
     color: #eeb695;
+    font-weight: bold;
+  }
+  .mod_ts {
+    color: #76f6e5;
+    font-weight: bold;
   }
     .map_tooltip .tooltip_title {
       width: 30%;
