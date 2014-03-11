@@ -218,12 +218,12 @@ def displayMap(request, arg):
             shpNames.append(fn.split('.shp.gif')[0])
 
     mapsFromAuthor = Maps.objects.filter(author=mapObject.author,next_rev=0).exclude(id=mapObject.id).distinct('map_hash').order_by('map_hash', '-posted').exclude(map_hash=mapObject.map_hash)
-    if len(mapsFromAuthor) >= 6:
-        mapsFromAuthor = random.sample(mapsFromAuthor, 6)
+    if len(mapsFromAuthor) >= 8:
+        mapsFromAuthor = random.sample(mapsFromAuthor, 8)
     else:
         mapsFromAuthor = random.sample(mapsFromAuthor, len(mapsFromAuthor))
 
-    similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(id=mapObject.id)[0:6]
+    similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(id=mapObject.id)[0:8]
     
     screenshots = Screenshots.objects.filter(ex_name="maps",ex_id=arg)
 
