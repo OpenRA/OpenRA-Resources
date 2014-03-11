@@ -972,6 +972,9 @@ p.registerInfo {
       }
       .left_map_content .map_title .author {
         padding: 4px 0 0 0;
+        width: 158px;
+        word-break: break-word;
+        float: right;
       }
        .map_download {
         font-size: 12px;
@@ -1203,6 +1206,9 @@ p.registerInfo {
           max-width: 80px;
           max-height: 80px;
           vertical-align: middle;
+        }
+        .side_img_links .side_img_link a {
+          display: block;
         }
     .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua, .showLintLog, .addScreenshot {
       cursor: pointer;
