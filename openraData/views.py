@@ -485,6 +485,8 @@ def DeleteMap(request, arg):
         if mapObject.next_rev != 0:
             Maps.objects.filter(id=mapObject.next_rev).update(pre_rev=mapObject.pre_rev)
         mapObject.delete()
+        p = multiprocessing.Process(target=triggers.PushMapsToRsyncDirs, args=(), name='triggers')
+        p.start()
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'deleteMap.html',
