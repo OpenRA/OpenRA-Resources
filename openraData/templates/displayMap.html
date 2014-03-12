@@ -27,7 +27,7 @@
                             <div class="notification_label">Attention!</div>
                             <div class="notification_tooltip">
                                 {% if map.players == 0 %}
-                                <div>Map in unplayable! Max slots: 0</div>
+                                <div>Map is unplayable! Max slots: 0</div>
                                 {% else %}
                                 <div>This map can't be automatically downloaded by OpenRA game!
                                 {% if map.downloading == False %}
@@ -153,10 +153,10 @@
                     </div>
                     
                     {% if screenshots %}
-                    <div class="map_screenshots cBlock">
+                    <div class="map_screenshots cBlock highslide-gallery">
                         <h5>Screenshots:</h5>
                         {% for item in screenshots %}
-                        <div class="cScreenshot"><a href="/screenshots/{{item.id}}/"><img src="/screenshots/{{item.id}}/mini/" /></a>
+                        <div class="cScreenshot"><a class="highslide" href="/screenshots/{{item.id}}/" onclick="return hs.expand(this, config1)"><img src="/screenshots/{{item.id}}/mini/" /></a>
                             {% if request.user.id == item.user_id or request.user.is_superuser %}
                                 <br /><span style="font-size: 0.8em; text-align: justify;"><a href="/screenshots/{{item.id}}/delete/" onClick='return confirmDelete("screenshot")'>delete</a></span>
                             {% endif %}
@@ -198,7 +198,7 @@
                     <div class="map_download">
                         <a href={{ '/maps/' }}{{ arg }}{{ '/oramap' }} class="button">Download</a>
                     </div>
-                    <div class="map_data_label">Mod:</div><div class="map_data_text">{{ map.game_mod|upper }}</div>
+                    <div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
                     <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>
                     <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
                     <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>
