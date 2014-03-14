@@ -98,15 +98,27 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			if arg2 == "-rating":
 				mapObject = sorted(mapObject, key=lambda x: (x.rating_score), reverse=False)
 			if arg2 == "author":
-				if arg3 != "":
-					mapObject = mapObject.filter(author__iexact=arg3.lower())
+				if arg3 == "":
+					mapObject = []
+				else:
+					if arg3 != "yaml":
+						mapObject = mapObject.filter(author__iexact=arg3.lower())
+						if not mapObject:
+							mapObject = []
+					else:
+						mapObject = []
 			if arg2 == "uploader":
-				if arg3 != "" and arg3 != "yaml":
-					try:
-						u = User.objects.get(username__iexact=arg3.lower())
-						mapObject = mapObject.filter(user_id=u.id)
-					except:
-						pass
+				if arg3 == "":
+					mapObject = []
+				else:
+					if arg3 != "yaml":
+						try:
+							u = User.objects.get(username__iexact=arg3.lower())
+							mapObject = mapObject.filter(user_id=u.id)
+						except:
+							mapObject = []
+					else:
+						mapObject = []
 		except:
 			raise Http404
 		page = 1

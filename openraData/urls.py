@@ -77,7 +77,6 @@ urlpatterns = patterns('',
     url(r'^map/(?P<arg>\w+)/(?P<arg1>\w+)/(?P<arg2>\-?\w+)/?$', api.mapAPI, name='mapAPI_list'),
     url(r'^map/(?P<arg>\w+)/(?P<arg1>\w+)/(?P<arg2>\-?\w+)/(?P<arg3>[^/]+)/?$', api.mapAPI, name='mapAPI_list_strict'),
     url(r'^map/(?P<arg>\w+)/(?P<arg1>\w+)/(?P<arg2>\-?\w+)/(?P<arg3>[^/]+)/(?P<arg4>\w+)/?$', api.mapAPI, name='mapAPI_list_strict'),
-
     
     url(r'^crashlogs/?$', api.CrashLogs, name='CrashLogs'),
     url(r'^crashlogs/(?P<crashid>\w+)/(?P<logfile>\w+)/?$', api.CrashLogsServe, name='CrashLogsServe'),
