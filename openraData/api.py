@@ -16,14 +16,14 @@ from django.contrib.auth.models import User
 from openraData import misc
 
 # Map API
-def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
+def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 	# get detailed map info by title
 	if arg == "title":
-		title = value.lower()
+		title = arg1.lower()
 		mapObject = Maps.objects.filter(title__icontains=title)
 		if not mapObject:
 			raise Http404
-		if apifilter == "yaml":
+		if arg2 == "yaml":
 			yaml_response = ""
 			for item in mapObject:
 				yaml_response += serialize_basic_map_info(request, item, "yaml")
@@ -36,12 +36,12 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
 	
 	# get detailed map info by hash
 	elif arg == "hash":
-		map_hash = value
+		map_hash = arg1
 		try:
 			mapObject = Maps.objects.get(map_hash=map_hash)
 		except:
 			raise Http404
-		if apifilter == "yaml":
+		if arg2 == "yaml":
 			yaml_response = serialize_basic_map_info(request, mapObject, "yaml")
 			return StreamingHttpResponse(yaml_response, content_type="text/plain")
 		else:
@@ -50,12 +50,12 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
 	
 	# get URL of map by hash
 	elif arg == "url":
-		map_hash = value
+		map_hash = arg1
 		try:
 			mapObject = Maps.objects.get(map_hash=map_hash)
 		except:
 			raise Http404
-		if apifilter == "yaml":
+		if arg2 == "yaml":
 			yaml_response = serialize_url_map_info(request, mapObject, "yaml")
 			return StreamingHttpResponse(yaml_response, content_type="text/plain")
 		else:
@@ -64,12 +64,12 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
 	
 	# get minimap preview by hash (represented in JSON by encoded into base64)
 	elif arg == "minimap":
-		map_hash = value
+		map_hash = arg1
 		try:
 			mapObject = Maps.objects.get(map_hash=map_hash)
 		except:
 			raise Http404
-		if apifilter == "yaml":
+		if arg2 == "yaml":
 			yaml_response = serialize_minimap_map_info(request, mapObject, "yaml")
 			return StreamingHttpResponse(yaml_response, content_type="text/plain")
 		else:
@@ -78,39 +78,59 @@ def mapAPI(request, arg, value="", apifilter="", filtervalue=""):
 	
 	# get detailed map info + encoded minimap + URL for a range of maps (supports filters)
 	elif arg == "list":
-		mod = value
+		mod = arg1
 		if mod == "":
 			raise Http404
-		if apifilter != "":
-			if apifilter not in ["rating", "-rating", "players", "-players", "posted", "-posted", "author", "uploader"]:
-				raise Http404
+		if arg2 not in ["rating", "-rating", "players", "-players", "posted", "-posted", "author", "uploader"]:
+			raise Http404
 		try:
-			mapObject = Maps.objects.filter(game_mod=mod.lower(),players__gte=1).distinct('map_hash')
-			if apifilter == "players":
+			mapObject = Maps.objects.filter(game_mod=mod.lower(),players__gte=1,requires_upgrade=False,downloading=True).distinct('map_hash')
+			if arg2 == "players":
 				mapObject = sorted(mapObject, key=lambda x: (x.players), reverse=True)
-			if apifilter == "-players":
+			if arg2 == "-players":
 				mapObject = sorted(mapObject, key=lambda x: (x.players), reverse=False)
-			if apifilter == "posted":
+			if arg2 == "posted":
 				mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
-			if apifilter == "-posted":
+			if arg2 == "-posted":
 				mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=False)
-			if apifilter == "rating":
+			if arg2 == "rating":
 				mapObject = sorted(mapObject, key=lambda x: (x.rating_score), reverse=True)
-			if apifilter == "-rating":
+			if arg2 == "-rating":
 				mapObject = sorted(mapObject, key=lambda x: (x.rating_score), reverse=False)
-			if apifilter == "author":
-				if filtervalue != "":
-					mapObject = mapObject.filter(author__iexact=filtervalue.lower())
-			if apifilter == "uploader":
-				if filtervalue != "" and filtervalue != "yaml":
-					try:
-						u = User.objects.get(username__iexact=filtervalue.lower())
-						mapObject = mapObject.filter(user_id=u.id)
-					except:
-						pass
+			if arg2 == "author":
+				if arg3 == "":
+					mapObject = []
+				else:
+					if arg3 != "yaml":
+						mapObject = mapObject.filter(author__iexact=arg3.lower())
+						if not mapObject:
+							mapObject = []
+					else:
+						mapObject = []
+			if arg2 == "uploader":
+				if arg3 == "":
+					mapObject = []
+				else:
+					if arg3 != "yaml":
+						try:
+							u = User.objects.get(username__iexact=arg3.lower())
+							mapObject = mapObject.filter(user_id=u.id)
+						except:
+							mapObject = []
+					else:
+						mapObject = []
 		except:
 			raise Http404
-		if filtervalue == "yaml":
+		page = 1
+		try:
+			page = int(arg3)
+		except:
+			pass
+		perPage = 24
+		slice_start = perPage*int(page)-perPage
+		slice_end = perPage*int(page)
+		mapObject = mapObject[slice_start:slice_end]
+		if "yaml" in [arg3, arg4]:
 			yaml_response = ""
 			for item in mapObject:
 				yaml_response += serialize_basic_map_info(request, item, "yaml")
@@ -190,12 +210,14 @@ def serialize_minimap_map_info(request, mapObject, yaml=""):
 		response_data = """{0}:
 		id: {1}
 		minimap: {2}
-		url: {3}
-		revision: {4}
-		last_revision: {5}\n""".format(
+		spawnpoints: {3}
+		url: {4}
+		revision: {5}
+		last_revision: {6}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
 		minimap,
+		mapObject.spawnpoints,
 		url,
 		mapObject.revision,
 		last_revision,
@@ -204,6 +226,7 @@ def serialize_minimap_map_info(request, mapObject, yaml=""):
 	response_data = {}
 	response_data['id'] = mapObject.id
 	response_data['minimap'] = minimap
+	response_data['spawnpoints'] = mapObject.spawnpoints
 	response_data['url'] = url
 	response_data['map_hash'] = mapObject.map_hash
 	response_data['revision'] = mapObject.revision
@@ -260,20 +283,21 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		width: {9}
 		height: {10}
 		bounds: {11}
-		tileset: {12}
-		revision: {13}
-		last_revision: {14}
-		requires_upgrade: {15}
-		advanced_map: {16}
-		lua: {17}
-		posted: {18}
-		viewed: {19}
-		downloaded: {20}
-		rating_votes: {21}
-		rating_score: {22}
-		license: {23}
-		minimap: {24}
-		url: {25}\n""".format(
+		spawnpoints: {12}
+		tileset: {13}
+		revision: {14}
+		last_revision: {15}
+		requires_upgrade: {16}
+		advanced_map: {17}
+		lua: {18}
+		posted: {19}
+		viewed: {20}
+		downloaded: {21}
+		rating_votes: {22}
+		rating_score: {23}
+		license: {24}
+		minimap: {25}
+		url: {26}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
 		mapObject.title,
@@ -286,6 +310,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		mapObject.width,
 		mapObject.height,
 		mapObject.bounds,
+		mapObject.spawnpoints,
 		mapObject.tileset,
 		mapObject.revision,
 		last_revision,
@@ -315,6 +340,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	response_data['width'] = mapObject.width
 	response_data['height'] = mapObject.height
 	response_data['bounds'] = mapObject.bounds
+	response_data['spawnpoints'] = mapObject.spawnpoints
 	response_data['tileset'] = mapObject.tileset
 	response_data['revision'] = mapObject.revision
 	response_data['last_revision'] = last_revision

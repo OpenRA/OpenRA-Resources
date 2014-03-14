@@ -44,6 +44,7 @@ class MapHandlers():
         self.MapDesc = ""
         self.MapPlayers = 0
         self.Bounds = ""
+        self.spawnpoints = ""
 
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
         if pre_r != 0:
@@ -120,6 +121,7 @@ class MapHandlers():
         #Load basic map info
         countAdvanced = 0
         shouldCount = False
+        expectspawn = False
         for line in string.split(yamlData, '\n'):
             if line[0:5] == "Title":
                 self.MapTitle = line[6:].strip().replace("'", "''")
@@ -137,6 +139,12 @@ class MapHandlers():
                 self.MapSize = line[8:].strip()
             if line[0:6] == "Bounds":
                 self.Bounds = line[7:].strip()
+            if line.strip()[-7:] == "mpspawn":
+                expectspawn = True
+            if line.strip()[0:8] == "Location":
+                if expectspawn:
+                    self.spawnpoints += line.split(':')[1].strip()+","
+                    expectspawn = False
             if line.strip()[0:8] == "Playable":
                 state = line.split(':')[1]
                 if state.strip().lower() in ['true', 'on', 'yes', 'y']:
@@ -151,6 +159,7 @@ class MapHandlers():
                 shouldCount = True
             if shouldCount:
                 countAdvanced += 1
+        self.spawnpoints = self.spawnpoints.rstrip(",")
         if countAdvanced > 20:
             self.advanced_map = True
 
@@ -186,6 +195,7 @@ class MapHandlers():
             width = self.MapSize.split(',')[0],
             height = self.MapSize.split(',')[1],
             bounds = self.Bounds,
+            spawnpoints = self.spawnpoints,
             tileset = self.MapTileset,
             legacy_map = self.legacy_map,
             revision = rev,
