@@ -33,27 +33,16 @@ def map_upgrade(mapObject, engine, http_host):
 
 		maphash = recalculate_hash(item)
 		lint_passed = not LintCheck([item], http_host)
+		Maps.objects.filter(id=item.id).update(map_hash=maphash)
+		Maps.objects.filter(id=item.id).update(requires_upgrade=lint_passed)
 
 		if not UnzipMap(item):
 			print("failed to unzip %s" % item.id)
 			continue
-		map_data_ordered = ReadYamlAgain(item)
-		if len(map_data_ordered) == 0:
-			print("readyamlagain: failed to read map or map.yaml")
+		yamlread = ReadYamlAgain(item)
+		if not yamlread:
+			print("ReadYamlAgain: failed to read map or map.yaml")
 			continue
-
-		Maps.objects.filter(id=item.id).update(map_hash=maphash)
-		Maps.objects.filter(id=item.id).update(requires_upgrade=lint_passed)
-		Maps.objects.filter(id=item.id).update(game_mod=map_data_ordered['game_mod'])
-		Maps.objects.filter(id=item.id).update(title=map_data_ordered['title'])
-		Maps.objects.filter(id=item.id).update(author=map_data_ordered['author'])
-		Maps.objects.filter(id=item.id).update(tileset=map_data_ordered['tileset'])
-		Maps.objects.filter(id=item.id).update(map_type=map_data_ordered['map_type'])
-		Maps.objects.filter(id=item.id).update(description=map_data_ordered['description'])
-		Maps.objects.filter(id=item.id).update(players=map_data_ordered['players'])
-		Maps.objects.filter(id=item.id).update(bounds=map_data_ordered['bounds'])
-		Maps.objects.filter(id=item.id).update(width=map_data_ordered['width'])
-		Maps.objects.filter(id=item.id).update(height=map_data_ordered['height'])
 	os.chdir(currentDirectory)
 	return True
 
@@ -87,7 +76,7 @@ def ReadYamlAgain(mapObject):
 			filename = fn
 			break
 	if filename == "":
-		return {}
+		return False
 	z = zipfile.ZipFile(path + filename, mode='a')
 	yamlData = ""
 	for zfn in z.namelist():
@@ -97,7 +86,9 @@ def ReadYamlAgain(mapObject):
 			break
 	z.close()
 	if yamlData == "":
-		return {}
+		return False
+	expectspawn = False
+	spawnpoints = ""
 	map_data_ordered = {}
 	map_data_ordered['players'] = 0
 	map_data_ordered['description'] = ""
@@ -119,11 +110,31 @@ def ReadYamlAgain(mapObject):
 			map_data_ordered['height'] = line[8:].strip().split(',')[1]
 		if line[0:6] == "Bounds":
 			map_data_ordered['bounds'] = line[7:].strip()
+		if line.strip()[-7:] == "mpspawn":
+			expectspawn = True
+		if line.strip()[0:8] == "Location":
+			if expectspawn:
+				spawnpoints += line.split(':')[1].strip()+","
+				expectspawn = False
 		if line.strip()[0:8] == "Playable":
 			state = line.split(':')[1]
 			if state.strip().lower() in ['true', 'on', 'yes', 'y']:
 				map_data_ordered['players'] += 1
-	return map_data_ordered
+	map_data_ordered['spawnpoints'] = spawnpoints.rstrip(",")
+	if len(map_data_ordered) == 0:
+		return False
+	Maps.objects.filter(id=mapObject.id).update(game_mod=map_data_ordered['game_mod'])
+	Maps.objects.filter(id=mapObject.id).update(title=map_data_ordered['title'])
+	Maps.objects.filter(id=mapObject.id).update(author=map_data_ordered['author'])
+	Maps.objects.filter(id=mapObject.id).update(tileset=map_data_ordered['tileset'])
+	Maps.objects.filter(id=mapObject.id).update(map_type=map_data_ordered['map_type'])
+	Maps.objects.filter(id=mapObject.id).update(description=map_data_ordered['description'])
+	Maps.objects.filter(id=mapObject.id).update(players=map_data_ordered['players'])
+	Maps.objects.filter(id=mapObject.id).update(bounds=map_data_ordered['bounds'])
+	Maps.objects.filter(id=mapObject.id).update(spawnpoints=map_data_ordered['spawnpoints'])
+	Maps.objects.filter(id=mapObject.id).update(width=map_data_ordered['width'])
+	Maps.objects.filter(id=mapObject.id).update(height=map_data_ordered['height'])
+	return True
 
 def UnzipMap(mapObject):
 	currentDirectory = os.getcwd() + os.sep
