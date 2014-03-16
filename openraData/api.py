@@ -44,11 +44,15 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			yaml_response = ""
 			for item in mapObject:
 				yaml_response += serialize_basic_map_info(request, item, "yaml")
+			if yaml_response == "":
+				raise Http404
 			return StreamingHttpResponse(yaml_response, content_type="text/plain")
 		else:
 			json_response = []
 			for item in mapObject:
 				json_response.append(serialize_basic_map_info(request, item))
+			if len(json_response) == 0:
+				raise Http404
 			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
 	
 	# get URL of map by hash
@@ -61,11 +65,15 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			yaml_response = ""
 			for item in mapObject:
 				yaml_response += serialize_url_map_info(request, item, "yaml")
+			if yaml_response == "":
+				raise Http404
 			return StreamingHttpResponse(yaml_response, content_type="text/plain")
 		else:
 			json_response = []
 			for item in mapObject:
-				json_response.append(serialize_url_map_info(request, mapObject))
+				json_response.append(serialize_url_map_info(request, item))
+			if len(json_response) == 0:
+				raise Http404
 			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
 	
 	# get minimap preview by hash (represented in JSON by encoded into base64)
@@ -78,11 +86,15 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			yaml_response = ""
 			for item in mapObject:
 				yaml_response += serialize_minimap_map_info(request, item, "yaml")
+			if yaml_response == "":
+				raise Http404
 			return StreamingHttpResponse(yaml_response, content_type="text/plain")
 		else:
 			json_response = []
 			for item in mapObject:
-				json_response.append(serialize_minimap_map_info(request, mapObject))
+				json_response.append(serialize_minimap_map_info(request, item))
+			if len(json_response) == 0:
+				raise Http404
 			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
 	
 	# get detailed map info + encoded minimap + URL for a range of maps (supports filters)
@@ -187,8 +199,6 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		except:
 			raise Http404
 		if not mapObject.downloading:
-			raise Http404
-		if mapObject.requires_upgrade:
 			raise Http404
 		path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id)
 		try:
@@ -307,7 +317,8 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		rating_score: {23}
 		license: {24}
 		minimap: {25}
-		url: {26}\n""".format(
+		url: {26}
+		downloading: {27}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
 		mapObject.title,
@@ -335,6 +346,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		license,
 		minimap,
 		url,
+		mapObject.downloading,
 		).replace("\t\t","\t")
 		return response_data
 	response_data = {}
@@ -365,6 +377,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	response_data['license'] = license
 	response_data['minimap'] = minimap
 	response_data['url'] = url
+	response_data['downloading'] = mapObject.downloading
 	return response_data
 
 def get_minimap(mapid, soft=False):

@@ -233,6 +233,8 @@ class MapHandlers():
         self.LintCheck(self.MapMod)
         if self.LintPassed:
             Maps.objects.filter(id=transac.id).update(requires_upgrade=False)
+        else:
+            Maps.objects.filter(id=transac.id).update(downloading=False)
 
         self.GenerateMinimap()
         #self.GenerateFullPreview(userObject)

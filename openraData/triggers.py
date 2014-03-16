@@ -210,6 +210,7 @@ def LintCheck(mapObject, http_host):
 			lintlog = open(path+'lintlog','w')
 			lintlog.write(proc[0])
 			lintlog.close()
+			Maps.objects.filter(id=item.id).update(downloading=False)
 			if not item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
 				userObject = User.objects.get(pk=item.user_id)

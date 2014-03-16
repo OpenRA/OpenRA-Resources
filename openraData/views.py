@@ -366,6 +366,7 @@ def serveOramap(request, arg, sync=""):
                 oramap = arg + ".oramap"
         response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename = %s' % oramap
+        response['Content-Length'] = os.path.getsize(serveOramap)
         Maps.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
         return response
 
