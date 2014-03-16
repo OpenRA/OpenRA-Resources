@@ -36,44 +36,53 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 	
 	# get detailed map info by hash
 	elif arg == "hash":
-		map_hash = arg1
-		try:
-			mapObject = Maps.objects.get(map_hash=map_hash)
-		except:
+		map_hashes = arg1.split(',')
+		mapObject = Maps.objects.filter(map_hash__in=map_hashes)
+		if not mapObject:
 			raise Http404
 		if arg2 == "yaml":
-			yaml_response = serialize_basic_map_info(request, mapObject, "yaml")
+			yaml_response = ""
+			for item in mapObject:
+				yaml_response += serialize_basic_map_info(request, item, "yaml")
 			return StreamingHttpResponse(yaml_response, content_type="text/plain")
 		else:
-			json_response = [serialize_basic_map_info(request, mapObject)]
+			json_response = []
+			for item in mapObject:
+				json_response.append(serialize_basic_map_info(request, item))
 			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
 	
 	# get URL of map by hash
 	elif arg == "url":
-		map_hash = arg1
-		try:
-			mapObject = Maps.objects.get(map_hash=map_hash)
-		except:
+		map_hashes = arg1.split(',')
+		mapObject = Maps.objects.filter(map_hash__in=map_hashes)
+		if not mapObject:
 			raise Http404
 		if arg2 == "yaml":
-			yaml_response = serialize_url_map_info(request, mapObject, "yaml")
+			yaml_response = ""
+			for item in mapObject:
+				yaml_response += serialize_url_map_info(request, item, "yaml")
 			return StreamingHttpResponse(yaml_response, content_type="text/plain")
 		else:
-			json_response = [serialize_url_map_info(request, mapObject)]
+			json_response = []
+			for item in mapObject:
+				json_response.append(serialize_url_map_info(request, mapObject))
 			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
 	
 	# get minimap preview by hash (represented in JSON by encoded into base64)
 	elif arg == "minimap":
-		map_hash = arg1
-		try:
-			mapObject = Maps.objects.get(map_hash=map_hash)
-		except:
+		map_hashes = arg1.split(',')
+		mapObject = Maps.objects.filter(map_hash__in=map_hashes)
+		if not mapObject:
 			raise Http404
 		if arg2 == "yaml":
-			yaml_response = serialize_minimap_map_info(request, mapObject, "yaml")
+			yaml_response = ""
+			for item in mapObject:
+				yaml_response += serialize_minimap_map_info(request, item, "yaml")
 			return StreamingHttpResponse(yaml_response, content_type="text/plain")
 		else:
-			json_response = [serialize_minimap_map_info(request, mapObject)]
+			json_response = []
+			for item in mapObject:
+				json_response.append(serialize_minimap_map_info(request, mapObject))
 			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
 	
 	# get detailed map info + encoded minimap + URL for a range of maps (supports filters)
