@@ -196,6 +196,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		oramap = os.path.splitext(oramap)[0] + "-" + str(mapObject.revision) + ".oramap"
 		response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
 		response['Content-Disposition'] = 'attachment; filename = %s' % oramap
+		response['Content-Length'] = os.path.getsize(serveOramap)
 		Maps.objects.filter(id=mapObject.id).update(downloaded=mapObject.downloaded+1)
 		return response
 
