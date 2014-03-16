@@ -74,7 +74,9 @@
                         <div>
                             <h5>Description:</h5>
                             {% autoescape off %}
-                            <p>{{ map.description|strip_tags|convert_links|default:"No description :(" }}</p>
+                            {% if map.description != "Describe your map here" %}
+                            <p>{{ map.description|strip_tags|convert_links }}</p>
+                            {% endif %}
                             {% endautoescape %}
                         </div>
                         <div class="map_info">
@@ -133,7 +135,7 @@
                             </tr>
                             <tr>
                                 <td>{% if map.pre_rev == 0 %}
-                                    It's the first revision
+                                    Nothing found
                                     {% else %}
                                         <a href="/maps/{{map.pre_rev}}/"><img src="/maps/{{map.pre_rev}}/minimap" /></a>
                                     {% endif %}
@@ -143,7 +145,7 @@
                                         {% if map.user_id == request.user.id or request.user.is_superuser %}
                                         <a href="/maps/upload/{{map.id}}/">Upload new revision</a>
                                         {% else %}
-                                        It's the latest revision
+                                        Nothing found
                                         {% endif %}
                                     {% else %}
                                         <a href="/maps/{{map.next_rev}}/"><img src="/maps/{{map.next_rev}}/minimap" /></a>

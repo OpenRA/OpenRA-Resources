@@ -566,6 +566,7 @@ table tr td {
   padding: 0;
   border: solid 2px #74c2e7;
   max-width: 250px;
+  max-height: 220px;
 }
 
 #screenshot IMG.active {
