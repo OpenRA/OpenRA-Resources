@@ -1,1 +1,27 @@
-<center><h2>In Development</h2></center>
+{% if global_search_request.maps.amount == 0 %}
+Nothing found
+{% else %}
+	{% if global_search_request.maps.hash %}
+		<p>Matches in Map HASH:<p>
+		{% for item in global_search_request.maps.hash %}
+			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+		{% endfor %}
+	{% endif %}
+
+	{% if global_search_request.maps.title %}
+		<p>Matches in Map Title:<p>
+		{% for item in global_search_request.maps.title %}
+			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+		{% endfor %}
+	{% endif %}
+
+	{% if global_search_request.maps.info.0 or global_search_request.maps.info.1 %}
+		<p>Matches in Map Info:<p>
+		{% for item in global_search_request.maps.info.0 %}
+			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+		{% endfor %}
+		{% for item in global_search_request.maps.info.1 %}
+			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+		{% endfor %}
+	{% endif %}
+{% endif %}

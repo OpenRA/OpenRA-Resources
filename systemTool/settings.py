@@ -131,3 +131,6 @@ GITHUB_REPO = ''
 
 # Email address of a person who is responsible for fixing map uploading issues
 ADMIN_EMAIL = ''
+
+# Reply-to email address
+DEFAULT_FROM_EMAIL = ''

@@ -55,12 +55,36 @@ def feed(request):
     return StreamingHttpResponse(template.render(context), content_type='text/xml')
 
 def search(request):
+    if request.method == 'POST':
+        if request.POST.get('qsearch', "").strip() == "":
+            return HttpResponseRedirect('/')
+        search_request = request.POST.get('qsearch', "").strip()
+    global_search_request = {}
+    global_search_request['maps'] = {'amount': 0, 'hash': None, 'title': None, 'info': None}
+
+    s_by_hash = Maps.objects.filter(map_hash__icontains=search_request)
+    global_search_request['maps']['hash'] = s_by_hash
+    global_search_request['maps']['amount'] += len(s_by_hash)
+
+    s_by_title = Maps.objects.filter(title__icontains=search_request)
+    global_search_request['maps']['title'] = s_by_title
+    global_search_request['maps']['amount'] += len(s_by_title)
+
+    s_by_info = Maps.objects.filter(info__icontains=search_request)
+    global_search_request['maps']['amount'] += len(s_by_info)
+
+    s_by_description = Maps.objects.filter(description__icontains=search_request).exclude(info__icontains=search_request)
+    global_search_request['maps']['amount'] += len(s_by_description)
+    global_search_request['maps']['info'] = [s_by_info, s_by_description]
+
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'search.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': ' - Search',
+        'global_search_request': global_search_request,
+        'search_request': search_request,
     })
     return StreamingHttpResponse(template.render(context))
 
