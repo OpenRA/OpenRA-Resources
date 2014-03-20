@@ -342,6 +342,8 @@ def serveMinimap(request, arg):
     for filename in mapDir:
         if filename.endswith("-mini.png"):
             minimap = filename
+        if filename == "map.png":
+            minimap = filename
             break
     if minimap == "":
         minimap = "nominimap.png"
