@@ -210,7 +210,7 @@
 
                 <div class="right_map_content">
                     <div class="map_download">
-                        <a href={{ '/maps/' }}{{ arg }}{{ '/oramap' }} class="button">Download</a>
+                        <a href="/maps/{{arg}}/oramap" title="{{disk_size}}" class="button">Download</a>
                     </div>
                     <div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
                     <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>

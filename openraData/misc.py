@@ -73,3 +73,9 @@ def send_email_to_user_OnLint(email_addr, body):
 						  [email_addr], connection=connection)
 	email.send()
 	connection.close()
+
+def sizeof_fmt(disk_size):
+	for x in ['bytes','KB','MB','GB','TB']:
+		if disk_size < 1024.0:
+			return "%3.1f %s" % (disk_size, x)
+		disk_size /= 1024.0

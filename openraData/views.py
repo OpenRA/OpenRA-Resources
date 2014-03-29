@@ -196,13 +196,16 @@ def displayMap(request, arg):
             if form.is_valid():
                 handlers.addScreenshot(request.FILES['scfile'], arg, request.user, 'map')
     fullPreview = False
+    disk_size = 0
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
         mapDir = os.listdir(path)
         for filename in mapDir:
             if filename.endswith("-full.png"):
                 fullPreview = True
-                break
+            if filename.endswith(".oramap"):
+                disk_size = os.path.getsize(path + '/' + filename)
+                disk_size = misc.sizeof_fmt(disk_size)
     except:
         pass
     try:
@@ -274,6 +277,7 @@ def displayMap(request, arg):
         'similarMaps': similarMaps,
         'screenshots': screenshots,
         'shpNames': shpNames,
+        'disk_size': disk_size,
     })
     return StreamingHttpResponse(template.render(context))
 
