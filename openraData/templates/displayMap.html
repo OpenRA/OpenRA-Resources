@@ -127,7 +127,7 @@
                             <h3>Report this map</h3>
                             <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
                                 <div><textarea name="reportReason" placeholder="Reason"></textarea></div>
-                                {% if license %}<div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>{% endif %}
+                                <div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
                                 <div><button type="submit">Submit</button></div>
                             </form>
                         </div>
