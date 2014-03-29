@@ -70,23 +70,34 @@
                         <div><h5>Hash:</h5><span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span></div>
                     </div>
 
+                    {% if map.description and map.description != "Describe your map here" %}
                     <div class="map_description cBlock">
                         <div>
                             <h5>Description:</h5>
                             {% autoescape off %}
-                            {% if map.description != "Describe your map here" %}
                             <p>{{ map.description|strip_tags|convert_links }}</p>
-                            {% endif %}
                             {% endautoescape %}
                         </div>
+                        {% if map.info %}
                         <div class="map_info">
-                            {% if map.info %}
                             {% autoescape off %}
                             <p>{{ map.info|strip_tags|convert_links|linebreaks }}</p>
                             {% endautoescape %}
-                            {% endif %}
                         </div>
+                        {% endif %}
                     </div>
+                    {% else %}
+                        {% if map.info %}
+                        <div class="map_description cBlock">
+                            <div>
+                                <h5>Description:</h5>
+                                {% autoescape off %}
+                                <p>{{ map.info|strip_tags|convert_links|linebreaks }}</p>
+                                {% endautoescape %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endif %}
                     
                     <div>
                         <div class="editMapInfo popup">
@@ -116,7 +127,7 @@
                             <h3>Report this map</h3>
                             <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
                                 <div><textarea name="reportReason" placeholder="Reason"></textarea></div>
-                                {% if license %}<div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>{% endif %}
+                                <div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
                                 <div><button type="submit">Submit</button></div>
                             </form>
                         </div>
@@ -189,7 +200,7 @@
                             <div class="clear"></div>
                         {% if request.user.is_authenticated %}
                             {% if reported == False %}
-                            <br /><a class="reportCopyright">Report copyright infringement</a>
+                            <a class="reportCopyright">Report copyright infringement</a>
                             {% endif %}
                         {% endif %}
                         </div>
@@ -204,7 +215,6 @@
                     <div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
                     <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>
                     <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
-                    <div class="map_data_label">Author:</div><div class="map_data_text">{{ map.author }}</div>
                     <div class="map_data_label">Max Players:</div><div class="map_data_text">{{ map.players }}</div>
                     <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
                     <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div><br /><br />
@@ -248,7 +258,7 @@
                         {% if mapsFromAuthor %}
                         <div>More from <a href="/maps/author/{{map.author}}/">{{ map.author }}</a>:</div>
                         {% for item in mapsFromAuthor %}
-                            <div class="side_img_link"><a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a></div>
+                            <div class="side_img_link"><a title="{{item.title}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a></div>
                         {% endfor %}
                         {% endif %}
                     </div>
@@ -257,7 +267,7 @@
                     <div class="side_img_links">
                         <div>Similar maps:</div>
                         {% for item in similarMaps %}
-                        <div class="side_img_link"><a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a></div>
+                        <div class="side_img_link"><a title="{{item.title}} by {{item.author}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a></div>
                         {% endfor %}
                     </div>
                     {% endif %}
