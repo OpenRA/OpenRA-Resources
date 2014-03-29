@@ -1077,10 +1077,8 @@ p.registerInfo {
       }
     .map_description {
       position: relative;
-      min-height: 100px;
     }
       .map_info {
-        min-height: 20px;
       }
     .map_revisions {
       text-align: center;
@@ -1094,6 +1092,7 @@ p.registerInfo {
         width: 352px;
         padding: 0 0 0 8px;
         line-height: 18px;
+        font-size: 0.9em;
       }
       .reportMap {
 
@@ -1219,6 +1218,9 @@ p.registerInfo {
         }
     .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua, .showLintLog, .addScreenshot {
       cursor: pointer;
+    }
+    .reportCopyright {
+      font-size: 0.9em;
     }
 
 
