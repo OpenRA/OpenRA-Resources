@@ -62,7 +62,7 @@ def search(request):
     global_search_request = {}
     global_search_request['maps'] = {'amount': 0, 'hash': None, 'title': None, 'info': None}
 
-    s_by_hash = Maps.objects.filter(map_hash__icontains=search_request)
+    s_by_hash = Maps.objects.filter(map_hash=search_request)
     global_search_request['maps']['hash'] = s_by_hash
     global_search_request['maps']['amount'] += len(s_by_hash)
 
