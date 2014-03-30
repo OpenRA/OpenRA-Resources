@@ -1101,7 +1101,6 @@ p.registerInfo {
           font-size: 0.9em;
         }
     .map_screenshots {
-      min-height: 124px;
       text-align: center;
     }
       .map_screenshots h5 {
