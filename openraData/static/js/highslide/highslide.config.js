@@ -8,6 +8,7 @@ hs.fadeInOut = true;
 hs.align = 'center';
 hs.marginBottom = 70;
 hs.marginLeft = 100;
+hs.maxWidth = 1000;
 hs.captionEval = 'this.a.title';
 hs.captionOverlay.position = 'below';
 hs.registerOverlay({
