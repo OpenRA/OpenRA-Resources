@@ -2,10 +2,10 @@
             {% if amount != 0 %}
             <div id="map_grid">
                 {% for item in maps %}
-                    <div id="map_grid_cell">
+                    <div class="map_grid_cell">
                         <a href="http://{{http_host}}/maps/{{item.id}}">
                             <div class="cell-link-container">
-                                <div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title }}</div>
+                                <div><img src="/maps/{{item.id}}/minimap" alt="{{item.id}}" /></div><div class="link_title">{{ item.title }}</div>
                             </div>
                         </a>
                         <div class="map_tooltip">
@@ -36,7 +36,7 @@
             {% if 2 in range %}
             <div id="paging">
                 {% for i in range %}
-                <div id="paging_cell">
+                <div class="paging_cell">
                 {% if i == page %}
                     <span>{{ i }}</span>
                 {% else %}

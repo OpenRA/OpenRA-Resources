@@ -7,7 +7,6 @@ register = template.Library()
 def convert_links(value):
 	value = re.sub(r'(?P<urlmatch>https?:\/\/[^ <\n\r]*)', '<a href="\g<urlmatch>" target=_blank>\g<urlmatch></a>', value)
 	return value
-
 register.filter('convert_links', convert_links)
 
 class MLStripper(HTMLParser):
@@ -23,5 +22,8 @@ def strip_tags(value):
 	s = MLStripper()
 	s.feed(value)
 	return s.get_data()
-
 register.filter('strip_tags', strip_tags)
+
+def proper_space(value):
+	return value.replace(" ", "%20")
+register.filter('proper_space', proper_space)

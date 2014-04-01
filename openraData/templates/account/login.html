@@ -16,7 +16,7 @@
                             {% if form.non_field_errors %}<span style="color: #ff0000; font-weight: bold;" class="error">{{ form.non_field_errors|join:", " }}</span>{% endif %}
                             <div class="row">
                                 <div class="innerCellLeft">
-                                    <label for="id_username">Username:</label>{% if form.login.errors %}<br />
+                                    <label for="id_login">Username:</label>{% if form.login.errors %}<br />
                                     <span style="color: #ff0000; font-weight: bold;" class="error">{{ form.login.errors|join:", " }}</span>{% endif %}
                                 </div>
                                 <div class="innerCellRight">{{ form.login }}</div>

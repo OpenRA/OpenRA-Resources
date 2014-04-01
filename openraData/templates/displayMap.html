@@ -14,7 +14,7 @@
                         {% if fullPreview %}
                             <a href={{ '/maps/' }}{{ arg }}{{ '/render' }}><img src={{ '/maps/' }}{{ arg }}{{ '/render' }} /></a>
                         {% else %}
-                            <img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} />
+                            <img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} alt="minimap" />
                         {% endif %}
                         </div>
                     </div>
@@ -75,13 +75,13 @@
                         <div>
                             <h5>Description:</h5>
                             {% autoescape off %}
-                            <p>{{ map.description|strip_tags|convert_links }}</p>
+                            {{ map.description|strip_tags|convert_links }}
                             {% endautoescape %}
                         </div>
                         {% if map.info %}
                         <div class="map_info">
                             {% autoescape off %}
-                            <p>{{ map.info|strip_tags|convert_links|linebreaks }}</p>
+                            {{ map.info|strip_tags|convert_links|linebreaks }}
                             {% endautoescape %}
                         </div>
                         {% endif %}
@@ -148,7 +148,7 @@
                                 <td>{% if map.pre_rev == 0 %}
                                     Nothing found
                                     {% else %}
-                                        <a href="/maps/{{map.pre_rev}}/"><img src="/maps/{{map.pre_rev}}/minimap" /></a>
+                                        <a href="/maps/{{map.pre_rev}}/"><img src="/maps/{{map.pre_rev}}/minimap" alt="minimap" /></a>
                                     {% endif %}
                                 </td>
                                 <td>{{ map.revision }}</td>
@@ -159,7 +159,7 @@
                                         Nothing found
                                         {% endif %}
                                     {% else %}
-                                        <a href="/maps/{{map.next_rev}}/"><img src="/maps/{{map.next_rev}}/minimap" /></a>
+                                        <a href="/maps/{{map.next_rev}}/"><img src="/maps/{{map.next_rev}}/minimap" alt="minimap" /></a>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -170,7 +170,7 @@
                     <div class="map_screenshots cBlock highslide-gallery">
                         <h5>Screenshots:</h5>
                         {% for item in screenshots %}
-                        <div class="cScreenshot"><a class="highslide" href="/screenshots/{{item.id}}/" onclick="return hs.expand(this, config1)"><img src="/screenshots/{{item.id}}/mini/" /></a>
+                        <div class="cScreenshot"><a class="highslide" href="/screenshots/{{item.id}}/" onclick="return hs.expand(this, config1)"><img src="/screenshots/{{item.id}}/mini/" alt="screenshot" /></a>
                             {% if request.user.id == item.user_id or request.user.is_superuser %}
                                 <br /><span style="font-size: 0.8em; text-align: justify;"><a href="/screenshots/{{item.id}}/delete/" onClick='return confirmDelete("screenshot")'>delete</a></span>
                             {% endif %}
@@ -183,7 +183,7 @@
                     <div class="map_shp cBlock">
                         <h5>Preview of embeded SHP files:</h5>
                         {% for item in shpNames %}
-                        <div class="cSHP"><img src="/maps/{{arg}}/shp/{{item}}" /></div>
+                        <div class="cSHP"><img src="/maps/{{arg}}/shp/{{item}}" alt="shp" /></div>
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -256,9 +256,9 @@
 
                     <div class="side_img_links">
                         {% if mapsFromAuthor %}
-                        <div>More from <a href="/maps/author/{{map.author}}/">{{ map.author }}</a>:</div>
+                        <div>More from <a href="/maps/author/{{map.author|proper_space}}/">{{ map.author }}</a>:</div>
                         {% for item in mapsFromAuthor %}
-                            <div class="side_img_link"><a title="{{item.title}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a></div>
+                            <div class="side_img_link"><a title="{{item.title}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" alt="minimap" /></a></div>
                         {% endfor %}
                         {% endif %}
                     </div>
@@ -267,7 +267,7 @@
                     <div class="side_img_links">
                         <div>Similar maps:</div>
                         {% for item in similarMaps %}
-                        <div class="side_img_link"><a title="{{item.title}} by {{item.author}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a></div>
+                        <div class="side_img_link"><a title="{{item.title}} by {{item.author}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" alt="minimap" /></a></div>
                         {% endfor %}
                     </div>
                     {% endif %}

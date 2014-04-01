@@ -232,7 +232,7 @@ table tr td {
   margin: 10px auto;
 }
 
-#paging_cell {
+.paging_cell {
   background: rgba(32, 44, 69, 0.4);
   border: 1px solid #74c2e7;
   display: table-column;
@@ -244,7 +244,7 @@ table tr td {
   display: table-cell;
 }
 
-#paging_cell a {
+.paging_cell a {
   font-size: 0.9em;
   display: block;
   text-decoration: none;
@@ -254,13 +254,13 @@ table tr td {
   vertical-align: bottom
 }
 
-#paging_cell a:hover {
+.paging_cell a:hover {
   background: rgba(32, 44, 69, 0.7);
   transition: all 0.6s ease;
   text-decoration: underline;
 }
 
-#paging_cell span {
+.paging_cell span {
   background: rgba(32, 44, 69, 0.7);
   display: block;
   font-size: 0.9em;
@@ -277,7 +277,7 @@ table tr td {
   position: relative;
 }
 
-#map_grid_cell {
+.map_grid_cell {
   background: rgba(32, 44, 69, 0.4);
   border: 2px solid #74c2e7;
   display: table-column;
@@ -287,7 +287,7 @@ table tr td {
   position: relative;
 }
 
-#map_grid_cell a {
+.map_grid_cell a {
   display: block;
   min-height: 170px;
   width: 137px;
@@ -310,12 +310,12 @@ table tr td {
   width: 135px;
 }
 
-#map_grid_cell:hover {
+.map_grid_cell:hover {
   background: rgba(32, 44, 69, 0.7);
   transition: all 0.6s ease;
 }
 
-#map_grid_cell img {
+.map_grid_cell img {
   max-width: 120px;
   max-height: 116px;
   padding: 8px;
@@ -893,7 +893,7 @@ p.registerInfo {
   }
 
 /* Map Tooltip */
-#map_grid_cell:hover .map_tooltip {
+.map_grid_cell:hover .map_tooltip {
   display: block;
 }
 
