@@ -74,6 +74,7 @@
                     <div class="map_description cBlock">
                         <div>
                             <h5>Description:</h5>
+                            <p></p>
                             {% autoescape off %}
                             {{ map.description|strip_tags|convert_links }}
                             {% endautoescape %}
@@ -91,8 +92,9 @@
                         <div class="map_description cBlock">
                             <div>
                                 <h5>Description:</h5>
+                                <p></p>
                                 {% autoescape off %}
-                                <p>{{ map.info|strip_tags|convert_links|linebreaks }}</p>
+                                {{ map.info|strip_tags|convert_links|linebreaks }}
                                 {% endautoescape %}
                             </div>
                         </div>

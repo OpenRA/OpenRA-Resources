@@ -2,7 +2,7 @@
             {% if amount != 0 %}
             <div id="map_grid">
                 {% for item in maps %}
-                    <div id="map_grid_cell">
+                    <div class="map_grid_cell">
                         <a href="http://{{http_host}}/maps/{{item.id}}">
                             <div class="cell-link-container">
                                 <div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title }}</div>
