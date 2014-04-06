@@ -27,12 +27,16 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			yaml_response = ""
 			for item in mapObject:
 				yaml_response += serialize_basic_map_info(request, item, "yaml")
-			return StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response = StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 		else:
 			json_response = []
 			for item in mapObject:
 				json_response.append(serialize_basic_map_info(request, item))
-			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
+			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 	
 	# get detailed map info by hash
 	elif arg == "hash":
@@ -46,14 +50,18 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 				yaml_response += serialize_basic_map_info(request, item, "yaml")
 			if yaml_response == "":
 				raise Http404
-			return StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response = StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 		else:
 			json_response = []
 			for item in mapObject:
 				json_response.append(serialize_basic_map_info(request, item))
 			if len(json_response) == 0:
 				raise Http404
-			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
+			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 	
 	# get URL of map by hash
 	elif arg == "url":
@@ -67,14 +75,18 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 				yaml_response += serialize_url_map_info(request, item, "yaml")
 			if yaml_response == "":
 				raise Http404
-			return StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response = StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 		else:
 			json_response = []
 			for item in mapObject:
 				json_response.append(serialize_url_map_info(request, item))
 			if len(json_response) == 0:
 				raise Http404
-			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
+			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 	
 	# get minimap preview by hash (represented in JSON by encoded into base64)
 	elif arg == "minimap":
@@ -88,14 +100,18 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 				yaml_response += serialize_minimap_map_info(request, item, "yaml")
 			if yaml_response == "":
 				raise Http404
-			return StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response = StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 		else:
 			json_response = []
 			for item in mapObject:
 				json_response.append(serialize_minimap_map_info(request, item))
 			if len(json_response) == 0:
 				raise Http404
-			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
+			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 	
 	# get detailed map info + encoded minimap + URL for a range of maps (supports filters)
 	elif arg == "list":
@@ -155,13 +171,17 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			yaml_response = ""
 			for item in mapObject:
 				yaml_response += serialize_basic_map_info(request, item, "yaml")
-			return StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response = StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 		else:
 			json_response = []
 			for item in mapObject:
 				response_data = serialize_basic_map_info(request, item)
 				json_response.append(response_data)
-			return StreamingHttpResponse(json.dumps(json_response), content_type="application/json")
+			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 
 	elif arg == "sync":
 		mod = value
@@ -178,7 +198,9 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		data = ""
 		for item in mapObject:
 			data = data + get_url(request, item.id) + "/sync" + "\n"
-		return StreamingHttpResponse(data, content_type="plain/text")
+		response = StreamingHttpResponse(data, content_type="plain/text")
+		response['Access-Control-Allow-Origin'] = '*'
+		return response
 	elif arg == "syncall":
 		mod = value
 		if mod == "":
@@ -190,7 +212,9 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		data = ""
 		for item in mapObject:
 			data = data + get_url(request, item.id) + "/sync" + "\n"
-		return StreamingHttpResponse(data, content_type="plain/text")
+		response = StreamingHttpResponse(data, content_type="plain/text")
+		response['Access-Control-Allow-Origin'] = '*'
+		return response
 	else:
 		# serve application/zip by hash
 		oramap = ""
