@@ -308,6 +308,7 @@ table tr td {
 
 .cell-link-container div.link_title {
   width: 135px;
+  padding-left: 1px;
 }
 
 .map_grid_cell:hover {
