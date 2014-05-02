@@ -432,12 +432,12 @@ table tr td {
 }
 
 #nav li ul a {
-  display: block; 
+  display: block;
   padding: 0 0 0 10px;
   margin: 0px 0px 0px 0px;
   padding-bottom: 5px;
   padding-top: 5px;
-  text-align: lef80t;
+  text-align: left;
 }
 
 #nav li li:hover {
