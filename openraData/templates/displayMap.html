@@ -208,6 +208,31 @@
                         </div>
                     </div>
                     {% endif %}
+                    <div class="cBlock">
+                        {% load threadedcomments_tags %}
+                        <h3>Comments [{% get_comment_count for map as amount_of_comments %}{{amount_of_comments}}] for {{ map.title }}:</h3>
+
+                        {% render_comment_list for map %}
+                        {% get_comment_form for map as comment_form %}
+
+                        <form action="/articles/comments/post/" method="post">{% csrf_token %}
+                        {% if not user.is_authenticated %}
+                        <p><label for="id_name">Name:</label> <input id="id_name" maxlength="50" name="name" type="text" /></p>
+
+                        <p><label for="id_email">Email address:</label> <input id="id_email" name="email" type="email" /></p>
+                        {% endif %}
+                        <label for="id_comment"></label><textarea cols="40" id="id_comment" name="comment" rows="10"></textarea>
+
+                        {{ comment_form.content_type }}
+                        {{ comment_form.timestamp }}
+                        {{ comment_form.object_pk }}
+                        {{ comment_form.security_hash }}
+                        {{ comment_form.parent }}
+                        <p>
+                        <input type="submit" value="Post"/>
+                        </p>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="right_map_content">

@@ -65,7 +65,11 @@ INSTALLED_APPS = (
     'allauth.socialaccount.providers.google',
     'south',
     'corsheaders',
+    'threadedcomments',
+    'django.contrib.comments',
 )
+
+COMMENTS_APP = 'threadedcomments'
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -62,6 +62,7 @@ urlpatterns = patterns('',
 
     url(r'^news/feed/?$', views.feed, name='feed'),
     url(r'^search/', views.search, name='search'),
+    url(r'^articles/comments/', include('django.contrib.comments.urls')),
 
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
     url(r'^panel/mymaps/?$', views.ControlPanel, name='ControlPanel'),

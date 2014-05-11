@@ -44,6 +44,12 @@ hr {
   background: #74c2e7;
 }
 
+textarea {
+   resize: none;
+   background-image: url('/static/images/darkbg.svg');
+   border: 1px solid #74c2e7;
+}
+
 .hr-thick {
   border: 0;
   height: 3px;
