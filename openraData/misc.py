@@ -1,6 +1,11 @@
 from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
+from threadedcomments.models import Comment
+from openraData.models import Maps
+from openraData.models import Units
+from openraData.models import Mods
+from openraData.models import Screenshots
 
 def selectLicenceInfo(itemObject):
 	creative_commons = itemObject.policy_cc
@@ -79,3 +84,60 @@ def sizeof_fmt(disk_size):
 		if disk_size < 1024.0:
 			return "%3.1f %s" % (disk_size, x)
 		disk_size /= 1024.0
+
+def count_comments_for_many(mapObject, content):
+	comments = {}
+	for item in mapObject:
+		comments[str(item.id)] = 0
+		revs = Revisions(content)
+		revisions = revs.GetRevisions(item.id)
+		for rev in revisions:
+			commentObject = Comment.objects.filter(object_pk=str(rev))
+			for value in commentObject:
+				if value.content_type.name == content:
+					comments[str(item.id)] = comments[str(item.id)] + 1
+	return comments
+
+########## Revisions
+class Revisions():
+
+    def __init__(self, modelName):
+        self.revisions = []
+        self.modelName = modelName
+
+    def GetRevisions(self, itemid, seek_next=False):
+        if seek_next:
+            if self.modelName.lower() == "map":
+                itemObject = Maps.objects.get(id=itemid)
+            elif self.modelName.lower() == "unit":
+                itemObject = Units.objects.get(id=itemid)
+            elif self.modelName.lower() == "mod":
+                itemObject = Mods.objects.get(id=itemid)
+            if itemObject.next_rev == 0:
+                return
+            self.revisions.append(itemObject.next_rev)
+            self.GetRevisions(itemObject.next_rev, True)
+            return
+        self.revisions.insert(0, itemid)
+        if self.modelName.lower() == "map":
+            itemObject = Maps.objects.get(id=itemid)
+        elif self.modelName.lower() == "unit":
+            itemObject = Units.objects.get(id=itemid)
+        elif self.modelName.lower() == "mod":
+            itemObject = Mods.objects.get(id=itemid)
+        if itemObject.pre_rev == 0:
+            self.GetRevisions(self.revisions[-1], True)
+            return self.revisions
+        self.GetRevisions(itemObject.pre_rev)
+        return self.revisions
+
+    def GetLatestRevisionID(self, itemid):
+        if self.modelName.lower() == "map":
+            itemObject = Maps.objects.get(id=itemid)
+        elif self.modelName.lower() == "unit":
+            itemObject = Units.objects.get(id=itemid)
+        elif self.modelName.lower() == "mod":
+            itemObject = Mods.objects.get(id=itemid)
+        if itemObject.next_rev == 0:
+            return itemObject.id
+        return self.GetLatestRevisionID(itemObject.next_rev)

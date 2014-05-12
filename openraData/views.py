@@ -20,6 +20,7 @@ from .forms import AddScreenshotForm
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
+from threadedcomments.models import Comment
 from openraData import handlers, misc, triggers
 from openraData.models import Maps, Screenshots, Comments, Reports
 
@@ -100,6 +101,9 @@ def ControlPanel(request, page=1, filter=""):
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/panel/")
+
+    comments = misc.count_comments_for_many(mapObject, 'Map')
+
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'control_panel.html',
@@ -110,6 +114,7 @@ def ControlPanel(request, page=1, filter=""):
         'page': int(page),
         'range': [i+1 for i in range(rowsRange)],
         'amount_maps': amount,
+        'comments': comments,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -124,6 +129,9 @@ def maps(request, page=1, filter=""):
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/")
+
+    comments = misc.count_comments_for_many(mapObject, 'Map')
+
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'maps.html',
@@ -134,6 +142,7 @@ def maps(request, page=1, filter=""):
         'page': int(page),
         'range': [i+1 for i in range(rowsRange)],
         'amount': amount,
+        'comments': comments,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -148,6 +157,9 @@ def mapsFromAuthor(request, author, page=1):
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/author/%s/" % author)
+
+    comments = misc.count_comments_for_many(mapObject, 'Map')
+
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'mapsFromAuthor.html',
@@ -159,6 +171,7 @@ def mapsFromAuthor(request, author, page=1):
         'range': [i+1 for i in range(rowsRange)],
         'amount': amount,
         'author': author,
+        'comments': comments,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -548,7 +561,7 @@ def MapRevisions(request, arg, page=1):
     perPage = 20
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
-    revs = handlers.Revisions('maps')
+    revs = misc.Revisions('map')
     revisions = revs.GetRevisions(arg)
     mapObject = Maps.objects.filter(id__in=revisions).order_by('-posted')
     amount = len(mapObject)
@@ -556,6 +569,9 @@ def MapRevisions(request, arg, page=1):
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/%s/revisions/" % arg)
+
+    comments = misc.count_comments_for_many(mapObject, 'Map')
+
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'revisionsMap.html',
@@ -567,6 +583,7 @@ def MapRevisions(request, arg, page=1):
         'range': [i+1 for i in range(rowsRange)],
         'amount': amount,
         'arg': arg,
+        'comments': comments,
     })
     return StreamingHttpResponse(template.render(context))
 

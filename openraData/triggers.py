@@ -292,7 +292,7 @@ def GenerateFullPreview(mapObject, userObject):
 				ex_name = "maps",
 				posted =  timezone.now(),
 				map_preview = True,
-				)
+		)
 		transac.save()
 		os.chdir(currentDirectory)
 		return True

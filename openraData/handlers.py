@@ -367,51 +367,6 @@ class MapHandlers():
         logfile.close()
         return True
 
-########## Revisions
-
-class Revisions():
-
-    def __init__(self, modelName):
-        self.revisions = []
-        self.modelName = modelName
-
-    def GetRevisions(self, itemid, seek_next=False):
-        if seek_next:
-            if self.modelName.lower() == "maps":
-                itemObject = Maps.objects.get(id=itemid)
-            elif self.modelName.lower() == "units":
-                itemObject = Units.objects.get(id=itemid)
-            elif self.modelName.lower() == "mods":
-                itemObject = Mods.objects.get(id=itemid)
-            if itemObject.next_rev == 0:
-                return
-            self.revisions.append(itemObject.next_rev)
-            self.GetRevisions(itemObject.next_rev, True)
-            return
-        self.revisions.insert(0, itemid)
-        if self.modelName.lower() == "maps":
-            itemObject = Maps.objects.get(id=itemid)
-        elif self.modelName.lower() == "units":
-            itemObject = Units.objects.get(id=itemid)
-        elif self.modelName.lower() == "mods":
-            itemObject = Mods.objects.get(id=itemid)
-        if itemObject.pre_rev == 0:
-            self.GetRevisions(self.revisions[-1], True)
-            return self.revisions
-        self.GetRevisions(itemObject.pre_rev)
-        return self.revisions
-
-    def GetLatestRevisionID(self, itemid):
-        if self.modelName.lower() == "maps":
-            itemObject = Maps.objects.get(id=itemid)
-        elif self.modelName.lower() == "units":
-            itemObject = Units.objects.get(id=itemid)
-        elif self.modelName.lower() == "mods":
-            itemObject = Mods.objects.get(id=itemid)
-        if itemObject.next_rev == 0:
-            return itemObject.id
-        return self.GetLatestRevisionID(itemObject.next_rev)
-
 def addScreenshot(f, arg, user_id, item):
     if item == 'map':
         Object = Maps.objects.filter(id=arg)

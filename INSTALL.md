@@ -17,6 +17,7 @@ OpenRA.Utility and OpenRA.Lint
 django-registration module (easy_install -Z django-registration)
 django-allauth (pip install django-allauth)
 django-cors-headers (pip install django-cors-headers)
+django-threadedcomments (pip install django-threadedcomments)
 south (easy_install south)
 sendmail (or any other mail server)
 curl

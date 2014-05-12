@@ -27,3 +27,7 @@ register.filter('strip_tags', strip_tags)
 def proper_space(value):
 	return value.replace(" ", "%20")
 register.filter('proper_space', proper_space)
+
+def amount_comments(value, arg):
+	return str(value[str(arg)])
+register.filter('amount_comments', amount_comments)

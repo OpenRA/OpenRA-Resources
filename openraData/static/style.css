@@ -47,7 +47,8 @@ hr {
 textarea {
    resize: none;
    background-image: url('/static/images/darkbg.svg');
-   border: 1px solid #74c2e7;
+   border: 2px solid #74c2e7;
+   color: #fff;
 }
 
 .hr-thick {
@@ -955,6 +956,16 @@ p.registerInfo {
     }
     .map_tooltip .tooltip_value {
       width: 70%;
+      color: #f0f0f0;
+      padding: 1px 0;
+    }
+    .map_tooltip .tooltip_title_misc {
+      width: 35%;
+      color: #dfdfdf;
+      padding: 1px 0;
+    }
+    .map_tooltip .tooltip_value_misc {
+      width: 15%;
       color: #f0f0f0;
       padding: 1px 0;
     }
