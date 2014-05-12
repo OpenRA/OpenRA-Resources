@@ -20,7 +20,7 @@ from .forms import AddScreenshotForm
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from threadedcomments.models import Comment
+from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, triggers
 from openraData.models import Maps, Screenshots, Comments, Reports
 
@@ -102,7 +102,7 @@ def ControlPanel(request, page=1, filter=""):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/panel/")
 
-    comments = misc.count_comments_for_many(mapObject, 'Map')
+    comments = misc.count_comments_for_many(mapObject, 'map')
 
     template = loader.get_template('index.html')
     context = RequestContext(request, {
@@ -130,7 +130,7 @@ def maps(request, page=1, filter=""):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/")
 
-    comments = misc.count_comments_for_many(mapObject, 'Map')
+    comments = misc.count_comments_for_many(mapObject, 'map')
 
     template = loader.get_template('index.html')
     context = RequestContext(request, {
@@ -158,7 +158,7 @@ def mapsFromAuthor(request, author, page=1):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/author/%s/" % author)
 
-    comments = misc.count_comments_for_many(mapObject, 'Map')
+    comments = misc.count_comments_for_many(mapObject, 'map')
 
     template = loader.get_template('index.html')
     context = RequestContext(request, {
@@ -523,7 +523,7 @@ def DeleteMap(request, arg):
             pass
         Screenshots.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
         Reports.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
-        Comments.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
+        ThreadedComment.objects.filter(object_pk=mapObject.id, title='map').delete()
         if mapObject.pre_rev != 0:
             Maps.objects.filter(id=mapObject.pre_rev).update(next_rev=mapObject.next_rev)
         if mapObject.next_rev != 0:
@@ -570,7 +570,7 @@ def MapRevisions(request, arg, page=1):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/%s/revisions/" % arg)
 
-    comments = misc.count_comments_for_many(mapObject, 'Map')
+    comments = misc.count_comments_for_many(mapObject, 'map')
 
     template = loader.get_template('index.html')
     context = RequestContext(request, {

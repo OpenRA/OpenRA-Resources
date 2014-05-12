@@ -1,7 +1,7 @@
 from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
-from threadedcomments.models import Comment
+from threadedcomments.models import ThreadedComment
 from openraData.models import Maps
 from openraData.models import Units
 from openraData.models import Mods
@@ -92,10 +92,7 @@ def count_comments_for_many(mapObject, content):
 		revs = Revisions(content)
 		revisions = revs.GetRevisions(item.id)
 		for rev in revisions:
-			commentObject = Comment.objects.filter(object_pk=str(rev))
-			for value in commentObject:
-				if value.content_type.name == content:
-					comments[str(item.id)] = comments[str(item.id)] + 1
+			comments[str(item.id)] = len(ThreadedComment.objects.filter(title=content.lower(), object_pk=str(rev)))
 	return comments
 
 ########## Revisions
