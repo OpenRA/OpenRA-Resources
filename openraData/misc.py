@@ -53,8 +53,8 @@ def send_email_to_admin_OnMapFail(tempname):
 def send_email_to_admin_OnReport(args):
 	connection = mail.get_connection()
 	connection.open()
-	body = "Item: http://%s  By user_id: %s  Reason: %s  Infringement: %s" % (args['addr'], args['user_id'], args['reason'], args['infringement'])
-	email = mail.EmailMessage('OpenRA Resource Center - New Report', body, settings.ADMIN_EMAIL,
+	body = "Item: http://%s  \nBy user_id: %s  \nReason: %s  \nInfringement: %s" % (args['addr'], args['user_id'], args['reason'], args['infringement'])
+	email = mail.EmailMessage('OpenRA Resource Center(to admin) - New Report', body, settings.ADMIN_EMAIL,
                           [settings.ADMIN_EMAIL], connection=connection)
 	email.send()
 	connection.close()
@@ -65,7 +65,7 @@ def send_email_to_user_OnReport(args):
 		return False
 	connection = mail.get_connection()
 	connection.open()
-	body = "Your %s has been reported: %s  |  Reason: %s" % (args['resource_type'], args['addr'], args['reason'])
+	body = "Your %s has been reported: %s \nReason: %s" % (args['resource_type'], args['addr'], args['reason'])
 	email = mail.EmailMessage('OpenRA Resource Center - Your content has been reported', body, mail_addr,
                           [mail_addr], connection=connection)
 	email.send()
