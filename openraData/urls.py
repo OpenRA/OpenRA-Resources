@@ -31,6 +31,7 @@ urlpatterns = patterns('',
     url(r'^maps/(?P<arg>\d+)/rules/?$', views.serveYamlRules, name='printYamlRules'),
     url(r'^maps/(?P<arg>\d+)/lua/(?P<name>\w+)/?$', views.serveLua, name='printLua'),
     url(r'^maps/(?P<arg>\d+)/shp/(?P<name>[\w\d\W]+)/?$', views.serveMapSHP, name='printMapSHP'),
+    url(r'^maps/random/?$', views.randomMap, name='randomMap'),
 
     url(r'^units/?$', views.units, name='units'),
     url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),

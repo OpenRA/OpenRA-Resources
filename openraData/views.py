@@ -175,6 +175,11 @@ def mapsFromAuthor(request, author, page=1):
     })
     return StreamingHttpResponse(template.render(context))
 
+def randomMap(request):
+    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    mapObject = random.choice(mapObject)
+    return HttpResponseRedirect('/maps/'+str(mapObject.id))
+
 def displayMap(request, arg):
     if request.method == 'POST':
         if request.POST.get('reportReason', "").strip() != "":
