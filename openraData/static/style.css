@@ -233,6 +233,12 @@ table tr td {
   font-size: 0.9em;
 }
 
+.features {
+  text-align: center;
+  display: table;
+  margin: 10px auto;
+}
+
 #paging {
   text-align: center;
   display: table;
