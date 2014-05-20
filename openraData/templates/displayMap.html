@@ -351,6 +351,7 @@
 
                     $(".printYamlShow").on("click", function() {
                         $(".popupContainer").empty()
+                        $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>map.yaml</h3></div>'));
                         $.ajax({
                             url : "/maps/{{map.id}}/yaml/",
                             dataType: "text",
