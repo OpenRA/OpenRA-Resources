@@ -156,7 +156,7 @@
                                 <td>{{ map.revision }}</td>
                                 <td>{% if map.next_rev == 0 %}
                                         {% if map.user_id == request.user.id or request.user.is_superuser %}
-                                        <a href="/maps/upload/{{map.id}}/">Upload new revision</a>
+                                        <a href="/upload/map/{{map.id}}/">Upload new revision</a>
                                         {% else %}
                                         Nothing found
                                         {% endif %}

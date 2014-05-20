@@ -85,6 +85,7 @@
             </li>
         {% if user.is_authenticated %}
             <li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
+            <li><a href="/upload/map/"><span {% if '/upload' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload</span></a></li>
         {% else %}
             <li><a href="/accounts/login/"><span {% if request.path == '/accounts/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>
         {% endif %}
