@@ -180,6 +180,31 @@ def randomMap(request):
     mapObject = random.choice(mapObject)
     return HttpResponseRedirect('/maps/'+str(mapObject.id))
 
+def mostRatedMap(request):
+    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    mapObject = random.choice(mapObject)
+    return HttpResponseRedirect('/maps/'+str(mapObject.id))
+
+def mostCommentedMap(request):
+    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    mapObject = random.choice(mapObject)
+    return HttpResponseRedirect('/maps/'+str(mapObject.id))
+
+def mostViewedMap(request):
+    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    mapObject = random.choice(mapObject)
+    return HttpResponseRedirect('/maps/'+str(mapObject.id))
+
+def mostDownloadedMap(request):
+    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    mapObject = random.choice(mapObject)
+    return HttpResponseRedirect('/maps/'+str(mapObject.id))
+
+def activelyDevelopedMap(request):
+    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    mapObject = random.choice(mapObject)
+    return HttpResponseRedirect('/maps/'+str(mapObject.id))
+
 def displayMap(request, arg):
     if request.method == 'POST':
         if request.POST.get('reportReason', "").strip() != "":

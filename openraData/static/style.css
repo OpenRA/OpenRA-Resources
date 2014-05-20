@@ -566,28 +566,13 @@ table tr td {
   padding: 0 0 5px 0;
 }
 
-#screenshot {
-  position:relative;
-  height:350px;
+.screenshot {
+  max-height:350px;
 }
 
-#screenshot img {
-  position:absolute;
-  top:0;
-  left:0;
-  z-index:8;
-  padding: 0;
-  border: solid 2px #74c2e7;
+.screenshot img {
   max-width: 250px;
   max-height: 220px;
-}
-
-#screenshot IMG.active {
-  z-index:10;
-}
-
-#screenshot IMG.last-active {
-  z-index:9;
 }
 
 #ghbanner img {
