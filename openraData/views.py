@@ -6,6 +6,7 @@ import datetime
 import shutil
 import multiprocessing
 import random
+import operator
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
@@ -13,6 +14,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, Http404
 from django.db import connection
 from django.db.models import Count
+from django.db.models import Max
 from django.utils import timezone
 
 from .forms import UploadMapForm
@@ -23,6 +25,7 @@ from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, triggers
 from openraData.models import Maps, Screenshots, Comments, Reports
+from djangoratings.models import Score, Vote
 
 def index(request):
     scObject = Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
@@ -181,27 +184,32 @@ def randomMap(request):
     return HttpResponseRedirect('/maps/'+str(mapObject.id))
 
 def mostRatedMap(request):
-    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
-    mapObject = random.choice(mapObject)
-    return HttpResponseRedirect('/maps/'+str(mapObject.id))
+    max_rating = Vote.objects.all().aggregate(Max('score'))['score__max']
+    voteObject = Vote.objects.filter(score=max_rating)
+    voteObject = random.choice(voteObject)
+    return HttpResponseRedirect('/maps/'+str(voteObject.object_id))
 
 def mostCommentedMap(request):
-    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
-    mapObject = random.choice(mapObject)
-    return HttpResponseRedirect('/maps/'+str(mapObject.id))
+    mapObject = Maps.objects.filter(next_rev=0)
+    comments = misc.count_comments_for_many(mapObject, 'map')
+    mapid = max(comments.iteritems(), key=operator.itemgetter(1))[0]
+    return HttpResponseRedirect('/maps/'+mapid)
 
 def mostViewedMap(request):
-    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    max_viewed = Maps.objects.all().aggregate(Max('viewed'))['viewed__max']
+    mapObject = Maps.objects.filter(viewed=max_viewed)
     mapObject = random.choice(mapObject)
     return HttpResponseRedirect('/maps/'+str(mapObject.id))
 
 def mostDownloadedMap(request):
-    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    max_downloaded = Maps.objects.all().aggregate(Max('downloaded'))['downloaded__max']
+    mapObject = Maps.objects.filter(downloaded=max_downloaded)
     mapObject = random.choice(mapObject)
     return HttpResponseRedirect('/maps/'+str(mapObject.id))
 
 def activelyDevelopedMap(request):
-    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
+    max_developed = Maps.objects.all().aggregate(Max('revision'))['revision__max']
+    mapObject = Maps.objects.filter(revision=max_developed)
     mapObject = random.choice(mapObject)
     return HttpResponseRedirect('/maps/'+str(mapObject.id))
 
