@@ -60,7 +60,7 @@ def send_email_to_admin_OnReport(args):
 	connection.close()
 
 def send_email_to_user_OnReport(args):
-	mail_addr = User.objects.get(pk=args['owner_id']).email
+	mail_addr = misc.return_email(args['owner_id'])
 	if mail_addr == "":
 		return False
 	connection = mail.get_connection()
@@ -78,6 +78,10 @@ def send_email_to_user_OnLint(email_addr, body):
 						  [email_addr], connection=connection)
 	email.send()
 	connection.close()
+
+def return_email(userid):
+	mail_addr = User.objects.get(pk=userid).email
+	return mail_addr
 
 def sizeof_fmt(disk_size):
 	for x in ['bytes','KB','MB','GB','TB']:

@@ -213,9 +213,9 @@ def LintCheck(mapObject, http_host):
 			Maps.objects.filter(id=item.id).update(downloading=False)
 			if not item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
-				userObject = User.objects.get(pk=item.user_id)
-				if userObject.email != "":
-					misc.send_email_to_user_OnLint(userObject.email, "Lint check failed for one of your maps: http://"+http_host+"/maps/"+str(item.id)+"/")
+				mail_addr = misc.return_email(item.user_id)
+				if mail_addr != "":
+					misc.send_email_to_user_OnLint(mail_addr, "Lint check failed for one of your maps: http://"+http_host+"/maps/"+str(item.id)+"/")
 	os.chdir(cwd)
 	return status
 

@@ -24,8 +24,10 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, triggers
-from openraData.models import Maps, Screenshots, Comments, Reports
+from openraData.models import Maps, Screenshots, Reports
 from djangoratings.models import Score, Vote
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 
 def index(request):
     scObject = Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
@@ -246,6 +248,29 @@ def displayMap(request, arg):
             form = AddScreenshotForm(request.POST, request.FILES)
             if form.is_valid():
                 handlers.addScreenshot(request.FILES['scfile'], arg, request.user, 'map')
+        elif request.POST.get('comment', "") != "" and request.POST.get('name', "") != "" and request.POST.get('email', "") != "":
+            content_type = ContentType.objects.filter(name='Map')[0]
+            userObject = User.objects.filter(pk=request.user.id)
+            if not userObject:
+                userObject = None
+            else:
+                userObject = userObject[0]
+            transac = ThreadedComment(
+                content_type = content_type,
+                object_pk = int(request.POST['object_pk']),
+                user = userObject,
+                user_name = request.POST['name'],
+                user_email = request.POST['email'],
+                user_url = '',
+                comment = request.POST['comment'].strip(),
+                title = request.POST['title'],
+                submit_date = timezone.now(),
+                is_public = True,
+                is_removed = False,
+                site_id = 1,
+            )
+            transac.save()
+            return HttpResponseRedirect('/maps/'+arg)
     fullPreview = False
     disk_size = 0
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg

@@ -217,16 +217,13 @@
                         <a name="comments"></a>
                         <form action="/maps/{{map.id}}/#comments" method="post">{% csrf_token %}
                         {% if not user.is_authenticated %}
-                        {% if comment_form.name.errors %}<br />
-                        <span style="color: #ff0000; font-weight: bold;" class="error">{{ comment_form.name.errors|join:", " }}</span>{% endif %}
-                        <p><div><label for="id_name">Name:</label></div> <input id="id_name" maxlength="50" name="name" type="text" /></p>
+                            <p><div><label for="id_name">Name:</label></div> <input id="id_name" maxlength="50" name="name" type="text" /></p>
 
-                        {% if comment_form.email.errors %}<br />
-                        <span style="color: #ff0000; font-weight: bold;" class="error">{{ comment_form.email.errors|join:", " }}</span>{% endif %}
-                        <p><div><label for="id_email">Email address:</label></div> <input id="id_email" name="email" type="email" /></p>
+                            <p><div><label for="id_email">Email address:</label></div> <input id="id_email" name="email" type="email"/></p>
+                        {% else %}
+                            <input id="id_name" maxlength="50" name="name" type="hidden" value="{{user.username}}"/>
+                            <input id="id_email" name="email" type="hidden" value="{{user.email}}"/>
                         {% endif %}
-                        {% if comment_form.comment.errors %}<br />
-                        <span style="color: #ff0000; font-weight: bold;" class="error">{{ comment_form.comment.errors|join:", " }}</span>{% endif %}
                         <label for="id_comment"></label><textarea cols="40" id="id_comment" name="comment" rows="10"></textarea>
 
                         {{ comment_form.content_type }}
