@@ -372,6 +372,12 @@ def deleteScreenshot(request, itemid):
             return HttpResponseRedirect("/"+name+"/"+arg)
     return HttpResponseRedirect("/")
 
+def deleteComment(request, arg, itemname, itemid):
+    comObject = ThreadedComment.objects.filter(id=arg)
+    if comObject:
+        comObject[0].delete()
+    return HttpResponseRedirect("/"+itemname+"/"+itemid)
+
 def serveScreenshot(request, itemid, itemname=""):
     image = ""
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid

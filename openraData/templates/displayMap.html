@@ -1,4 +1,5 @@
             {% load customTags %}
+            {% load threadedcomments_tags %}
             <div id="map_data_container">
                 <div class="left_map_content">
 
@@ -211,8 +212,21 @@
                     <div class="cBlock">
                         {% load threadedcomments_tags %}
                         <h5>Comments [{% get_comment_count for map as amount_of_comments %}{{amount_of_comments}}] for {{ map.title }}:</h5><br />
+                        {% get_comment_list for map as comment_list %}
+                        {% for comment in comment_list|fill_tree|annotate_tree %}{% ifchanged comment.parent_id %}{% else %}</li>{% endifchanged %}{% if not comment.open and not comment.close %}</li>{% endif %}{% if comment.open %}
+                        <ul>{% endif %}
+                            <li id="c{{ comment.id }}">
+                                <dl class="comment">
+                                    <dt>
+                                        {{ comment.submit_date }} - {{ comment.name }} <a href="/deletecomment/{{comment.id}}/maps/{{map.id}}/" onClick='return confirmDelete("comment")' title='delete'>メ</a>
+                                    </dt>
+                                    <dd>
+                                        {{ comment.comment|linebreaks }}
+                                    </dd>
+                                </dl>
+                                {% for close in comment.close %}</li></ul>{% endfor %}
+                        {% endfor %}
 
-                        {% render_comment_list for map %}
                         {% get_comment_form for map as comment_form %}
                         <a name="comments"></a>
                         <form action="/maps/{{map.id}}/#comments" method="post">{% csrf_token %}

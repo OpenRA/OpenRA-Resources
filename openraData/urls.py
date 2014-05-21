@@ -58,6 +58,7 @@ urlpatterns = patterns('',
     url(r'^replays/?$', views.replays, name='replays'),
 
     url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
+    url(r'^deletecomment/(?P<arg>\d+)/(?P<itemname>\w+)/(?P<itemid>\w+)/?$', views.deleteComment, name='deleteComment'),
 
     url(r'^accounts/register/?$', RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),
         name='registration_register'), 
