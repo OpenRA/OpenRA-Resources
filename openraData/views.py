@@ -375,7 +375,8 @@ def deleteScreenshot(request, itemid):
 def deleteComment(request, arg, itemname, itemid):
     comObject = ThreadedComment.objects.filter(id=arg)
     if comObject:
-        comObject[0].delete()
+        if comObject[0].user == request.user or request.user.is_superuser:
+            comObject[0].delete()
     return HttpResponseRedirect("/"+itemname+"/"+itemid)
 
 def serveScreenshot(request, itemid, itemname=""):

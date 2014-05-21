@@ -212,13 +212,14 @@
                     <div class="cBlock">
                         {% load threadedcomments_tags %}
                         <h5>Comments [{% get_comment_count for map as amount_of_comments %}{{amount_of_comments}}] for {{ map.title }}:</h5><br />
+
                         {% get_comment_list for map as comment_list %}
                         {% for comment in comment_list|fill_tree|annotate_tree %}{% ifchanged comment.parent_id %}{% else %}</li>{% endifchanged %}{% if not comment.open and not comment.close %}</li>{% endif %}{% if comment.open %}
                         <ul>{% endif %}
                             <li id="c{{ comment.id }}">
                                 <dl class="comment">
                                     <dt>
-                                        {{ comment.submit_date }} - {{ comment.name }} <a href="/deletecomment/{{comment.id}}/maps/{{map.id}}/" onClick='return confirmDelete("comment")' title='delete'>メ</a>
+                                        {{ comment.submit_date }} - {{ comment.name }} {% if comment.user == request.user or request.user.is_superuser%}<a href="/deletecomment/{{comment.id}}/maps/{{map.id}}/" onClick='return confirmDelete("comment")' title='delete'>メ</a>{% endif %}
                                     </dt>
                                     <dd>
                                         {{ comment.comment|linebreaks }}
