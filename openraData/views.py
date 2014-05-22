@@ -24,7 +24,7 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, triggers
-from openraData.models import Maps, Screenshots, Reports
+from openraData.models import Maps, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions
 from djangoratings.models import Score, Vote
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -255,10 +255,10 @@ def displayMap(request, arg):
                 userObject = None
             else:
                 userObject = userObject[0]
-                if request.POST.get('email', "") != "":
-                    email = request.POST['email']
-                else:
-                    email = ""
+            if request.POST.get('email', "") != "":
+                email = request.POST['email']
+            else:
+                email = ""
             transac = ThreadedComment(
                 content_type = content_type,
                 object_pk = int(request.POST['object_pk']),
@@ -274,6 +274,67 @@ def displayMap(request, arg):
                 site_id = 1,
             )
             transac.save()
+            mapObj = Maps.objects.get(id=arg)
+            if request.user.id:
+                userID = request.user.id
+            else:
+                userID = 0
+            ntfObj = NotifyOfComments.objects.filter(object_type='map',object_id=arg).exclude(user=userID).exclude(user=mapObj.user_id)
+            for item in ntfObj:
+                singleUserOptions = UserOptions.objects.filter(user=item.user_id)
+                mail_addr = misc.return_email(item.user_id)
+                if not singleUserOptions:
+                    transac_uo = UserOptions(
+                        user = User.objects.get(pk=item.user_id),
+                        notifications_email = True,
+                        notifications_site = True,
+                    )
+                    transac_uo.save()
+                    transac_rc = ReadComments(
+                        owner = User.objects.get(pk=mapObj.user_id),
+                        object_type = 'map',
+                        object_id = arg,
+                        ifread = False,
+                    )
+                    transac_rc.save()
+                    if mail_addr:
+                        misc.send_email_to_user_OnComment('map', arg, mail_addr)
+                else:
+                    if singleUserOptions[0].notifications_email:
+                        if mail_addr:
+                            misc.send_email_to_user_OnComment('map', arg, mail_addr)
+                    if singleUserOptions[0].notifications_site:
+                        transac_rc = ReadComments(
+                            owner = User.objects.get(pk=mapObj.user_id),
+                            object_type = 'map',
+                            object_id = arg,
+                            ifread = False,
+                        )
+                        transac_rc.save()
+            ntfObj = NotifyOfComments.objects.filter(object_type='map',object_id=arg,user=userID)
+            if not ntfObj:
+                if userID != 0: # not anonymous
+                    transac_noc = NotifyOfComments(
+                        user = User.objects.get(pk=userID),
+                        object_type = 'map',
+                        object_id = arg,
+                    )
+                    transac_noc.save()
+            if mapObj.user_id != userID:
+                sOC = UserOptions.objects.filter(user=mapObj.user_id)
+                mail_addr = misc.return_email(mapObj.user_id)
+                if mail_addr:
+                    if sOC:
+                        if sOC[0].notifications_email:
+                            misc.send_email_to_user_OnComment('map', arg, mail_addr, 'owner')
+                    else:
+                        transac_uo = UserOptions(
+                            user = User.objects.get(pk=mapObj.user_id),
+                            notifications_email = True,
+                            notifications_site = True,
+                        )
+                        transac_uo.save()
+                        misc.send_email_to_user_OnComment('map', arg, mail_addr, 'owner')
             return HttpResponseRedirect('/maps/'+arg)
     fullPreview = False
     disk_size = 0

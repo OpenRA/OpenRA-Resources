@@ -80,6 +80,19 @@ def send_email_to_user_OnLint(email_addr, body):
 	email.send()
 	connection.close()
 
+def send_email_to_user_OnComment(itemtype, itemid, email_addr, info=""):
+	http_host = 'http://resource.openra.net'
+	connection = mail.get_connection()
+	connection.open()
+	if not info:
+		body = itemtype.title()+" you've commented, has some activity : " + http_host + "/maps/" + itemid
+	elif info == "owner":
+		body = "Your "+itemtype.title()+" has been commented: " + http_host + "/maps/" + itemid
+	email = mail.EmailMessage('OpenRA Resource Center - New Comment', body, email_addr,
+						  [email_addr], connection=connection)
+	email.send()
+	connection.close()
+
 def return_email(userid):
 	# it will have set value if it's social account and email is provided
 	mail_addr = User.objects.get(pk=userid).email

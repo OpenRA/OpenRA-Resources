@@ -10,7 +10,7 @@
                 });
             </script>
             <div class="upload_container">
-                <form action={{ '/maps/upload/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
+                <form action={{ '/upload/map/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
                     <table class="Table">
                         <tr>
                             {% if previous_rev == 0 %}
