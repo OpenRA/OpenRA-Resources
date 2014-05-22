@@ -219,7 +219,7 @@
                             <li id="c{{ comment.id }}">
                                 <dl class="comment">
                                     <dt>
-                                        {{ comment.submit_date }} - {{ comment.name }} {% if comment.user == request.user or request.user.is_superuser%}<a href="/deletecomment/{{comment.id}}/maps/{{map.id}}/" onClick='return confirmDelete("comment")' title='delete'>メ</a>{% endif %}
+                                        {{ comment.submit_date }} - {% autoescape off %}{{ comment.name|account_link:comment.user_id }}{% endautoescape %} {% if comment.user == request.user or request.user.is_superuser%}<a href="/deletecomment/{{comment.id}}/maps/{{map.id}}/" onClick='return confirmDelete("comment")' title='delete'>メ</a>{% endif %}
                                     </dt>
                                     <dd>
                                         {{ comment.comment|linebreaks }}

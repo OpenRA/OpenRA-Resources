@@ -248,19 +248,23 @@ def displayMap(request, arg):
             form = AddScreenshotForm(request.POST, request.FILES)
             if form.is_valid():
                 handlers.addScreenshot(request.FILES['scfile'], arg, request.user, 'map')
-        elif request.POST.get('comment', "") != "" and request.POST.get('name', "") != "" and request.POST.get('email', "") != "":
+        elif request.POST.get('comment', "") != "" and request.POST.get('name', "") != "":
             content_type = ContentType.objects.filter(name='Map')[0]
             userObject = User.objects.filter(pk=request.user.id)
             if not userObject:
                 userObject = None
             else:
                 userObject = userObject[0]
+                if request.POST.get('email', "") != "":
+                    email = request.POST['email']
+                else:
+                    email = ""
             transac = ThreadedComment(
                 content_type = content_type,
                 object_pk = int(request.POST['object_pk']),
                 user = userObject,
                 user_name = request.POST['name'],
-                user_email = request.POST['email'],
+                user_email = email,
                 user_url = '',
                 comment = request.POST['comment'].strip(),
                 title = request.POST['title'],

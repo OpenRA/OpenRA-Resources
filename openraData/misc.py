@@ -1,6 +1,7 @@
 from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
+from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
 from openraData.models import Maps
 from openraData.models import Units
@@ -80,8 +81,19 @@ def send_email_to_user_OnLint(email_addr, body):
 	connection.close()
 
 def return_email(userid):
+	# it will have set value if it's social account and email is provided
 	mail_addr = User.objects.get(pk=userid).email
 	return mail_addr
+
+def get_account_link(userid):
+	obj = SocialAccount.objects.filter(user_id=userid)
+	if obj:
+		if obj[0].provider == "google":
+			return obj[0].extra_data['link']
+		elif obj[0].provider == "github":
+			return obj[0].extra_data['html_url']
+	else:
+		return ""
 
 def sizeof_fmt(disk_size):
 	for x in ['bytes','KB','MB','GB','TB']:
