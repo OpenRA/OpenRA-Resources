@@ -31,6 +31,10 @@ from django.contrib.sites.models import Site
 
 def index(request):
     scObject = Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
+    if request.user.id:
+        newcomments = len(ReadComments.objects.filter(owner=request.user.id))
+    else:
+        newcomments = False
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'index_content.html',
@@ -38,6 +42,7 @@ def index(request):
         'http_host': request.META['HTTP_HOST'],
         'title': '',
         'screenshots': scObject,
+        'newcomments': newcomments,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -311,6 +316,14 @@ def displayMap(request, arg):
                             ifread = False,
                         )
                         transac_rc.save()
+            if not ntfObj:
+                transac_rc = ReadComments(
+                    owner = User.objects.get(pk=mapObj.user_id),
+                    object_type = 'map',
+                    object_id = arg,
+                    ifread = False,
+                )
+                transac_rc.save()
             ntfObj = NotifyOfComments.objects.filter(object_type='map',object_id=arg,user=userID)
             if not ntfObj:
                 if userID != 0: # not anonymous
@@ -860,6 +873,10 @@ def handle404(request):
     return StreamingHttpResponse(template.render(context))
 
 def profile(request):
+    if request.user.id:
+        newcomments = len(ReadComments.objects.filter(owner=request.user.id))
+    else:
+        newcomments = False
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
     mapObject = Maps.objects.filter(user_id=request.user.id,next_rev=0)
@@ -876,6 +893,7 @@ def profile(request):
         'title': ' - Profile',
         'amountMaps': amountMaps,
         'ifsocial': ifsocial,
+        'newcomments': newcomments,
     })
     return StreamingHttpResponse(template.render(context))
 
