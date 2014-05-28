@@ -184,7 +184,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			return response
 
 	elif arg == "sync":
-		mod = value
+		mod = arg1
 		if mod == "":
 			raise Http404
 		try:
@@ -202,7 +202,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		response['Access-Control-Allow-Origin'] = '*'
 		return response
 	elif arg == "syncall":
-		mod = value
+		mod = arg1
 		if mod == "":
 			raise Http404
 		mapObject = Maps.objects.filter(game_mod=mod.lower(),players__gte=1).distinct("map_hash")
@@ -438,7 +438,8 @@ def CrashLogs(request):
 	gameID = 0
 	desync = False
 	if request.method != 'POST':
-		raise Http404
+		return HttpResponseRedirect('https://github.com/ihptru/OpenRA/issues')
+
 	if not request.POST.get('gameID', False):
 		raise Http404
 	if not request.POST.get('description', False):

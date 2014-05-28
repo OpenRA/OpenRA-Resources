@@ -28,10 +28,11 @@ class ReadComments(models.Model):
     owner               = models.ForeignKey(User)
     object_type         = models.CharField(max_length=50)
     object_id           = models.IntegerField(default=0)
+    comment_id          = models.IntegerField(default=0)
     ifread              = models.BooleanField(default=False)
 
 class Maps(models.Model):
-    
+
     class Meta:
         verbose_name = 'Map'
 

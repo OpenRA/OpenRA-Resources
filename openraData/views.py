@@ -279,6 +279,7 @@ def displayMap(request, arg):
                 site_id = 1,
             )
             transac.save()
+            comment_id = transac.id
             mapObj = Maps.objects.get(id=arg)
             if request.user.id:
                 userID = request.user.id
@@ -299,6 +300,7 @@ def displayMap(request, arg):
                         owner = User.objects.get(pk=mapObj.user_id),
                         object_type = 'map',
                         object_id = arg,
+                        comment_id = comment_id,
                         ifread = False,
                     )
                     transac_rc.save()
@@ -313,6 +315,7 @@ def displayMap(request, arg):
                             owner = User.objects.get(pk=mapObj.user_id),
                             object_type = 'map',
                             object_id = arg,
+                            comment_id = comment_id,
                             ifread = False,
                         )
                         transac_rc.save()
@@ -321,6 +324,7 @@ def displayMap(request, arg):
                     owner = User.objects.get(pk=mapObj.user_id),
                     object_type = 'map',
                     object_id = arg,
+                    comment_id = comment_id,
                     ifread = False,
                 )
                 transac_rc.save()
