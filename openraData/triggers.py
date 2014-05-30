@@ -176,8 +176,6 @@ def PushMapsToRsyncDirs():
 				if item.next_rev == 0:
 					dest_maps = RSYNC_MAP_PATH + item.game_mod.lower() + '/' + str(item.id) + '.oramap'
 					os.link(src, dest_maps)
-					sc = '/usr/local/bin/openra-restart-idle.sh'
-					proc_temp = Popen(sc, stdout=PIPE).communicate()
 				dest_api_maps = RSYNC_MAP_API_PATH + item.map_hash + '_' + os.path.splitext(fname)[0] + '-' + str(item.revision) + '.oramap'
 				os.link(src, dest_api_maps)
 				break
