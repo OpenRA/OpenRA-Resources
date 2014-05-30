@@ -61,7 +61,7 @@ def send_email_to_admin_OnReport(args):
 	connection.close()
 
 def send_email_to_user_OnReport(args):
-	mail_addr = misc.return_email(args['owner_id'])
+	mail_addr = return_email(args['owner_id'])
 	if mail_addr == "":
 		return False
 	connection = mail.get_connection()
