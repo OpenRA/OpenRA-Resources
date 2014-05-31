@@ -19,10 +19,10 @@
    enable-background="new 0 0 134 134"
    xml:space="preserve"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="open-ra-org.svg"><metadata
+   sodipodi:docname="openra-net.svg"><metadata
      id="metadata3043"><rdf:RDF><cc:Work
          rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
      id="defs3041" /><sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -38,7 +38,7 @@
      showgrid="false"
      inkscape:zoom="2.3548316"
      inkscape:cx="-1.582398"
-     inkscape:cy="67.212329"
+     inkscape:cy="67.636987"
      inkscape:window-x="-3"
      inkscape:window-y="-3"
      inkscape:window-maximized="1"
@@ -57,5 +57,7 @@
      transform="matrix(0.7071,0.7071,-0.7071,0.7071,44.5088,29.4959)"
      font-size="16"
      id="text3037"
-     style="font-size:16px;fill:#ffffff;fill-opacity:1;font-family:MyriadPro-Bold">openra.net</text>
+     style="font-size:16px;fill:#ffffff;fill-opacity:1;font-family:MyriadPro-Bold"><tspan
+       style="-inkscape-font-specification:DejaVu Sans Bold;font-family:DejaVu Sans;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal"
+       id="tspan3037">openra.net</tspan></text>
 </svg>
