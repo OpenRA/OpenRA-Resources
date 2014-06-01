@@ -1,3 +1,4 @@
+            {% load customTags %}
             <h2>Found {{ amount }} revisions</h2>
             {% if amount != 0 %}
             <div id="map_grid">
@@ -19,13 +20,19 @@
                                     <td class="tooltip_title">Uploader: </td>
                                     <td class="tooltip_value">{{ item.user }}</td>
                                 </tr>
+                            </table>
+                            <table>
                                 <tr>
-                                    <td class="tooltip_title"><b>Revision: </b></td>
-                                    <td class="tooltip_value"><b>{{ item.revision }}</b></td>
+                                    <td class="tooltip_title_misc"><b>Revision: </b></td>
+                                    <td class="tooltip_value_misc"><b>{{ item.revision }}</b></td>
+                                    <td class="tooltip_title_misc">Players: </td>
+                                    <td class="tooltip_value_misc">{{ item.players }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="tooltip_title">Players: </td>
-                                    <td class="tooltip_value">{{ item.players }}</td>
+                                    <td class="tooltip_title_misc">Comments: </td>
+                                    <td class="tooltip_value_misc">{{ comments|amount_comments:item.id }}</td>
+                                    <td class="tooltip_title_misc">Rating: </td>
+                                    <td class="tooltip_value_misc">0</td>
                                 </tr>
                             </table>
                         </div>

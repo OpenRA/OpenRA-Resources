@@ -1,7 +1,7 @@
+        {% load customTags %}
         <div id="panel_content">
             <nav class="side_nav">
                 <ul>
-                    <li><a href="/panel/" {% if '/panel/' == request.path %}{{'class="nav-selected"'}}{% endif %}>Upload</a></li>
                     <li><a href="/panel/mymaps/" {% if '/panel/mymaps/' in request.path %}{{'class="nav-selected"'}}{% endif %}>My Maps ({{ amount_maps }})</a></li>
                     <li><a style="opacity: 0.5;" href="#" {% if '/panel/myunits/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Units (0)</a></li>
                     <li><a style="opacity: 0.5;" href="#" {% if '/panel/mymods/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Mods (0)</a></li>
@@ -11,9 +11,6 @@
             </nav>
 
             <div class="side_nav_content">
-            {% if '/panel/' == request.path %}
-                <a href="/maps/upload/">Upload</a>
-            {% endif %}
             {% if '/panel/mymaps/' in request.path %}
                 {% if amount_maps != 0 %}
                 <div id="map_grid">
@@ -31,13 +28,19 @@
                                     <td class="tooltip_title">Author: </td>
                                     <td class="tooltip_value">{{ item.author }} </td>
                                 </tr>
+                            </table>
+                            <table>
                                 <tr>
-                                    <td class="tooltip_title">Revision: </td>
-                                    <td class="tooltip_value">{{ item.revision }}</td>
+                                    <td class="tooltip_title_misc">Revision: </td>
+                                    <td class="tooltip_value_misc">{{ item.revision }}</td>
+                                    <td class="tooltip_title_misc">Players: </td>
+                                    <td class="tooltip_value_misc">{{ item.players }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="tooltip_title">Players: </td>
-                                    <td class="tooltip_value">{{ item.players }}</td>
+                                    <td class="tooltip_title_misc">Comments: </td>
+                                    <td class="tooltip_value_misc">{{ comments|amount_comments:item.id }}</td>
+                                    <td class="tooltip_title_misc">Rating: </td>
+                                    <td class="tooltip_value_misc">0</td>
                                 </tr>
                             </table>
                         </div>

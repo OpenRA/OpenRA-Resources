@@ -1,6 +1,7 @@
 import re
 from HTMLParser import HTMLParser
 from django import template
+from openraData import misc
 
 register = template.Library()
 
@@ -27,3 +28,15 @@ register.filter('strip_tags', strip_tags)
 def proper_space(value):
 	return value.replace(" ", "%20")
 register.filter('proper_space', proper_space)
+
+def amount_comments(value, arg):
+	return str(value[str(arg)])
+register.filter('amount_comments', amount_comments)
+
+def account_link(value, arg):
+	account = misc.get_account_link(arg)
+	if account != "":
+		return "<a href='"+account+"' target='_blank'>"+value+"</a>"
+	else:
+		return value
+register.filter('account_link', account_link)

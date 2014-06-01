@@ -44,6 +44,13 @@ hr {
   background: #74c2e7;
 }
 
+textarea {
+   resize: none;
+   background-image: url('/static/images/darkbg.svg');
+   border: 2px solid #74c2e7;
+   color: #fff;
+}
+
 .hr-thick {
   border: 0;
   height: 3px;
@@ -224,6 +231,12 @@ p.download, .newsDetails {
 
 table tr td {
   font-size: 0.9em;
+}
+
+.features {
+  text-align: center;
+  display: table;
+  margin: 10px auto;
 }
 
 #paging {
@@ -553,28 +566,13 @@ table tr td {
   padding: 0 0 5px 0;
 }
 
-#screenshot {
-  position:relative;
-  height:350px;
+.screenshot {
+  max-height:350px;
 }
 
-#screenshot img {
-  position:absolute;
-  top:0;
-  left:0;
-  z-index:8;
-  padding: 0;
-  border: solid 2px #74c2e7;
+.screenshot img {
   max-width: 250px;
   max-height: 220px;
-}
-
-#screenshot IMG.active {
-  z-index:10;
-}
-
-#screenshot IMG.last-active {
-  z-index:9;
 }
 
 #ghbanner img {
@@ -949,6 +947,16 @@ p.registerInfo {
     }
     .map_tooltip .tooltip_value {
       width: 70%;
+      color: #f0f0f0;
+      padding: 1px 0;
+    }
+    .map_tooltip .tooltip_title_misc {
+      width: 35%;
+      color: #dfdfdf;
+      padding: 1px 0;
+    }
+    .map_tooltip .tooltip_value_misc {
+      width: 15%;
       color: #f0f0f0;
       padding: 1px 0;
     }

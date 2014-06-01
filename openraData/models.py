@@ -11,8 +11,28 @@ class UserOptions(models.Model):
     notifications_email = models.BooleanField(default=False)
     notifications_site  = models.BooleanField(default=True)
 
+class NotifyOfComments(models.Model):
+
+    class Meta:
+        verbose_name = 'NotifyOfComment'
+
+    user                = models.ForeignKey(User)
+    object_type         = models.CharField(max_length=50)
+    object_id           = models.IntegerField(default=0)
+
+class ReadComments(models.Model):
+
+    class Meta:
+        verbose_name = 'ReadComment'
+
+    owner               = models.ForeignKey(User)
+    object_type         = models.CharField(max_length=50)
+    object_id           = models.IntegerField(default=0)
+    comment_id          = models.IntegerField(default=0)
+    ifread              = models.BooleanField(default=False)
+
 class Maps(models.Model):
-    
+
     class Meta:
         verbose_name = 'Map'
 
@@ -121,17 +141,6 @@ class Reports(models.Model):
     ex_id               = models.IntegerField(default=0)
     ex_name             = models.CharField(max_length=16)
     infringement        = models.BooleanField(default=False)
-    posted              = models.DateTimeField('date published')
-
-class Comments(models.Model):
-
-    class Meta:
-        verbose_name = 'Comment'
-
-    user                = models.ForeignKey(User)
-    message             = models.CharField(max_length=400)
-    ex_id               = models.IntegerField(default=0)
-    ex_name             = models.CharField(max_length=16)
     posted              = models.DateTimeField('date published')
 
 class Screenshots(models.Model):

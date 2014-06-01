@@ -153,7 +153,7 @@ def UnzipMap(mapObject):
 	return True
 
 def PushMapsToRsyncDirs():
-	# this function syncs rsync directories with fresh list of maps, triggered by uploading a new map
+	# this function syncs rsync directories with fresh list of maps, triggered by uploading a new map or removing one
 	if settings.RSYNC_MAP_PATH.strip() == "":
 		return
 	mods = Maps.objects.values_list('game_mod', flat=True).distinct()
@@ -213,9 +213,9 @@ def LintCheck(mapObject, http_host):
 			Maps.objects.filter(id=item.id).update(downloading=False)
 			if not item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
-				userObject = User.objects.get(pk=item.user_id)
-				if userObject.email != "":
-					misc.send_email_to_user_OnLint(userObject.email, "Lint check failed for one of your maps: http://"+http_host+"/maps/"+str(item.id)+"/")
+				mail_addr = misc.return_email(item.user_id)
+				if mail_addr != "":
+					misc.send_email_to_user_OnLint(mail_addr, "Lint check failed for one of your maps: http://"+http_host+"/maps/"+str(item.id)+"/")
 	os.chdir(cwd)
 	return status
 
@@ -292,7 +292,7 @@ def GenerateFullPreview(mapObject, userObject):
 				ex_name = "maps",
 				posted =  timezone.now(),
 				map_preview = True,
-				)
+		)
 		transac.save()
 		os.chdir(currentDirectory)
 		return True

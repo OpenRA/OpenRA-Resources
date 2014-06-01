@@ -36,6 +36,7 @@
     {% if user.is_authenticated %}
         <a class="userManageTop" style="text-decoration: underline;" href="/accounts/logout/">Sign out</a>
         <a class="userManageTop" style="text-decoration: underline; padding-right: 30px;" href="/accounts/profile/">Profile ({{ user.username}})</a>
+        {% if newcomments %}<a class="userManageTop" style="text-decoration: none; padding-right: 30px;" href="#">[{{newcomments}}] <span style="text-decoration: underline;">Comments</span></a>{% endif %}
     {% endif %}
     </div>
 
@@ -85,6 +86,7 @@
             </li>
         {% if user.is_authenticated %}
             <li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
+            <li><a href="/upload/map/"><span {% if '/upload' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload</span></a></li>
         {% else %}
             <li><a href="/accounts/login/"><span {% if request.path == '/accounts/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>
         {% endif %}

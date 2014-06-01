@@ -1,9 +1,9 @@
         <div class="top_content">
             <div id="mainleft">
-                <div id="screenshot">
+                <div class="screenshot">
                     {% for item in screenshots %}
                     <a href="/{{item.ex_name}}/{{item.ex_id}}/">
-                        <img src="/screenshots/{{item.id}}/mini/" alt="screenshot" style="opacity: 0;" />
+                        <img src="/screenshots/{{item.id}}/mini/" alt="screenshot" />
                     </a>
                     {% endfor %}
                 </div>
@@ -25,35 +25,43 @@
         <div>
             <p>If you created a new map and want to play it with other players, you just have to:</p>
             <ul>
-                <li><a href="/maps/upload/">Upload the map here</a>.</li>
+                <li><a href="/upload/map/">Upload the map here</a>.</li>
                 <li>Create a new game and select your map.</li>
                 <li>Other players joining can download the map in-game directly from this website.</li>
             </ul>
-            <p><b>Note:</b> Some OpenRA dedicated servers are set up to automatically <a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Sync-maps-over-RSYNC-%28for-dedicated-servers%29">synchronize the map folder</a> with the whole archive of this website.</p>
+            <p><b>Note:</b> Some OpenRA dedicated servers are set up to automatically <a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Sync-maps-over-RSYNC-%28for-dedicated-servers%29" target="_blank">synchronize the map folder</a> with the whole archive of this website.</p>
         </div>
 
         <script>
-            function nextSlide() {
-                var x = $('#screenshot img:not(.active)')
-                return $(x[Math.floor(Math.random() * x.length)])
+        (function($){ 
+            $.fn.image_fader = function(user_options) {
+                var container = $(this);
+                var links = container.find("a");
+                var linkI = -1;
+                var default_options = {
+                    path: "",
+                    duration: 10000
+                };
+                var options = $.extend(default_options, user_options);
+                var show = function(){
+                    linkI ++;
+                    if( linkI >= links.size()) linkI = 0;
+                    links.eq(linkI).fadeIn(500, delay);
+                };
+                var delay = function(){
+                    links.eq(linkI).animate({opacity:100}, options.duration , hide).addClass("current_link");
+                };
+                var hide = function(){
+                    links.eq(linkI).hide(500, function(){
+                        $(this).removeClass("current_link");
+                        show();
+                    });
+                };
+                $(links).hide();
+                show();
             }
-
-            function slideSwitch() {
-                var active = $('#screenshot img.active')
-                if (active.length == 0)
-                    active = nextSlide()
-                var next = nextSlide()
-                active.addClass('last-active')
-
-                $("img.last-active").animate({opacity: 0.0}, 1000, function() {
-                    next.css({opacity: 0.0}).addClass('active').animate({opacity: 1.0}, 1000, function() {
-                      active.removeClass('active last-active')
-                    })
-                })
-            }
-
-            $(function() { 
-                $("#screenshot img:first").css({opacity: 1.0})
-                setInterval("slideSwitch()", 10000);
-            })
+        })(jQuery);
+        jQuery(document).ready(function(){
+            $(".screenshot").image_fader();
+        });
         </script>

@@ -184,7 +184,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			return response
 
 	elif arg == "sync":
-		mod = value
+		mod = arg1
 		if mod == "":
 			raise Http404
 		try:
@@ -202,7 +202,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		response['Access-Control-Allow-Origin'] = '*'
 		return response
 	elif arg == "syncall":
-		mod = value
+		mod = arg1
 		if mod == "":
 			raise Http404
 		mapObject = Maps.objects.filter(game_mod=mod.lower(),players__gte=1).distinct("map_hash")
@@ -319,35 +319,33 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		id: {1}
 		title: {2}
 		description: {3}
-		info: {4}
-		author: {5}
-		map_type: {6}
-		players: {7}
-		game_mod: {8}
-		width: {9}
-		height: {10}
-		bounds: {11}
-		spawnpoints: {12}
-		tileset: {13}
-		revision: {14}
-		last_revision: {15}
-		requires_upgrade: {16}
-		advanced_map: {17}
-		lua: {18}
-		posted: {19}
-		viewed: {20}
-		downloaded: {21}
-		rating_votes: {22}
-		rating_score: {23}
-		license: {24}
-		minimap: {25}
-		url: {26}
-		downloading: {27}\n""".format(
+		author: {4}
+		map_type: {5}
+		players: {6}
+		game_mod: {7}
+		width: {8}
+		height: {9}
+		bounds: {10}
+		spawnpoints: {11}
+		tileset: {12}
+		revision: {13}
+		last_revision: {14}
+		requires_upgrade: {15}
+		advanced_map: {16}
+		lua: {17}
+		posted: {18}
+		viewed: {19}
+		downloaded: {20}
+		rating_votes: {21}
+		rating_score: {22}
+		license: {23}
+		minimap: {24}
+		url: {25}
+		downloading: {26}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
 		mapObject.title,
 		mapObject.description,
-		mapObject.info,
 		mapObject.author,
 		mapObject.map_type,
 		mapObject.players,
@@ -438,7 +436,8 @@ def CrashLogs(request):
 	gameID = 0
 	desync = False
 	if request.method != 'POST':
-		raise Http404
+		return HttpResponseRedirect('https://github.com/ihptru/OpenRA/issues')
+
 	if not request.POST.get('gameID', False):
 		raise Http404
 	if not request.POST.get('description', False):
