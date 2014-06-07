@@ -228,17 +228,12 @@
                                 {% for close in comment.close %}</li></ul>{% endfor %}
                         {% endfor %}
 
+                        {% if user.is_authenticated %}
                         {% get_comment_form for map as comment_form %}
                         <a name="comments"></a>
                         <form action="/maps/{{map.id}}/#comments" method="post">{% csrf_token %}
-                        {% if not user.is_authenticated %}
-                            <p><div><label for="id_name">Name:</label></div> <input id="id_name" maxlength="50" name="name" type="text" /></p>
-
-                            <p><div><label for="id_email">Email address:</label></div> <input id="id_email" name="email" type="email"/></p>
-                        {% else %}
                             <input id="id_name" maxlength="50" name="name" type="hidden" value="{{user.username}}"/>
                             <input id="id_email" name="email" type="hidden" value="{{user.email}}"/>
-                        {% endif %}
                         <label for="id_comment"></label><textarea cols="40" id="id_comment" name="comment" rows="10"></textarea>
 
                         {{ comment_form.content_type }}
@@ -251,6 +246,7 @@
                         <button type="submit">Post</button>
                         </p>
                         </form>
+                        {% endif %}
                     </div>
                 </div>
 
