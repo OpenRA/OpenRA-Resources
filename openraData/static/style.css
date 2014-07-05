@@ -47,7 +47,7 @@ hr {
 textarea {
    resize: none;
    background-image: url('/static/images/darkbg.svg');
-   border: 2px solid #74c2e7;
+   border: 1px solid #74c2e7;
    color: #fff;
 }
 
@@ -68,12 +68,17 @@ textarea {
 }
 
 .cBlock {
-  border: 2px solid #74c2e7;
+  border: 1px solid #74c2e7;
   padding: 8px;
   margin: 12px 0 0;
   background: rgba(32, 44, 69, 0.4);
 }
 
+.cBlockNoPadding {
+  border: 1px solid #74c2e7;
+  margin: 12px 0 0;
+  background: rgba(32, 44, 69, 0.4);
+}
 /* Popup */
 .popup {
   display: none;
@@ -988,7 +993,7 @@ p.registerInfo {
       }
       .left_map_content .map_title .author {
         padding: 4px 0 0 0;
-        width: 158px;
+        width: 150px;
         word-break: break-word;
         float: right;
       }
@@ -999,13 +1004,18 @@ p.registerInfo {
       }
         .map_download .button {
           padding: 6px 16px;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+          box-shadow: 0px 0px 10px #71A0FF;
+        }
+        .map_download .button:hover {
+          box-shadow: inset 0px 0px 10px rgba(0,0,0,0.3);
         }
     .left_map_content .notification_container {
       position: absolute;
       top: 54px;
     }
       .notification_container .notification {
-        width: 88px;
+        width: 83px;
         background: #0a93d7;
         padding: 6px 20px;
         margin: 0 0 10px 4px;
@@ -1039,7 +1049,7 @@ p.registerInfo {
           padding: 6px;
           position: absolute;
           z-index: 11;
-          left: 128px;
+          left: 123px;
           top: -110%;
           width: 230px;
           min-height: 90px;
@@ -1063,7 +1073,7 @@ p.registerInfo {
       margin: 0;
 
       position: relative;
-      border: 2px dashed #74c2e7;
+      border: 1px dashed #74c2e7;
     }
       .left_map_content .map_image_container .map_image {
         vertical-align:middle;
@@ -1076,14 +1086,32 @@ p.registerInfo {
           display: block;
           margin: 0 auto;
         }
-    .map_hash {
-      text-align: right;
-      margin: 15px 0 0;
+    .map_hash_block {
+      position: relative;
     }
-      .map_hash h5 {
-        position: absolute;
-        left: 100px;
+      .map_hash_block_element {
+        display: inline-block;
+        border-right: 1px solid #74c2e7;
+        margin-right: -3px;
       }
+        .map_hash_block_element a {
+          display: block;
+          padding: 7px;
+          text-decoration: none;
+        }
+        .map_hash_block_element a:hover {
+          background-color: rgba(0, 0, 0, 0.2);
+        }
+      .map_hash {
+        display: inline-block;
+        text-align: right;
+        float: right;
+        padding: 7px;
+      }
+        .map_hash h5 {
+          position: absolute;
+          left: 100px;
+        }
     .map_description {
       position: relative;
     }
@@ -1091,6 +1119,9 @@ p.registerInfo {
       }
     .map_revisions {
       text-align: center;
+    }
+    .map_revisions a img {
+      max-width: 170px;
     }
     .map_license {
     }
@@ -1144,7 +1175,10 @@ p.registerInfo {
   .right_map_content {
     float: right;
     position: relative;
-    width: 30%;
+    width: 27%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid #74C2E7;
+    padding: 10px;
   }
     .right_map_content .map_data_label {
       width: 43%;
@@ -1162,6 +1196,25 @@ p.registerInfo {
       text-align: left;
       padding: 0 0 1px;
       font-size: 0.9em;
+      vertical-align: top;
+    }
+    .right_map_content .map_data_link {
+      width: 100%;
+      color: #f0f0f0;
+      text-align: center;
+      padding: 0 0 1px;
+      font-size: 0.9em;
+      border: 1px solid #74C2E7;
+      margin-top: -1px;
+    }
+    .right_map_content .map_data_link a {
+      display: block;
+      height: 25px;
+      line-height: 25px;
+      text-decoration: none;
+    }
+    .right_map_content .map_data_link a:hover {
+      background-color: rgba(0, 0, 0, 0.2);
     }
       .editMapInfo {
       }
@@ -1224,7 +1277,7 @@ p.registerInfo {
         .side_img_links .side_img_link a {
           display: block;
         }
-    .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua, .showLintLog, .addScreenshot {
+    .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua, .showLintLog, .addScreenshot, .change_downloading_status, .change_sync_status {
       cursor: pointer;
     }
     .reportCopyright {
@@ -1247,4 +1300,10 @@ p.registerInfo {
   font-size: 0.9em;
   float: right;
   padding-top: 50px;
+}
+
+/* */
+.integration {
+  color: #ff0000;
+  font-weight: bold;
 }

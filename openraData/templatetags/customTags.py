@@ -40,3 +40,7 @@ def account_link(value, arg):
 	else:
 		return value
 register.filter('account_link', account_link)
+
+def map_real_size(value):
+	return "x".join(value.split(',')[2:])
+register.filter('map_real_size', map_real_size)
