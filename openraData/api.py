@@ -219,7 +219,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		# serve application/zip by hash
 		oramap = ""
 		try:
-			mapObject = Maps.objects.get(map_hash=arg)
+			mapObject = Maps.objects.filter(map_hash=arg)[0]
 		except:
 			raise Http404
 		if not mapObject.downloading:

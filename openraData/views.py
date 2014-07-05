@@ -409,7 +409,11 @@ def displayMap(request, arg):
         mapsFromAuthor = random.sample(mapsFromAuthor, len(mapsFromAuthor))
 
     similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(id=mapObject.id)[0:8]
-    
+
+    duplicates = Maps.objects.filter(map_hash=mapObject.map_hash).exclude(id=mapObject.id)
+    if duplicates:
+        duplicates = True
+
     screenshots = Screenshots.objects.filter(ex_name="maps",ex_id=arg)
 
     license, icons = misc.selectLicenceInfo(mapObject)
@@ -436,6 +440,7 @@ def displayMap(request, arg):
         'screenshots': screenshots,
         'shpNames': shpNames,
         'disk_size': disk_size,
+        'duplicates': duplicates,
     })
     return StreamingHttpResponse(template.render(context))
 
