@@ -11,6 +11,7 @@ from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpRespons
 from django.db.models import Count
 
 from openraData.models import Maps
+from openraData.models import Reports
 from openraData.models import CrashReports
 from django.contrib.auth.models import User
 from openraData import misc
@@ -118,10 +119,16 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		mod = arg1
 		if mod == "":
 			raise Http404
-		if arg2 not in ["rating", "-rating", "players", "-players", "posted", "-posted", "author", "uploader"]:
+		if arg2 not in ["rating", "-rating", "players", "-players", "posted", "-posted", "author", "uploader", ""]:
 			raise Http404
 		try:
 			mapObject = Maps.objects.filter(game_mod=mod.lower(),players__gte=1,requires_upgrade=False,downloading=True).distinct('map_hash')
+			mapObjectCopy = []
+			for item in mapObject:
+				reportObject = Reports.objects.filter(ex_id=item.id,ex_name="maps")
+				if len(reportObject) < 3:
+					mapObjectCopy.append(item)
+			mapObject = mapObjectCopy
 			if arg2 == "players":
 				mapObject = sorted(mapObject, key=lambda x: (x.players), reverse=True)
 			if arg2 == "-players":
@@ -190,6 +197,12 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		try:
 			mapObject = Maps.objects.filter(game_mod=mod.lower()).filter(next_rev=0,players__gte=1)
 			mapObject = mapObject.filter(requires_upgrade=False).filter(downloading=True).distinct("map_hash")
+			mapObjectCopy = []
+			for item in mapObject:
+				reportObject = Reports.objects.filter(ex_id=item.id,ex_name="maps")
+				if len(reportObject) < 3:
+					mapObjectCopy.append(item)
+			mapObject = mapObjectCopy
 			mapObject = sorted(mapObject, key=lambda x: (x.id))
 			if not mapObject:
 				raise Http404
@@ -223,6 +236,11 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		except:
 			raise Http404
 		if not mapObject.downloading:
+			raise Http404
+		if mapObject.requires_upgrade:
+			raise Http404
+		reportObject = Reports.objects.filter(ex_id=mapObject.id,ex_name="maps")
+		if len(reportObject) >= 3:
 			raise Http404
 		path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id)
 		try:
@@ -314,6 +332,16 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		license = "Creative Commons " + license
 	else:
 		license = "null"
+	downloading = True
+	if mapObject.requires_upgrade:
+		downloading = False
+	if not mapObject.downloading:
+		downloading = False
+	if mapObject.players == 0:
+		downloading = False
+	reportObject = Reports.objects.filter(ex_id=mapObject.id,ex_name="maps")
+	if len(reportObject) >= 3:
+		downloading = False
 	if yaml:
 		response_data = """{0}:
 		id: {1}
@@ -368,7 +396,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		license,
 		minimap,
 		url,
-		mapObject.downloading,
+		downloading,
 		).replace("\t\t","\t")
 		return response_data
 	response_data = {}
@@ -399,7 +427,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	response_data['license'] = license
 	response_data['minimap'] = minimap
 	response_data['url'] = url
-	response_data['downloading'] = mapObject.downloading
+	response_data['downloading'] = downloading
 	return response_data
 
 def get_minimap(mapid, soft=False):

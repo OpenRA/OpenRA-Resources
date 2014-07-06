@@ -226,8 +226,6 @@ def displayMap(request, arg):
             checkReports = Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name='maps')
             if not checkReports:
                 checkReports = Reports.objects.filter(ex_id=arg, ex_name='maps')
-                if len(checkReports) >= 2:
-                    Maps.objects.filter(id=arg).update(downloading=False)
                 infringement = request.POST.get('infringement', False)
                 if infringement == "true":
                     infringement = True
@@ -698,6 +696,20 @@ def DeleteMap(request, arg):
         'mapAuthor': mapAuthor,
     })
     return StreamingHttpResponse(template.render(context))
+
+def SetDownloadingStatus(request, arg):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/maps/'+arg)
+    try:
+        mapObject = Maps.objects.get(id=arg)
+    except:
+        return HttpResponseRedirect('/maps/')
+    if mapObject.user_id == request.user.id or request.user.is_superuser:
+        if mapObject.downloading:
+            Maps.objects.filter(id=arg).update(downloading=False)
+        else:
+            Maps.objects.filter(id=arg).update(downloading=True)
+    return HttpResponseRedirect('/maps/'+arg)
 
 def addScreenshot(request, arg, item):
     if item == 'map':

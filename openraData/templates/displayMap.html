@@ -27,20 +27,18 @@
                             <label class="x"></label>
                             <div class="notification_label">Attention!</div>
                             <div class="notification_tooltip">
-                                {% if map.players == 0 %}
-                                <div>Map is unplayable! Max slots: 0</div>
-                                {% else %}
                                 <div>This map can't be automatically downloaded by OpenRA game!
                                 {% if map.requires_upgrade == True %}
                                     <p>Reason: Requires upgrade, see <a class="showLintLog" data-name="Lint Log">lintlog</a> (Failed for version: {{version}})</p>
                                     <p>Checkout <a href="http://wiki.openra.net/Upgrading-mods-to-a-new-release" target="_blank">upgrade instruction</a></p>
-                                {% else %}
-                                    {% if map.downloading == False %}
-                                    <p>Reason: Too many reports</p>
-                                    {% endif %}
+                                {% elif map.downloading == False %}
+                                    <p>Reason: Downloading is manually set to False</p>
+                                {% elif reports|length >= 3 %}
+                                    <p>Reason: More then 3 active reports!</p>
+                                {% elif map.players == 0 %}
+                                    <p>Reason: Map is unplayable! Max slots: 0</p>
                                 {% endif %}
                                 </div>
-                                {% endif %}
                             </div>
                         </div>
                         {% endif %}
@@ -295,7 +293,7 @@
                         <a class="addScreenshot">add screenshot</a>
                     </div>
                     <div class="map_data_link">
-                        <a class="change_downloading_status" title="Only In-Game Downloading">set downloading {% if map.downloading %}false{% else %}true{% endif %}</a>
+                        <a class="change_downloading_status" href="/maps/{{map.id}}/setdownloadingstatus/" title="Only In-Game Downloading">set downloading {% if map.downloading %}false{% else %}true{% endif %}</a>
                     </div>
                     <div class="map_data_link">
                         <a class="change_sync_status" title="Synchronization with Dedicated servers">forbid syncing</a>
