@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count
 from django.utils import timezone
-from openraData.models import Maps, Screenshots
+from openraData.models import Maps, Screenshots, Reports
 from openraData import misc
 
 # Map Triggers
@@ -164,6 +164,13 @@ def PushMapsToRsyncDirs():
 	for mod in mods:
 		os.makedirs(RSYNC_MAP_PATH + mod.lower())
 	mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1).distinct("map_hash")
+	mapObjectCopy = []
+	for item in mapObject:
+		reportObject = Reports.objects.filter(ex_id=item.id,ex_name="maps")
+		if len(reportObject) < 3:
+			mapObjectCopy.append(item)
+	mapObject = mapObjectCopy
+	reportObject = Reports.objects.filter()
 	site_path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/'
 	if os.path.exists(RSYNC_MAP_API_PATH):
 		shutil.rmtree(RSYNC_MAP_API_PATH)
@@ -210,7 +217,6 @@ def LintCheck(mapObject, http_host):
 			lintlog = open(path+'lintlog','w')
 			lintlog.write(proc[0])
 			lintlog.close()
-			Maps.objects.filter(id=item.id).update(downloading=False)
 			if not item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
 				mail_addr = misc.return_email(item.user_id)
