@@ -163,7 +163,7 @@ def PushMapsToRsyncDirs():
 		shutil.rmtree(RSYNC_MAP_PATH)
 	for mod in mods:
 		os.makedirs(RSYNC_MAP_PATH + mod.lower())
-	mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1).distinct("map_hash")
+	mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1,rsync_allow=True).distinct("map_hash")
 	mapObjectCopy = []
 	for item in mapObject:
 		reportObject = Reports.objects.filter(ex_id=item.id,ex_name="maps")

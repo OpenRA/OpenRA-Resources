@@ -711,6 +711,20 @@ def SetDownloadingStatus(request, arg):
             Maps.objects.filter(id=arg).update(downloading=True)
     return HttpResponseRedirect('/maps/'+arg)
 
+def ChangeRsyncStatus(request, arg):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/maps/'+arg)
+    try:
+        mapObject = Maps.objects.get(id=arg)
+    except:
+        return HttpResponseReirect('/maps/')
+    if mapObject.user_id == request.user.id or request.user.is_superuser:
+        if mapObject.rsync_allow:
+            Maps.objects.filter(id=arg).update(rsync_allow=False)
+        else:
+            Maps.objects.filter(id=arg).update(rsync_allow=True)
+    return HttpResponseRedirect('/maps/'+arg)
+
 def addScreenshot(request, arg, item):
     if item == 'map':
         Object = Maps.objects.filter(id=arg)

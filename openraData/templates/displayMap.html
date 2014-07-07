@@ -265,8 +265,8 @@
                     <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
                     <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.bounds|map_real_size }}</div>
                     <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
-                    <div class="map_data_label">Downloading:</div><div class="map_data_text" title"ingame"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < 3 and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
-                    <div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">allowed</a></div>
+                    <div class="map_data_label">Downloading:</div><div class="map_data_text" title="ingame"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < 3 and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
+                    <div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">{% if map.rsync_allow %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
                     <br /><br />
                     <div class="map_data_label">Rating:</div><div class="map_data_text">{{ map.rating_score }}</div>
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
@@ -296,7 +296,7 @@
                         <a class="change_downloading_status" href="/maps/{{map.id}}/setdownloadingstatus/" title="Only In-Game Downloading">set downloading {% if map.downloading %}false{% else %}true{% endif %}</a>
                     </div>
                     <div class="map_data_link">
-                        <a class="change_sync_status" title="Synchronization with Dedicated servers">forbid syncing</a>
+                        <a class="change_sync_status" href="/maps/{{map.id}}/changersyncstatus/" title="Synchronization with Dedicated servers">{% if map.rsync_allow %}forbid{% else %}allow{% endif %} syncing</a>
                     </div>
                     <div class="map_data_link">
                         <a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete("map")'>delete {%if map.user_id == request.user.id %}my {% endif %}map</a>
