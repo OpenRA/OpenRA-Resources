@@ -148,12 +148,6 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			raise Http404
 		try:
 			mapObject = Maps.objects.filter(game_mod=mod.lower(),players__gte=1,requires_upgrade=False,downloading=True).distinct('map_hash')
-			mapObjectCopy = []
-			for item in mapObject:
-				reportObject = Reports.objects.filter(ex_id=item.id,ex_name="maps")
-				if len(reportObject) < 3:
-					mapObjectCopy.append(item)
-			mapObject = mapObjectCopy
 			if arg2 == "players":
 				mapObject = sorted(mapObject, key=lambda x: (x.players), reverse=True)
 			if arg2 == "-players":

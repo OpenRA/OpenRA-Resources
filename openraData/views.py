@@ -238,6 +238,7 @@ def displayMap(request, arg):
                     posted = timezone.now(),
                 )
                 transac.save()
+                Maps.objects.filter(id=arg).update(amount_reports=F('amount_reports')+1)
                 misc.send_email_to_admin_OnReport({'addr':request.META['HTTP_HOST']+'/maps/'+arg, 'user_id':request.user.id, 'reason':request.POST['reportReason'].strip(), 'infringement':infringement,})
                 misc.send_email_to_user_OnReport({'addr':request.META['HTTP_HOST']+'/maps/'+arg, 'owner_id':Maps.objects.get(id=arg).user_id, 'reason':request.POST['reportReason'].strip(), 'resource_type':'map',})
                 return HttpResponseRedirect('/maps/'+arg)
