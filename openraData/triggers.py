@@ -170,7 +170,6 @@ def PushMapsToRsyncDirs():
 		if len(reportObject) < 3:
 			mapObjectCopy.append(item)
 	mapObject = mapObjectCopy
-	reportObject = Reports.objects.filter()
 	site_path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/'
 	if os.path.exists(RSYNC_MAP_API_PATH):
 		shutil.rmtree(RSYNC_MAP_API_PATH)

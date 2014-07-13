@@ -63,7 +63,32 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
-	
+
+	# get detailed map info by ID
+	elif arg == "id":
+		map_IDs = arg1.split(',')
+		mapObject = Maps.objects.filter(id__in=map_IDs)
+		if not mapObject:
+			raise Http404
+		if arg2 == "yaml":
+			yaml_response = ""
+			for item in mapObject:
+				yaml_response += serialize_basic_map_info(request, item, "yaml")
+			if yaml_response == "":
+				raise Http404
+			response = StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
+		else:
+			json_response = []
+			for item in mapObject:
+				json_response.append(serialize_basic_map_info(request, item))
+			if len(json_response) == 0:
+				raise Http404
+			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
+
 	# get URL of map by hash
 	elif arg == "url":
 		map_hashes = arg1.split(',')
@@ -228,6 +253,23 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		response = StreamingHttpResponse(data, content_type="plain/text")
 		response['Access-Control-Allow-Origin'] = '*'
 		return response
+	elif arg == "lastmap":
+		mapObject = Maps.objects.latest('id')
+		if arg1 == "yaml":
+			yaml_response = serialize_basic_map_info(request, mapObject, "yaml")
+			if yaml_response == "":
+				raise Http404
+			response = StreamingHttpResponse(yaml_response, content_type="text/plain")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
+		else:
+			json_response = []
+			json_response.append(serialize_basic_map_info(request, mapObject))
+			if len(json_response) == 0:
+				raise Http404
+			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
 	else:
 		# serve application/zip by hash
 		oramap = ""
