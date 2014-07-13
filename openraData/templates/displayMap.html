@@ -119,7 +119,7 @@
                             <h3>Reports of {{ map.title }}</h3>
                             {% for item in reports %}
                             <div class="reportRow">
-                                <div class="reportUser">{{item.0}} reported on {{item.3}} {% if item.2 == True %} ( &copy; ){% endif %}{% if reported and item.0 == request.user.username %} (<a href="/maps/{{map.id}}/cancelreport/">cancel</a>){% endif %}</div>
+                                <div class="reportUser">{{item.0}} reported on {{item.3}} {% if item.2 == True %} ( &copy; ){% endif %}{% if reported and item.0 == request.user.username %} (<a href="/maps/{{map.id}}/cancelreport/" onClick='return confirmDelete("report")'>cancel</a>){% endif %}</div>
                                 {% autoescape off %}
                                 <div class="reportMsg">{{item.1|strip_tags|convert_links}}</div>
                                 {% endautoescape %}
