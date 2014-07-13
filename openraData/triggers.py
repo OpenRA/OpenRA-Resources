@@ -163,7 +163,7 @@ def PushMapsToRsyncDirs():
 		shutil.rmtree(RSYNC_MAP_PATH)
 	for mod in mods:
 		os.makedirs(RSYNC_MAP_PATH + mod.lower())
-	mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1,rsync_allow=True).distinct("map_hash")
+	mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1,rsync_allow=True,amount_reports__lte=3).distinct("map_hash")
 	site_path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/'
 	if os.path.exists(RSYNC_MAP_API_PATH):
 		shutil.rmtree(RSYNC_MAP_API_PATH)

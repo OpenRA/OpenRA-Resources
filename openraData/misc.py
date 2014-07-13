@@ -3,11 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
-from openraData.models import Maps
-from openraData.models import Units
-from openraData.models import Mods
-from openraData.models import Screenshots
-from openraData.models import Reports
+from openraData.models import Maps, Units, Mods, Screenshots, Reports
 
 def selectLicenceInfo(itemObject):
 	creative_commons = itemObject.policy_cc
