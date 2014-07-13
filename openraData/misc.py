@@ -3,10 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
-from openraData.models import Maps
-from openraData.models import Units
-from openraData.models import Mods
-from openraData.models import Screenshots
+from openraData.models import Maps, Units, Mods, Screenshots, Reports
 
 def selectLicenceInfo(itemObject):
 	creative_commons = itemObject.policy_cc
@@ -46,7 +43,7 @@ def send_email_to_admin_OnMapFail(tempname):
 	connection = mail.get_connection()
 	connection.open()
 	email = mail.EmailMessage('OpenRA Resource Center - Failed to upload map', 'See attachment', settings.ADMIN_EMAIL,
-                          [settings.ADMIN_EMAIL], connection=connection)
+						  [settings.ADMIN_EMAIL], connection=connection)
 	email.attach_file(tempname)
 	email.send()
 	connection.close()
@@ -56,7 +53,7 @@ def send_email_to_admin_OnReport(args):
 	connection.open()
 	body = "Item: http://%s  \nBy user_id: %s  \nReason: %s  \nInfringement: %s" % (args['addr'], args['user_id'], args['reason'], args['infringement'])
 	email = mail.EmailMessage('OpenRA Resource Center(to admin) - New Report', body, settings.ADMIN_EMAIL,
-                          [settings.ADMIN_EMAIL], connection=connection)
+						  [settings.ADMIN_EMAIL], connection=connection)
 	email.send()
 	connection.close()
 
@@ -68,7 +65,7 @@ def send_email_to_user_OnReport(args):
 	connection.open()
 	body = "Your %s has been reported: %s \nReason: %s" % (args['resource_type'], args['addr'], args['reason'])
 	email = mail.EmailMessage('OpenRA Resource Center - Your content has been reported', body, mail_addr,
-                          [mail_addr], connection=connection)
+						  [mail_addr], connection=connection)
 	email.send()
 	connection.close()
 
@@ -127,43 +124,43 @@ def count_comments_for_many(mapObject, content):
 ########## Revisions
 class Revisions():
 
-    def __init__(self, modelName):
-        self.revisions = []
-        self.modelName = modelName
+	def __init__(self, modelName):
+		self.revisions = []
+		self.modelName = modelName
 
-    def GetRevisions(self, itemid, seek_next=False):
-        if seek_next:
-            if self.modelName.lower() == "map":
-                itemObject = Maps.objects.get(id=itemid)
-            elif self.modelName.lower() == "unit":
-                itemObject = Units.objects.get(id=itemid)
-            elif self.modelName.lower() == "mod":
-                itemObject = Mods.objects.get(id=itemid)
-            if itemObject.next_rev == 0:
-                return
-            self.revisions.append(itemObject.next_rev)
-            self.GetRevisions(itemObject.next_rev, True)
-            return
-        self.revisions.insert(0, itemid)
-        if self.modelName.lower() == "map":
-            itemObject = Maps.objects.get(id=itemid)
-        elif self.modelName.lower() == "unit":
-            itemObject = Units.objects.get(id=itemid)
-        elif self.modelName.lower() == "mod":
-            itemObject = Mods.objects.get(id=itemid)
-        if itemObject.pre_rev == 0:
-            self.GetRevisions(self.revisions[-1], True)
-            return self.revisions
-        self.GetRevisions(itemObject.pre_rev)
-        return self.revisions
+	def GetRevisions(self, itemid, seek_next=False):
+		if seek_next:
+			if self.modelName.lower() == "map":
+				itemObject = Maps.objects.get(id=itemid)
+			elif self.modelName.lower() == "unit":
+				itemObject = Units.objects.get(id=itemid)
+			elif self.modelName.lower() == "mod":
+				itemObject = Mods.objects.get(id=itemid)
+			if itemObject.next_rev == 0:
+				return
+			self.revisions.append(itemObject.next_rev)
+			self.GetRevisions(itemObject.next_rev, True)
+			return
+		self.revisions.insert(0, itemid)
+		if self.modelName.lower() == "map":
+			itemObject = Maps.objects.get(id=itemid)
+		elif self.modelName.lower() == "unit":
+			itemObject = Units.objects.get(id=itemid)
+		elif self.modelName.lower() == "mod":
+			itemObject = Mods.objects.get(id=itemid)
+		if itemObject.pre_rev == 0:
+			self.GetRevisions(self.revisions[-1], True)
+			return self.revisions
+		self.GetRevisions(itemObject.pre_rev)
+		return self.revisions
 
-    def GetLatestRevisionID(self, itemid):
-        if self.modelName.lower() == "map":
-            itemObject = Maps.objects.get(id=itemid)
-        elif self.modelName.lower() == "unit":
-            itemObject = Units.objects.get(id=itemid)
-        elif self.modelName.lower() == "mod":
-            itemObject = Mods.objects.get(id=itemid)
-        if itemObject.next_rev == 0:
-            return itemObject.id
-        return self.GetLatestRevisionID(itemObject.next_rev)
+	def GetLatestRevisionID(self, itemid):
+		if self.modelName.lower() == "map":
+			itemObject = Maps.objects.get(id=itemid)
+		elif self.modelName.lower() == "unit":
+			itemObject = Units.objects.get(id=itemid)
+		elif self.modelName.lower() == "mod":
+			itemObject = Mods.objects.get(id=itemid)
+		if itemObject.next_rev == 0:
+			return itemObject.id
+		return self.GetLatestRevisionID(itemObject.next_rev)

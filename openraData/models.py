@@ -63,6 +63,7 @@ class Maps(models.Model):
     downloaded          = models.IntegerField(default=0)
     rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
     rsync_allow         = models.BooleanField(default=True)
+    amount_reports      = models.IntegerField(default=0)
     policy_cc           = models.BooleanField(default=False)
     policy_adaptations  = models.CharField(max_length=30)
     policy_commercial   = models.BooleanField(default=False)
