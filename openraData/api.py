@@ -144,7 +144,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		mod = arg1
 		if mod == "":
 			raise Http404
-		if arg2 not in ["rating", "-rating", "players", "-players", "posted", "-posted", "author", "uploader", ""]:
+		if arg2 not in ["rating", "-rating", "players", "-players", "posted", "-posted", "downloaded", "-downloaded", "author", "uploader", ""]:
 			raise Http404
 		try:
 			mapObject = Maps.objects.filter(game_mod=mod.lower(),players__gte=1,requires_upgrade=False,downloading=True,amount_reports__lte=3).distinct('map_hash')
@@ -160,6 +160,10 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 				mapObject = sorted(mapObject, key=lambda x: (x.rating_score), reverse=True)
 			if arg2 == "-rating":
 				mapObject = sorted(mapObject, key=lambda x: (x.rating_score), reverse=False)
+			if arg2 == "downloaded":
+				mapObject = sorted(mapObject, key=lambda x: (x.downloaded), reverse=True)
+			if arg2 == "-downloaded":
+				mapObject = sorted(mapObject, key=lambda x: (x.downloaded), reverse=False)
 			if arg2 == "author":
 				if arg3 == "":
 					mapObject = []
