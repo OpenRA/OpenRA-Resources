@@ -634,7 +634,8 @@ def uploadMap(request, previous_rev=0):
         if mapObject:
             rev = mapObject[0].revision + 1
             previous_rev_title = mapObject[0].title
-            user_id = mapObject[0].user_id
+            if request.user.is_superuser:
+                user_id = mapObject[0].user_id
     initial = {'policy_cc': 'cc_yes', 'commercial': 'com_no', 'adaptations': 'adapt_alike'}
     if request.method == 'POST':
         form = UploadMapForm(request.POST, request.FILES, initial=initial)
