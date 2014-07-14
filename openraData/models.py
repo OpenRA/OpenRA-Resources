@@ -49,7 +49,7 @@ class Maps(models.Model):
     height              = models.CharField(max_length=16)
     bounds              = models.CharField(max_length=50,default="")
     tileset             = models.CharField(max_length=50)
-    spawnpoints         = models.CharField(max_length=200,default="")
+    spawnpoints         = models.CharField(max_length=1000,default="")
     legacy_map          = models.BooleanField(default=False)
     revision            = models.IntegerField(default=1)
     pre_rev             = models.IntegerField(default=0)
