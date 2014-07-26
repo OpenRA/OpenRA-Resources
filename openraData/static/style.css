@@ -844,6 +844,7 @@ p.registerInfo {
       background: #dfdfdf;
       color: #000;
       padding: 4px 6px;
+      margin-right: 2px;
     }
     #changePasswordForm label {
       font-size: 12px;
