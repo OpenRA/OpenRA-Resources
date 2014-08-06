@@ -26,7 +26,7 @@ def map_upgrade(mapObject, engine, http_host):
 				break
 		if filename == "":
 			continue
-		command = 'mono OpenRA.Utility.exe --upgrade-map %s %s' % (path+filename, engine)
+		command = 'mono OpenRA.Utility.exe --upgrade-map %s %s %s' % (path+filename, engine, item.game_mod)
 		print(command)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
 		os.chdir(currentDirectory)
