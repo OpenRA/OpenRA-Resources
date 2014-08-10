@@ -34,7 +34,7 @@
                                 {% elif map.downloading == False %}
                                     <p>Reason: Downloading is manually set to False</p>
                                 {% elif reports|length >= 3 %}
-                                    <p>Reason: More then 3 active reports!</p>
+                                    <p>Reason: More then 2 <a class="allReportsShow">active reports</a>!</p>
                                 {% elif map.players == 0 %}
                                     <p>Reason: Map is unplayable! Max slots: 0</p>
                                 {% endif %}
@@ -278,11 +278,11 @@
                         <div class="map_data_link"><a class="report">report map</a></div>
                         {% endif %}
                         {% if reports %}
-                            <div class="map_data_link"><a class="allReportsShow">show reports</a></div>
+                            <div class="map_data_link"><a class="allReportsShow" title="{{reports|length}} reports">show reports</a></div>
                         {% endif %}
                     {% else %}
                         {% if reports %}
-                            <div class="map_data_link"><a class="allReportsShow">show reports</a></div>
+                            <div class="map_data_link"><a class="allReportsShow" title="{{reports|length}} reports">show reports</a></div>
                         {% endif %}
                     {% endif %}
                     {% if request.user.is_superuser or map.user_id == request.user.id %}
