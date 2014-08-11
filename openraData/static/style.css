@@ -72,12 +72,14 @@ textarea {
   padding: 8px;
   margin: 12px 0 0;
   background: rgba(32, 44, 69, 0.4);
+  word-wrap: break-word;
 }
 
 .cBlockNoPadding {
   border: 1px solid #74c2e7;
   margin: 12px 0 0;
   background: rgba(32, 44, 69, 0.4);
+  word-wrap: break-word;
 }
 /* Popup */
 .popup {
