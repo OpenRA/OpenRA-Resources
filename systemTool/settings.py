@@ -140,3 +140,6 @@ ADMIN_EMAIL = ''
 
 # Reply-to email address
 DEFAULT_FROM_EMAIL = ''
+
+# Determining amount of reports for item, required to forbid in-game downloading, synchronization with servers, etc.
+REPORTS_PENALTY_AMOUNT = 3
