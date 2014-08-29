@@ -324,6 +324,7 @@ table tr td {
 .cell-link-container div {
   text-align: center;
   width: 137px;
+  word-wrap: break-word;
 }
 
 .cell-link-container div.link_title {
@@ -993,6 +994,7 @@ p.registerInfo {
       .left_map_content .map_title .title {
         font-size: 22px;
         line-height: 20px;
+        word-wrap: break-word;
       }
       .left_map_content .map_title .author {
         padding: 4px 0 0 0;
