@@ -255,7 +255,7 @@ class MapHandlers():
 
         os.chdir(settings.OPENRA_PATH)
 
-        command = 'mono OpenRA.Utility.exe --map-hash ' + filepath
+        command = 'mono --debug OpenRA.Utility.exe --map-hash ' + filepath
         proc = Popen(command.split(), stdout=PIPE).communicate()
         self.maphash = proc[0].strip()
         self.LOG.append(self.maphash)
@@ -265,7 +265,7 @@ class MapHandlers():
     def LintCheck(self, mod):
         os.chdir(settings.OPENRA_PATH)
 
-        command = 'mono OpenRA.Lint.exe ' + mod + ' ' + self.map_full_path_filename
+        command = 'mono --debug OpenRA.Lint.exe ' + mod + ' ' + self.map_full_path_filename
         proc = Popen(command.split(), stdout=PIPE).communicate()
         if proc[0].strip() == "":
             self.flushLog( ['Yaml check succeeded.'] )
@@ -279,7 +279,7 @@ class MapHandlers():
     def GenerateMinimap(self):
         os.chdir(settings.OPENRA_PATH)
 
-        command = 'mono OpenRA.Utility.exe --map-preview ' + self.map_full_path_filename
+        command = 'mono --debug OpenRA.Utility.exe --map-preview ' + self.map_full_path_filename
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
@@ -295,7 +295,7 @@ class MapHandlers():
     def GenerateFullPreview(self, userObject):
         os.chdir(settings.OPENRA_PATH)
 
-        command = 'mono OpenRA.Utility.exe --full-preview ' + self.map_full_path_filename
+        command = 'mono --debug OpenRA.Utility.exe --full-preview ' + self.map_full_path_filename
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
@@ -322,7 +322,7 @@ class MapHandlers():
             if fn.endswith('.shp'):
                 os.mkdir(self.map_full_path_directory+'content/png/')
                 os.chdir(self.map_full_path_directory+'content/png/')
-                command = 'mono %sOpenRA.Utility.exe --png %s %s' % (settings.OPENRA_PATH, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+                command = 'mono --debug %sOpenRA.Utility.exe --png %s %s' % (settings.OPENRA_PATH, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
                 proc = Popen(command.split(), stdout=PIPE).communicate()
                 self.flushLog(proc)
                 pngsdir = os.listdir(self.map_full_path_directory+'content/png/')
@@ -342,7 +342,7 @@ class MapHandlers():
     def LegacyImport(self, mapPath):
         os.chdir(settings.OPENRA_PATH)
         for mod in ['ra','cnc','d2k','ts']:
-            command = 'mono OpenRA.Utility.exe --map-import %s %s' % (mod, mapPath)
+            command = 'mono --debug OpenRA.Utility.exe --map-import %s %s' % (mod, mapPath)
             proc = Popen(command.split(), stdout=PIPE).communicate()
             self.LOG.append([proc[0]])
             if "Error" in proc[0] or "Unknown" in proc[0]:

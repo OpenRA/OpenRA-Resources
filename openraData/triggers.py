@@ -26,7 +26,7 @@ def map_upgrade(mapObject, engine, http_host):
 				break
 		if filename == "":
 			continue
-		command = 'mono OpenRA.Utility.exe --upgrade-map %s %s' % (path+filename, engine)
+		command = 'mono --debug OpenRA.Utility.exe --upgrade-map %s %s %s' % (path+filename, engine, item.game_mod)
 		print(command)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
 		os.chdir(currentDirectory)
@@ -60,7 +60,7 @@ def recalculate_hash(mapObject):
 	if filename == "":
 		os.chdir(currentDirectory)
 		return "none"
-	command = 'mono OpenRA.Utility.exe --map-hash ' + path + filename
+	command = 'mono --debug OpenRA.Utility.exe --map-hash ' + path + filename
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	maphash = proc[0].strip()
 	os.chdir(currentDirectory)
@@ -158,26 +158,19 @@ def PushMapsToRsyncDirs():
 		return
 	mods = Maps.objects.values_list('game_mod', flat=True).distinct()
 	RSYNC_MAP_PATH = misc.addSlash(settings.RSYNC_MAP_PATH)
-	RSYNC_MAP_API_PATH = misc.addSlash(settings.RSYNC_MAP_API_PATH)
 	if os.path.exists(RSYNC_MAP_PATH):
 		shutil.rmtree(RSYNC_MAP_PATH)
 	for mod in mods:
 		os.makedirs(RSYNC_MAP_PATH + mod.lower())
-	mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1,rsync_allow=True,amount_reports__lte=3).distinct("map_hash")
+	mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1,rsync_allow=True,amount_reports__lt=3,next_rev=0).distinct("map_hash")
 	site_path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/'
-	if os.path.exists(RSYNC_MAP_API_PATH):
-		shutil.rmtree(RSYNC_MAP_API_PATH)
-	os.mkdir(RSYNC_MAP_API_PATH)
 	for item in mapObject:
 		listd = os.listdir(site_path + str(item.id))
 		for fname in listd:
 			if fname.endswith('.oramap'):
 				src = site_path + str(item.id) + '/' + fname
-				if item.next_rev == 0:
-					dest_maps = RSYNC_MAP_PATH + item.game_mod.lower() + '/' + str(item.id) + '.oramap'
-					os.link(src, dest_maps)
-				dest_api_maps = RSYNC_MAP_API_PATH + item.map_hash + '_' + os.path.splitext(fname)[0] + '-' + str(item.revision) + '.oramap'
-				os.link(src, dest_api_maps)
+				dest_maps = RSYNC_MAP_PATH + item.game_mod.lower() + '/' + str(item.id) + '.oramap'
+				os.link(src, dest_maps)
 				break
 		continue
 
@@ -197,7 +190,7 @@ def LintCheck(mapObject, http_host):
 				break
 		if map_file == "":
 			continue
-		command = 'mono OpenRA.Lint.exe ' + item.game_mod.lower() + ' ' + path + map_file
+		command = 'mono --debug OpenRA.Lint.exe ' + item.game_mod.lower() + ' ' + path + map_file
 		print(command)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
 		if proc[0].strip() == "":
@@ -228,7 +221,7 @@ def GenerateSHPpreview(mapObject):
 			if fn.endswith('.shp'):
 				os.mkdir(path + 'content/png/')
 				os.chdir(path + 'content/png/')
-				command = 'mono %sOpenRA.Utility.exe --png %s %s' % (settings.OPENRA_PATH, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+				command = 'mono --debug %sOpenRA.Utility.exe --png %s %s' % (settings.OPENRA_PATH, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
 				proc = Popen(command.split(), stdout=PIPE).communicate()
 				pngsdir = os.listdir(path + 'content/png/')
 				imglist = []
@@ -258,7 +251,7 @@ def GenerateMinimap(mapObject):
 	if filename == "":
 		os.chdir(currentDirectory)
 		return False
-	command = 'mono OpenRA.Utility.exe --map-preview ' + path + filename
+	command = 'mono --debug OpenRA.Utility.exe --map-preview ' + path + filename
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
 		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
@@ -281,7 +274,7 @@ def GenerateFullPreview(mapObject, userObject):
 	if filename == "":
 		os.chdir(currentDirectory)
 		return False
-	command = 'mono OpenRA.Utility.exe --full-preview ' + path + filename
+	command = 'mono --debug OpenRA.Utility.exe --full-preview ' + path + filename
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
 		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")

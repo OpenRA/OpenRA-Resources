@@ -128,9 +128,7 @@ OPENRA_PATH = '/usr/lib/openra/'
 # Path to directory which will be shared over rsync, with full permissions for website user
 # Must be outside of website's path tree
 # RSYNC_MAP_PATH: Website trigger will dump there 'good' maps for dedicated servers
-# RSYNC_MAP_API_PATH: Website trigger will dump there allowed for auto-downloading maps for Map API mirrors usage
 RSYNC_MAP_PATH = ''
-RSYNC_MAP_API_PATH = ''
 
 # Github related configuration
 GITHUB_API_TOKEN = ''
@@ -142,3 +140,6 @@ ADMIN_EMAIL = ''
 
 # Reply-to email address
 DEFAULT_FROM_EMAIL = ''
+
+# Determining amount of reports for item, required to forbid in-game downloading, synchronization with servers, etc.
+REPORTS_PENALTY_AMOUNT = 3

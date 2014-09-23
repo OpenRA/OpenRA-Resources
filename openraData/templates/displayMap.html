@@ -34,7 +34,7 @@
                                 {% elif map.downloading == False %}
                                     <p>Reason: Downloading is manually set to False</p>
                                 {% elif reports|length >= 3 %}
-                                    <p>Reason: More then 3 active reports!</p>
+                                    <p>Reason: More then 2 <a class="allReportsShow">active reports</a>!</p>
                                 {% elif map.players == 0 %}
                                     <p>Reason: Map is unplayable! Max slots: 0</p>
                                 {% endif %}
@@ -69,7 +69,7 @@
 
                     <div class="map_hash_block cBlockNoPadding">
                         <div class="map_hash_block_element"><a href="/map/hash/{{map.map_hash}}" target='_blank'>API</a></div>
-                        <div class="map_hash_block_element"><a href="#">stats</a></div>
+                        <div class="map_hash_block_element"><a href="http://master.openra.net/map_stats?hash={{map.map_hash}}" target="_blank">stats</a></div>
                         <div class="map_hash">{% if duplicates %}<a href="#" title='duplicates'>Ξ</a> {% endif %}<span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span></div>
                     </div>
 
@@ -242,7 +242,7 @@
                                     <img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/{{icons}}/4.0/88x31.png" />
                                 </a>
                             </div>
-                            <div class="license_text left">Some rights reserved: <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US" title="Extnernal graphics and sounds are not covered by the license">Creative Commons {{license}}</a>. Extnernal graphics and sounds are not covered by the license.</div>
+                            <div class="license_text left">Some rights reserved: <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US" title="External graphics and sounds are not covered by the license">Creative Commons {{license}}</a>. External graphics and sounds are not covered by the license.</div>
                             <div class="clear"></div>
                         {% if request.user.is_authenticated %}
                             {% if reported == False %}
@@ -266,7 +266,7 @@
                     <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.bounds|map_real_size }}</div>
                     <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
                     <div class="map_data_label">Downloading:</div><div class="map_data_text" title="ingame"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < 3 and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
-                    <div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">{% if map.rsync_allow %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
+                    <div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">{% if map.rsync_allow and map.downloading and reports|length < 3 and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
                     <br /><br />
                     <div class="map_data_label">Rating:</div><div class="map_data_text">{{ map.rating_score }}</div>
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
@@ -278,16 +278,16 @@
                         <div class="map_data_link"><a class="report">report map</a></div>
                         {% endif %}
                         {% if reports %}
-                            <div class="map_data_link"><a class="allReportsShow">show reports</a></div>
+                            <div class="map_data_link"><a class="allReportsShow">show reports ({{reports|length}})</a></div>
                         {% endif %}
                     {% else %}
                         {% if reports %}
-                            <div class="map_data_link"><a class="allReportsShow">show reports</a></div>
+                            <div class="map_data_link"><a class="allReportsShow">show reports ({{reports|length}})</a></div>
                         {% endif %}
                     {% endif %}
                     {% if request.user.is_superuser or map.user_id == request.user.id %}
                     <div class="map_data_link">
-                        <a class="editMapInfoShow">edit map info</a>
+                        <a class="editMapInfoShow" title="additional map info">edit map info</a>
                     </div>
                     <div class="map_data_link">
                         <a class="addScreenshot">add screenshot</a>
