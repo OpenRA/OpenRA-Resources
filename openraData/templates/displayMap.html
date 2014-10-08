@@ -106,6 +106,7 @@
                     
                     <div>
                         <div class="editMapInfo popup">
+                        <div class="popup-content-wrapper">
                             <div class="closePopup"><label class="x"></label></div>
                             <h3>Edit map info</h3>
                             <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
@@ -113,8 +114,10 @@
                                 <div><button type="submit">Submit</button></div>
                             </form>
                         </div>
+                        </div>
                     
                         <div class="allReports popup">
+                        <div class="popup-content-wrapper">
                             <div class="closePopup"><label class="x"></label></div>
                             <h3>Reports of {{ map.title }}</h3>
                             {% for item in reports %}
@@ -126,8 +129,10 @@
                             </div>
                             {% endfor %}
                         </div>
+                        </div>
 
                         <div class="reportMap popup">
+                        <div class="popup-content-wrapper">
                             <div class="closePopup"><label class="x"></label></div>                                                      
                             <h3>Report this map</h3>
                             <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
@@ -135,6 +140,7 @@
                                 <div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
                                 <div><button type="submit">Submit</button></div>
                             </form>
+                        </div>
                         </div>
 
                         <div class="printMisc popup" style="width: 580px; left: 10%; margin-top: -100px; font-size: 0.9em;"><div class="popupContainer"></div>
@@ -378,6 +384,7 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("popupContainer");
                             }
                         });
                         $(".printMisc").show()
@@ -398,6 +405,7 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("popupContainer");
                             }
                         });
                         $(".printMisc").show()
@@ -418,6 +426,7 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("popupContainer");
                             }
                         });
                         $(".printMisc").show()
@@ -438,6 +447,7 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("popupContainer");
                             }
                         });
                         $(".printMisc").show()
@@ -455,6 +465,7 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("addScreenshotForm");
                             }
                         });
                         $(".addScreenshotForm").show()
