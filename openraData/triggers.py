@@ -26,7 +26,7 @@ def map_upgrade(mapObject, engine, http_host):
 				break
 		if filename == "":
 			continue
-		command = 'mono --debug OpenRA.Utility.exe --upgrade-map %s %s %s' % (path+filename, engine, item.game_mod)
+		command = 'mono --debug OpenRA.Utility.exe %s --upgrade-map %s %s' % (item.game_mod, path+filename, engine)
 		print(command)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
 		os.chdir(currentDirectory)
@@ -60,7 +60,7 @@ def recalculate_hash(mapObject):
 	if filename == "":
 		os.chdir(currentDirectory)
 		return "none"
-	command = 'mono --debug OpenRA.Utility.exe --map-hash ' + path + filename
+	command = 'mono --debug OpenRA.Utility.exe %s --map-hash %s' % (mapObject.game_mod, path + filename)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	maphash = proc[0].strip()
 	os.chdir(currentDirectory)
@@ -221,7 +221,7 @@ def GenerateSHPpreview(mapObject):
 			if fn.endswith('.shp'):
 				os.mkdir(path + 'content/png/')
 				os.chdir(path + 'content/png/')
-				command = 'mono --debug %sOpenRA.Utility.exe --png %s %s' % (settings.OPENRA_PATH, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+				command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_PATH, mapObject.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
 				proc = Popen(command.split(), stdout=PIPE).communicate()
 				pngsdir = os.listdir(path + 'content/png/')
 				imglist = []
@@ -251,7 +251,7 @@ def GenerateMinimap(mapObject):
 	if filename == "":
 		os.chdir(currentDirectory)
 		return False
-	command = 'mono --debug OpenRA.Utility.exe --map-preview ' + path + filename
+	command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (mapObject.game_mod, path + filename)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
 		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
@@ -274,7 +274,7 @@ def GenerateFullPreview(mapObject, userObject):
 	if filename == "":
 		os.chdir(currentDirectory)
 		return False
-	command = 'mono --debug OpenRA.Utility.exe --full-preview ' + path + filename
+	command = 'mono --debug OpenRA.Utility.exe %s --full-preview %s' % (mapObject.game_mod, path + filename)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
 		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")
