@@ -265,6 +265,7 @@
                         <a href="/maps/{{arg}}/oramap" title="{{disk_size}}" class="button">Download</a>
                     </div>
                     <div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
+                    <div class="map_data_label">File Size:</div><div class="map_data_text">{{disk_size}}</div>
                     <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>
                     <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
                     <div class="map_data_label">Players:</div><div class="map_data_text">{{ map.players }}</div>
@@ -277,8 +278,8 @@
                     <div class="map_data_label">Rating:</div><div class="map_data_text">{{ map.rating_score }}</div>
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
                     <div class="map_data_label">Downloaded:</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
-                    <div class="map_data_link"><a class="printYamlShow">show yaml</a>
-                    </div>
+                    <div class="map_data_link"><a class="printYamlShow">show yaml</a></div>
+                    <div class="map_data_link"><a class="printMapContent">show archive content</a></div>
                     {% if request.user.is_authenticated %}
                         {% if reported == False %}
                         <div class="map_data_link"><a class="report">report map</a></div>
