@@ -3,22 +3,6 @@ html {
   box-shadow: 0px 0px 100px rgb(0, 0, 0) inset;
 }
 
-body.bg-day {
-  background-image: url("/static/images/bg.svg");
-}
-
-body.bg-day-fallback {
-  background-image: url("/static/images/bg-fallback.png");
-}
-
-body.bg-night {
-  background-image: url("/static/images/bg-night.svg");
-}
-
-body.bg-night-fallback {
-  background-image: url("/static/images/bg-night-fallback.png");
-}
-
 body {
   background-color: #000;
   background-attachment: fixed;
