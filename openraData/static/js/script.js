@@ -15,33 +15,35 @@
 
 
 /*	id 2: change site background depending on client's time */
-	function backgroundDayNight(prefix, extension) {
+	function backgroundDayNight(prefix, ext) {
 		var d = new Date();
-		if (d.getHours() >= 23 || d.getHours() <= 7) {
-			$('body').attr('style', 'background-image: url("/static/images/bg-night'+prefix+'.'+extension+'")');
+		if (d.getHours() <= 23 || d.getHours() >= 7) {
+			$('body').css('background-image', 'url("/static/images/bg'+prefix+'.'+ext+'")');
 		}
 		else {
-			$('body').attr('style', 'background-image: url("/static/images/bg'+prefix+'.'+extension+'")');
+			$('body').css('background-image', 'url("/static/images/bg-night'+prefix+'.'+ext+'")');
 		}
 	}
 
-	$(function() {
+	$(document).ready(function() {
 		backgroundDayNight("", "svg");
 	});
 /*	id 2: end */
 
 
 /*	id 3: svg fallback to png if not supported */
-	function supportsSVG() {
-		return !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGRect;
-	}
-	$(function() {
-		if (!supportsSVG()) {
-			document.documentElement.className += ' no-svg';
-			backgroundDayNight("-fallback", "png");
-			$('img[src$=".svg"]').attr('src', function() {
-				return $(this).attr('src').replace('.svg', '-fallback.png');
-			});
+	$(document).ready(function(){
+		function supportsSVG() {
+			return !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGRect;
 		}
+		$(function() {
+			if (!supportsSVG()) {
+				document.documentElement.className += ' no-svg';
+				backgroundDayNight("-fallback", "png");
+				$('img[src$=".svg"]').attr('src', function() {
+					return $(this).attr('src').replace('.svg', '-fallback.png');
+				});
+			}
+		});
 	});
 /*	id 3: end */

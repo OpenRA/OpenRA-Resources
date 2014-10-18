@@ -3,8 +3,24 @@ html {
   box-shadow: 0px 0px 100px rgb(0, 0, 0) inset;
 }
 
+body.bg-day {
+  background-image: url("/static/images/bg.svg");
+}
+
+body.bg-day-fallback {
+  background-image: url("/static/images/bg-fallback.png");
+}
+
+body.bg-night {
+  background-image: url("/static/images/bg-night.svg");
+}
+
+body.bg-night-fallback {
+  background-image: url("/static/images/bg-night-fallback.png");
+}
+
 body {
-  background-color: black;
+  background-color: #000;
   background-attachment: fixed;
   margin: 0; 
   color: #f5f5f5;
@@ -567,6 +583,10 @@ table tr td {
 
 .top_content {
   padding: 0 0 5px 0;
+}
+
+.hide_block {
+  display: none;
 }
 
 .screenshot {
