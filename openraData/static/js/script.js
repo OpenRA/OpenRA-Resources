@@ -17,11 +17,11 @@
 /*	id 2: change site background depending on client's time */
 	function backgroundDayNight(prefix, ext) {
 		var d = new Date();
-		if (d.getHours() <= 23 || d.getHours() >= 7) {
-			$('body').css('background-image', 'url("/static/images/bg'+prefix+'.'+ext+'")');
+		if (d.getHours() >= 23 || d.getHours() <= 7) {
+			$('body').css('background-image', 'url("/static/images/bg-night'+prefix+'.'+ext+'")');
 		}
 		else {
-			$('body').css('background-image', 'url("/static/images/bg-night'+prefix+'.'+ext+'")');
+			$('body').css('background-image', 'url("/static/images/bg'+prefix+'.'+ext+'")');
 		}
 	}
 
@@ -61,3 +61,12 @@ function selectText(containerid) {
 	}
 }
 /*	id 4: end */
+
+/*	id 5: paging related - show only 1 cell with "..." */
+$(document).ready(function() {
+	var elements_paging = document.getElementsByClassName('no-page-before');
+	$(elements_paging[0]).removeClass('hide_block');
+	var elements_paging = document.getElementsByClassName('no-page-after');
+	$(elements_paging[0]).removeClass('hide_block');
+});
+/*	id 5: end */

@@ -43,35 +43,43 @@
             {% if 2 in range %}
             <div id="paging">
                 {% for i in range %}
-                <div class="paging_cell">
-                {% if i == page %}
-                    <span>{{ i }}</span>
-                {% else %}
-                    <a href="http://{{http_host}}/maps/page/{{i}}">{{ i }}</a>
-                {% endif %}
-                </div>
+                    <div class="paging_cell">
+                    {% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
+                        {% if page == i %}
+                            <span>{{ i }}</span>
+                        {% else %}
+                            <a href="http://{{http_host}}/maps/page/{{i}}">{{ i }}</a>
+                        {% endif %}
+                    {% else %}
+                        {% if i < page %}
+                            <span class='no-page-before hide_block'>...</span>
+                        {% else %}
+                            <span class='no-page-after hide_block'>...</span>
+                        {% endif %}
+                    {% endif %}
+                    </div>
                 {% endfor %}
             </div>
             {% endif %}
             <div class="clear"></div>
             {% endif %}
             <div class="features">
-                <form style="float: left;" method="GET" action="/maps/random/">
-                    <button type="submit">Random Map</button>
+                <form class="maps_page_buttons_form" method="GET" action="/maps/random/">
+                    <button class="maps_page_buttons" type="submit">Random Map</button>
                 </form>
-                <form style="float: left;" method="GET" action="/maps/mostRated/">
-                    <button type="submit">Highest Rated Map</button>
+                <form class="maps_page_buttons_form" method="GET" action="/maps/mostRated/">
+                    <button class="maps_page_buttons" type="submit">Highest Rated</button>
                 </form>
-                <form style="float: left;" method="GET" action="/maps/mostCommented/">
-                    <button type="submit">Most Commented</button>
+                <form class="maps_page_buttons_form" method="GET" action="/maps/mostCommented/">
+                    <button class="maps_page_buttons" type="submit">Most Commented</button>
                 </form>
-                <form style="float: left;" method="GET" action="/maps/mostViewed/">
-                    <button type="submit">Most Viewed</button>
+                <form class="maps_page_buttons_form" method="GET" action="/maps/mostViewed/">
+                    <button class="maps_page_buttons" type="submit">Most Viewed</button>
                 </form>
-                <form style="float: left;" method="GET" action="/maps/mostDownloaded/">
-                    <button type="submit">Most Downloaded</button>
+                <form class="maps_page_buttons_form" method="GET" action="/maps/mostDownloaded/">
+                    <button class="maps_page_buttons" type="submit">Most Downloaded</button>
                 </form>
-                <form style="float: left;" method="GET" action="/maps/activelyDeveloped/">
-                    <button type="submit">Actively Developed</button>
+                <form class="maps_page_buttons_form" method="GET" action="/maps/activelyDeveloped/">
+                    <button class="maps_page_buttons" type="submit">Actively Developed</button>
                 </form>
             </div>
