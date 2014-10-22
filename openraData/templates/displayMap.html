@@ -106,6 +106,7 @@
                     
                     <div>
                         <div class="editMapInfo popup">
+                        <div class="popup-content-wrapper">
                             <div class="closePopup"><label class="x"></label></div>
                             <h3>Edit map info</h3>
                             <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
@@ -113,8 +114,10 @@
                                 <div><button type="submit">Submit</button></div>
                             </form>
                         </div>
+                        </div>
                     
                         <div class="allReports popup">
+                        <div class="popup-content-wrapper">
                             <div class="closePopup"><label class="x"></label></div>
                             <h3>Reports of {{ map.title }}</h3>
                             {% for item in reports %}
@@ -126,8 +129,10 @@
                             </div>
                             {% endfor %}
                         </div>
+                        </div>
 
                         <div class="reportMap popup">
+                        <div class="popup-content-wrapper">
                             <div class="closePopup"><label class="x"></label></div>                                                      
                             <h3>Report this map</h3>
                             <form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
@@ -135,6 +140,7 @@
                                 <div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
                                 <div><button type="submit">Submit</button></div>
                             </form>
+                        </div>
                         </div>
 
                         <div class="printMisc popup" style="width: 580px; left: 10%; margin-top: -100px; font-size: 0.9em;"><div class="popupContainer"></div>
@@ -259,6 +265,7 @@
                         <a href="/maps/{{arg}}/oramap" title="{{disk_size}}" class="button">Download</a>
                     </div>
                     <div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
+                    <div class="map_data_label">File Size:</div><div class="map_data_text">{{disk_size}}</div>
                     <div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>
                     <div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
                     <div class="map_data_label">Players:</div><div class="map_data_text">{{ map.players }}</div>
@@ -270,9 +277,10 @@
                     <br /><br />
                     <div class="map_data_label">Rating:</div><div class="map_data_text">{{ map.rating_score }}</div>
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
-                    <div class="map_data_label">Downloaded:</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
-                    <div class="map_data_link"><a class="printYamlShow">show yaml</a>
-                    </div>
+                    <div class="map_data_label">Downloaded:</div><div class="map_data_text">{{ map.downloaded }}</div>
+                    <div class="map_data_label">Played:</div><div class="map_data_text">{{ played_counter }}</div><br /><br />
+                    <div class="map_data_link"><a class="printYamlShow">show yaml</a></div>
+                    <div class="map_data_link"><a class="printMapContent">show archive content</a></div>
                     {% if request.user.is_authenticated %}
                         {% if reported == False %}
                         <div class="map_data_link"><a class="report">report map</a></div>
@@ -378,6 +386,7 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("popupContainer");
                             }
                         });
                         $(".printMisc").show()
@@ -398,6 +407,7 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("popupContainer");
                             }
                         });
                         $(".printMisc").show()
@@ -418,6 +428,7 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("popupContainer");
                             }
                         });
                         $(".printMisc").show()
@@ -438,6 +449,7 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("popupContainer");
                             }
                         });
                         $(".printMisc").show()
@@ -455,21 +467,11 @@
                                     $("#overlay").hide()
                                     $(".popup").hide()
                                 });
+                                noScroll("addScreenshotForm");
                             }
                         });
                         $(".addScreenshotForm").show()
                         $("#overlay").show()
                     })
                 })
-                function selectText(containerid) {
-                    if (document.selection) {
-                        var range = document.body.createTextRange();
-                        range.moveToElementText(document.getElementById(containerid));
-                        range.select();
-                    } else if (window.getSelection) {
-                        var range = document.createRange();
-                        range.selectNode(document.getElementById(containerid));
-                        window.getSelection().addRange(range);
-                    }
-                }
             </script>

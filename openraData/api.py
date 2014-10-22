@@ -35,7 +35,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			json_response = []
 			for item in mapObject:
 				json_response.append(serialize_basic_map_info(request, item))
-			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response = StreamingHttpResponse(json.dumps(json_response, indent=4), content_type="application/javascript")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 	
@@ -60,7 +60,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 				json_response.append(serialize_basic_map_info(request, item))
 			if len(json_response) == 0:
 				raise Http404
-			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response = StreamingHttpResponse(json.dumps(json_response, indent=4), content_type="application/javascript")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 
@@ -85,7 +85,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 				json_response.append(serialize_basic_map_info(request, item))
 			if len(json_response) == 0:
 				raise Http404
-			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response = StreamingHttpResponse(json.dumps(json_response, indent=4), content_type="application/javascript")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 
@@ -110,7 +110,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 				json_response.append(serialize_url_map_info(request, item))
 			if len(json_response) == 0:
 				raise Http404
-			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response = StreamingHttpResponse(json.dumps(json_response, indent=4), content_type="application/javascript")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 	
@@ -135,7 +135,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 				json_response.append(serialize_minimap_map_info(request, item))
 			if len(json_response) == 0:
 				raise Http404
-			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response = StreamingHttpResponse(json.dumps(json_response, indent=4), content_type="application/javascript")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 	
@@ -217,7 +217,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			for item in mapObject:
 				response_data = serialize_basic_map_info(request, item)
 				json_response.append(response_data)
-			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response = StreamingHttpResponse(json.dumps(json_response, indent=4), content_type="application/javascript")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 
@@ -273,7 +273,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			json_response.append(serialize_basic_map_info(request, mapObject))
 			if len(json_response) == 0:
 				raise Http404
-			response = StreamingHttpResponse(json.dumps(json_response), content_type="application/javascript")
+			response = StreamingHttpResponse(json.dumps(json_response, indent=4), content_type="application/javascript")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 	else:
@@ -389,7 +389,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	if mapObject.amount_reports >= 3:
 		downloading = False
 	if yaml:
-		response_data = """{0}:
+		response_data = u"""{0}:
 		id: {1}
 		title: {2}
 		description: {3}
@@ -420,7 +420,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		mapObject.id,
 		mapObject.title,
 		mapObject.description,
-		mapObject.author,
+		mapObject.author.encode('utf-8').decode('utf-8'),
 		mapObject.map_type,
 		mapObject.players,
 		mapObject.game_mod,

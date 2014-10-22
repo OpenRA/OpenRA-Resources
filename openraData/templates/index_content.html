@@ -1,6 +1,6 @@
         <div class="top_content">
             <div id="mainleft">
-                <div class="screenshot">
+                <div class="screenshot hide_block">
                     {% for item in screenshots %}
                     <a href="/{{item.ex_name}}/{{item.ex_id}}/">
                         <img src="/screenshots/{{item.id}}/mini/" alt="screenshot" />
@@ -33,9 +33,9 @@
         </div>
 
         <script>
-        (function($){ 
-            $.fn.image_fader = function(user_options) {
-                var container = $(this);
+        $(document).ready(function(){
+            var image_fader = function(user_options) {
+                var container = $(".screenshot");
                 var links = container.find("a");
                 var linkI = -1;
                 var default_options = {
@@ -49,19 +49,17 @@
                     links.eq(linkI).fadeIn(500, delay);
                 };
                 var delay = function(){
-                    links.eq(linkI).animate({opacity:100}, options.duration , hide).addClass("current_link");
+                    links.eq(linkI).animate({opacity:100}, options.duration , hide);
                 };
                 var hide = function(){
                     links.eq(linkI).hide(500, function(){
-                        $(this).removeClass("current_link");
                         show();
                     });
                 };
                 $(links).hide();
                 show();
             }
-        })(jQuery);
-        jQuery(document).ready(function(){
-            $(".screenshot").image_fader();
+            $(".screenshot").removeClass("hide_block");
+            image_fader();
         });
         </script>

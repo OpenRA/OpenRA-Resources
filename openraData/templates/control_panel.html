@@ -50,16 +50,24 @@
                 <div class="clear"></div>
                 {% if 2 in range %}
                 <div id="paging">
-                    {% for i in range %}
+                {% for i in range %}
                     <div class="paging_cell">
-                    {% if i == page %}
-                        <span>{{ i }}</span>
+                    {% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
+                        {% if page == i %}
+                            <span>{{ i }}</span>
+                        {% else %}
+                            <a href="http://{{http_host}}/panel/mymaps/page/{{i}}">{{ i }}</a>
+                        {% endif %}
                     {% else %}
-                        <a href="http://{{http_host}}/panel/mymaps/page/{{i}}">{{ i }}</a>
+                        {% if i < page %}
+                            <span class='no-page-before hide_block'>...</span>
+                        {% else %}
+                            <span class='no-page-after hide_block'>...</span>
+                        {% endif %}
                     {% endif %}
                     </div>
-                    {% endfor %}
-                </div>
+                {% endfor %}
+            </div>
                 {% endif %}
                 {% endif %}
             {% endif %}

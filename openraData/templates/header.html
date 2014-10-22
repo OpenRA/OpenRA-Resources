@@ -2,31 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=1024" />
     <title>OpenRA Resource Center{{ title }}</title>
     <link href="/static/style.css" rel="stylesheet">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
     <script type="text/javascript" src="/static/js/highslide/highslide-with-gallery.packed.js" ></script>
     <script type="text/javascript" src="/static/js/highslide/highslide.config.js" charset="utf-8" ></script>
+    <script type="text/javascript" src="/static/js/script.js"></script>
     <link href="/static/js/highslide/highslide.css" rel="stylesheet">
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <link href="/static/favicon.ico" rel="shortcut icon" type="image/x-icon">
     <link href="/news/feed/" rel="alternate" type="application/atom+xml">
-    <script>
-        function supportsSVG() {
-            return !!document.createElementNS && !!document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGRect;
-        }
-        $(function() {
-            if (!supportsSVG()) {
-                document.documentElement.className += ' no-svg';
-                $('img[src$=".svg"]').attr('src', function() {
-                    return $(this).attr('src').replace('.svg', '-fallback.png');
-                });
-            }
-        });
-    </script>
 </head>
 <body>
     <div id="overlay"></div>

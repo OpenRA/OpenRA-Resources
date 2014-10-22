@@ -4,16 +4,11 @@ html {
 }
 
 body {
-  background-color: black;
-  background-image: url("/static/images/bg.svg");
-  background-attachment:fixed;
+  background-color: #000;
+  background-attachment: fixed;
   margin: 0; 
   color: #f5f5f5;
   font: 14px/1.3 Helvetica,arial,freesans,clean,sans-serif;
-}
-
-.no-svg body {
-  background-image: url("/static/images/bg-fallback.png");
 }
 
 h1 {
@@ -254,7 +249,6 @@ table tr td {
 
 .paging_cell {
   background: rgba(32, 44, 69, 0.4);
-  border: 1px solid #74c2e7;
   display: table-column;
   float: left;
   margin-left: -1px;
@@ -300,7 +294,6 @@ table tr td {
 .map_grid_cell {
   background: rgba(32, 44, 69, 0.4);
   border: 2px solid #74c2e7;
-  display: table-column;
   float: left;
   margin-top: -2px;
   margin-left: -2px;
@@ -572,6 +565,10 @@ table tr td {
 
 .top_content {
   padding: 0 0 5px 0;
+}
+
+.hide_block {
+  display: none !important;
 }
 
 .screenshot {
@@ -848,6 +845,10 @@ p.registerInfo {
       color: #000;
       padding: 4px 6px;
       margin: 2px;
+      padding: 6px 16px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+      box-shadow: 0px 0px 10px #71A0FF;
+      cursor: pointer;
     }
     #changePasswordForm label {
       font-size: 12px;
@@ -1282,7 +1283,7 @@ p.registerInfo {
         .side_img_links .side_img_link a {
           display: block;
         }
-    .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua, .showLintLog, .addScreenshot, .change_downloading_status, .change_sync_status {
+    .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua, .showLintLog, .addScreenshot, .change_downloading_status, .change_sync_status, .printMapContent {
       cursor: pointer;
     }
     .reportCopyright {
@@ -1311,4 +1312,13 @@ p.registerInfo {
 .integration {
   color: #ff0000;
   font-weight: bold;
+}
+
+.maps_page_buttons_form {
+  float: left;
+}
+
+.maps_page_buttons {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
 }
