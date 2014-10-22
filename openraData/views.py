@@ -7,6 +7,7 @@ import shutil
 import multiprocessing
 import random
 import operator
+import json
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
@@ -415,6 +416,13 @@ def displayMap(request, arg):
 
     screenshots = Screenshots.objects.filter(ex_name="maps",ex_id=arg)
 
+    played_counter = urllib2.urlopen("http://master.openra.net/map_stats?hash=%s" % mapObject.map_hash).read().decode()
+    played_counter = json.loads(played_counter)
+    if played_counter:
+        played_counter = played_counter["played"]
+    else:
+        played_counter = 0
+
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -440,6 +448,7 @@ def displayMap(request, arg):
         'shpNames': shpNames,
         'disk_size': disk_size,
         'duplicates': duplicates,
+        'played_counter': played_counter,
     })
     return StreamingHttpResponse(template.render(context))
 

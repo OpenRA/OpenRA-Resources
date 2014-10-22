@@ -277,7 +277,8 @@
                     <br /><br />
                     <div class="map_data_label">Rating:</div><div class="map_data_text">{{ map.rating_score }}</div>
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
-                    <div class="map_data_label">Downloaded:</div><div class="map_data_text">{{ map.downloaded }}</div><br /><br />
+                    <div class="map_data_label">Downloaded:</div><div class="map_data_text">{{ map.downloaded }}</div>
+                    <div class="map_data_label">Played:</div><div class="map_data_text">{{ played_counter }}</div><br /><br />
                     <div class="map_data_link"><a class="printYamlShow">show yaml</a></div>
                     <div class="map_data_link"><a class="printMapContent">show archive content</a></div>
                     {% if request.user.is_authenticated %}
