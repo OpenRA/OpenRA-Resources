@@ -217,11 +217,13 @@ def GenerateSHPpreview(mapObject):
 	for item in mapObject:
 		path = os.getcwd() + os.sep + 'openraData/data/maps/' + str(item.id) + os.sep
 		Dir = os.listdir(path + 'content/')
+		if os.path.isdir(path+'content/png/'):
+			shutil.rmtree(path+'content/png/')
 		for fn in Dir:
 			if fn.endswith('.shp'):
 				os.mkdir(path + 'content/png/')
 				os.chdir(path + 'content/png/')
-				command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_PATH, mapObject.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+				command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_PATH, item.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
 				proc = Popen(command.split(), stdout=PIPE).communicate()
 				pngsdir = os.listdir(path + 'content/png/')
 				imglist = []
