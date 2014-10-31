@@ -525,11 +525,13 @@ def serveMinimap(request, arg):
         if filename.endswith("-mini.png"):
             minimap = filename
             serveImage = path + os.sep + minimap
+            break
     contentDir = os.listdir(path + '/content/')
     for filename in contentDir:
         if filename == "map.png":
             minimap = filename
             serveImage = path + '/content/' + minimap
+            break
     if minimap == "":
         minimap = "nominimap.png"
         serveImage = os.getcwd() + os.sep + __name__.split('.')[0] + '/static/images/nominimap.png'
