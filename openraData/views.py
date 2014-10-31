@@ -524,14 +524,15 @@ def serveMinimap(request, arg):
     for filename in mapDir:
         if filename.endswith("-mini.png"):
             minimap = filename
+            serveImage = path + os.sep + minimap
+    contentDir = os.listdir(path + '/content/')
+    for filename in contentDir:
         if filename == "map.png":
             minimap = filename
-            break
+            serveImage = path + '/content/' + minimap
     if minimap == "":
         minimap = "nominimap.png"
         serveImage = os.getcwd() + os.sep + __name__.split('.')[0] + '/static/images/nominimap.png'
-    else:
-        serveImage = path + os.sep + minimap
     response = StreamingHttpResponse(open(serveImage), content_type='image/png')
     response['Content-Disposition'] = 'attachment; filename = %s' % minimap
     return response
