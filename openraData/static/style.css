@@ -1338,3 +1338,8 @@ p.registerInfo {
   padding-left: 8px !important;
   padding-right: 8px !important;
 }
+
+.five-star-rating {
+  padding-bottom: 5px;
+  margin-left: -5px;
+}
