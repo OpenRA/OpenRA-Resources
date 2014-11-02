@@ -157,9 +157,9 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			if arg2 == "-posted":
 				mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=False)
 			if arg2 == "rating":
-				mapObject = sorted(mapObject, key=lambda x: (x.rating_score), reverse=True)
+				mapObject = sorted(mapObject, key=lambda x: (x.rating), reverse=True)
 			if arg2 == "-rating":
-				mapObject = sorted(mapObject, key=lambda x: (x.rating_score), reverse=False)
+				mapObject = sorted(mapObject, key=lambda x: (x.rating), reverse=False)
 			if arg2 == "downloaded":
 				mapObject = sorted(mapObject, key=lambda x: (x.downloaded), reverse=True)
 			if arg2 == "-downloaded":
@@ -410,12 +410,11 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		posted: {18}
 		viewed: {19}
 		downloaded: {20}
-		rating_votes: {21}
-		rating_score: {22}
-		license: {23}
-		minimap: {24}
-		url: {25}
-		downloading: {26}\n""".format(
+		rating: {21}
+		license: {22}
+		minimap: {23}
+		url: {24}
+		downloading: {25}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
 		mapObject.title,
@@ -437,8 +436,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		str(mapObject.posted),
 		mapObject.viewed,
 		mapObject.downloaded,
-		mapObject.rating_votes,
-		mapObject.rating_score,
+		mapObject.rating,
 		license,
 		minimap,
 		url,
@@ -468,8 +466,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	response_data['posted'] = str(mapObject.posted)
 	response_data['viewed'] = mapObject.viewed
 	response_data['downloaded'] = mapObject.downloaded
-	response_data['rating_votes'] = mapObject.rating_votes
-	response_data['rating_score'] = mapObject.rating_score
+	response_data['rating'] = mapObject.rating
 	response_data['license'] = license
 	response_data['minimap'] = minimap
 	response_data['url'] = url

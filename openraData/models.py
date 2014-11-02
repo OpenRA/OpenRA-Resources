@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from djangoratings.fields import RatingField
 
 class UserOptions(models.Model):
 
@@ -61,7 +60,7 @@ class Maps(models.Model):
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
     downloaded          = models.IntegerField(default=0)
-    rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
+    rating              = models.FloatField(default=0.0)
     rsync_allow         = models.BooleanField(default=True)
     amount_reports      = models.IntegerField(default=0)
     policy_cc           = models.BooleanField(default=False)
@@ -85,7 +84,7 @@ class Units(models.Model):
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
     downloaded          = models.IntegerField(default=0)
-    rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
+    rating              = models.FloatField(default=0.0)
     policy_cc           = models.BooleanField(default=False)
     policy_adaptations  = models.CharField(max_length=30)
     policy_commercial   = models.BooleanField(default=False)
@@ -104,7 +103,7 @@ class Mods(models.Model):
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
     downloaded          = models.IntegerField(default=0)
-    rating              = RatingField(range=5, allow_anonymous=True, use_cookies=True)
+    rating              = models.FloatField(default=0.0)
     policy_cc           = models.BooleanField(default=False)
     policy_adaptations  = models.CharField(max_length=30)
     policy_commercial   = models.BooleanField(default=False)
@@ -121,6 +120,7 @@ class Replays(models.Model):
     posted              = models.DateTimeField('date published')
     viewed              = models.IntegerField(default=0)
     downloaded          = models.IntegerField(default=0)
+    rating              = models.FloatField(default=0.0)
 
 class Palettes(models.Model):
 
@@ -132,6 +132,7 @@ class Palettes(models.Model):
     info                = models.CharField(max_length=400)
     used                = models.IntegerField(default=0)
     posted              = models.DateTimeField('date published')
+    rating              = models.FloatField(default=0.0)
 
 class Reports(models.Model):
 
@@ -165,3 +166,14 @@ class CrashReports(models.Model):
     description         = models.CharField(max_length=400)
     isdesync            = models.BooleanField(default=False)
     gistID              = models.IntegerField(default=0)
+
+class Rating(models.Model):
+
+    class Meta:
+        verbose_name = 'Rating'
+
+    user                = models.ForeignKey(User)
+    ex_id               = models.IntegerField(default=0)
+    ex_name             = models.CharField(max_length=16)
+    rating              = models.FloatField(default=0.0)
+    posted              = models.DateTimeField('date rated')

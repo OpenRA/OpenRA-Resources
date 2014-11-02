@@ -25,8 +25,7 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, triggers
-from openraData.models import Maps, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions
-from djangoratings.models import Score, Vote
+from openraData.models import Maps, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 
@@ -192,10 +191,10 @@ def randomMap(request):
     return HttpResponseRedirect('/maps/'+str(mapObject.id))
 
 def mostRatedMap(request):
-    max_rating = Vote.objects.all().aggregate(Max('score'))['score__max']
-    voteObject = Vote.objects.filter(score=max_rating)
+    max_rating = Maps.objects.all().aggregate(Max('rating'))['rating__max']
+    voteObject = Maps.objects.filter(rating=max_rating)
     voteObject = random.choice(voteObject)
-    return HttpResponseRedirect('/maps/'+str(voteObject.object_id))
+    return HttpResponseRedirect('/maps/'+str(voteObject.id))
 
 def mostCommentedMap(request):
     mapObject = Maps.objects.filter(next_rev=0)
@@ -423,6 +422,9 @@ def displayMap(request, arg):
     else:
         played_counter = 0
 
+    ratesAmount = Rating.objects.filter(ex_id=mapObject.id,ex_name='map')
+    ratesAmount = len(ratesAmount)
+
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -449,6 +451,7 @@ def displayMap(request, arg):
         'disk_size': disk_size,
         'duplicates': duplicates,
         'played_counter': played_counter,
+        'ratesAmount': ratesAmount,
     })
     return StreamingHttpResponse(template.render(context))
 

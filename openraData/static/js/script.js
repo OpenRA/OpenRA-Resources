@@ -77,7 +77,7 @@ $(document).ready(function() {
 	$('.five-star-rating').jRating({
 		bigStarsPath: '/static/js/jRating/icons/star.png',
 		smallStarsPath: '/static/js/jRating/icons/small.png',
-		phpPath: '/ajax/jRating/',
+		phpPath: '/ajax/jRating/' + $('.five-star-rating').data('type') + '/',
 		length: 5,
 		canRateAgain: false,
 		nbRates: 1,

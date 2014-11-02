@@ -95,7 +95,7 @@ urlpatterns = patterns('',
     url(r'^robots\.txt$', RedirectView.as_view(url='/static/robots.txt')),
     url(r'^sitemap\.xml$', RedirectView.as_view(url='/static/sitemap.xml')),
 
-    url(r'^ajax/jRating/?$', ajax.jRating, name='ajax.jRating'),
+    url(r'^ajax/jRating/(?P<arg>\w+)/?$', ajax.jRating, name='ajax.jRating'),
 
     url(r'^.*$', views.handle404, name='handle404'),
 )
