@@ -3,8 +3,7 @@ from django.views.generic import RedirectView
 from registration.forms import RegistrationFormUniqueEmail
 from registration.backends.default.views import RegistrationView
 
-from openraData import views
-from openraData import api
+from openraData import views, api, ajax
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
@@ -95,7 +94,8 @@ urlpatterns = patterns('',
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
     url(r'^robots\.txt$', RedirectView.as_view(url='/static/robots.txt')),
     url(r'^sitemap\.xml$', RedirectView.as_view(url='/static/sitemap.xml')),
-    url(r'^uptime/?$', views.uptime, name="uptime"),
+
+    url(r'^ajax/jRating/(?P<arg>\w+)/?$', ajax.jRating, name='ajax.jRating'),
 
     url(r'^.*$', views.handle404, name='handle404'),
 )

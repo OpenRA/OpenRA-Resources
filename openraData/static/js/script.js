@@ -70,3 +70,21 @@ $(document).ready(function() {
 	$(elements_paging[0]).removeClass('hide_block');
 });
 /*	id 5: end */
+
+
+/*	-id 6: jRating (5 star rating) */
+$(document).ready(function() {
+	$('.five-star-rating').jRating({
+		bigStarsPath: '/static/js/jRating/icons/star.png',
+		smallStarsPath: '/static/js/jRating/icons/small.png',
+		phpPath: '/ajax/jRating/' + $('.five-star-rating').data('type') + '/',
+		length: 5,
+		canRateAgain: false,
+		nbRates: 1,
+		rateMax: 5,
+		decimalLength: 1,
+		onSuccess: function (response){
+		},
+	});
+});
+/*	id 6: end */

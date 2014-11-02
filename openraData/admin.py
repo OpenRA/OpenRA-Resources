@@ -11,6 +11,7 @@ from openraData.models import Reports
 from openraData.models import UserOptions
 from openraData.models import NotifyOfComments
 from openraData.models import ReadComments
+from openraData.models import Rating
 
 admin.site.register(Maps)
 admin.site.register(Units)
@@ -23,3 +24,4 @@ admin.site.register(Reports)
 admin.site.register(UserOptions)
 admin.site.register(NotifyOfComments)
 admin.site.register(ReadComments)
+admin.site.register(Rating)

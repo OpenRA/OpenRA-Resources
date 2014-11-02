@@ -336,6 +336,18 @@ table tr td {
   padding: 8px;
 }
 
+.map-custom-status{
+}
+
+.map-custom-status img {
+  position: relative;
+  min-width: 100%;
+  left: 0;
+  padding: 0px;
+  top: 3px;
+  box-shadow: 0px 2px 5px #000;
+}
+
 #rssfeed {
   width: 800px;
   margin: 5px auto;
@@ -772,6 +784,10 @@ p.registerInfo {
   }
 .license_cc .license_options {
   list-style-type: none;
+}
+
+.license_options {
+  display: none;
 }
 
 /* Profile pages */
@@ -1321,4 +1337,9 @@ p.registerInfo {
 .maps_page_buttons {
   padding-left: 8px !important;
   padding-right: 8px !important;
+}
+
+.five-star-rating {
+  padding-bottom: 5px;
+  margin-left: -5px;
 }

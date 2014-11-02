@@ -20,6 +20,15 @@
                             <div class="cell-link-container">
                                 <div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title }}</div>
                             </div>
+                            {% if item.downloading == False or item.requires_upgrade == True or item.players == 0  or item.amount_reports >= 3 %}
+                            <div class="map-custom-status"><img src="/static/images/attention-mini.jpg" /></div>
+                            {% endif %}
+                            {% if item.advanced_map %}
+                            <div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" /></div>
+                            {% endif %}
+                            {% if item.lua %}
+                            <div class="map-custom-status"><img src="/static/images/lua-mini.jpg" /></div>
+                            {% endif %}
                         </a>
                         <div class="map_tooltip">
                             <div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
@@ -40,7 +49,7 @@
                                     <td class="tooltip_title_misc">Comments: </td>
                                     <td class="tooltip_value_misc">{{ comments|amount_comments:item.id }}</td>
                                     <td class="tooltip_title_misc">Rating: </td>
-                                    <td class="tooltip_value_misc">0</td>
+                                    <td class="tooltip_value_misc">{{ item.rating }}</td>
                                 </tr>
                             </table>
                         </div>
