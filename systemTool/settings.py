@@ -56,7 +56,6 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'registration',
     'openraData',
-    'djangoratings',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
