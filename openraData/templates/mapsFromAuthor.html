@@ -8,6 +8,15 @@
                             <div class="cell-link-container">
                                 <div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title }}</div>
                             </div>
+                            {% if item.downloading == False or item.requires_upgrade == True or item.players == 0  or item.amount_reports >= 3 %}
+                            <div class="map-custom-status"><img src="/static/images/attention-mini.jpg" /></div>
+                            {% endif %}
+                            {% if item.advanced_map %}
+                            <div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" /></div>
+                            {% endif %}
+                            {% if item.lua %}
+                            <div class="map-custom-status"><img src="/static/images/lua-mini.jpg" /></div>
+                            {% endif %}
                         </a>
                         <div class="map_tooltip">
                             <div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
