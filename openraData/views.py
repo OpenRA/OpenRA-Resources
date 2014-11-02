@@ -965,13 +965,3 @@ def links(request):
         'title': ' - Links',
     })
     return StreamingHttpResponse(template.render(context))
-
-def uptime(request):
-    template = loader.get_template('index.html')
-    context = RequestContext(request, {
-        'content': 'uptime.html',
-        'request': request,
-        'http_host': request.META['HTTP_HOST'],
-        'title': ' - Uptime',
-    })
-    return StreamingHttpResponse(template.render(context))
