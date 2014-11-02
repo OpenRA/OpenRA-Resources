@@ -786,6 +786,10 @@ p.registerInfo {
   list-style-type: none;
 }
 
+.license_options {
+  display: none;
+}
+
 /* Profile pages */
 
 #profile_container {

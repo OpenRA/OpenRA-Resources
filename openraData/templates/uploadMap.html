@@ -1,12 +1,13 @@
             {% if user.is_authenticated %}
             <script>
-                $(function() {
+                $(document).ready(function() {
                     $("input[value=cc_yes]").click(function() {
                         $(".license_options").show();
                     });
                     $("input[value=cc_no]").click(function() {
                         $(".license_options").hide();
                     });
+                    $("input[value=cc_no]").prop("checked", "true");
                 });
             </script>
             <div class="upload_container">
