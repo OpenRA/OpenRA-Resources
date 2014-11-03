@@ -22,7 +22,7 @@ class MLStripper(HTMLParser):
 def strip_tags(value):
 	s = MLStripper()
 	s.feed(value)
-	return s.get_data()
+	return s.get_data().replace("''","'")
 register.filter('strip_tags', strip_tags)
 
 def proper_space(value):

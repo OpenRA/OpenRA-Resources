@@ -1,3 +1,4 @@
+{% load customTags %}
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
 <channel>
 	<atom:link href="/news/feed/" rel="self" type="application/rss+xml"/>
@@ -10,7 +11,7 @@
 		<guid isPermaLink="false">
 		http://{{http_host}}/maps/{{item.id}}/
 		</guid>
-		<title>{{item.title}}</title>
+		<title>{{item.title|strip_tags}}</title>
 		<link>
 		http://{{http_host}}/maps/{{item.id}}/
 		</link>
@@ -27,7 +28,7 @@
 		</description>
 		<pubDate>{{item.posted}}</pubDate>
 		<author>
-		<name>{{item.author}}</name>
+		<name>{{item.author|strip_tags}}</name>
 		</author>
 	</item>
 	{% endfor %}

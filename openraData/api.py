@@ -3,6 +3,7 @@ import json
 import base64
 import zipfile
 import urllib2
+import cgi
 from subprocess import Popen, PIPE
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -417,17 +418,17 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		downloading: {25}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
-		mapObject.title,
-		mapObject.description,
-		mapObject.author.encode('utf-8').decode('utf-8'),
-		mapObject.map_type,
+		cgi.escape(mapObject.title, quote=None),
+		cgi.escape(mapObject.description, quote=None),
+		cgi.escape(mapObject.author.encode('utf-8').decode('utf-8'), quote=None),
+		cgi.escape(mapObject.map_type, quote=None),
 		mapObject.players,
-		mapObject.game_mod,
+		cgi.escape(mapObject.game_mod, quote=None),
 		mapObject.width,
 		mapObject.height,
 		mapObject.bounds,
 		mapObject.spawnpoints,
-		mapObject.tileset,
+		cgi.escape(mapObject.tileset, quote=None),
 		mapObject.revision,
 		last_revision,
 		mapObject.requires_upgrade,
@@ -441,23 +442,23 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		minimap,
 		url,
 		downloading,
-		).replace("\t\t","\t")
+		).replace("\t\t","\t").replace("''", "'")
 		return response_data
 	response_data = {}
 	response_data['id'] = mapObject.id
-	response_data['title'] = mapObject.title
-	response_data['description'] = mapObject.description
-	response_data['info'] = mapObject.info
-	response_data['author'] = mapObject.author
-	response_data['map_type'] = mapObject.map_type
+	response_data['title'] = cgi.escape(mapObject.title, quote=None).replace("''", "'")
+	response_data['description'] = cgi.escape(mapObject.description, quote=None).replace("''", "'")
+	response_data['info'] = cgi.escape(mapObject.info, quote=None).replace("''", "'")
+	response_data['author'] = cgi.escape(mapObject.author, quote=None).replace("''", "'")
+	response_data['map_type'] = cgi.escape(mapObject.map_type, quote=None).replace("''", "'")
 	response_data['players'] = mapObject.players
-	response_data['game_mod'] = mapObject.game_mod
+	response_data['game_mod'] = cgi.escape(mapObject.game_mod, quote=None).replace("''", "'")
 	response_data['map_hash'] = mapObject.map_hash
 	response_data['width'] = mapObject.width
 	response_data['height'] = mapObject.height
 	response_data['bounds'] = mapObject.bounds
 	response_data['spawnpoints'] = mapObject.spawnpoints
-	response_data['tileset'] = mapObject.tileset
+	response_data['tileset'] = cgi.escape(mapObject.tileset, quote=None)
 	response_data['revision'] = mapObject.revision
 	response_data['last_revision'] = last_revision
 	response_data['requires_upgrade'] = mapObject.requires_upgrade
