@@ -152,9 +152,7 @@ class MapHandlers():
             if line.strip()[0:13] == "UseAsShellmap":
                 state = line.split(':')[1]
                 if state.strip().lower() in ['true', 'on', 'yes', 'y']:
-                    self.LOG.append('Failed. Reason: %s' % line)
-                    misc.send_email_to_admin_OnMapFail(tempname)
-                    return False
+                    pass
             if line.strip()[0:5] == "Rules":
                 shouldCount = True
             if shouldCount:
