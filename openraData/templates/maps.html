@@ -9,13 +9,13 @@
                                 <div><img src="/maps/{{item.id}}/minimap" alt="{{item.id}}" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
                             </div>
                             {% if item.downloading == False or item.requires_upgrade == True or item.players == 0  or item.amount_reports >= 3 %}
-                            <div class="map-custom-status"><img src="/static/images/attention-mini.jpg" /></div>
+                            <div class="map-custom-status"><img src="/static/images/attention-mini.jpg" alt="attention" /></div>
                             {% endif %}
                             {% if item.advanced_map %}
-                            <div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" /></div>
+                            <div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" alt="advanced" /></div>
                             {% endif %}
                             {% if item.lua %}
-                            <div class="map-custom-status"><img src="/static/images/lua-mini.jpg" /></div>
+                            <div class="map-custom-status"><img src="/static/images/lua-mini.jpg" alt="lua" /></div>
                             {% endif %}
                         </a>
                         <div class="map_tooltip">
