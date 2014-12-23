@@ -375,7 +375,7 @@
                     $(".printYamlShow").on("click", function() {
                         $(".popupContainer").empty()
                         $(".printMisc").empty()
-                        $(".printMisc").append($('<div class="popupContainer"></div>'))
+                        $(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
                         $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>map.yaml</h3></div>'));
                         $.ajax({
                             url : "/maps/{{map.id}}/yaml/",
@@ -396,7 +396,7 @@
                     $(".printRulesShow").on("click", function() {
                         $(".popupContainer").empty()
                         $(".printMisc").empty()
-                        $(".printMisc").append($('<div class="popupContainer"></div>'))
+                        $(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
                         $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>'+$(this).data("name")+'</h3></div>'));
                         $.ajax({
                             url : "/maps/{{map.id}}/rules/",
@@ -417,7 +417,7 @@
                     $(".showLintLog").on("click", function() {
                         $(".popupContainer").empty()
                         $(".printMisc").empty()
-                        $(".printMisc").append($('<div class="popupContainer"></div>'))
+                        $(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
                         $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>'+$(this).data("name")+'</h3></div>'));
                         $.ajax({
                             url : "/maps/{{map.id}}/lintlog/",
@@ -438,7 +438,7 @@
                     $(".printLua").on("click", function() {
                         $(".popupContainer").empty()
                         $(".printMisc").empty()
-                        $(".printMisc").append($('<div class="popupContainer"></div>'))
+                        $(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
                         $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>'+$(this).data("name")+'</h3></div>'));
                         $.ajax({
                             url : "/maps/{{map.id}}/lua/" + this.title,
@@ -457,7 +457,7 @@
                     })
 
                     $(".addScreenshot").on("click", function() {
-                        $(".addScreenshotForm").empty()
+                        $(".addScreenshotForm").empty();
                         $.ajax({
                             url : "/maps/{{map.id}}/addmapsc/" + this.title,
                             dataType: "text",

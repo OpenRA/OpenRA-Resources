@@ -1343,3 +1343,12 @@ p.registerInfo {
   padding-bottom: 5px;
   margin-left: -5px;
 }
+
+.ajax-loader {
+  position: relative;
+  left: 39%;
+  margin-top: 15%;
+  background-image: url('/static/images/loader.gif');
+  width: 128px;
+  height: 128px;
+}
