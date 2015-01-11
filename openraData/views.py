@@ -8,6 +8,7 @@ import multiprocessing
 import random
 import operator
 import json
+import cgi
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
@@ -586,7 +587,7 @@ def serveOramap(request, arg, sync=""):
 
 def serveYaml(request, arg):
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
-    response = StreamingHttpResponse(open(path), content_type='application/plain')
+    response = StreamingHttpResponse(cgi.escape(open(path).read(), quote=None), content_type='application/plain')
     response['Content-Disposition'] = 'attachment; filename = map.yaml'
     return response
 
@@ -602,7 +603,7 @@ def serveYamlRules(request, arg):
             start = True
         if start:
             result += line
-    response = StreamingHttpResponse(result, content_type='application/plain')
+    response = StreamingHttpResponse(cgi.escape(result, quote=None), content_type='application/plain')
     response['Content-Disposition'] = 'attachment; filename = advanced.%s' % arg
     return response
 
@@ -617,7 +618,7 @@ def serveLua(request, arg, name):
                 break
     if fname == "":
         raise Http404
-    response = StreamingHttpResponse(open(path+fname), content_type='application/plain')
+    response = StreamingHttpResponse(cgi.escape(open(path+fname).read(), quote=None), content_type='application/plain')
     response['Content-Disposition'] = 'attachment; filename = %s' % fname
     return response
 

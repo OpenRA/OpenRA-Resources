@@ -5,8 +5,8 @@
 
                     <div class="map_title left">
                         <div>
-                            <div class="title">{{ map.title }}</div>
-                            <div class="author">by {{ map.author }}</div>
+                            <div class="title">{{ map.title|strip_tags }}</div>
+                            <div class="author">by {{ map.author|strip_tags }}</div>
                         </div>
                     </div>
 
@@ -79,7 +79,7 @@
                             <h5>Description:</h5>
                             <p></p>
                             {% autoescape off %}
-                            {{ map.description|strip_tags|convert_links }}
+                            {{ map.description|strip_tags|convert_links|nl_to_br }}
                             {% endautoescape %}
                         </div>
                         {% if map.info %}
@@ -192,6 +192,7 @@
 
                     {% if shpNames %}
                     <div class="map_shp cBlock">
+                        <span class="top-bottom-double-arrow" title="show more shp previews">⇳</span>
                         <h5>Preview of embeded SHP files:</h5>
                         {% for item in shpNames %}
                         <div class="cSHP"><img src="/maps/{{arg}}/shp/{{item}}" alt="shp" /></div>
@@ -275,7 +276,7 @@
                     <div class="map_data_label">Downloading:</div><div class="map_data_text" title="ingame"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < 3 and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
                     <div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">{% if map.rsync_allow and map.downloading and reports|length < 3 and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
                     <br /><br />
-                    <div class="map_data_label">Rating:</div><div class="map_data_text">{% if request.user.is_authenticated %}<div class="five-star-rating" data-average="{{map.rating}}" data-id="{{map.id}}" data-type="map" title="{{ratesAmount}} users rated, average: {{map.rating}}"></div>{% else %}<span title="Authenticate to rate map">{{ map.rating }}</title>{% endif %}</div>
+                    <div class="map_data_label">Rating:</div><div class="map_data_text">{% if request.user.is_authenticated %}<div class="five-star-rating" data-average="{{map.rating}}" data-id="{{map.id}}" data-type="map" title="{{ratesAmount}} users rated, average: {{map.rating}}"></div>{% else %}<span title="Authenticate to rate map">{{ map.rating }}</span>{% endif %}</div>
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
                     <div class="map_data_label">Downloaded:</div><div class="map_data_text">{{ map.downloaded }}</div>
                     <div class="map_data_label">Played:</div><div class="map_data_text">{{ played_counter }}</div><br /><br />
@@ -313,7 +314,7 @@
 
                     <div class="side_img_links">
                         {% if mapsFromAuthor %}
-                        <div>More from <a href="/maps/author/{{map.author|proper_space}}/" title="Author">{{ map.author }}</a>:</div>
+                        <div>More from <a href="/maps/author/{{map.author|proper_space}}/" title="Author">{{ map.author|strip_tags }}</a>:</div>
                         {% for item in mapsFromAuthor %}
                             <div class="side_img_link"><a title="{{item.title}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" alt="minimap" /></a></div>
                         {% endfor %}
@@ -375,7 +376,7 @@
                     $(".printYamlShow").on("click", function() {
                         $(".popupContainer").empty()
                         $(".printMisc").empty()
-                        $(".printMisc").append($('<div class="popupContainer"></div>'))
+                        $(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
                         $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>map.yaml</h3></div>'));
                         $.ajax({
                             url : "/maps/{{map.id}}/yaml/",
@@ -396,7 +397,7 @@
                     $(".printRulesShow").on("click", function() {
                         $(".popupContainer").empty()
                         $(".printMisc").empty()
-                        $(".printMisc").append($('<div class="popupContainer"></div>'))
+                        $(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
                         $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>'+$(this).data("name")+'</h3></div>'));
                         $.ajax({
                             url : "/maps/{{map.id}}/rules/",
@@ -417,7 +418,7 @@
                     $(".showLintLog").on("click", function() {
                         $(".popupContainer").empty()
                         $(".printMisc").empty()
-                        $(".printMisc").append($('<div class="popupContainer"></div>'))
+                        $(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
                         $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>'+$(this).data("name")+'</h3></div>'));
                         $.ajax({
                             url : "/maps/{{map.id}}/lintlog/",
@@ -438,7 +439,7 @@
                     $(".printLua").on("click", function() {
                         $(".popupContainer").empty()
                         $(".printMisc").empty()
-                        $(".printMisc").append($('<div class="popupContainer"></div>'))
+                        $(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
                         $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>'+$(this).data("name")+'</h3></div>'));
                         $.ajax({
                             url : "/maps/{{map.id}}/lua/" + this.title,
@@ -457,7 +458,7 @@
                     })
 
                     $(".addScreenshot").on("click", function() {
-                        $(".addScreenshotForm").empty()
+                        $(".addScreenshotForm").empty();
                         $.ajax({
                             url : "/maps/{{map.id}}/addmapsc/" + this.title,
                             dataType: "text",
