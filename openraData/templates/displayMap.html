@@ -79,7 +79,7 @@
                             <h5>Description:</h5>
                             <p></p>
                             {% autoescape off %}
-                            {{ map.description|strip_tags|convert_links }}
+                            {{ map.description|strip_tags|convert_links|nl_to_br }}
                             {% endautoescape %}
                         </div>
                         {% if map.info %}
@@ -192,6 +192,7 @@
 
                     {% if shpNames %}
                     <div class="map_shp cBlock">
+                        <span class="top-bottom-double-arrow" title="show more shp previews">⇳</span>
                         <h5>Preview of embeded SHP files:</h5>
                         {% for item in shpNames %}
                         <div class="cSHP"><img src="/maps/{{arg}}/shp/{{item}}" alt="shp" /></div>

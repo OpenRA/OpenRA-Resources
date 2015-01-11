@@ -44,3 +44,7 @@ register.filter('account_link', account_link)
 def map_real_size(value):
 	return "x".join(value.split(',')[2:])
 register.filter('map_real_size', map_real_size)
+
+def nl_to_br(value):
+	return value.replace('\\n', '<br />')
+register.filter('nl_to_br', nl_to_br)

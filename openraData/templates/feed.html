@@ -16,15 +16,17 @@
 		http://{{http_host}}/maps/{{item.id}}/
 		</link>
 		<description>
+		{% autoescape off %}
 		<![CDATA[<img align="left" hspace="5" src="http://{{http_host}}/maps/{{item.id}}/minimap"/>
-		{% if item.description != "" %}Description: {{item.description}}<br />{% endif %}Mod: {{item.game_mod}}<br />Type: {{item.map_type}}<br />Revision: {{item.revision}}<br />Max Players: {{item.players}}<br />Tileset: {{item.tileset}}<br />Hash: {{item.map_hash}}
+		{% if item.description != "" %}Description: {{item.description|nl_to_br}}<br />{% endif %}Mod: {{item.game_mod}}<br />Type: {{item.map_type}}<br />Revision: {{item.revision}}<br />Max Players: {{item.players}}<br />Tileset: {{item.tileset}}<br />Hash: {{item.map_hash}}
 		{% if item.info != "" %}
 		<br />
-		Info by uploader: {{item.info}}
+		Info by uploader: {{item.info|nl_to_br}}
 		{% endif %}
 		{% if item.advanced_map == True %}
 		<br /><br />Map is advanced{% if item.lua == True %} and contains Lua logic{% endif %}
 		{% endif %} ]]>
+		{% endautoescape %}
 		</description>
 		<pubDate>{{item.posted}}</pubDate>
 		<author>

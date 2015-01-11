@@ -975,6 +975,7 @@ p.registerInfo {
       width: 70%;
       color: #f0f0f0;
       padding: 1px 0;
+      word-break: break-word;
     }
     .map_tooltip .tooltip_title_misc {
       width: 35%;
@@ -1178,6 +1179,7 @@ p.registerInfo {
         }
     .map_shp {
       min-height: 84px;
+      overflow: hidden;
     }
       .map_shp .cSHP {
         display: inline-block;
@@ -1219,6 +1221,7 @@ p.registerInfo {
       padding: 0 0 1px;
       font-size: 0.9em;
       vertical-align: top;
+      word-wrap: break-word;
     }
     .right_map_content .map_data_link {
       width: 100%;
@@ -1351,4 +1354,14 @@ p.registerInfo {
   background-image: url('/static/images/loader.gif');
   width: 128px;
   height: 128px;
+}
+
+.top-bottom-double-arrow {
+  display: none;
+  position: absolute;
+  color: #74c2e7;
+  font-size: 40px;
+  right: 22px;
+  margin-top: 35px;
+  cursor: pointer;
 }
