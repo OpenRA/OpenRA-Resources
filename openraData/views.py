@@ -142,7 +142,8 @@ def maps(request, page=1, filter=""):
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
-    if len(mapObject) == 0 and int(page) != 1:
+    amount_this_page = len(mapObject)
+    if amount_this_page == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/")
 
     comments = misc.count_comments_for_many(mapObject, 'map')
@@ -158,6 +159,8 @@ def maps(request, page=1, filter=""):
         'range': [i+1 for i in range(rowsRange)],
         'amount': amount,
         'comments': comments,
+        'slice_start': slice_start,
+        'amount_this_page': amount_this_page,
     })
     return StreamingHttpResponse(template.render(context))
 

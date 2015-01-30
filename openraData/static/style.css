@@ -308,6 +308,12 @@ table tr td {
   color: #fff;
 }
 
+.map-grid-header-info {
+  margin-left: 1px;
+  margin-right: 2px;
+  border: 2px solid #74c2e7;;
+}
+
 .cell-link-container {
   text-align: center;
   position: absolute;
@@ -521,10 +527,16 @@ table tr td {
 }
 
 .copyright {
-  margin-left: 223px;
+  position: relative;
+  width: 100%;
   height: 100%;
   float: left;
   vertical-align: middle;
+}
+
+.footer-links {
+  position: absolute;
+  width: 800px;
 }
 
 .FAQ {
@@ -1305,6 +1317,9 @@ p.registerInfo {
     .editMapInfoShow, .report, .reportCopyright, .allReportsShow, .printYamlShow, .printLua, .showLintLog, .addScreenshot, .change_downloading_status, .change_sync_status, .printMapContent {
       cursor: pointer;
     }
+    .syncing_status {
+      cursor: default;
+    }
     .reportCopyright {
       font-size: 0.9em;
     }
@@ -1364,4 +1379,8 @@ p.registerInfo {
   right: 22px;
   margin-top: 35px;
   cursor: pointer;
+}
+
+.no-pd-bot {
+  padding-bottom: 0px !important;
 }
