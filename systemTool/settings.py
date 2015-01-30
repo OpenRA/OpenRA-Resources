@@ -121,6 +121,12 @@ STATIC_URL = '/static/'
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
+
+###########################
+##### CUSTOM SETTINGS #####
+###########################
+
+
 # Path to directory where OpenRA files are stored
 OPENRA_PATH = '/usr/lib/openra/'
 
@@ -142,3 +148,7 @@ DEFAULT_FROM_EMAIL = ''
 
 # Determining amount of reports for item, required to forbid in-game downloading, synchronization with servers, etc.
 REPORTS_PENALTY_AMOUNT = 3
+
+# Is site under maintenance
+SITE_MAINTENANCE = False
+SITE_MAINTENANCE_OVER = '14:00 GMT' # when we finish technical works

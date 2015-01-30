@@ -37,14 +37,18 @@ def index(request):
     else:
         newcomments = False
     template = loader.get_template('index.html')
-    context = RequestContext(request, {
+    template_args = {
         'content': 'index_content.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': '',
         'screenshots': scObject,
         'newcomments': newcomments,
-    })
+    }
+    if settings.SITE_MAINTENANCE:
+        template_args['content'] = 'service/maintenance.html'
+        template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
+    context = RequestContext(request, template_args)
     return StreamingHttpResponse(template.render(context))
 
 def logoutView(request):
