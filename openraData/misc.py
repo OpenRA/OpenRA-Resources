@@ -90,6 +90,13 @@ def send_email_to_user_OnComment(itemtype, itemid, email_addr, info=""):
 	email.send()
 	connection.close()
 
+def send_email_to_admin(title, body):
+	connection = mail.get_connection()
+	connection.open()
+	email = mail.EmailMessage(title, body, settings.ADMIN_EMAIL, [settings.ADMIN_EMAIL], connection=connection)
+	email.send()
+	connection.close()
+
 def return_email(userid):
 	# it will have set value if it's social account and email is provided
 	mail_addr = User.objects.get(pk=userid).email

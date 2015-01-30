@@ -10,11 +10,8 @@ from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
-from openraData.models import Maps
-from openraData.models import Units
-from openraData.models import Mods
-from openraData.models import Screenshots
-from openraData import triggers, misc
+from openraData.models import Maps, Units, Mods, Screenshots
+from openraData import utility, misc
 
 class MapHandlers():
     
@@ -236,7 +233,7 @@ class MapHandlers():
 
         self.GenerateMinimap()
         #self.GenerateFullPreview(userObject)
-        p = multiprocessing.Process(target=triggers.PushMapsToRsyncDirs, args=(), name='triggers')
+        p = multiprocessing.Process(target=utility.PushMapsToRsyncDirs, args=(), name='utility')
         p.start()
 
         shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(), name='shppreview')

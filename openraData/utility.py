@@ -2,6 +2,7 @@ import os
 import shutil
 import zipfile
 import string
+import signal
 from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from subprocess import Popen, PIPE
 from django.conf import settings
@@ -11,7 +12,6 @@ from django.utils import timezone
 from openraData.models import Maps, Screenshots, Reports
 from openraData import misc
 
-# Map Triggers
 
 def map_upgrade(mapObject, engine, http_host):
 	currentDirectory = os.getcwd() + os.sep
@@ -224,7 +224,30 @@ def GenerateSHPpreview(mapObject):
 				os.mkdir(path + 'content/png/')
 				os.chdir(path + 'content/png/')
 				command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_PATH, item.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
-				proc = Popen(command.split(), stdout=PIPE).communicate()
+				print(command)
+
+				class TimedOut(Exception): # Raised if timed out.
+					pass
+
+				def signal_handler(signum, frame):
+					raise TimedOut("Timed out!")
+
+				signal.signal(signal.SIGALRM, signal_handler)
+
+				signal.alarm(settings.UTILITY_TIME_LIMIT)    # Limit command execution time
+
+				try:
+					proc = Popen(command.split(), stdout=PIPE).communicate()
+					signal.alarm(0)
+				except:
+					err = 'Error: failed to generate SHP preview for %s (map: %s)' % (fn, item.id)
+					print(err)
+					misc.send_email_to_admin('ORC: Failed to generate SHP preview', '%s \n\n %s' % (err, command))
+
+					os.chdir(currentDirectory)
+					shutil.rmtree(path+'content/png/')
+
+					continue
 				pngsdir = os.listdir(path + 'content/png/')
 				imglist = []
 				for pngfn in pngsdir:
@@ -254,6 +277,7 @@ def GenerateMinimap(mapObject):
 		os.chdir(currentDirectory)
 		return False
 	command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (mapObject.game_mod, path + filename)
+	print(command)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
 		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
@@ -277,6 +301,7 @@ def GenerateFullPreview(mapObject, userObject):
 		os.chdir(currentDirectory)
 		return False
 	command = 'mono --debug OpenRA.Utility.exe %s --full-preview %s' % (mapObject.game_mod, path + filename)
+	print(command)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
 		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")

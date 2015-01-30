@@ -152,3 +152,6 @@ REPORTS_PENALTY_AMOUNT = 3
 # Is site under maintenance
 SITE_MAINTENANCE = False
 SITE_MAINTENANCE_OVER = '14:00 GMT' # when we finish technical works
+
+# Time limit for some execution processes
+UTILITY_TIME_LIMIT = 60

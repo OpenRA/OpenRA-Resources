@@ -25,7 +25,7 @@ from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
-from openraData import handlers, misc, triggers
+from openraData import handlers, misc, utility
 from openraData.models import Maps, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -707,7 +707,7 @@ def DeleteMap(request, arg):
         if mapObject.next_rev != 0:
             Maps.objects.filter(id=mapObject.next_rev).update(pre_rev=mapObject.pre_rev)
         mapObject.delete()
-        p = multiprocessing.Process(target=triggers.PushMapsToRsyncDirs, args=(), name='triggers')
+        p = multiprocessing.Process(target=utility.PushMapsToRsyncDirs, args=(), name='utility')
         p.start()
     template = loader.get_template('index.html')
     context = RequestContext(request, {
