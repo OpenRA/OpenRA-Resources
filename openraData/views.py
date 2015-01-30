@@ -457,6 +457,7 @@ def displayMap(request, arg):
         'duplicates': duplicates,
         'played_counter': played_counter,
         'ratesAmount': ratesAmount,
+        'REPORTS_PENALTY_AMOUNT': settings.REPORTS_PENALTY_AMOUNT,
     })
     return StreamingHttpResponse(template.render(context))
 
