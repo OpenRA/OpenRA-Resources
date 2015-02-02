@@ -159,8 +159,6 @@ def maps(request, page=1, filter=""):
         'range': [i+1 for i in range(rowsRange)],
         'amount': amount,
         'comments': comments,
-        'slice_start': slice_start,
-        'amount_this_page': amount_this_page,
     })
     return StreamingHttpResponse(template.render(context))
 

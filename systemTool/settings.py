@@ -127,8 +127,16 @@ ACCOUNT_ACTIVATION_DAYS = 7
 ###########################
 
 
-# Path to directory where OpenRA files are stored
-OPENRA_PATH = '/usr/lib/openra/'
+# Path to directory where OpenRA versions are stored
+OPENRA_ROOT_PATH = '/usr/local/openra/'
+# OpenRA Versions matching their directory names
+OPENRA_VERSIONS = {
+    'default': 'release-20141029',
+    '0': 'playtest-20150118',
+    '1': 'bleed', # `bleed` directory is being updated by external script once new commit is pushed
+}
+# Path to file which stores HASH of the latest `bleed` version
+OPENRA_BLEED_HASH_FILE_PATH = ''
 
 # Path to directory which will be shared over rsync, with full permissions for website user
 # Must be outside of website's path tree

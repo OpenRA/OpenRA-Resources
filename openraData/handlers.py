@@ -32,6 +32,7 @@ class MapHandlers():
         self.legacy_name = ""
         self.legacy_map = False
 
+        self.MapFormat = 6
         self.MapMod = ""
         self.MapTitle = ""
         self.MapAuthor = ""
@@ -44,6 +45,11 @@ class MapHandlers():
         self.spawnpoints = ""
 
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
+        
+        parser = settings.OPENRA_VERSIONS['default']
+        if post.get("parser", None) != None:
+            parser = post['parser']
+
         if pre_r != 0:
             mapObject = Maps.objects.filter(id=pre_r, user_id=user_id)
             if not mapObject:
@@ -81,11 +87,11 @@ class MapHandlers():
                 return False
 
         if mimetype == 'text/plain':
-            if not self.LegacyImport(tempname):
+            if not self.LegacyImport(tempname, parser):
                 self.LOG.append('Failed to import legacy map.')
                 misc.send_email_to_admin_OnMapFail(tempname)
                 return False
-            shutil.move(settings.OPENRA_PATH + self.legacy_name, tempname)
+            shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + self.legacy_name, tempname)
             name = os.path.splitext(name)[0] + '.oramap'
             self.legacy_map = True
 
@@ -105,7 +111,7 @@ class MapHandlers():
             return False
         z.close()
 
-        self.GetHash(tempname)
+        self.GetHash(tempname, parser)
         userObject = User.objects.get(pk=user_id)
         try:
             hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
@@ -136,6 +142,8 @@ class MapHandlers():
                 self.MapSize = line[8:].strip()
             if line[0:6] == "Bounds":
                 self.Bounds = line[7:].strip()
+            if line[0:9] == "MapFormat":
+                self.MapFormat = int(line[10:].strip())
             if line.strip()[-7:] == "mpspawn":
                 expectspawn = True
             if line.strip()[0:8] == "Location":
@@ -190,6 +198,7 @@ class MapHandlers():
             width = self.MapSize.split(',')[0],
             height = self.MapSize.split(',')[1],
             bounds = self.Bounds,
+            mapformat = self.MapFormat,
             spawnpoints = self.spawnpoints,
             tileset = self.MapTileset,
             legacy_map = self.legacy_map,
@@ -205,6 +214,7 @@ class MapHandlers():
             policy_cc = cc,
             policy_commercial = commercial,
             policy_adaptations = adaptations,
+            parser = parser,
             )
         transac.save()
         self.UID = str(transac.id)
@@ -225,18 +235,18 @@ class MapHandlers():
             self.flushLog( ['Info: ' + post['info']] )
         
         self.UnzipMap()
-        self.LintCheck(self.MapMod)
+        self.LintCheck(self.MapMod, parser)
         if self.LintPassed:
             Maps.objects.filter(id=transac.id).update(requires_upgrade=False)
         else:
             Maps.objects.filter(id=transac.id).update(requires_upgrade=True)
 
-        self.GenerateMinimap()
-        #self.GenerateFullPreview(userObject)
+        self.GenerateMinimap(parser)
+        #self.GenerateFullPreview(userObject, parser)
         p = multiprocessing.Process(target=utility.PushMapsToRsyncDirs, args=(), name='utility')
         p.start()
 
-        shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(), name='shppreview')
+        shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(parser,), name='shppreview')
         shp.start()
 
     def UnzipMap(self):
@@ -244,11 +254,11 @@ class MapHandlers():
         z.extractall(self.map_full_path_directory + 'content/')
         z.close()
 
-    def GetHash(self, filepath=""):
+    def GetHash(self, filepath="", parser=settings.OPENRA_VERSIONS['default']):
         if filepath == "":
             filepath = self.map_full_path_filename
 
-        os.chdir(settings.OPENRA_PATH)
+        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
 
         command = 'mono --debug OpenRA.Utility.exe ra --map-hash ' + filepath
         proc = Popen(command.split(), stdout=PIPE).communicate()
@@ -257,8 +267,8 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def LintCheck(self, mod):
-        os.chdir(settings.OPENRA_PATH)
+    def LintCheck(self, mod, parser=settings.OPENRA_VERSIONS['default']):
+        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
 
         command = 'mono --debug OpenRA.Lint.exe ' + mod + ' ' + self.map_full_path_filename
         proc = Popen(command.split(), stdout=PIPE).communicate()
@@ -271,14 +281,14 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateMinimap(self):
-        os.chdir(settings.OPENRA_PATH)
+    def GenerateMinimap(self, parser=settings.OPENRA_VERSIONS['default']):
+        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
 
         command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (self.MapMod, self.map_full_path_filename)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
-            shutil.move(misc.addSlash(settings.OPENRA_PATH) + self.preview_filename,
+            shutil.move(misc.addSlash(settings.OPENRA_ROOT_PATH + parser + "/") + self.preview_filename,
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-mini.png")
             self.flushLog(proc)
             self.minimap_generated = True
@@ -287,14 +297,14 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateFullPreview(self, userObject):
-        os.chdir(settings.OPENRA_PATH)
+    def GenerateFullPreview(self, userObject, parser=settings.OPENRA_VERSIONS['default']):
+        os.chdir(settings.OPENRA_ROOT_PATH, parser)
 
         command = 'mono --debug OpenRA.Utility.exe %s--full-preview %s' % (self.MapMod, self.map_full_path_filename)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
-            shutil.move(misc.addSlash(settings.OPENRA_PATH) + self.preview_filename,
+            shutil.move(misc.addSlash(settings.OPENRA_ROOT_PATH + parser + "/") + self.preview_filename,
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-full.png")
             self.flushLog(proc)
             self.fullpreview_generated = True
@@ -311,13 +321,13 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateSHPpreview(self):
+    def GenerateSHPpreview(self, parser=settings.OPENRA_VERSIONS['default']):
         Dir = os.listdir(self.map_full_path_directory+'content/')
         for fn in Dir:
             if fn.endswith('.shp'):
                 os.mkdir(self.map_full_path_directory+'content/png/')
                 os.chdir(self.map_full_path_directory+'content/png/')
-                command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_PATH, self.MapMod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+                command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_ROOT_PATH + parser + "/", self.MapMod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
                 proc = Popen(command.split(), stdout=PIPE).communicate()
                 self.flushLog(proc)
                 pngsdir = os.listdir(self.map_full_path_directory+'content/png/')
@@ -334,8 +344,8 @@ class MapHandlers():
                 os.chdir(self.currentDirectory)
                 shutil.rmtree(self.map_full_path_directory+'content/png/')
 
-    def LegacyImport(self, mapPath):
-        os.chdir(settings.OPENRA_PATH)
+    def LegacyImport(self, mapPath, parser=settings.OPENRA_VERSIONS['default']):
+        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
         for mod in ['ra','cnc','d2k','ts']:
             command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
             proc = Popen(command.split(), stdout=PIPE).communicate()

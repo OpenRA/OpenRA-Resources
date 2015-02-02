@@ -110,6 +110,8 @@ def ReadYamlAgain(mapObject):
 			map_data_ordered['height'] = line[8:].strip().split(',')[1]
 		if line[0:6] == "Bounds":
 			map_data_ordered['bounds'] = line[7:].strip()
+		if line[0:9] == "MapFormat":
+			map_data_ordered['mapformat'] = int(line[10:].strip())
 		if line.strip()[-7:] == "mpspawn":
 			expectspawn = True
 		if line.strip()[0:8] == "Location":
@@ -131,6 +133,7 @@ def ReadYamlAgain(mapObject):
 	Maps.objects.filter(id=mapObject.id).update(description=map_data_ordered['description'])
 	Maps.objects.filter(id=mapObject.id).update(players=map_data_ordered['players'])
 	Maps.objects.filter(id=mapObject.id).update(bounds=map_data_ordered['bounds'])
+	Maps.objects.filter(id=mapObject.id).update(mapformat=map_data_ordered['mapformat'])
 	Maps.objects.filter(id=mapObject.id).update(spawnpoints=map_data_ordered['spawnpoints'])
 	Maps.objects.filter(id=mapObject.id).update(width=map_data_ordered['width'])
 	Maps.objects.filter(id=mapObject.id).update(height=map_data_ordered['height'])
