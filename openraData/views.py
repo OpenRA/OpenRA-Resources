@@ -374,14 +374,7 @@ def displayMap(request, arg):
         mapObject = Maps.objects.get(id=arg)
     except:
         return HttpResponseRedirect('/')
-    verpath = misc.addSlash(settings.OPENRA_PATH)
-    versionFile = open(verpath + 'mods/ra/mod.yaml', 'r')
-    version = versionFile.read()
-    versionFile.close()
-    try:
-        version = re.findall('Version: (.*)', version)[0]
-    except:
-        version = "null"
+
     reportedByUser = False
     reports = []
     reportObject = Reports.objects.filter(ex_id=mapObject.id, ex_name='maps')
@@ -445,7 +438,6 @@ def displayMap(request, arg):
         'fullPreview': fullPreview,
         'license': license,
         'icons': icons,
-        'version': version,
         'reports': reports,
         'reported': reportedByUser,
         'luaNames': luaNames,

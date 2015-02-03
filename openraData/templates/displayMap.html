@@ -29,7 +29,7 @@
                             <div class="notification_tooltip">
                                 <div>This map can't be automatically downloaded by OpenRA game!
                                 {% if map.requires_upgrade == True %}
-                                    <p>Reason: Requires upgrade, see <a class="showLintLog" data-name="Lint Log">lintlog</a> (Failed for version: {{version}})</p>
+                                    <p>Reason: Requires upgrade, see <a class="showLintLog" data-name="Lint Log">lintlog</a> (Failed for version: {{map.parser}})</p>
                                     <p>Checkout <a href="http://wiki.openra.net/Upgrading-mods-to-a-new-release" target="_blank">upgrade instruction</a></p>
                                 {% elif map.downloading == False %}
                                     <p>Reason: Downloading is manually set to False</p>
