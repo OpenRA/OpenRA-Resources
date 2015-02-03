@@ -415,7 +415,9 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		license: {22}
 		minimap: {23}
 		url: {24}
-		downloading: {25}\n""".format(
+		downloading: {25}
+		mapformat: {26}
+		parser: {27}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
 		cgi.escape(mapObject.title, quote=None),
@@ -442,6 +444,8 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		minimap,
 		url,
 		downloading,
+		mapObject.mapformat,
+		mapObject.parser,
 		).replace("\t\t","\t").replace("''", "'")
 		return response_data
 	response_data = {}
@@ -472,6 +476,8 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	response_data['minimap'] = minimap
 	response_data['url'] = url
 	response_data['downloading'] = downloading
+	response_data['mapformat'] = mapObject.mapformat
+	response_data['parser'] = mapObject.parser
 	return response_data
 
 def get_minimap(mapid, soft=False):
