@@ -790,6 +790,7 @@ p.registerInfo {
 .upload_container {
   width: 360px;
   margin: 0 auto;
+  text-align: center;
 }
   .upload_container input[type="text"] {
     width: 100%;
@@ -1383,4 +1384,58 @@ p.registerInfo {
 
 .no-pd-bot {
   padding-bottom: 0px !important;
+}
+
+.red {
+  color: #ff0000;
+}
+
+.id_file {
+  max-width: 330px;
+  min-width: 330px;
+}
+
+.upload-map-form-left {
+  width: 450px;
+  font-size: 0.9em;
+  display: table-cell;
+}
+
+.upload-map-form-left textarea {
+  width: 220px;
+  height: 100px;
+  font-size: 0.95em;
+}
+
+.upload-map-form-right {
+  font-size: 0.9em;
+  display: table-cell;
+  vertical-align: top;
+  width: 220px;
+}
+
+.upload-map-form-info {
+  width: 250px;
+  display: table-cell;
+  vertical-align: top;
+}
+
+.upload-map-form-parser {
+  display: table-cell;
+  vertical-align: top;
+}
+
+.upload-map-form-parser select {
+  background: transparent;
+  color: #fff;
+  width: 160px;
+  margin-top: 10px;
+}
+
+.upload-map-form-file {
+  margin-top: 26px;
+}
+
+.upload-map-form-stars {
+  font-size: 0.9em;
 }

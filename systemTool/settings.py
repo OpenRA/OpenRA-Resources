@@ -133,10 +133,12 @@ OPENRA_ROOT_PATH = '/usr/local/openra/'
 OPENRA_VERSIONS = {
     'default': 'release-20141029',
     '0': 'playtest-20150118',
-    '1': 'bleed', # `bleed` directory is being updated by external script once new commit is pushed
+    '1': 'bleed', # just a name, see OPENRA_BLEED_PARSER setting
 }
 # Path to file which stores HASH of the latest `bleed` version
 OPENRA_BLEED_HASH_FILE_PATH = ''
+# `bleed` parser  directory is being updated by external script once new commit is pushed and has different structure
+OPENRA_BLEED_PARSER = 'bleed/usr/lib/openra'
 
 # Path to directory which will be shared over rsync, with full permissions for website user
 # Must be outside of website's path tree

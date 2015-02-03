@@ -19,7 +19,6 @@ from django.db.models import Count
 from django.db.models import Max
 from django.utils import timezone
 
-from .forms import UploadMapForm
 from .forms import AddScreenshotForm
 from django.db.models import F
 from django.contrib.auth.models import User
@@ -646,7 +645,7 @@ def serveMapSHP(request, arg, name):
 def uploadMap(request, previous_rev=0):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
-    uploadingLog = []
+    error_response = False
     uid = False
     rev = 1
     previous_rev_title = ""
@@ -658,18 +657,17 @@ def uploadMap(request, previous_rev=0):
             previous_rev_title = mapObject[0].title
             if request.user.is_superuser:
                 user_id = mapObject[0].user_id
-    initial = {'policy_cc': 'cc_yes', 'commercial': 'com_no', 'adaptations': 'adapt_alike'}
     if request.method == 'POST':
-        form = UploadMapForm(request.POST, request.FILES, initial=initial)
-        if form.is_valid():
+        if request.FILES.get('file', None) != None:
             uploadingMap = handlers.MapHandlers()
-            uploadingMap.ProcessUploading(user_id, request.FILES['file'], request.POST, rev, previous_rev)
-            uploadingLog = uploadingMap.LOG
+            error_response = uploadingMap.ProcessUploading(user_id, request.FILES['file'], request.POST, rev, previous_rev)
             if uploadingMap.UID:
                 uid = str(uploadingMap.UID)
-            form = UploadMapForm(initial=initial)
-    else:
-        form = UploadMapForm(initial=initial)
+                if error_response == False:
+                    return HttpResponseRedirect('/maps/' + uid + "/")
+
+    bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
+    bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
 
     template = loader.get_template('index.html')
     context = RequestContext(request, {
@@ -677,11 +675,12 @@ def uploadMap(request, previous_rev=0):
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': ' - Uploading Map',
-        'form': form,
-        'uploadingLog': uploadingLog,
         'uid': uid,
         'previous_rev': previous_rev,
         'previous_rev_title': previous_rev_title,
+        'parsers': settings.OPENRA_VERSIONS.values(),
+        'bleed_tag': bleed_tag,
+        'error_response': error_response,
     })
     return StreamingHttpResponse(template.render(context))
 

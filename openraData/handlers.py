@@ -47,17 +47,21 @@ class MapHandlers():
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
         
         parser = settings.OPENRA_VERSIONS['default']
+        parser_to_db = parser
         if post.get("parser", None) != None:
             parser = post['parser']
+            parser_to_db = parser
+            if 'git' in parser:
+                parser = settings.OPENRA_BLEED_PARSER
 
         if pre_r != 0:
             mapObject = Maps.objects.filter(id=pre_r, user_id=user_id)
             if not mapObject:
                 self.LOG.append('Failed. You do not own map for which you want to upload a new revision.')
-                return False
+                return 'Failed. You do not own map for which you want to upload a new revision.'
             if mapObject[0].next_rev != 0:
-                self.LOG.append('Failed. Unable to upload a new revision for map which already has one')
-                return False
+                self.LOG.append('Failed. Unable to upload a new revision for map which already has one.')
+                return 'Failed. Unable to upload a new revision for map which already has one.'
             previous_policy_cc = mapObject[0].policy_cc
             previous_policy_commercial = mapObject[0].policy_commercial
             previous_policy_adaptations = mapObject[0].policy_adaptations
@@ -72,7 +76,7 @@ class MapHandlers():
         if not (mimetype == 'application/zip' and os.path.splitext(f.name)[1].lower() == '.oramap'):
             if not (mimetype == 'text/plain' and os.path.splitext(f.name)[1].lower() == '.mpr'):
                 self.LOG.append('Failed. Unsupported file type.')
-                return False
+                return 'Failed. Unsupported file type.'
 
         name = f.name
         badChars = ": ; < > @ $ # & ( ) % '".split()
@@ -84,13 +88,13 @@ class MapHandlers():
         for bc in findBadChars:
             if bc not in ['.','-']:
                 self.LOG.append('Failed. Your filename is bogus; rename and try again.')
-                return False
+                return 'Failed. Your filename is bogus; rename and try again.'
 
         if mimetype == 'text/plain':
             if not self.LegacyImport(tempname, parser):
                 self.LOG.append('Failed to import legacy map.')
                 misc.send_email_to_admin_OnMapFail(tempname)
-                return False
+                return 'Failed to import legacy map.'
             shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + self.legacy_name, tempname)
             name = os.path.splitext(name)[0] + '.oramap'
             self.legacy_map = True
@@ -108,16 +112,16 @@ class MapHandlers():
         if "map.yaml" not in mapFileContent or "map.bin" not in mapFileContent:
             self.LOG.append('Failed. Invalid map format.')
             misc.send_email_to_admin_OnMapFail(tempname)
-            return False
+            return 'Failed. Invalid map format.'
         z.close()
 
         self.GetHash(tempname, parser)
         userObject = User.objects.get(pk=user_id)
         try:
             hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
-            self.LOG.append("Failed. You've already uploaded")
+            self.LOG.append("Failed. You've already uploaded this map.")
             self.UID = str(hashExists.id)
-            return False
+            return "Failed. You've already uploaded this map."
         except:
             pass   # all good
 
@@ -214,7 +218,7 @@ class MapHandlers():
             policy_cc = cc,
             policy_commercial = commercial,
             policy_adaptations = adaptations,
-            parser = parser,
+            parser = parser_to_db,
             )
         transac.save()
         self.UID = str(transac.id)
@@ -248,6 +252,7 @@ class MapHandlers():
 
         shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(parser,), name='shppreview')
         shp.start()
+        return False # no errors
 
     def UnzipMap(self):
         z = zipfile.ZipFile(self.map_full_path_filename, mode='a')
