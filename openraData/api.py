@@ -148,7 +148,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 		if arg2 not in ["rating", "-rating", "players", "-players", "posted", "-posted", "downloaded", "-downloaded", "title", "-title", "author_name", "-author_name", "author", "uploader", ""]:
 			raise Http404
 		try:
-			mapObject = Maps.objects.filter(game_mod=mod.lower(),players__gte=1,requires_upgrade=False,downloading=True,amount_reports__lte=3).distinct('map_hash')
+			mapObject = Maps.objects.filter(game_mod=mod.lower(),players__gte=1,requires_upgrade=False,downloading=True,amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT).distinct('map_hash')
 			if arg2 == "players":
 				mapObject = sorted(mapObject, key=lambda x: (x.players), reverse=True)
 			if arg2 == "-players":
@@ -232,7 +232,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			mapObjectCopy = []
 			for item in mapObject:
 				reportObject = Reports.objects.filter(ex_id=item.id,ex_name="maps")
-				if len(reportObject) < 3:
+				if len(reportObject) < settings.REPORTS_PENALTY_AMOUNT:
 					mapObjectCopy.append(item)
 			mapObject = mapObjectCopy
 			mapObject = sorted(mapObject, key=lambda x: (x.id))
@@ -288,7 +288,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			raise Http404
 		if mapObject.requires_upgrade:
 			raise Http404
-		if mapObject.amount_reports >= 3:
+		if mapObject.amount_reports >= settings.REPORTS_PENALTY_AMOUNT:
 			raise Http404
 		path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id)
 		try:
@@ -387,7 +387,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		downloading = False
 	if mapObject.players == 0:
 		downloading = False
-	if mapObject.amount_reports >= 3:
+	if mapObject.amount_reports >= settings.REPORTS_PENALTY_AMOUNT:
 		downloading = False
 	if yaml:
 		response_data = u"""{0}:

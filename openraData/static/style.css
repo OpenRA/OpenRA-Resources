@@ -550,6 +550,16 @@ table tr td {
   margin-right: 10px;
 }
 
+.Issues {
+  width: 40px;
+  float: right;
+}
+
+.API {
+  width: 40px;
+  float: right;
+}
+
 .link-container h3 {
   margin: 24px 0 6px;
 }
@@ -1442,4 +1452,9 @@ p.registerInfo {
 
 .small-font {
   font-size: 0.9em;
+}
+
+.map-store-info {
+  font-size: 0.9em;
+  margin-right: 2px;
 }
