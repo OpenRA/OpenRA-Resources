@@ -619,15 +619,21 @@ def serveLua(request, arg, name):
     response['Content-Disposition'] = 'attachment; filename = %s' % fname
     return response
 
-def serveMapSHP(request, arg, name):
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/'
+def serveMapSHP(request, arg, name, request_type='preview'):
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + '/content/'
     fname = ""
     listdir = os.listdir(path)
     for fn in listdir:
-        if fn.endswith('.shp.gif'):
-            if fn.split('.shp.gif')[0] == name:
-                fname = fn
-                break
+        if request_type == 'preview':
+            if fn.endswith('.shp.gif'):
+                if fn.split('.shp.gif')[0] == name:
+                    fname = fn
+                    break
+        elif request_type == 'fetch':
+            if fn.endswith('.shp'):
+                if fn.split('.shp')[0] == name:
+                    fname = fn
+                    break
     if fname == "":
         raise Http404
     response = StreamingHttpResponse(open(path+fname), content_type='image/gif')
