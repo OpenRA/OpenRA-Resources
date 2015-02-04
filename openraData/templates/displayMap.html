@@ -273,6 +273,9 @@
                     <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
                     <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.bounds|map_real_size }}</div>
                     <div class="map_data_label">MapFormat:</div><div class="map_data_text">{{ map.mapformat }}</div>
+                    {% if map.shellmap %}
+                        <div class="map_data_label">Shellmap:</div><div class="map_data_text">{{ map.shellmap }}</div>
+                    {% endif %}
                     <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
                     <div class="map_data_label">Downloading:</div><div class="map_data_text" title="ingame"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < REPORTS_PENALTY_AMOUNT and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
                     <div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">{% if map.rsync_allow and map.downloading and reports|length < REPORTS_PENALTY_AMOUNT and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
