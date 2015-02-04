@@ -195,7 +195,7 @@
                         <span class="top-bottom-double-arrow" title="show more shp previews">⇳</span>
                         <h5>Preview of embeded SHP files:</h5>
                         {% for item in shpNames %}
-                        <div class="cSHP"><a href="/maps/{{arg}}/shp/{{item}}/fetch/"><img src="/maps/{{arg}}/shp/{{item}}/preview/" alt="shp" /></a></div>
+                        <div class="cSHP"><a href="/maps/{{arg}}/shp/{{item}}/fetch/" title='Download {{item}}.shp'><img src="/maps/{{arg}}/shp/{{item}}/preview/" alt="shp" /></a></div>
                         {% endfor %}
                     </div>
                     {% endif %}

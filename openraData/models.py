@@ -51,6 +51,7 @@ class Maps(models.Model):
     spawnpoints         = models.CharField(max_length=1000,default="")
     mapformat           = models.IntegerField(default=6)
     parser              = models.CharField(max_length=100, default="release-20141029")
+    shellmap            = models.BooleanField(default=False)
     legacy_map          = models.BooleanField(default=False)
     revision            = models.IntegerField(default=1)
     pre_rev             = models.IntegerField(default=0)

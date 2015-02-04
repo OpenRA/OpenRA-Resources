@@ -39,10 +39,28 @@ def map_upgrade(mapObject, engine, http_host):
 		if not UnzipMap(item):
 			print("failed to unzip %s" % item.id)
 			continue
-		yamlread = ReadYamlAgain(item)
-		if not yamlread:
-			print("ReadYamlAgain: failed to read map or map.yaml")
+		
+		read_yaml_response = ReadYaml(item)
+		resp_map_data = read_yaml_response['response']
+		if read_yaml_response['error']:
+			print("ReadYaml: " + resp_map_data)
 			continue
+		else:
+			Maps.objects.filter(id=item.id).update(game_mod=resp_map_data['game_mod'])
+			Maps.objects.filter(id=item.id).update(title=resp_map_data['title'])
+			Maps.objects.filter(id=item.id).update(author=resp_map_data['author'])
+			Maps.objects.filter(id=item.id).update(tileset=resp_map_data['tileset'])
+			Maps.objects.filter(id=item.id).update(map_type=resp_map_data['map_type'])
+			Maps.objects.filter(id=item.id).update(description=resp_map_data['description'])
+			Maps.objects.filter(id=item.id).update(players=resp_map_data['players'])
+			Maps.objects.filter(id=item.id).update(bounds=resp_map_data['bounds'])
+			Maps.objects.filter(id=item.id).update(mapformat=resp_map_data['mapformat'])
+			Maps.objects.filter(id=item.id).update(spawnpoints=resp_map_data['spawnpoints'])
+			Maps.objects.filter(id=item.id).update(width=resp_map_data['width'])
+			Maps.objects.filter(id=item.id).update(height=resp_map_data['height'])
+			Maps.objects.filter(id=item.id).update(shellmap=resp_map_data['shellmap'])
+			Maps.objects.filter(id=item.id).update(lua=resp_map_data['lua'])
+			Maps.objects.filter(id=item.id).update(advanced_map=resp_map_data['advanced'])
 	os.chdir(currentDirectory)
 	return True
 
@@ -66,32 +84,42 @@ def recalculate_hash(mapObject):
 	os.chdir(currentDirectory)
 	return maphash
 
-def ReadYamlAgain(mapObject):
-	currentDirectory = os.getcwd() + os.sep
-	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + '/'
-	filename = ""
-	Dir = os.listdir(path)
-	for fn in Dir:
-		if fn.endswith('.oramap'):
-			filename = fn
-			break
-	if filename == "":
-		return False
-	z = zipfile.ZipFile(path + filename, mode='a')
+def ReadYaml(item=False, fullpath=""):
+	if fullpath == "":
+		if item == False:
+			return {'response': 'wrong method call', 'error': True}
+		currentDirectory = os.getcwd() + os.sep
+		path = currentDirectory + 'openraData/data/maps/' + str(item.id) + '/'
+		Dir = os.listdir(path)
+		for fn in Dir:
+			if fn.endswith('.oramap'):
+				fullpath = path + fn
+				break
+		if fullpath == "":
+			return {'response': 'could not find .oramap', 'error': True}
+	map_data_ordered = {}
+	map_data_ordered['lua'] = False
+	map_data_ordered['advanced'] = False
+	map_data_ordered['players'] = 0
+	map_data_ordered['description'] = ""
+	map_data_ordered['shellmap'] = False
+
+	z = zipfile.ZipFile(fullpath, mode='a')
 	yamlData = ""
 	for zfn in z.namelist():
 		if zfn == "map.yaml":
 			mapbytes = z.read(zfn)
 			yamlData = mapbytes.decode("utf-8")
-			break
+		if zfn.endswith('.lua'):
+			map_data_ordered['lua'] = True
 	z.close()
 	if yamlData == "":
-		return False
+		return {'response': 'Failed. Invalid map format.', 'error': True}
+
+	countAdvanced = 0
+	shouldCountRules = False
 	expectspawn = False
 	spawnpoints = ""
-	map_data_ordered = {}
-	map_data_ordered['players'] = 0
-	map_data_ordered['description'] = ""
 	for line in string.split(yamlData, '\n'):
 		if line[0:5] == "Title":
 			map_data_ordered['title'] = line[6:].strip().replace("'", "''")
@@ -122,22 +150,21 @@ def ReadYamlAgain(mapObject):
 			state = line.split(':')[1]
 			if state.strip().lower() in ['true', 'on', 'yes', 'y']:
 				map_data_ordered['players'] += 1
+		if line[0:10] == "Visibility":
+			if line[11:].strip() == "Shellmap":
+				map_data_ordered['shellmap'] = True
+		if line.strip()[0:5] == "Rules":
+			shouldCountRules = True
+		if shouldCountRules:
+			countAdvanced += 1
+
 	map_data_ordered['spawnpoints'] = spawnpoints.rstrip(",")
+	if countAdvanced > 20:
+		map_data_ordered['advanced'] = True
 	if len(map_data_ordered) == 0:
-		return False
-	Maps.objects.filter(id=mapObject.id).update(game_mod=map_data_ordered['game_mod'])
-	Maps.objects.filter(id=mapObject.id).update(title=map_data_ordered['title'])
-	Maps.objects.filter(id=mapObject.id).update(author=map_data_ordered['author'])
-	Maps.objects.filter(id=mapObject.id).update(tileset=map_data_ordered['tileset'])
-	Maps.objects.filter(id=mapObject.id).update(map_type=map_data_ordered['map_type'])
-	Maps.objects.filter(id=mapObject.id).update(description=map_data_ordered['description'])
-	Maps.objects.filter(id=mapObject.id).update(players=map_data_ordered['players'])
-	Maps.objects.filter(id=mapObject.id).update(bounds=map_data_ordered['bounds'])
-	Maps.objects.filter(id=mapObject.id).update(mapformat=map_data_ordered['mapformat'])
-	Maps.objects.filter(id=mapObject.id).update(spawnpoints=map_data_ordered['spawnpoints'])
-	Maps.objects.filter(id=mapObject.id).update(width=map_data_ordered['width'])
-	Maps.objects.filter(id=mapObject.id).update(height=map_data_ordered['height'])
-	return True
+		return {'response': 'map data is not filled', 'error': True}
+
+	return {'response': map_data_ordered, 'error': False}
 
 def UnzipMap(mapObject):
 	currentDirectory = os.getcwd() + os.sep
