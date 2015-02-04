@@ -275,12 +275,23 @@ class MapHandlers():
     def LintCheck(self, mod, parser=settings.OPENRA_VERSIONS['default']):
         os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
 
-        command = 'mono --debug OpenRA.Lint.exe ' + mod + ' ' + self.map_full_path_filename
+        command = 'mono --debug OpenRA.Utility.exe ' + mod + ' --check-yaml ' + self.map_full_path_filename
         ## temp check, TODO: remove after new release
-        if 'release' not in parser:
-            command = 'mono --debug OpenRA.Utility.exe ' + mod + ' --check-yaml ' + self.map_full_path_filename
+        if parser == 'release-20141029':
+            command = 'mono --debug OpenRA.Lint.exe ' + mod + ' ' + self.map_full_path_filename
         proc = Popen(command.split(), stdout=PIPE).communicate()
-        if proc[0].strip() == "":
+        
+        passing = True
+        for line in proc:
+            if line == None:
+                continue
+            if 'Testing map' in line:
+                passing = True
+            else:
+                if line.strip() != "":
+                    passing = False
+
+        if passing:
             self.flushLog( ['Yaml check succeeded.'] )
             self.LintPassed = True
         else:
