@@ -3,6 +3,7 @@ import os
 import zipfile
 import string
 import re
+import signal
 from subprocess import Popen, PIPE
 import multiprocessing
 from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
@@ -199,8 +200,6 @@ class MapHandlers():
 
         self.GenerateMinimap(resp_map_data['game_mod'], parser)
         #self.GenerateFullPreview(userObject, resp_map_data['game_mod'], parser)
-        #p = multiprocessing.Process(target=utility.PushMapsToRsyncDirs, args=(), name='utility')
-        #p.start()
 
         shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(resp_map_data['game_mod'], parser,), name='shppreview')
         shp.start()
@@ -299,8 +298,30 @@ class MapHandlers():
                 os.mkdir(self.map_full_path_directory+'content/png/')
                 os.chdir(self.map_full_path_directory+'content/png/')
                 command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_ROOT_PATH + parser + "/", game_mod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
-                proc = Popen(command.split(), stdout=PIPE).communicate()
-                self.flushLog(proc)
+
+                class TimedOut(Exception): # Raised if timed out.
+                    pass
+
+                def signal_handler(signum, frame):
+                    raise TimedOut("Timed out!")
+
+                signal.signal(signal.SIGALRM, signal_handler)
+
+                signal.alarm(settings.UTILITY_TIME_LIMIT)    # Limit command execution time
+
+                try:
+                    proc = Popen(command.split(), stdout=PIPE).communicate()
+                    self.flushLog(proc)
+                    signal.alarm(0)
+                except:
+                    err = 'Error: failed to generate SHP preview for %s (map: %s)' % (fn, self.UID)
+                    print(err)
+                    misc.send_email_to_admin('ORC: Failed to generate SHP preview', '%s \n\n %s' % (err, command))
+
+                    os.chdir(self.currentDirectory)
+                    shutil.rmtree(self.map_full_path_directory+'content/png/')
+
+                    continue
                 pngsdir = os.listdir(self.map_full_path_directory+'content/png/')
                 imglist = []
                 for pngfn in pngsdir:
