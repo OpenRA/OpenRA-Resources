@@ -113,3 +113,9 @@ server {
  * Go to "Social Apps"; Add a new social app (set a proper client id and secret, chose a proper site)
  * Load http://yoursitedomain.com/accounts/github/login/  to authorize your new application at github
  * Do the similar actions to create and set up Google Application (without creating new site over django admin)
+
+### CRON config
+#### Sync maps for rsync directory ( `rsync`   is a django-admin command, path:  `openraData/management/commands/rsync.py` )
+```
+* 1 * * * cd <full path to repository root directory> && python manage.py rsync
+```
