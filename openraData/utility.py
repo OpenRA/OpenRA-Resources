@@ -326,27 +326,3 @@ def GenerateFullPreview(mapObject, userObject):
 	except:
 		os.chdir(currentDirectory)
 		return False
-
-def PushMapsToRsyncDirs():
-	# this function syncs rsync directories with fresh list of maps, triggered by uploading a new map or removing one
-	if settings.RSYNC_MAP_PATH.strip() == "":
-		return
-	mods = Maps.objects.values_list('game_mod', flat=True).distinct()
-	RSYNC_MAP_PATH = misc.addSlash(settings.RSYNC_MAP_PATH)
-	for mod in mods:
-		try:
-			os.makedirs(RSYNC_MAP_PATH + mod.lower())
-		except:
-			pass
-	mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1,rsync_allow=True,amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT,next_rev=0).distinct("map_hash")
-	site_path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/'
-	for item in mapObject:
-		listd = os.listdir(site_path + str(item.id))
-		for fname in listd:
-			if fname.endswith('.oramap'):
-				src = site_path + str(item.id) + '/' + fname
-				dest_maps = RSYNC_MAP_PATH + item.game_mod.lower() + '/' + str(item.id) + '.oramap'
-				if not os.path.exists(dest_maps):
-					os.link(src, dest_maps)
-				break
-		continue

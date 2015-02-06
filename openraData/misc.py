@@ -1,3 +1,6 @@
+import os
+import datetime
+import time
 from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -171,3 +174,15 @@ class Revisions():
 		if itemObject.next_rev == 0:
 			return itemObject.id
 		return self.GetLatestRevisionID(itemObject.next_rev)
+
+def Log(data, channel="default"):
+	if not os.path.isdir(os.getcwd() + "/logs/"):
+		os.makedirs(os.getcwd() + "/logs/")
+	logfile = open(os.getcwd() + "/logs/" + channel + ".log", "a")
+	if data:
+		today = datetime.datetime.today()
+		timestamp = today.strftime('%Y/%m/%d %H:%M:%S') + ' [' + time.tzname[0] + ']:  '
+
+		logfile.write(timestamp + data.strip() + "\n")
+	logfile.close()
+	return True
