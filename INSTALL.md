@@ -117,5 +117,5 @@ server {
 ### CRON config
 #### Sync maps for rsync directory ( `rsync`   is a django-admin command, path:  `openraData/management/commands/rsync.py` )
 ```
-* 1 * * * cd <full path to repository root directory> && python manage.py rsync
+0 * * * * cd <full path to repository root directory> && python manage.py rsync
 ```
