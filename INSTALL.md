@@ -1,27 +1,34 @@
 ## Prepare enviroment
 We will use PostgreSQL server even though our framework supports many...
 That's just our preference, so if you deploy it, you can choose any Database you want.
+
 ### Dependencies
 
 ```
+libmysqlclient-dev
 python (version 2)
-python-psycopg2  (postgresql module)
-python-pgmagick
-python-openid
-python-requests
-python-requests-oauthlib
 imagemagick
-Django python Web Framework version 1.6
 mono 2.10 +
-OpenRA.Utility and OpenRA.Lint
-django-registration module (easy_install -Z django-registration)
-django-allauth (pip install django-allauth)
-django-cors-headers (pip install django-cors-headers)
-django-threadedcomments (pip install django-threadedcomments)
-south (easy_install south)
 sendmail (or any other mail server)
 curl
 ```
+
+### Set up virtualenv, ex (using virtualenvwrapper):
+
+```
+$ pip install virtualenvwrapper
+...
+$ export WORKON_HOME=~/Envs
+$ mkdir -p $WORKON_HOME
+$ source /usr/local/bin/virtualenvwrapper.sh
+$ mkvirtualenv --system-site-packages resource_site
+$ workon resource_site
+
+# enter repository root directory and install python packages:
+$ pip install -r requirements.txt
+```
+
+### System configuration
 
  * Run PostgreSQL server; create user and database (in utf-8 encoding)
  * Change password for postgres user; setup DB backups
