@@ -74,8 +74,8 @@ class MapHandlers():
         command = 'file -b --mime-type %s' % tempname
         proc = Popen(command.split(), stdout=PIPE).communicate()
         mimetype = proc[0].strip()
-        if not (mimetype == 'application/zip' and os.path.splitext(f.name)[1].lower() == '.oramap'):
-            if not (mimetype == 'text/plain' and os.path.splitext(f.name)[1].lower() == '.mpr'):
+        if not ( mimetype == 'application/zip' and os.path.splitext(f.name)[1].lower() == '.oramap' ):
+            if not ( mimetype == 'text/plain' and os.path.splitext(f.name)[1].lower() in ['.mpr', '.ini'] ):
                 self.LOG.append('Failed. Unsupported file type.')
                 return 'Failed. Unsupported file type.'
 
@@ -96,7 +96,10 @@ class MapHandlers():
                 self.LOG.append('Failed to import legacy map.')
                 misc.send_email_to_admin_OnMapFail(tempname)
                 return 'Failed to import legacy map.'
-            shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + self.legacy_name, tempname)
+            try:    # catch exception, TODO: remove after new release in 2015
+                shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + self.legacy_name, tempname)
+            except:
+                pass
             name = os.path.splitext(name)[0] + '.oramap'
             self.legacy_map = True
 
