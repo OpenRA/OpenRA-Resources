@@ -165,3 +165,6 @@ SITE_MAINTENANCE_OVER = '14:00 GMT' # when we finish technical works
 
 # Time limit for some execution processes
 UTILITY_TIME_LIMIT = 20
+
+# HTTP_HOST of this site (ex: resource.openra.net)
+HTTP_HOST = ''

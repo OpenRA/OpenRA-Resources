@@ -13,10 +13,12 @@ from openraData.models import Maps, Screenshots, Reports
 from openraData import misc
 
 
-def map_upgrade(mapObject, engine, http_host):
+def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS['default']):
 	currentDirectory = os.getcwd() + os.sep
 	for item in mapObject:
-		os.chdir(settings.OPENRA_PATH)
+		
+		os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+
 		path = currentDirectory + 'openraData/data/maps/' + str(item.id) + '/'
 		filename = ""
 		Dir = os.listdir(path)
@@ -26,13 +28,31 @@ def map_upgrade(mapObject, engine, http_host):
 				break
 		if filename == "":
 			continue
+
+		if item.parser != "":
+			if 'git' not in item.parser:
+				parser_eng = item.parser.split('-')[1]
+				if int(engine) > int(parser_eng):
+					engine = parser_eng
+
 		command = 'mono --debug OpenRA.Utility.exe %s --upgrade-map %s %s' % (item.game_mod, path+filename, engine)
 		print(command)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
+
+		upgraded = True
+		for line in proc:
+			if line == None:
+				continue
+			if line.strip() != "":
+				upgraded = False
+
 		os.chdir(currentDirectory)
 
-		maphash = recalculate_hash(item)
-		lint_passed = not LintCheck([item], http_host)
+		if not upgraded:
+			print("Problems upgrading map: %s" % (item.id))
+
+		maphash = recalculate_hash(item, parser)
+		lint_passed = not LintCheck([item], parser)
 		Maps.objects.filter(id=item.id).update(map_hash=maphash)
 		Maps.objects.filter(id=item.id).update(requires_upgrade=lint_passed)
 
@@ -61,12 +81,15 @@ def map_upgrade(mapObject, engine, http_host):
 			Maps.objects.filter(id=item.id).update(shellmap=resp_map_data['shellmap'])
 			Maps.objects.filter(id=item.id).update(lua=resp_map_data['lua'])
 			Maps.objects.filter(id=item.id).update(advanced_map=resp_map_data['advanced'])
+			Maps.objects.filter(id=item.id).update(parser=parser)
+			print('Updated data, fetched from Yaml: %s' % item.id)
 	os.chdir(currentDirectory)
 	return True
 
-def recalculate_hash(mapObject):
+def recalculate_hash(mapObject, parser=settings.OPENRA_VERSIONS['default']):
 	currentDirectory = os.getcwd() + os.sep
-	os.chdir(settings.OPENRA_PATH)
+
+	os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
 
 	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + '/'
 	filename = ""
@@ -82,6 +105,7 @@ def recalculate_hash(mapObject):
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	maphash = proc[0].strip()
 	os.chdir(currentDirectory)
+	print('Recalculated hash: %s' % mapObject.id)
 	return maphash
 
 def ReadYaml(item=False, fullpath=""):
@@ -178,14 +202,20 @@ def UnzipMap(mapObject):
 	if filename == "":
 		return False
 	z = zipfile.ZipFile(path + filename, mode='a')
-	z.extractall(path + 'content/')
+	try:
+		z.extractall(path + 'content/')
+	except:
+		return False
 	z.close()
+	print('Unzipped map: %s' % mapObject.id)
 	return True
 
-def LintCheck(mapObject, http_host):
+def LintCheck(mapObject, parser=settings.OPENRA_VERSIONS['default']):
 	# this function performs a Lint Check for all existing maps
 	cwd = os.getcwd()
-	os.chdir(settings.OPENRA_PATH)
+	
+	os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+
 	status = False
 
 	for item in mapObject:
@@ -198,16 +228,35 @@ def LintCheck(mapObject, http_host):
 				break
 		if map_file == "":
 			continue
-		command = 'mono --debug OpenRA.Lint.exe ' + item.game_mod.lower() + ' ' + path + map_file
+		command = 'mono --debug OpenRA.Utility.exe ' + item.game_mod.lower() + ' --check-yaml ' + path + map_file
 		print(command)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
-		if proc[0].strip() == "":
+
+		passing = True
+		for res in proc:
+			if res == None:
+				continue
+			lines = res.split("\n")
+			for line in lines:
+				print(line)
+				if 'Testing map' in line:
+					passing = True
+				else:
+					if line.strip() != "":
+						passing = False
+
+		if passing:
 			status = True
+
+			print('passed lint')
+
 			if item.requires_upgrade:
 				Maps.objects.filter(id=item.id).update(requires_upgrade=False)
 		else:
 			status = False
-			print(proc)
+
+			print('failed to pass lint')
+
 			lintlog = open(path+'lintlog','w')
 			lintlog.write(proc[0])
 			lintlog.close()
@@ -215,11 +264,11 @@ def LintCheck(mapObject, http_host):
 				Maps.objects.filter(id=item.id).update(requires_upgrade=True)
 				mail_addr = misc.return_email(item.user_id)
 				if mail_addr != "":
-					misc.send_email_to_user_OnLint(mail_addr, "Lint check failed for one of your maps: http://"+http_host+"/maps/"+str(item.id)+"/")
+					misc.send_email_to_user_OnLint(mail_addr, "Lint check failed for one of your maps: http://"+settings.HTTP_HOST+"/maps/"+str(item.id)+"/")
 	os.chdir(cwd)
 	return status
 
-def GenerateSHPpreview(mapObject):
+def GenerateSHPpreview(mapObject, parser=settings.OPENRA_VERSIONS['default']):
 	# generates gif preview of shp files for every mapObject in list of objects
 	currentDirectory = os.getcwd()
 	for item in mapObject:
@@ -231,7 +280,7 @@ def GenerateSHPpreview(mapObject):
 			if fn.endswith('.shp'):
 				os.mkdir(path + 'content/png/')
 				os.chdir(path + 'content/png/')
-				command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_PATH, item.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+				command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_ROOT_PATH + parser + "/", item.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
 				print(command)
 
 				class TimedOut(Exception): # Raised if timed out.
@@ -271,9 +320,11 @@ def GenerateSHPpreview(mapObject):
 				shutil.rmtree(path+'content/png/')
 	return True
 
-def GenerateMinimap(mapObject):
+def GenerateMinimap(mapObject, parser=settings.OPENRA_VERSIONS['default']):
 	currentDirectory = os.getcwd() + os.sep
-	os.chdir(settings.OPENRA_PATH)
+	
+	os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+
 	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + os.sep
 	filename = ""
 	Dir = os.listdir(path)
@@ -288,16 +339,20 @@ def GenerateMinimap(mapObject):
 	print(command)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
-		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
+		shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
 		os.chdir(currentDirectory)
+		print('Minimap generated: %s' % mapObject.id)
 		return True
 	except:
 		os.chdir(currentDirectory)
+		print('Failed to generate minimap: %s' % mapObject.id)
 		return False
 
-def GenerateFullPreview(mapObject, userObject):
+def GenerateFullPreview(mapObject, userObject, parser=settings.OPENRA_VERSIONS['default']):
 	currentDirectory = os.getcwd() + os.sep
-	os.chdir(settings.OPENRA_PATH)
+	
+	os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+
 	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + os.sep
 	filename = ""
 	Dir = os.listdir(path)
@@ -312,7 +367,7 @@ def GenerateFullPreview(mapObject, userObject):
 	print(command)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
-		shutil.move(settings.OPENRA_PATH + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")
+		shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")
 		transac = Screenshots(
 				user = userObject,
 				ex_id = mapObject.id,
