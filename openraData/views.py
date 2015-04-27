@@ -405,7 +405,7 @@ def displayMap(request, arg):
     else:
         mapsFromAuthor = random.sample(mapsFromAuthor, len(mapsFromAuthor))
 
-    similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(id=mapObject.id)[0:8]
+    similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(map_hash=mapObject.map_hash)[0:8]
 
     duplicates = Maps.objects.filter(map_hash=mapObject.map_hash).exclude(id=mapObject.id)
     if duplicates:
