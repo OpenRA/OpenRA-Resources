@@ -22,18 +22,18 @@
                     <div class="clear"></div>
 
                     <div class="notification_container">
-                        {% if map.downloading == False or map.requires_upgrade == True or map.players == 0 or reports|length >= 3 %}
+                        {% if map.downloading == False or map.requires_upgrade == True or map.players == 0 or reports|length >= REPORTS_PENALTY_AMOUNT %}
                         <div class="notification map_attention">
                             <label class="x"></label>
                             <div class="notification_label">Attention!</div>
                             <div class="notification_tooltip">
                                 <div>This map can't be automatically downloaded by OpenRA game!
                                 {% if map.requires_upgrade == True %}
-                                    <p>Reason: Requires upgrade, see <a class="showLintLog" data-name="Lint Log">lintlog</a> (Failed for version: {{version}})</p>
+                                    <p>Reason: Requires upgrade, see <a class="showLintLog" data-name="Lint Log">lintlog</a> (Failed for version: {{map.parser}})</p>
                                     <p>Checkout <a href="http://wiki.openra.net/Upgrading-mods-to-a-new-release" target="_blank">upgrade instruction</a></p>
                                 {% elif map.downloading == False %}
                                     <p>Reason: Downloading is manually set to False</p>
-                                {% elif reports|length >= 3 %}
+                                {% elif reports|length >= REPORTS_PENALTY_AMOUNT %}
                                     <p>Reason: More then 2 <a class="allReportsShow">active reports</a>!</p>
                                 {% elif map.players == 0 %}
                                     <p>Reason: Map is unplayable! Max slots: 0</p>
@@ -69,7 +69,7 @@
 
                     <div class="map_hash_block cBlockNoPadding">
                         <div class="map_hash_block_element"><a href="/map/hash/{{map.map_hash}}" target='_blank'>API</a></div>
-                        <div class="map_hash_block_element"><a href="http://master.openra.net/map_stats?hash={{map.map_hash}}" target="_blank">stats</a></div>
+                        <div class="map_hash_block_element"><a href="http://master.openra.net/map_stats?hash={{map.map_hash}}" title='Master Server statistics for this Hash' target="_blank">stats</a></div>
                         <div class="map_hash">{% if duplicates %}<a href="#" title='duplicates'>Ξ</a> {% endif %}<span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span></div>
                     </div>
 
@@ -195,7 +195,7 @@
                         <span class="top-bottom-double-arrow" title="show more shp previews">⇳</span>
                         <h5>Preview of embeded SHP files:</h5>
                         {% for item in shpNames %}
-                        <div class="cSHP"><img src="/maps/{{arg}}/shp/{{item}}" alt="shp" /></div>
+                        <div class="cSHP"><a href="/maps/{{arg}}/shp/{{item}}/fetch/" title='Download {{item}}.shp'><img src="/maps/{{arg}}/shp/{{item}}/preview/" alt="shp" /></a></div>
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -272,10 +272,16 @@
                     <div class="map_data_label">Players:</div><div class="map_data_text">{{ map.players }}</div>
                     <div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
                     <div class="map_data_label">Size:</div><div class="map_data_text">{{ map.bounds|map_real_size }}</div>
+                    <div class="map_data_label">MapFormat:</div><div class="map_data_text">{{ map.mapformat }}</div>
+                    {% if map.shellmap %}
+                        <div class="map_data_label">Shellmap:</div><div class="map_data_text">{{ map.shellmap }}</div>
+                    {% endif %}
                     <div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
-                    <div class="map_data_label">Downloading:</div><div class="map_data_text" title="ingame"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < 3 and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
-                    <div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">{% if map.rsync_allow and map.downloading and reports|length < 3 and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
-                    <br /><br />
+                    <div class="map_data_label">Downloading:</div><div class="map_data_text" title="ingame"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < REPORTS_PENALTY_AMOUNT and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
+                    <div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">{% if map.rsync_allow and map.downloading and reports|length < REPORTS_PENALTY_AMOUNT and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
+                    <br />
+                    <div class='cBlock'><span class='small-font'>Parsed by: {{map.parser}}</span></div>
+                    <br />
                     <div class="map_data_label">Rating:</div><div class="map_data_text">{% if request.user.is_authenticated %}<div class="five-star-rating" data-average="{{map.rating}}" data-id="{{map.id}}" data-type="map" title="{{ratesAmount}} users rated, average: {{map.rating}}"></div>{% else %}<span title="Authenticate to rate map">{{ map.rating }}</span>{% endif %}</div>
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
                     <div class="map_data_label">Downloaded:</div><div class="map_data_text">{{ map.downloaded }}</div>

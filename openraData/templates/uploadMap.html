@@ -1,99 +1,92 @@
-            {% if user.is_authenticated %}
-            <script>
-                $(document).ready(function() {
-                    $("input[value=cc_yes]").click(function() {
-                        $(".license_options").show();
-                    });
-                    $("input[value=cc_no]").click(function() {
-                        $(".license_options").hide();
-                    });
-                    $("input[value=cc_no]").prop("checked", "true");
-                });
-            </script>
-            <div class="upload_container">
-                <form action={{ '/upload/map/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
-                    <table class="Table">
-                        <tr>
-                            {% if previous_rev == 0 %}
-                            <th colspan="2">Upload your oramap or mpr file</th>
+{% if user.is_authenticated %}
+
+    <script>
+        $(document).ready(function() {
+            $("input[value=cc_yes]").click(function() {
+                $(".license_options").show();
+            });
+            $("input[value=cc_no]").click(function() {
+                $(".license_options").hide();
+            });
+
+            $('.upload-map-form-parser option:first-child').attr("selected", "selected");
+
+        });
+    </script>
+
+    <div class='cBlock no-pd-bot'>
+        <div class="upload_container">
+            <h3>Upload your ORAMAP or MPR(INI)<span class='red'>*</span> file</h3>
+        </div>
+    </div>
+
+    <div class='cBlock'>
+        <form action={{ '/upload/map/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
+
+            <div class='upload-map-form-left'>
+
+                <div class='upload-map-form-info'>
+                    <textarea class="id_info" name="info" placeholder="Additional information**"></textarea>
+                </div>
+                <div class='upload-map-form-parser'>
+                    Parse with OpenRA version:<br />
+                    <select name="parser" size="4">
+                        {% for parser in parsers %}
+                            {% if parser == 'bleed' %}
+                                <option value="{{ bleed_tag }}">bleed ({{ bleed_tag }})</option>
                             {% else %}
-                            <th colspan="2">Upload new revision of <a target="_blank" href="/maps/{{previous_rev}}/">{{previous_rev_title}}</a></th>
+                                <option value="{{ parser }}">{{ parser }}</option>
                             {% endif %}
-                        </tr>
-                        <tr>
-                            <td>
-                                <label>Info:</label>{% if form.info.errors %} <span class="error">{{ form.info.errors|join:", " }}</span>{% endif %}
-                            </td>
-                            <td>
-                                {{ form.info }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label>File:</label>{% if form.file.errors %} <span class="error">{{ form.file.errors|join:", " }}</span>{% endif %}
-                            </td>
-                            <td>
-                                {{ form.file }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <hr />
-                            </td>
-                        </tr>
-                        {% if previous_rev == 0 %}
-                        <tr>
-                            <td colspan="2">
-                                <div class="license_cc">
-                                Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
-                                {% for radio in form.policy_cc %}
-                                    <label>{{ radio.tag }} {{ radio.choice_label }}</label>
-                                {% endfor %}
-                                </div>
-                                <div class="license_options"><br />
-                                Allow commercial uses of your work?<br />
-                                {% for radio in form.commercial %}
-                                    <label>{{ radio.tag }} {{ radio.choice_label }}</label>
-                                {% endfor %}<br /><br />
-                                Allow modifications of your work?<br />
-                                {% for radio in form.adaptations %}
-                                    <label>{{ radio.tag }} {{ radio.choice_label }}</label>
-                                {% endfor %}
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <hr />
-                            </td>
-                        </tr>
-                        {% endif %}
-                        <tr>
-                            <td>
-                                <button type="submit">Upload</button>
-                            </td>
-                            <td>
-                                {% if uploadingLog %}
-                                {% for line in uploadingLog %}
-                                    <hr />
-                                    {% if line == "Yaml check failed." %}
-                                        <p>{{ line }} See <a href={{ '/maps/' }}{{ uid }}{{ '/lintlog' }}>lintlog</a></p>
-                                    {% else %}
-                                        {% if line == "Failed. You've already uploaded" %}
-                                         <p>{{ line }} <a href={{ '/maps/' }}{{ uid }}>this map</a> before:</p>
-                                        {% else %}
-                                            <p>{{ line }}</p>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-                                {% endif %}
-                                {% if uid %}
-                                    <p><a href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/' }}{{ uid }}>
-                                    <img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </table>
-                </form>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class='upload-map-form-file'>
+                    <input class="id_file" name="file" type="file">
+                    <button type="submit">Upload</button>
+                </div>
             </div>
-            {% endif %}
+            <div class='upload-map-form-right'>
+                {% if previous_rev == 0 %}
+                <div class="license_cc">
+                    Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
+                    <label><input name="policy_cc" type="radio" value="cc_yes"> Yes</label>
+                    <label><input name="policy_cc" checked="checked" type="radio" value="cc_no"> No</label>
+                </div>
+                <div class="license_options"><br>
+                    Allow commercial uses of your work?<br>
+                    <label><input name="commercial" type="radio" value="com_yes"> Yes</label>
+                    <label><input checked="checked" name="commercial" type="radio" value="com_no"> No</label>
+                    <br /><br />
+                    Allow modifications of your work?<br>
+                    <label><input name="adaptations" type="radio" value="adapt_yes"> Yes</label>
+                    <label><input name="adaptations" type="radio" value="adapt_no"> No</label>
+                    <label><input checked="checked" name="adaptations" type="radio" value="adapt_alike"> Yes, as long as others share alike</label>
+                </div>
+                {% endif %}
+            </div>
+
+        </form>
+    </div>
+
+    {% if error_response %}
+    <div class='cBlock'>
+        <p>Error:</p>
+        <p>{{error_response}}</p>
+        {% if error_response == 'Yaml check failed.' %}
+            <p>See <a href={{ '/maps/' }}{{ uid }}{{ '/lintlog' }}>lintlog</a></p>
+        {% endif %}
+        {% if uid %}
+            <p><a href={{ 'http://' }}{{ request.META.HTTP_HOST }}{{ '/maps/' }}{{ uid }}>
+            <img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class='cBlock'>
+        <div class='upload-map-form-stars'>
+            <span class='red'>*</span>&nbsp;&nbsp;&nbsp;<span>Format of original Red Alert maps (MPR, INI); will automatically import it during uploading</span><br />
+            <span class='red'>**</span>&nbsp;&nbsp;<span>Optional map information which will append to default Description, fetched from map.yaml</span>
+        </div>
+    </div>
+  
+{% endif %}

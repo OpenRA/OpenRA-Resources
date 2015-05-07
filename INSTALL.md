@@ -1,27 +1,44 @@
 ## Prepare enviroment
 We will use PostgreSQL server even though our framework supports many...
 That's just our preference, so if you deploy it, you can choose any Database you want.
+
 ### Dependencies
 
 ```
+libmysqlclient-dev
 python (version 2)
-python-psycopg2  (postgresql module)
-python-pgmagick
-python-openid
-python-requests
-python-requests-oauthlib
 imagemagick
-Django python Web Framework version 1.6
+libmagick++-dev
+libboost-dev
+libboost-python-dev
+postgresql-server-dev-X.Y
+postgresql-server-dev-all
+libcurl4-openssl-dev
+python-pycurl
+libffi-dev
+libxslt1-dev
+python-dev
 mono 2.10 +
-OpenRA.Utility and OpenRA.Lint
-django-registration module (easy_install -Z django-registration)
-django-allauth (pip install django-allauth)
-django-cors-headers (pip install django-cors-headers)
-django-threadedcomments (pip install django-threadedcomments)
-south (easy_install south)
 sendmail (or any other mail server)
 curl
 ```
+
+### Set up virtualenv, ex (using virtualenvwrapper):
+
+```
+$ pip install virtualenvwrapper
+...
+$ export WORKON_HOME=~/Envs
+$ mkdir -p $WORKON_HOME
+$ source /usr/local/bin/virtualenvwrapper.sh
+$ mkvirtualenv --system-site-packages resource_site
+$ workon resource_site
+
+# enter repository root directory and install python packages:
+$ pip install -r requirements.txt
+```
+
+### System configuration
 
  * Run PostgreSQL server; create user and database (in utf-8 encoding)
  * Change password for postgres user; setup DB backups
@@ -36,11 +53,11 @@ curl
 
  * Generate a new Django secret key and change "SECRET_KEY" setting
  * Change "DEBUG" setting to False if it's True
- * Modify "OPENRA_PATH" to specify a directory with compiled OpenRA files (make sure it's always the latest release)
  * Modify "RSYNC_MAP_PATH" and "RSYNC_MAP_API_PATH" to specify directories where maps will be dumped by website trigger for dedicated servers and Map API mirrors usage. See [Sync Maps over Rsync](https://github.com/OpenRA/OpenRA-Content-Engine/wiki/Sync-maps-over-RSYNC-%28for-dedicated-servers%29) guide for details.
  * Modify GITHUB related settings (user, repository and API token): used to post an issue with info about OpenRA crash report
  * Modify "ADMIN_EMAIL" to specify an email address of a person who is responsible for fixing map uploading issues
  * Edit DB related configuration
+ * Deploy OpenRA binaries with full permissions for web site unix user, settings OPENRA_ROOT_PATH, OPENRA_VERSIONS, OPENRA_BLEED_HASH_FILE_PATH and OPENRA_BLEED_PARSER are self-explained.
 
 ```
 DATABASES = {
@@ -113,3 +130,9 @@ server {
  * Go to "Social Apps"; Add a new social app (set a proper client id and secret, chose a proper site)
  * Load http://yoursitedomain.com/accounts/github/login/  to authorize your new application at github
  * Do the similar actions to create and set up Google Application (without creating new site over django admin)
+
+### CRON config
+#### Sync maps for rsync directory ( `rsync`   is a django-admin command, path:  `openraData/management/commands/rsync.py` )
+```
+0 * * * * cd <full path to repository root directory> && python manage.py rsync
+```

@@ -1,3 +1,6 @@
+import os
+import datetime
+import time
 from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -90,6 +93,13 @@ def send_email_to_user_OnComment(itemtype, itemid, email_addr, info=""):
 	email.send()
 	connection.close()
 
+def send_email_to_admin(title, body):
+	connection = mail.get_connection()
+	connection.open()
+	email = mail.EmailMessage(title, body, settings.ADMIN_EMAIL, [settings.ADMIN_EMAIL], connection=connection)
+	email.send()
+	connection.close()
+
 def return_email(userid):
 	# it will have set value if it's social account and email is provided
 	mail_addr = User.objects.get(pk=userid).email
@@ -164,3 +174,15 @@ class Revisions():
 		if itemObject.next_rev == 0:
 			return itemObject.id
 		return self.GetLatestRevisionID(itemObject.next_rev)
+
+def Log(data, channel="default"):
+	if not os.path.isdir(os.getcwd() + "/logs/"):
+		os.makedirs(os.getcwd() + "/logs/")
+	logfile = open(os.getcwd() + "/logs/" + channel + ".log", "a")
+	if data:
+		today = datetime.datetime.today()
+		timestamp = today.strftime('%Y/%m/%d %H:%M:%S') + ' [' + time.tzname[0] + ']:  '
+
+		logfile.write(timestamp + data.strip() + "\n")
+	logfile.close()
+	return True

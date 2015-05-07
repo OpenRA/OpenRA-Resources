@@ -3,6 +3,7 @@ import os
 import zipfile
 import string
 import re
+import signal
 from subprocess import Popen, PIPE
 import multiprocessing
 from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
@@ -10,11 +11,8 @@ from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
-from openraData.models import Maps
-from openraData.models import Units
-from openraData.models import Mods
-from openraData.models import Screenshots
-from openraData import triggers, misc
+from openraData.models import Maps, Units, Mods, Screenshots
+from openraData import utility, misc
 
 class MapHandlers():
     
@@ -35,6 +33,7 @@ class MapHandlers():
         self.legacy_name = ""
         self.legacy_map = False
 
+        self.MapFormat = 6
         self.MapMod = ""
         self.MapTitle = ""
         self.MapAuthor = ""
@@ -47,14 +46,23 @@ class MapHandlers():
         self.spawnpoints = ""
 
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
+        
+        parser = settings.OPENRA_VERSIONS['default']
+        parser_to_db = parser
+        if post.get("parser", None) != None:
+            parser = post['parser']
+            parser_to_db = parser
+            if 'git' in parser:
+                parser = settings.OPENRA_BLEED_PARSER
+
         if pre_r != 0:
             mapObject = Maps.objects.filter(id=pre_r, user_id=user_id)
             if not mapObject:
                 self.LOG.append('Failed. You do not own map for which you want to upload a new revision.')
-                return False
+                return 'Failed. You do not own map for which you want to upload a new revision.'
             if mapObject[0].next_rev != 0:
-                self.LOG.append('Failed. Unable to upload a new revision for map which already has one')
-                return False
+                self.LOG.append('Failed. Unable to upload a new revision for map which already has one.')
+                return 'Failed. Unable to upload a new revision for map which already has one.'
             previous_policy_cc = mapObject[0].policy_cc
             previous_policy_commercial = mapObject[0].policy_commercial
             previous_policy_adaptations = mapObject[0].policy_adaptations
@@ -66,10 +74,10 @@ class MapHandlers():
         command = 'file -b --mime-type %s' % tempname
         proc = Popen(command.split(), stdout=PIPE).communicate()
         mimetype = proc[0].strip()
-        if not (mimetype == 'application/zip' and os.path.splitext(f.name)[1].lower() == '.oramap'):
-            if not (mimetype == 'text/plain' and os.path.splitext(f.name)[1].lower() == '.mpr'):
+        if not ( mimetype == 'application/zip' and os.path.splitext(f.name)[1].lower() == '.oramap' ):
+            if not ( mimetype == 'text/plain' and os.path.splitext(f.name)[1].lower() in ['.mpr', '.ini'] ):
                 self.LOG.append('Failed. Unsupported file type.')
-                return False
+                return 'Failed. Unsupported file type.'
 
         name = f.name
         badChars = ": ; < > @ $ # & ( ) % '".split()
@@ -81,86 +89,40 @@ class MapHandlers():
         for bc in findBadChars:
             if bc not in ['.','-']:
                 self.LOG.append('Failed. Your filename is bogus; rename and try again.')
-                return False
+                return 'Failed. Your filename is bogus; rename and try again.'
 
         if mimetype == 'text/plain':
-            if not self.LegacyImport(tempname):
+            if not self.LegacyImport(tempname, parser):
                 self.LOG.append('Failed to import legacy map.')
                 misc.send_email_to_admin_OnMapFail(tempname)
-                return False
-            shutil.move(settings.OPENRA_PATH + self.legacy_name, tempname)
+                return 'Failed to import legacy map.'
+            try:    # catch exception, TODO: remove after new release in 2015
+                shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + self.legacy_name, tempname)
+            except:
+                pass
             name = os.path.splitext(name)[0] + '.oramap'
             self.legacy_map = True
 
-        z = zipfile.ZipFile(tempname, mode='a')
-        yamlData = ""
-        mapFileContent = []
-        for filename in z.namelist():
-            mapFileContent.append(filename)
-            if filename == "map.yaml":
-                mapbytes = z.read(filename)
-                yamlData = mapbytes.decode("utf-8")
-            if filename.endswith(".lua"):
-                self.lua_map = True
-        if "map.yaml" not in mapFileContent or "map.bin" not in mapFileContent:
-            self.LOG.append('Failed. Invalid map format.')
-            misc.send_email_to_admin_OnMapFail(tempname)
-            return False
-        z.close()
-
-        self.GetHash(tempname)
+        ### Check if user has already uploaded the same map
+        self.GetHash(tempname, parser)
         userObject = User.objects.get(pk=user_id)
         try:
             hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
-            self.LOG.append("Failed. You've already uploaded")
+            self.LOG.append("Failed. You've already uploaded this map.")
             self.UID = str(hashExists.id)
-            return False
+            return "Failed. You've already uploaded this map."
         except:
             pass   # all good
 
-        #Load basic map info
-        countAdvanced = 0
-        shouldCount = False
-        expectspawn = False
-        for line in string.split(yamlData, '\n'):
-            if line[0:5] == "Title":
-                self.MapTitle = line[6:].strip().replace("'", "''")
-            if line[0:11] == "RequiresMod":
-                self.MapMod = line[12:].strip().lower()
-            if line[0:6] == "Author":
-                self.MapAuthor = line[7:].strip().replace("'", "''")
-            if line[0:7] == "Tileset":
-                self.MapTileset = line[8:].strip().lower()
-            if line[0:4] == "Type":
-                self.MapType = line[5:].strip()
-            if line[0:11] == "Description":
-                self.MapDesc = line[12:].strip().replace("'", "''")
-            if line[0:7] == "MapSize":
-                self.MapSize = line[8:].strip()
-            if line[0:6] == "Bounds":
-                self.Bounds = line[7:].strip()
-            if line.strip()[-7:] == "mpspawn":
-                expectspawn = True
-            if line.strip()[0:8] == "Location":
-                if expectspawn:
-                    self.spawnpoints += line.split(':')[1].strip()+","
-                    expectspawn = False
-            if line.strip()[0:8] == "Playable":
-                state = line.split(':')[1]
-                if state.strip().lower() in ['true', 'on', 'yes', 'y']:
-                    self.MapPlayers += 1
-            if line.strip()[0:13] == "UseAsShellmap":
-                state = line.split(':')[1]
-                if state.strip().lower() in ['true', 'on', 'yes', 'y']:
-                    pass
-            if line.strip()[0:5] == "Rules":
-                shouldCount = True
-            if shouldCount:
-                countAdvanced += 1
-        self.spawnpoints = self.spawnpoints.rstrip(",")
-        if countAdvanced > 20:
-            self.advanced_map = True
+        ### Read Yaml ###
+        read_yaml_response = utility.ReadYaml(False, tempname)
+        resp_map_data = read_yaml_response['response']
+        if read_yaml_response['error']:
+            self.LOG.append(resp_map_data)
+            misc.send_email_to_admin_OnMapFail(tempname)
+            return resp_map_data
 
+        ### Define license information
         cc = False
         commercial = False
         adaptations = ""
@@ -180,35 +142,40 @@ class MapHandlers():
             commercial = previous_policy_commercial
             adaptations = previous_policy_adaptations
 
+
+        ### Add record to Database
         transac = Maps(
             user = userObject,
-            title = self.MapTitle,
-            description = self.MapDesc.strip(),
+            title = resp_map_data['title'],
+            description = resp_map_data['description'],
             info = post['info'].strip(),
-            author = self.MapAuthor.strip(),
-            map_type = self.MapType.strip(),
-            players = self.MapPlayers,
-            game_mod = self.MapMod,
+            author = resp_map_data['author'],
+            map_type = resp_map_data['map_type'],
+            players = resp_map_data['players'],
+            game_mod = resp_map_data['game_mod'],
             map_hash = self.maphash.strip(),
-            width = self.MapSize.split(',')[0],
-            height = self.MapSize.split(',')[1],
-            bounds = self.Bounds,
-            spawnpoints = self.spawnpoints,
-            tileset = self.MapTileset,
+            width = resp_map_data['width'],
+            height = resp_map_data['height'],
+            bounds = resp_map_data['bounds'],
+            mapformat = resp_map_data['mapformat'],
+            spawnpoints = resp_map_data['spawnpoints'],
+            tileset = resp_map_data['tileset'],
+            shellmap = resp_map_data['shellmap'],
             legacy_map = self.legacy_map,
             revision = rev,
             pre_rev = pre_r,
             next_rev = 0,
             downloading = True,
             requires_upgrade = not self.LintPassed,
-            advanced_map = self.advanced_map,
-            lua = self.lua_map,
+            advanced_map = resp_map_data['advanced'],
+            lua = resp_map_data['lua'],
             posted = timezone.now(),
             viewed = 0,
             policy_cc = cc,
             policy_commercial = commercial,
             policy_adaptations = adaptations,
-            )
+            parser = parser_to_db,
+        )
         transac.save()
         self.UID = str(transac.id)
         if pre_r != 0:
@@ -228,30 +195,32 @@ class MapHandlers():
             self.flushLog( ['Info: ' + post['info']] )
         
         self.UnzipMap()
-        self.LintCheck(self.MapMod)
+        self.LintCheck(resp_map_data['game_mod'], parser)
         if self.LintPassed:
             Maps.objects.filter(id=transac.id).update(requires_upgrade=False)
         else:
             Maps.objects.filter(id=transac.id).update(requires_upgrade=True)
 
-        self.GenerateMinimap()
-        #self.GenerateFullPreview(userObject)
-        p = multiprocessing.Process(target=triggers.PushMapsToRsyncDirs, args=(), name='triggers')
-        p.start()
+        self.GenerateMinimap(resp_map_data['game_mod'], parser)
+        #self.GenerateFullPreview(userObject, resp_map_data['game_mod'], parser)
 
-        shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(), name='shppreview')
+        shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(resp_map_data['game_mod'], parser,), name='shppreview')
         shp.start()
+        return False # no errors
 
     def UnzipMap(self):
         z = zipfile.ZipFile(self.map_full_path_filename, mode='a')
-        z.extractall(self.map_full_path_directory + 'content/')
+        try:
+            z.extractall(self.map_full_path_directory + 'content/')
+        except:
+            pass
         z.close()
 
-    def GetHash(self, filepath=""):
+    def GetHash(self, filepath="", parser=settings.OPENRA_VERSIONS['default']):
         if filepath == "":
             filepath = self.map_full_path_filename
 
-        os.chdir(settings.OPENRA_PATH)
+        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
 
         command = 'mono --debug OpenRA.Utility.exe ra --map-hash ' + filepath
         proc = Popen(command.split(), stdout=PIPE).communicate()
@@ -260,12 +229,26 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def LintCheck(self, mod):
-        os.chdir(settings.OPENRA_PATH)
+    def LintCheck(self, mod, parser=settings.OPENRA_VERSIONS['default']):
+        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
 
-        command = 'mono --debug OpenRA.Lint.exe ' + mod + ' ' + self.map_full_path_filename
+        command = 'mono --debug OpenRA.Utility.exe ' + mod + ' --check-yaml ' + self.map_full_path_filename
+
         proc = Popen(command.split(), stdout=PIPE).communicate()
-        if proc[0].strip() == "":
+        
+        passing = True
+        for res in proc:
+            if res == None:
+                continue
+            lines = res.split("\n")
+            for line in lines:
+                if 'Testing map' in line:
+                    passing = True
+                else:
+                    if line.strip() != "":
+                        passing = False
+
+        if passing:
             self.flushLog( ['Yaml check succeeded.'] )
             self.LintPassed = True
         else:
@@ -274,14 +257,14 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateMinimap(self):
-        os.chdir(settings.OPENRA_PATH)
+    def GenerateMinimap(self, game_mod, parser=settings.OPENRA_VERSIONS['default']):
+        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
 
-        command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (self.MapMod, self.map_full_path_filename)
+        command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (game_mod, self.map_full_path_filename)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
-            shutil.move(misc.addSlash(settings.OPENRA_PATH) + self.preview_filename,
+            shutil.move(misc.addSlash(settings.OPENRA_ROOT_PATH + parser + "/") + self.preview_filename,
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-mini.png")
             self.flushLog(proc)
             self.minimap_generated = True
@@ -290,14 +273,14 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateFullPreview(self, userObject):
-        os.chdir(settings.OPENRA_PATH)
+    def GenerateFullPreview(self, userObject, game_mod, parser=settings.OPENRA_VERSIONS['default']):
+        os.chdir(settings.OPENRA_ROOT_PATH, parser)
 
-        command = 'mono --debug OpenRA.Utility.exe %s--full-preview %s' % (self.MapMod, self.map_full_path_filename)
+        command = 'mono --debug OpenRA.Utility.exe %s--full-preview %s' % (game_mod, self.map_full_path_filename)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
-            shutil.move(misc.addSlash(settings.OPENRA_PATH) + self.preview_filename,
+            shutil.move(misc.addSlash(settings.OPENRA_ROOT_PATH + parser + "/") + self.preview_filename,
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-full.png")
             self.flushLog(proc)
             self.fullpreview_generated = True
@@ -314,15 +297,37 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateSHPpreview(self):
+    def GenerateSHPpreview(self, game_mod, parser=settings.OPENRA_VERSIONS['default']):
         Dir = os.listdir(self.map_full_path_directory+'content/')
         for fn in Dir:
             if fn.endswith('.shp'):
                 os.mkdir(self.map_full_path_directory+'content/png/')
                 os.chdir(self.map_full_path_directory+'content/png/')
-                command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_PATH, self.MapMod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
-                proc = Popen(command.split(), stdout=PIPE).communicate()
-                self.flushLog(proc)
+                command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_ROOT_PATH + parser + "/", game_mod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+
+                class TimedOut(Exception): # Raised if timed out.
+                    pass
+
+                def signal_handler(signum, frame):
+                    raise TimedOut("Timed out!")
+
+                signal.signal(signal.SIGALRM, signal_handler)
+
+                signal.alarm(settings.UTILITY_TIME_LIMIT)    # Limit command execution time
+
+                try:
+                    proc = Popen(command.split(), stdout=PIPE).communicate()
+                    self.flushLog(proc)
+                    signal.alarm(0)
+                except:
+                    err = 'Error: failed to generate SHP preview for %s (map: %s)' % (fn, self.UID)
+                    print(err)
+                    misc.send_email_to_admin('ORC: Failed to generate SHP preview', '%s \n\n %s' % (err, command))
+
+                    os.chdir(self.currentDirectory)
+                    shutil.rmtree(self.map_full_path_directory+'content/png/')
+
+                    continue
                 pngsdir = os.listdir(self.map_full_path_directory+'content/png/')
                 imglist = []
                 for pngfn in pngsdir:
@@ -337,8 +342,8 @@ class MapHandlers():
                 os.chdir(self.currentDirectory)
                 shutil.rmtree(self.map_full_path_directory+'content/png/')
 
-    def LegacyImport(self, mapPath):
-        os.chdir(settings.OPENRA_PATH)
+    def LegacyImport(self, mapPath, parser=settings.OPENRA_VERSIONS['default']):
+        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
         for mod in ['ra','cnc','d2k','ts']:
             command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
             proc = Popen(command.split(), stdout=PIPE).communicate()

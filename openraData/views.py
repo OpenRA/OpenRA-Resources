@@ -19,13 +19,12 @@ from django.db.models import Count
 from django.db.models import Max
 from django.utils import timezone
 
-from .forms import UploadMapForm
 from .forms import AddScreenshotForm
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
-from openraData import handlers, misc, triggers
+from openraData import handlers, misc, utility
 from openraData.models import Maps, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -37,14 +36,18 @@ def index(request):
     else:
         newcomments = False
     template = loader.get_template('index.html')
-    context = RequestContext(request, {
+    template_args = {
         'content': 'index_content.html',
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': '',
         'screenshots': scObject,
         'newcomments': newcomments,
-    })
+    }
+    if settings.SITE_MAINTENANCE:
+        template_args['content'] = 'service/maintenance.html'
+        template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
+    context = RequestContext(request, template_args)
     return StreamingHttpResponse(template.render(context))
 
 def logoutView(request):
@@ -138,7 +141,8 @@ def maps(request, page=1, filter=""):
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
-    if len(mapObject) == 0 and int(page) != 1:
+    amount_this_page = len(mapObject)
+    if amount_this_page == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/")
 
     comments = misc.count_comments_for_many(mapObject, 'map')
@@ -370,14 +374,7 @@ def displayMap(request, arg):
         mapObject = Maps.objects.get(id=arg)
     except:
         return HttpResponseRedirect('/')
-    verpath = misc.addSlash(settings.OPENRA_PATH)
-    versionFile = open(verpath + 'mods/ra/mod.yaml', 'r')
-    version = versionFile.read()
-    versionFile.close()
-    try:
-        version = re.findall('Version: (.*)', version)[0]
-    except:
-        version = "null"
+
     reportedByUser = False
     reports = []
     reportObject = Reports.objects.filter(ex_id=mapObject.id, ex_name='maps')
@@ -408,7 +405,7 @@ def displayMap(request, arg):
     else:
         mapsFromAuthor = random.sample(mapsFromAuthor, len(mapsFromAuthor))
 
-    similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(id=mapObject.id)[0:8]
+    similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(map_hash=mapObject.map_hash)[0:8]
 
     duplicates = Maps.objects.filter(map_hash=mapObject.map_hash).exclude(id=mapObject.id)
     if duplicates:
@@ -441,7 +438,6 @@ def displayMap(request, arg):
         'fullPreview': fullPreview,
         'license': license,
         'icons': icons,
-        'version': version,
         'reports': reports,
         'reported': reportedByUser,
         'luaNames': luaNames,
@@ -453,6 +449,7 @@ def displayMap(request, arg):
         'duplicates': duplicates,
         'played_counter': played_counter,
         'ratesAmount': ratesAmount,
+        'REPORTS_PENALTY_AMOUNT': settings.REPORTS_PENALTY_AMOUNT,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -622,15 +619,21 @@ def serveLua(request, arg, name):
     response['Content-Disposition'] = 'attachment; filename = %s' % fname
     return response
 
-def serveMapSHP(request, arg, name):
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/'
+def serveMapSHP(request, arg, name, request_type='preview'):
+    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + '/content/'
     fname = ""
     listdir = os.listdir(path)
     for fn in listdir:
-        if fn.endswith('.shp.gif'):
-            if fn.split('.shp.gif')[0] == name:
-                fname = fn
-                break
+        if request_type == 'preview':
+            if fn.endswith('.shp.gif'):
+                if fn.split('.shp.gif')[0] == name:
+                    fname = fn
+                    break
+        elif request_type == 'fetch':
+            if fn.endswith('.shp'):
+                if fn.split('.shp')[0] == name:
+                    fname = fn
+                    break
     if fname == "":
         raise Http404
     response = StreamingHttpResponse(open(path+fname), content_type='image/gif')
@@ -640,7 +643,7 @@ def serveMapSHP(request, arg, name):
 def uploadMap(request, previous_rev=0):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
-    uploadingLog = []
+    error_response = False
     uid = False
     rev = 1
     previous_rev_title = ""
@@ -652,18 +655,17 @@ def uploadMap(request, previous_rev=0):
             previous_rev_title = mapObject[0].title
             if request.user.is_superuser:
                 user_id = mapObject[0].user_id
-    initial = {'policy_cc': 'cc_yes', 'commercial': 'com_no', 'adaptations': 'adapt_alike'}
     if request.method == 'POST':
-        form = UploadMapForm(request.POST, request.FILES, initial=initial)
-        if form.is_valid():
+        if request.FILES.get('file', None) != None:
             uploadingMap = handlers.MapHandlers()
-            uploadingMap.ProcessUploading(user_id, request.FILES['file'], request.POST, rev, previous_rev)
-            uploadingLog = uploadingMap.LOG
+            error_response = uploadingMap.ProcessUploading(user_id, request.FILES['file'], request.POST, rev, previous_rev)
             if uploadingMap.UID:
                 uid = str(uploadingMap.UID)
-            form = UploadMapForm(initial=initial)
-    else:
-        form = UploadMapForm(initial=initial)
+                if error_response == False:
+                    return HttpResponseRedirect('/maps/' + uid + "/")
+
+    bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
+    bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
 
     template = loader.get_template('index.html')
     context = RequestContext(request, {
@@ -671,11 +673,12 @@ def uploadMap(request, previous_rev=0):
         'request': request,
         'http_host': request.META['HTTP_HOST'],
         'title': ' - Uploading Map',
-        'form': form,
-        'uploadingLog': uploadingLog,
         'uid': uid,
         'previous_rev': previous_rev,
         'previous_rev_title': previous_rev_title,
+        'parsers': settings.OPENRA_VERSIONS.values(),
+        'bleed_tag': bleed_tag,
+        'error_response': error_response,
     })
     return StreamingHttpResponse(template.render(context))
 
@@ -702,8 +705,6 @@ def DeleteMap(request, arg):
         if mapObject.next_rev != 0:
             Maps.objects.filter(id=mapObject.next_rev).update(pre_rev=mapObject.pre_rev)
         mapObject.delete()
-        p = multiprocessing.Process(target=triggers.PushMapsToRsyncDirs, args=(), name='triggers')
-        p.start()
     template = loader.get_template('index.html')
     context = RequestContext(request, {
         'content': 'deleteMap.html',
