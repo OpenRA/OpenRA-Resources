@@ -8,6 +8,16 @@ That's just our preference, so if you deploy it, you can choose any Database you
 libmysqlclient-dev
 python (version 2)
 imagemagick
+libmagick++-dev
+libboost-dev
+libboost-python-dev
+postgresql-server-dev-X.Y
+postgresql-server-dev-all
+libcurl4-openssl-dev
+python-pycurl
+libffi-dev
+libxslt1-dev
+python-dev
 mono 2.10 +
 sendmail (or any other mail server)
 curl
