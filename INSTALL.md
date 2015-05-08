@@ -123,6 +123,41 @@ server {
 }
 ```
 
+### Setup Production (using Apache2 + mod_wsgi)
+
+Apache VirtualHost example:
+```
+<VirtualHost *:80>
+        ServerAdmin ihptru@gmail.com
+        ServerName resource.openra.net
+
+        Alias /static/ /home/openrassh/www/resource/openraData/static/
+        Alias /robots.txt /home/openrassh/www/resource/openraData/static/robots.txt
+
+        WSGIDaemonProcess resource.openra.net user=openrassh group=openrassh python-path=/home/openrassh/Envs/resource_site/lib/python2.7/site-packages
+        WSGIProcessGroup resource.openra.net
+        WSGIScriptAlias / /home/openrassh/www/resource/systemTool/wsgi.py
+
+        <Directory /home/openrassh/www/resource/systemTool>
+                Order deny,allow
+                Allow from all
+                <Files wsgi.py>
+                        Order deny,allow
+                        Allow from all
+                </Files>
+        </Directory>
+
+        <Directory /home/openrassh/www/resource/openraData/static>
+                Order deny,allow
+                Allow from all
+        </Directory>
+
+
+        ErrorLog /home/openrassh/www/resource.error.log
+        CustomLog /home/openrassh/www/resource.access.log common
+</VirtualHost>
+```
+
 ### Post-Installation
 #### Configure allauth
  * Create an application at Github (callback url: http://yoursitedomain.com/accounts/github/login/callback/)
@@ -134,5 +169,7 @@ server {
 ### CRON config
 #### Sync maps for rsync directory ( `rsync`   is a django-admin command, path:  `openraData/management/commands/rsync.py` )
 ```
-0 * * * * cd <full path to repository root directory> && python manage.py rsync
+WORKON_HOME=~/Envs
+
+0 * * * * source /usr/local/bin/virtualenvwrapper.sh && workon resource_site && cd <full path to repository root directory> && python manage.py rsync
 ```
