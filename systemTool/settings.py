@@ -140,8 +140,9 @@ OPENRA_VERSIONS = {
 # Path to file which stores HASH of the latest `bleed` version
 OPENRA_BLEED_HASH_FILE_PATH = ''
 
-# `bleed` parser  directory is being updated by external script once new commit is pushed and has different structure
-OPENRA_BLEED_PARSER = 'bleed/usr/lib/openra'
+# `bleed` parser  directory is being updated by external script once new commit is pushed and has different structure (full path to directory)
+OPENRA_BLEED_PARSER = ''
+
 
 # Path to directory which will be shared over rsync, with full permissions for website user ( with slash at the end )
 # Must be outside of website's path tree

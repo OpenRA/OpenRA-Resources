@@ -14,10 +14,14 @@ from openraData import misc
 
 
 def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS['default']):
+
+	parser_to_db = parser
+	parser = settings.OPENRA_ROOT_PATH + parser
+
 	currentDirectory = os.getcwd() + os.sep
 	for item in mapObject:
 		
-		os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+		os.chdir(parser + "/")
 
 		path = currentDirectory + 'openraData/data/maps/' + str(item.id) + '/'
 		filename = ""
@@ -81,15 +85,15 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS['default']):
 			Maps.objects.filter(id=item.id).update(shellmap=resp_map_data['shellmap'])
 			Maps.objects.filter(id=item.id).update(lua=resp_map_data['lua'])
 			Maps.objects.filter(id=item.id).update(advanced_map=resp_map_data['advanced'])
-			Maps.objects.filter(id=item.id).update(parser=parser)
+			Maps.objects.filter(id=item.id).update(parser=parser_to_db)
 			print('Updated data, fetched from Yaml: %s' % item.id)
 	os.chdir(currentDirectory)
 	return True
 
-def recalculate_hash(mapObject, parser=settings.OPENRA_VERSIONS['default']):
+def recalculate_hash(mapObject, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
 	currentDirectory = os.getcwd() + os.sep
 
-	os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+	os.chdir(parser + "/")
 
 	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + '/'
 	filename = ""
@@ -210,11 +214,11 @@ def UnzipMap(mapObject):
 	print('Unzipped map: %s' % mapObject.id)
 	return True
 
-def LintCheck(mapObject, parser=settings.OPENRA_VERSIONS['default']):
+def LintCheck(mapObject, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
 	# this function performs a Lint Check for all existing maps
 	cwd = os.getcwd()
 	
-	os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+	os.chdir(parser + "/")
 
 	status = False
 
@@ -268,7 +272,7 @@ def LintCheck(mapObject, parser=settings.OPENRA_VERSIONS['default']):
 	os.chdir(cwd)
 	return status
 
-def GenerateSHPpreview(mapObject, parser=settings.OPENRA_VERSIONS['default']):
+def GenerateSHPpreview(mapObject, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
 	# generates gif preview of shp files for every mapObject in list of objects
 	currentDirectory = os.getcwd()
 	for item in mapObject:
@@ -280,7 +284,7 @@ def GenerateSHPpreview(mapObject, parser=settings.OPENRA_VERSIONS['default']):
 			if fn.endswith('.shp'):
 				os.mkdir(path + 'content/png/')
 				os.chdir(path + 'content/png/')
-				command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_ROOT_PATH + parser + "/", item.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+				command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", item.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
 				print(command)
 
 				class TimedOut(Exception): # Raised if timed out.
@@ -320,10 +324,10 @@ def GenerateSHPpreview(mapObject, parser=settings.OPENRA_VERSIONS['default']):
 				shutil.rmtree(path+'content/png/')
 	return True
 
-def GenerateMinimap(mapObject, parser=settings.OPENRA_VERSIONS['default']):
+def GenerateMinimap(mapObject, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
 	currentDirectory = os.getcwd() + os.sep
 	
-	os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+	os.chdir(parser + "/")
 
 	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + os.sep
 	filename = ""
@@ -339,7 +343,7 @@ def GenerateMinimap(mapObject, parser=settings.OPENRA_VERSIONS['default']):
 	print(command)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
-		shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
+		shutil.move(parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
 		os.chdir(currentDirectory)
 		print('Minimap generated: %s' % mapObject.id)
 		return True
@@ -348,10 +352,10 @@ def GenerateMinimap(mapObject, parser=settings.OPENRA_VERSIONS['default']):
 		print('Failed to generate minimap: %s' % mapObject.id)
 		return False
 
-def GenerateFullPreview(mapObject, userObject, parser=settings.OPENRA_VERSIONS['default']):
+def GenerateFullPreview(mapObject, userObject, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
 	currentDirectory = os.getcwd() + os.sep
 	
-	os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+	os.chdir(parser + "/")
 
 	path = currentDirectory + 'openraData/data/maps/' + str(mapObject.id) + os.sep
 	filename = ""
@@ -367,7 +371,7 @@ def GenerateFullPreview(mapObject, userObject, parser=settings.OPENRA_VERSIONS['
 	print(command)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
 	try:
-		shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")
+		shutil.move(parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")
 		transac = Screenshots(
 				user = userObject,
 				ex_id = mapObject.id,

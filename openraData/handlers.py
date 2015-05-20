@@ -46,12 +46,13 @@ class MapHandlers():
         self.spawnpoints = ""
 
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
-        
-        parser = settings.OPENRA_VERSIONS['default']
-        parser_to_db = parser
+
+        parser_to_db = settings.OPENRA_VERSIONS['default']
+        parser = settings.OPENRA_ROOT_PATH + parser_to_db
+
         if post.get("parser", None) != None:
-            parser = post['parser']
-            parser_to_db = parser
+            parser_to_db = post['parser']
+            parser = settings.OPENRA_ROOT_PATH + parser_to_db
             if 'git' in parser:
                 parser = settings.OPENRA_BLEED_PARSER
 
@@ -97,7 +98,7 @@ class MapHandlers():
                 misc.send_email_to_admin_OnMapFail(tempname)
                 return 'Failed to import legacy map.'
             try:    # catch exception, TODO: remove after new release in 2015
-                shutil.move(settings.OPENRA_ROOT_PATH + parser + "/" + self.legacy_name, tempname)
+                shutil.move(parser + "/" + self.legacy_name, tempname)
             except:
                 pass
             name = os.path.splitext(name)[0] + '.oramap'
@@ -216,11 +217,11 @@ class MapHandlers():
             pass
         z.close()
 
-    def GetHash(self, filepath="", parser=settings.OPENRA_VERSIONS['default']):
+    def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
         if filepath == "":
             filepath = self.map_full_path_filename
 
-        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+        os.chdir(parser + "/")
 
         command = 'mono --debug OpenRA.Utility.exe ra --map-hash ' + filepath
         proc = Popen(command.split(), stdout=PIPE).communicate()
@@ -229,8 +230,8 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def LintCheck(self, mod, parser=settings.OPENRA_VERSIONS['default']):
-        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+    def LintCheck(self, mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+        os.chdir(parser + "/")
 
         command = 'mono --debug OpenRA.Utility.exe ' + mod + ' --check-yaml ' + self.map_full_path_filename
 
@@ -257,14 +258,14 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateMinimap(self, game_mod, parser=settings.OPENRA_VERSIONS['default']):
-        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+    def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+        os.chdir(parser + "/")
 
         command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (game_mod, self.map_full_path_filename)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
-            shutil.move(misc.addSlash(settings.OPENRA_ROOT_PATH + parser + "/") + self.preview_filename,
+            shutil.move(misc.addSlash(parser + "/") + self.preview_filename,
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-mini.png")
             self.flushLog(proc)
             self.minimap_generated = True
@@ -273,14 +274,14 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateFullPreview(self, userObject, game_mod, parser=settings.OPENRA_VERSIONS['default']):
-        os.chdir(settings.OPENRA_ROOT_PATH, parser)
+    def GenerateFullPreview(self, userObject, game_mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+        os.chdir(parser)
 
         command = 'mono --debug OpenRA.Utility.exe %s--full-preview %s' % (game_mod, self.map_full_path_filename)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         try:
-            shutil.move(misc.addSlash(settings.OPENRA_ROOT_PATH + parser + "/") + self.preview_filename,
+            shutil.move(misc.addSlash(parser + "/") + self.preview_filename,
                 self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-full.png")
             self.flushLog(proc)
             self.fullpreview_generated = True
@@ -297,13 +298,13 @@ class MapHandlers():
 
         os.chdir(self.currentDirectory)
 
-    def GenerateSHPpreview(self, game_mod, parser=settings.OPENRA_VERSIONS['default']):
+    def GenerateSHPpreview(self, game_mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
         Dir = os.listdir(self.map_full_path_directory+'content/')
         for fn in Dir:
             if fn.endswith('.shp'):
                 os.mkdir(self.map_full_path_directory+'content/png/')
                 os.chdir(self.map_full_path_directory+'content/png/')
-                command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (settings.OPENRA_ROOT_PATH + parser + "/", game_mod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+                command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", game_mod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
 
                 class TimedOut(Exception): # Raised if timed out.
                     pass
@@ -342,8 +343,8 @@ class MapHandlers():
                 os.chdir(self.currentDirectory)
                 shutil.rmtree(self.map_full_path_directory+'content/png/')
 
-    def LegacyImport(self, mapPath, parser=settings.OPENRA_VERSIONS['default']):
-        os.chdir(settings.OPENRA_ROOT_PATH + parser + "/")
+    def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+        os.chdir(parser + "/")
         for mod in ['ra','cnc','d2k','ts']:
             command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
             proc = Popen(command.split(), stdout=PIPE).communicate()
