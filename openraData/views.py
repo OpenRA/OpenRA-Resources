@@ -664,8 +664,10 @@ def uploadMap(request, previous_rev=0):
                 if error_response == False:
                     return HttpResponseRedirect('/maps/' + uid + "/")
 
-    bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
-    bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
+    bleed_tag = None
+    if (settings.OPENRA_BLEED_HASH_FILE_PATH != ''):
+        bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
+        bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
 
     template = loader.get_template('index.html')
     context = RequestContext(request, {
