@@ -148,7 +148,7 @@ def maps(request, page=1, filter=""):
 	comments = misc.count_comments_for_many(mapObject, 'map')
 
 	template = loader.get_template('index.html')
-	context = RequestContext(request, {
+	template_args = {
 		'content': 'maps.html',
 		'request': request,
 		'http_host': request.META['HTTP_HOST'],
@@ -158,7 +158,13 @@ def maps(request, page=1, filter=""):
 		'range': [i+1 for i in range(rowsRange)],
 		'amount': amount,
 		'comments': comments,
-	})
+	}
+
+	if settings.SITE_MAINTENANCE:
+		template_args['content'] = 'service/maintenance.html'
+		template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
+
+	context = RequestContext(request, template_args)
 	return StreamingHttpResponse(template.render(context))
 
 def mapsFromAuthor(request, author, page=1):
@@ -670,7 +676,7 @@ def uploadMap(request, previous_rev=0):
 		bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
 
 	template = loader.get_template('index.html')
-	context = RequestContext(request, {
+	template_args = {
 		'content': 'uploadMap.html',
 		'request': request,
 		'http_host': request.META['HTTP_HOST'],
@@ -681,7 +687,13 @@ def uploadMap(request, previous_rev=0):
 		'parsers': settings.OPENRA_VERSIONS.values(),
 		'bleed_tag': bleed_tag,
 		'error_response': error_response,
-	})
+	}
+
+	if settings.SITE_MAINTENANCE:
+		template_args['content'] = 'service/maintenance.html'
+		template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
+
+	context = RequestContext(request, template_args)
 	return StreamingHttpResponse(template.render(context))
 
 def DeleteMap(request, arg):
