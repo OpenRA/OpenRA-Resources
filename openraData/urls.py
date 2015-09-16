@@ -80,6 +80,8 @@ urlpatterns = patterns('',
 	
 	url(r'^faq/?$', views.faq, name='faq'),
 	url(r'^links/?$', views.links, name='links'),
+	url(r'^contacts/?$', views.contacts, name='contacts'),
+	url(r'^contacts/sent/?$', views.contacts_sent, name='contacts_sent'),
 	
 	url(r'^map/(?P<arg>\w+)/?$', api.mapAPI, name='mapAPI_download'),
 	url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/?$', api.mapAPI, name='mapAPI'), 

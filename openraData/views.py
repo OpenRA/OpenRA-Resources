@@ -972,3 +972,34 @@ def links(request):
 		'title': ' - Links',
 	})
 	return StreamingHttpResponse(template.render(context))
+
+def contacts(request):
+	message_sent = False
+	if request.method == 'POST':
+		if request.POST.get('contacts_submit', "").strip() != "":
+			name = request.POST.get('name', "")
+			email = request.POST.get('email', "")
+			message = request.POST.get('message', "")
+			misc.send_email_contacts_form(name, email, message)
+			return HttpResponseRedirect('/contacts/sent/')
+	template = loader.get_template('index.html')
+	context = RequestContext(request, {
+		'content': 'contacts.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Contacts',
+		'message_sent': message_sent,
+	})
+	return StreamingHttpResponse(template.render(context))
+
+def contacts_sent(request):
+	message_sent = True
+	template = loader.get_template('index.html')
+	context = RequestContext(request, {
+		'content': 'contacts.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Contacts',
+		'message_sent': message_sent,
+	})
+	return StreamingHttpResponse(template.render(context))

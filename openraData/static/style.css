@@ -1496,3 +1496,14 @@ p.registerInfo {
   margin-top: -100px;
   font-size: 0.9em;
 }
+
+.contacts textarea {
+  width: 405px;
+  height: 100px;
+  font-size: 0.9em;
+}
+
+.contacts label {
+  width: 60px;
+  display: inline-block;
+}
