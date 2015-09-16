@@ -70,6 +70,18 @@ class Maps(models.Model):
 	policy_adaptations  = models.CharField(max_length=30)
 	policy_commercial   = models.BooleanField(default=False)
 
+class Lints(models.Model):
+
+	class Meta:
+		verbose_name = 'Lint'
+
+	item_type           = models.CharField(max_length=16, default="maps")
+	map_id              = models.IntegerField(default=0)
+	version_tag         = models.CharField(max_length=100, default="release-20141029")
+	pass_status         = models.BooleanField(default=False)
+	lint_output         = models.CharField(max_length=100000, default="")
+	posted              = models.DateTimeField('date of check')
+
 class Units(models.Model):
 
 	class Meta:

@@ -25,7 +25,7 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, utility
-from openraData.models import Maps, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
+from openraData.models import Maps, Lints, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 
@@ -381,6 +381,11 @@ def displayMap(request, arg):
 	except:
 		return HttpResponseRedirect('/')
 
+	lints = []
+	lintObject = Lints.objects.filter(map_id=mapObject.id, item_type='maps')
+	for lint_item in lintObject:
+		lints.append([lint_item.version_tag, lint_item.pass_status, lint_item.lint_output])
+
 	reportedByUser = False
 	reports = []
 	reportObject = Reports.objects.filter(ex_id=mapObject.id, ex_name='maps')
@@ -456,6 +461,7 @@ def displayMap(request, arg):
 		'played_counter': played_counter,
 		'ratesAmount': ratesAmount,
 		'REPORTS_PENALTY_AMOUNT': settings.REPORTS_PENALTY_AMOUNT,
+		'lints': lints,
 	})
 	return StreamingHttpResponse(template.render(context))
 
@@ -545,25 +551,6 @@ def serveMinimap(request, arg):
 	response = StreamingHttpResponse(open(serveImage), content_type='image/png')
 	response['Content-Disposition'] = 'attachment; filename = %s' % minimap
 	return response
-
-def serveLintLog(request, arg):
-	lintlog = ""
-	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
-	try:
-		mapDir = os.listdir(path)
-	except:
-		return StreamingHttpResponse("")
-	for filename in mapDir:
-		if filename == "lintlog":
-			lintlog = filename
-			break
-	if lintlog == "":
-		return StreamingHttpResponse("")
-	else:
-		serveLog = path + os.sep + lintlog
-		response = StreamingHttpResponse(open(serveLog), content_type='text/plain')
-		response['Content-Disposition'] = 'attachment; filename = %s' % lintlog
-		return response
 
 def serveOramap(request, arg, sync=""):
 	oramap = ""
@@ -684,7 +671,7 @@ def uploadMap(request, previous_rev=0):
 		'uid': uid,
 		'previous_rev': previous_rev,
 		'previous_rev_title': previous_rev_title,
-		'parsers': settings.OPENRA_VERSIONS.values(),
+		'parsers': list(reversed( settings.OPENRA_VERSIONS.values() )),
 		'bleed_tag': bleed_tag,
 		'error_response': error_response,
 	}
@@ -713,6 +700,7 @@ def DeleteMap(request, arg):
 			pass
 		Screenshots.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
 		Reports.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
+		Lints.objects.filter(map_id=mapObject.id, item_type='maps').delete()
 		ThreadedComment.objects.filter(object_pk=mapObject.id, title='map').delete()
 		if mapObject.pre_rev != 0:
 			Maps.objects.filter(id=mapObject.pre_rev).update(next_rev=mapObject.next_rev)

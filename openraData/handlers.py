@@ -11,7 +11,7 @@ from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
-from openraData.models import Maps, Units, Mods, Screenshots
+from openraData.models import Maps, Lints, Units, Mods, Screenshots
 from openraData import utility, misc
 
 class MapHandlers():
@@ -47,7 +47,7 @@ class MapHandlers():
 
 	def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
 
-		parser_to_db = settings.OPENRA_VERSIONS['default']
+		parser_to_db = list(reversed( settings.OPENRA_VERSIONS.values() ))[0] # default parser = the latest
 		parser = settings.OPENRA_ROOT_PATH + parser_to_db
 
 		if post.get("parser", None) != None:
@@ -196,7 +196,11 @@ class MapHandlers():
 			self.flushLog( ['Info: ' + post['info']] )
 		
 		self.UnzipMap()
-		self.LintCheck(resp_map_data['game_mod'], parser)
+
+		lint_check_response = utility.LintCheck(transac, self.map_full_path_filename, parser)
+		if lint_check_response['error'] == False and lint_check_response['response'] == 'pass_for_requested_parser':
+			self.LintPassed = True
+
 		if self.LintPassed:
 			Maps.objects.filter(id=transac.id).update(requires_upgrade=False)
 		else:
@@ -217,7 +221,7 @@ class MapHandlers():
 			pass
 		z.close()
 
-	def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+	def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 		if filepath == "":
 			filepath = self.map_full_path_filename
 
@@ -230,35 +234,7 @@ class MapHandlers():
 
 		os.chdir(self.currentDirectory)
 
-	def LintCheck(self, mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
-		os.chdir(parser + "/")
-
-		command = 'mono --debug OpenRA.Utility.exe ' + mod + ' --check-yaml ' + self.map_full_path_filename
-
-		proc = Popen(command.split(), stdout=PIPE).communicate()
-		
-		passing = True
-		for res in proc:
-			if res == None:
-				continue
-			lines = res.split("\n")
-			for line in lines:
-				if 'Testing map' in line:
-					passing = True
-				else:
-					if line.strip() != "":
-						passing = False
-
-		if passing:
-			self.flushLog( ['Yaml check succeeded.'] )
-			self.LintPassed = True
-		else:
-			self.flushLog(proc, "lint")
-			self.flushLog( ['Yaml check failed.'] )
-
-		os.chdir(self.currentDirectory)
-
-	def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+	def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 		os.chdir(parser + "/")
 
 		command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (game_mod, self.map_full_path_filename)
@@ -274,7 +250,7 @@ class MapHandlers():
 
 		os.chdir(self.currentDirectory)
 
-	def GenerateFullPreview(self, userObject, game_mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+	def GenerateFullPreview(self, userObject, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 		os.chdir(parser)
 
 		command = 'mono --debug OpenRA.Utility.exe %s--full-preview %s' % (game_mod, self.map_full_path_filename)
@@ -298,7 +274,7 @@ class MapHandlers():
 
 		os.chdir(self.currentDirectory)
 
-	def GenerateSHPpreview(self, game_mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+	def GenerateSHPpreview(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 		Dir = os.listdir(self.map_full_path_directory+'content/')
 		for fn in Dir:
 			if fn.endswith('.shp'):
@@ -343,7 +319,7 @@ class MapHandlers():
 				os.chdir(self.currentDirectory)
 				shutil.rmtree(self.map_full_path_directory+'content/png/')
 
-	def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+	def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 		os.chdir(parser + "/")
 		for mod in ['ra','cnc','d2k','ts']:
 			command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)

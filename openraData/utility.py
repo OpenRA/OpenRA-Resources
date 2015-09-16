@@ -10,11 +10,11 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count
 from django.utils import timezone
-from openraData.models import Maps, Screenshots, Reports
+from openraData.models import Maps, Lints, Screenshots, Reports
 from openraData import misc
 
 
-def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS['default'], new_rev_on_upgrade=True):
+def map_upgrade(mapObject, engine, parser=list(reversed( settings.OPENRA_VERSIONS.values() ))[0], new_rev_on_upgrade=True):
 
 	parser_to_db = parser
 	parser = settings.OPENRA_ROOT_PATH + parser
@@ -103,15 +103,18 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS['default'], n
 
 			continue
 
-		lint_passed = LintCheck(item, ora_temp_dir_name+filename, parser)
-		if not lint_passed:
+		lint_check_response = LintCheck(item, ora_temp_dir_name+filename, parser, new_rev_on_upgrade)
+		if lint_check_response['error'] == True or lint_check_response['response'] != 'pass_for_requested_parser':
+			print("Lint check failed for requested parser: %s" % parser_to_db)
 			print("Interrupted map upgrade: %s" % (item.id))
 
 			if os.path.isdir(ora_temp_dir_name):
 				shutil.rmtree(ora_temp_dir_name)
 			
 			continue
-		if_map_requires_upgrade = not lint_passed
+		if_map_requires_upgrade = True
+		if lint_check_response['error'] == False and lint_check_response['response'] == 'pass_for_requested_parser':
+			if_map_requires_upgrade = False
 
 		unzipped_map = UnzipMap(item, ora_temp_dir_name+filename)
 		if not unzipped_map:
@@ -135,7 +138,7 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS['default'], n
 
 			continue
 
-		if upgraded and recalculate_hash_response['error'] == False and lint_passed and unzipped_map and read_yaml_response['error'] == False:
+		if upgraded and recalculate_hash_response['error'] == False and if_map_requires_upgrade == False and unzipped_map and read_yaml_response['error'] == False:
 
 			if not new_rev_on_upgrade:
 				# copy directory tree from temporarily location to old location
@@ -213,13 +216,17 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS['default'], n
 
 				print('Finished upgrading map %s %s. New ID: %s \n' % (item.id, if_new_rev, transac.id))
 
+				print('Running Lint checks for successfully upgraded map')
+
+				LintCheck(transac, "", parser)
+
 			if os.path.isdir(ora_temp_dir_name):
 				shutil.rmtree(ora_temp_dir_name)
 
 	os.chdir(currentDirectory)
 	return True
 
-def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 
 	currentDirectory = os.getcwd() + os.sep
 	os.chdir(parser + "/")
@@ -354,64 +361,105 @@ def UnzipMap(item, fullpath=""):
 	print('Unzipped map: %s' % item.id)
 	return True
 
-def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0], upgrade_with_new_rev=False):
 	# this function performs a Lint Check for map
-	cwd = os.getcwd()
-	os.chdir(parser + "/")
+	response = {'error': True, 'response': ''}
 
-	status = False
+	currentDirectory = os.getcwd() + os.sep
 
-	if fullpath == "":
-		path = cwd + os.sep + __name__.split('.')[0] + '/data/maps/' + str(item.id) + os.sep
-		listdir = os.listdir(path)
-		map_file = ""
-		for filename in listdir:
-			if filename.endswith('.oramap'):
-				map_file = filename
-				break
-		if map_file == "":
-			print("error, can not find .oramap")
-			return False
-		fullpath = path + map_file
+	available_parsers = list(reversed( settings.OPENRA_VERSIONS.values() ))
 
-	command = 'mono --debug OpenRA.Utility.exe ' + item.game_mod.lower() + ' --check-yaml ' + fullpath
-	print(command)
-	proc = Popen(command.split(), stdout=PIPE).communicate()
+	for current_parser in available_parsers:
+		if current_parser == "bleed":
 
-	passing = True
-	for res in proc:
-		if res == None:
+			bleed_tag = None
+			if (settings.OPENRA_BLEED_HASH_FILE_PATH != ''):
+				bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
+				bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
+			if bleed_tag == None:
+				continue
+			current_parser_to_db = bleed_tag
+			current_parser_path = settings.OPENRA_BLEED_PARSER
+		else:
+			current_parser_to_db = current_parser
+			current_parser_path = settings.OPENRA_ROOT_PATH + current_parser
+
+		if upgrade_with_new_rev and current_parser_path != parser:
 			continue
-		lines = res.split("\n")
-		for line in lines:
-			if 'Testing map' in line:
-				print(line)
-				passing = True
-			else:
-				if line.strip() != "":
+
+		os.chdir(current_parser_path + "/")
+
+		if fullpath == "":
+			path = currentDirectory + 'openraData/data/maps/' + str(item.id) + '/'
+			filename = ""
+			Dir = os.listdir(path)
+			for fn in Dir:
+				if fn.endswith('.oramap'):
+					filename = fn
+					break
+			if filename == "":
+				print("error, can not find .oramap")
+				response['error'] = True
+				response['response'] = 'can not find .oramap'
+				return response
+			fullpath = path + filename
+
+		command = 'mono --debug OpenRA.Utility.exe ' + item.game_mod.lower() + ' --check-yaml ' + fullpath
+		print(command)
+		print('Started Lint check for parser: %s' % current_parser_to_db)
+		proc = Popen(command.split(), stdout=PIPE).communicate()
+
+		passing = True
+		output_to_db = ""
+		for res in proc:
+			if res == None:
+				continue
+			lines = res.split("\n")
+			for line in lines:
+				if 'Testing map' in line:
 					print(line)
-					passing = False
+					passing = True
+				else:
+					if line.strip() != "":
+						output_to_db += line + "\\n"
+						print(line)
+						passing = False
 
-	if passing:
-		status = True
+		if not upgrade_with_new_rev:
+			lintObject = Lints.objects.filter(map_id=item.id,version_tag=current_parser_to_db)
+			lintObjectGit = Lints.objects.filter(map_id=item.id,version_tag__startswith='git')
+			if lintObject:
+				Lints.objects.filter(map_id=item.id,version_tag=current_parser_to_db).update(pass_status=passing,lint_output=output_to_db,posted=timezone.now())
+			elif lintObjectGit and current_parser_to_db.startswith('git'):
+				Lints.objects.filter(map_id=item.id,version_tag__startswith='git').update(pass_status=passing,lint_output=output_to_db, posted=timezone.now())
+			else:
+				lint_transac = Lints(
+					item_type = "maps",
+					map_id = item.id,
+					version_tag = current_parser_to_db,
+					pass_status = passing,
+					lint_output = output_to_db,
+					posted = timezone.now(),
+				)
+				lint_transac.save()
 
-		print('passed lint')
-	else:
-		status = False
+		if parser == current_parser_path:
+			if passing:
+				response['error'] = False
+				response['response'] = 'pass_for_requested_parser'
+				print('Lint check passed for requested parser: %s' % current_parser_to_db)
+			else:
+				print('Lint check failed for requested parser: %s' % current_parser_to_db)
+		else:
+			if passing:
+				print('Lint check passed for parser: %s' % current_parser_to_db)
+			else:
+				print('Lint check failed for parser: %s' % current_parser_to_db)
 
-		print('failed to pass lint')
+		os.chdir(currentDirectory)
+	return response
 
-		lintlog = open(os.path.dirname(fullpath)+'/lintlog','w')
-		lintlog.write(proc[0])
-		lintlog.close()
-		if not item.requires_upgrade:
-			mail_addr = misc.return_email(item.user_id)
-			if mail_addr != "":
-				misc.send_email_to_user_OnLint(mail_addr, "Lint check failed for one of your maps: http://"+settings.HTTP_HOST+"/maps/"+str(item.id)+"/")
-	os.chdir(cwd)
-	return status
-
-def GenerateSHPpreview(mapObject, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+def GenerateSHPpreview(mapObject, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 	# generates gif preview of shp files for every mapObject in list of objects
 	currentDirectory = os.getcwd()
 	for item in mapObject:
@@ -463,7 +511,7 @@ def GenerateSHPpreview(mapObject, parser=settings.OPENRA_ROOT_PATH + settings.OP
 				shutil.rmtree(path+'content/png/')
 	return True
 
-def GenerateMinimap(item, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+def GenerateMinimap(item, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 	currentDirectory = os.getcwd() + os.sep
 	
 	os.chdir(parser + "/")
@@ -491,7 +539,7 @@ def GenerateMinimap(item, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VER
 		print('Failed to generate minimap: %s' % item.id)
 		return False
 
-def GenerateFullPreview(item, userObject, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS['default']):
+def GenerateFullPreview(item, userObject, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 	currentDirectory = os.getcwd() + os.sep
 	
 	os.chdir(parser + "/")

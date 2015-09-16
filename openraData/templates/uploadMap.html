@@ -11,6 +11,9 @@
 
             $('.upload-map-form-parser option:first-child').attr("selected", "selected");
 
+            $('.upload-map-form-parser option:first-child').append(' (the latest published)')
+
+            $('.upload-map-form-parser option:contains("bleed")').append( ' (development)')
         });
     </script>
 
@@ -20,14 +23,25 @@
         </div>
     </div>
 
-    <div class='cBlock'>
-        <form action={{ '/upload/map/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
+
+    <form action={{ '/upload/map/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
+        <div class='cBlock'>
 
             <div class='upload-map-form-left'>
 
                 <div class='upload-map-form-info'>
-                    <textarea class="id_info" name="info" placeholder="Additional information**"></textarea>
+                    <textarea class="id_info" name="info" placeholder="Additional information**" title="Additional information**"></textarea>
                 </div>
+
+                <div class='upload-map-form-file'>
+                    <input class="id_file" name="file" type="file">
+                    <button type="submit">Upload</button>
+                </div>
+
+            </div>
+
+            <div class='upload-map-form-right'>
+
                 <div class='upload-map-form-parser'>
                     Parse with OpenRA version:<br />
                     <select name="parser" size="4">
@@ -40,33 +54,31 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class='upload-map-form-file'>
-                    <input class="id_file" name="file" type="file">
-                    <button type="submit">Upload</button>
-                </div>
-            </div>
-            <div class='upload-map-form-right'>
-                {% if previous_rev == 0 %}
-                <div class="license_cc">
-                    Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
-                    <label><input name="policy_cc" type="radio" value="cc_yes"> Yes</label>
-                    <label><input name="policy_cc" checked="checked" type="radio" value="cc_no"> No</label>
-                </div>
-                <div class="license_options"><br>
-                    Allow commercial uses of your work?<br>
-                    <label><input name="commercial" type="radio" value="com_yes"> Yes</label>
-                    <label><input checked="checked" name="commercial" type="radio" value="com_no"> No</label>
-                    <br /><br />
-                    Allow modifications of your work?<br>
-                    <label><input name="adaptations" type="radio" value="adapt_yes"> Yes</label>
-                    <label><input name="adaptations" type="radio" value="adapt_no"> No</label>
-                    <label><input checked="checked" name="adaptations" type="radio" value="adapt_alike"> Yes, as long as others share alike</label>
-                </div>
-                {% endif %}
+
             </div>
 
-        </form>
-    </div>
+        </div>
+
+        <div class='cBlock'>
+            {% if previous_rev == 0 %}
+            <div class="license_cc">
+                Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
+                <label><input name="policy_cc" type="radio" value="cc_yes"> Yes</label>
+                <label><input name="policy_cc" checked="checked" type="radio" value="cc_no"> No</label>
+            </div>
+            <div class="license_options"><br>
+                Allow commercial uses of your work?<br>
+                <label><input name="commercial" type="radio" value="com_yes"> Yes</label>
+                <label><input checked="checked" name="commercial" type="radio" value="com_no"> No</label>
+                <br /><br />
+                Allow modifications of your work?<br>
+                <label><input name="adaptations" type="radio" value="adapt_yes"> Yes</label>
+                <label><input name="adaptations" type="radio" value="adapt_no"> No</label>
+                <label><input checked="checked" name="adaptations" type="radio" value="adapt_alike"> Yes, as long as others share alike</label>
+            </div>
+            {% endif %}
+        </div>
+    </form>
 
     {% if error_response %}
     <div class='cBlock'>

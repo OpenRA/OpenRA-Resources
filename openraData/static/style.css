@@ -539,6 +539,12 @@ table tr td {
   width: 800px;
 }
 
+.Contacts {
+  width: 55px;
+  float: right;
+  margin-right: 10px;
+}
+
 .FAQ {
   width: 40px;
   float: right;
@@ -547,7 +553,6 @@ table tr td {
 .Links {
   width: 40px;
   float: right;
-  margin-right: 10px;
 }
 
 .Issues {
@@ -807,6 +812,10 @@ p.registerInfo {
   }
 .license_cc .license_options {
   list-style-type: none;
+}
+
+.license_cc, .license_options {
+  font-size: 0.9em;
 }
 
 .license_options {
@@ -1397,7 +1406,15 @@ p.registerInfo {
 }
 
 .red {
-  color: #ff0000;
+  color: #FD2B2B !important;
+}
+
+.green {
+  color: #00ff00 !important;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .id_file {
@@ -1406,13 +1423,13 @@ p.registerInfo {
 }
 
 .upload-map-form-left {
-  width: 450px;
+  width: 100%;
   font-size: 0.9em;
   display: table-cell;
 }
 
 .upload-map-form-left textarea {
-  width: 220px;
+  width: 405px;
   height: 100px;
   font-size: 0.95em;
 }
@@ -1425,7 +1442,7 @@ p.registerInfo {
 }
 
 .upload-map-form-info {
-  width: 250px;
+  width: 430px;
   display: table-cell;
   vertical-align: top;
 }
@@ -1438,12 +1455,13 @@ p.registerInfo {
 .upload-map-form-parser select {
   background: transparent;
   color: #fff;
-  width: 160px;
+  width: 260px;
+  height: 140px;
   margin-top: 10px;
 }
 
 .upload-map-form-file {
-  margin-top: 26px;
+  margin-top: 25px;
 }
 
 .upload-map-form-stars {
@@ -1457,4 +1475,24 @@ p.registerInfo {
 .map-store-info {
   font-size: 0.9em;
   margin-right: 2px;
+}
+
+.lint_check_line {
+  display: table;
+}
+
+.lint_check_line_status {
+  display: table-cell;
+  min-width: 36px;
+}
+
+.lint_check_line_version {
+  display: table-cell;
+}
+
+.Lints {
+  width: 580px;
+  left: 10%;
+  margin-top: -100px;
+  font-size: 0.9em;
 }
