@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 class UserOptions(models.Model):
 
@@ -129,10 +130,11 @@ class Replays(models.Model):
 		verbose_name = 'Replay'
 
 	user                = models.ForeignKey(User)
-	title               = models.CharField(max_length=200)
-	info                = models.CharField(max_length=2000)
-	version             = models.CharField(max_length=50)
-	posted              = models.DateTimeField('date published')
+	info                = models.CharField(max_length=2000, default="")
+	metadata            = models.CharField(max_length=100000, default="")
+	game_mod            = models.CharField(max_length=100, default="")
+	parser              = models.CharField(max_length=100, default="release-20141029")
+	posted              = models.DateTimeField('date published', default=datetime.datetime.now)
 	viewed              = models.IntegerField(default=0)
 	downloaded          = models.IntegerField(default=0)
 	rating              = models.FloatField(default=0.0)

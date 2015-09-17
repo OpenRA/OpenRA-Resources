@@ -719,6 +719,43 @@ def DeleteMap(request, arg):
 	})
 	return StreamingHttpResponse(template.render(context))
 
+def uploadReplay(request):
+	if not request.user.is_authenticated():
+		return HttpResponseRedirect('/replays/')
+	response = {'error': False, 'response': ''}
+
+	if request.method == 'POST':
+		if request.FILES.get('replay_file', None) != None:
+
+			replay_file = handlers.ReplayHandlers()
+			response = replay_file.process_uploading(request.user.id, request.FILES['replay_file'], request.POST)
+			if replay_file.UID:
+				if response['error'] == False:
+					return HttpResponseRedirect('/replays/' + str(replay_file.UID) + "/")
+
+	bleed_tag = None
+	if (settings.OPENRA_BLEED_HASH_FILE_PATH != ''):
+		bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
+		bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
+
+	template = loader.get_template('index.html')
+	template_args = {
+		'content': 'uploadReplay.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Uploading Replay',
+		'response': response,
+		'parsers': list(reversed( settings.OPENRA_VERSIONS.values() )),
+		'bleed_tag': bleed_tag,
+	}
+
+	if settings.SITE_MAINTENANCE:
+		template_args['content'] = 'service/maintenance.html'
+		template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
+
+	context = RequestContext(request, template_args)
+	return StreamingHttpResponse(template.render(context))
+
 def SetDownloadingStatus(request, arg):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/maps/'+arg)

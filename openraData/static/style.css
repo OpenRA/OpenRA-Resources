@@ -1468,6 +1468,53 @@ p.registerInfo {
   font-size: 0.9em;
 }
 
+.upload-replay-form-file {
+  margin-top: 25px;
+}
+
+.replay_file {
+  max-width: 330px;
+  min-width: 330px;
+}
+
+.upload-replay-form-left {
+  width: 100%;
+  font-size: 0.9em;
+  display: table-cell;
+}
+
+.upload-replay-form-left textarea {
+  width: 405px;
+  height: 100px;
+  font-size: 0.95em;
+}
+
+.upload-replay-form-right {
+  font-size: 0.9em;
+  display: table-cell;
+  vertical-align: top;
+  width: 220px;
+}
+
+.upload-replay-form-info {
+  width: 430px;
+  display: table-cell;
+  vertical-align: top;
+}
+
+.upload-replay-form-parser {
+  display: table-cell;
+  vertical-align: top;
+}
+
+.upload-replay-form-parser select {
+  background: transparent;
+  color: #fff;
+  width: 260px;
+  height: 140px;
+  margin-top: 10px;
+}
+
 .small-font {
   font-size: 0.9em;
 }

@@ -39,6 +39,8 @@ urlpatterns = patterns('',
 	url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
 	url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
 
+	url(r'^upload/replay/?$', views.uploadReplay, name='uploadReplay'),
+
 	url(r'^units/?$', views.units, name='units'),
 	url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),
 
