@@ -79,7 +79,7 @@ class Lints(models.Model):
 	map_id              = models.IntegerField(default=0)
 	version_tag         = models.CharField(max_length=100, default="release-20141029")
 	pass_status         = models.BooleanField(default=False)
-	lint_output         = models.CharField(max_length=100000, default="")
+	lint_output         = models.CharField(max_length=1000000, default="")
 	posted              = models.DateTimeField('date of check')
 
 class Units(models.Model):

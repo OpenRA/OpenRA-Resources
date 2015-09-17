@@ -383,6 +383,7 @@ def displayMap(request, arg):
 
 	lints = []
 	lintObject = Lints.objects.filter(map_id=mapObject.id, item_type='maps')
+	lintObject = sorted(lintObject, key=lambda x: (x.posted), reverse=False)
 	for lint_item in lintObject:
 		lints.append([lint_item.version_tag, lint_item.pass_status, lint_item.lint_output])
 

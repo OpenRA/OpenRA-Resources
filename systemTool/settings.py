@@ -132,9 +132,9 @@ OPENRA_ROOT_PATH = '/usr/local/openra/'
 
 # OpenRA Versions matching their directory names
 OPENRA_VERSIONS = {
-    'default': 'release-20141029',
-    '0': 'playtest-20150118',
-    '1': 'bleed', # just a name, see OPENRA_BLEED_PARSER setting
+    2: 'playtest-20150118',
+    1: 'release-20141029',
+    0: 'bleed', # just a name, see OPENRA_BLEED_PARSER setting
 }
 
 # Path to file which stores HASH of the latest `bleed` version

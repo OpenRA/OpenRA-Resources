@@ -1497,6 +1497,23 @@ p.registerInfo {
   font-size: 0.9em;
 }
 
+.lint_check {
+  max-width: 580px;
+  height: 340px;
+  overflow-y: auto;
+  padding-right: 5px;
+  word-wrap: break-word;
+}
+
+.lint_check_h3 {
+  position: relative;
+  top: -5px;
+}
+
+.lint_check_h3 h3 {
+  margin: 0px 0px 0px 0px;
+}
+
 .contacts textarea {
   width: 405px;
   height: 100px;

@@ -133,17 +133,15 @@
 
                         {% for lint in lints %}
                         <div class="Lints popup" data-version="{{lint.0}}">
-                        <div class="popup-content-wrapper">
-                            <div class="closePopup"><label class="x"></label></div>
-                                <div class="lint_check">
-                                    <h3>Lint check for {{ lint.0 }}</h3>
-                                    <div class="lint_output">
-                                        {% autoescape off %}
-                                        {{ lint.2|nl_to_br }}
-                                        {% endautoescape %}
-                                    </div>
-                                </div>
-                        </div>
+                            <div class="lint_check_h3">
+                                <h3>Lint check for {{ lint.0 }}</h3>
+                            </div>
+                            <div class="lint_check">
+                                {% autoescape off %}
+                                {{ lint.2|nl_to_br }}
+                                {% endautoescape %}
+                                <div class="closePopup"><label class="x"></label></div>
+                            </div>
                         </div>
                         {% endfor %}
 
@@ -463,6 +461,7 @@
                     $(".showLintLog").on("click", function() {
                         $('.Lints[data-version="'+$(this).attr("data-version")+'"]').show()
                         $("#overlay").show()
+                        noScroll('lint_check')
                     })
 
                     $(".printLua").on("click", function() {
