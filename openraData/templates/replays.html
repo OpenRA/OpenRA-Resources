@@ -1,1 +1,66 @@
-<center><h2>In Development</h2></center>
+{% load customTags %}
+
+<div class='cBlock no-pd-bot replay-grid-header-info'>
+	<h3>Found {{ amount }} replays</h3>
+</div>
+
+{% if amount != 0 %}
+	<div class="replay_grid">
+		{% for item in replays %}
+			<div class="replay_grid_cell">
+				
+				<div class="replay_grid_cell_mod">
+
+				</div>
+
+				<div class="replay_grid_cell_map">
+
+				</div>
+
+				<div class="replay_grid_cell_info">
+
+				</div>
+			</div>
+		{% endfor %}
+		<div class="clear"></div>
+	</div>
+
+
+	{% if 2 in range %}
+	<div id="paging">
+		{% for i in range %}
+			<div class="paging_cell">
+			{% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
+				{% if page == i %}
+					<span>{{ i }}</span>
+				{% else %}
+					<a href="http://{{http_host}}/replays/page/{{i}}">{{ i }}</a>
+				{% endif %}
+			{% else %}
+				{% if i < page %}
+					<span class='no-page-before hide_block'>...</span>
+				{% else %}
+					<span class='no-page-after hide_block'>...</span>
+				{% endif %}
+			{% endif %}
+			</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+	<div class="clear"></div>
+{% endif %}
+
+<div class='cBlock bottom-store-info'>
+	Replays are stored in the user directories with sub-directories per mod/version.
+	<ul>
+		<li><u>Windows:</u> My Documents\OpenRA\replays\&lt;mod name&gt;\&lt;version&gt;\</li>
+		<li><u>Mac OSX:</u> ~/Library/Application Support/OpenRA/replays/&lt;mod name&gt;/&lt;version&gt;/</li>
+		<li><u>Linux:</u> ~/.openra/replays/&lt;mod name&gt;/&lt;version&gt;/</li>
+	</ul>
+
+	Example:  /home/user/.openra/replays/ra/playtest-20150815/OpenRA-2015-09-17T084350Z.orarep
+</div>
+
+<div class='cBlock bottom-store-info'>
+	<p>More replays can be found at <a href="http://www.gamereplays.org/openra/replays.php?game=92" target="_blank">http://www.gamereplays.org/openra/replays.php?game=92</a></p>
+</div>

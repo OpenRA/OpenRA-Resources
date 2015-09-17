@@ -1143,6 +1143,7 @@ p.registerInfo {
         }
     .map_hash_block {
       position: relative;
+      font-size: 0.9em;
     }
       .map_hash_block_element {
         display: inline-block;
@@ -1169,6 +1170,9 @@ p.registerInfo {
         }
     .map_description {
       position: relative;
+    }
+    .map_description p {
+      font-size: 0.9em;
     }
       .map_info {
       }
@@ -1570,4 +1574,55 @@ p.registerInfo {
 .contacts label {
   width: 60px;
   display: inline-block;
+}
+
+/* Replays and Replay detail pages */
+.bottom-store-info {
+  font-size: 0.9em;
+  margin-right: 2px;
+}
+
+.replay-grid-header-info {
+  margin-left: 1px;
+  margin-right: 2px;
+  border: 2px solid #74c2e7;;
+}
+
+.replay_grid {
+  font-size: 0.9em;
+  text-align: center;
+  margin-left: 3px;
+  position: relative;
+
+  margin-left: 1px;
+  margin-right: 2px;
+  border-left: 2px solid #74c2e7;
+  border-right: 2px solid #74c2e7;
+}
+
+.replay_grid_cell {
+  border-bottom: 2px solid #74c2e7;
+  display: table;
+}
+
+.replay_grid_cell_mod {
+  width: 140px;
+  height: 140px;
+  display: table-cell;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.replay_grid_cell_map {
+  width: 140px;
+  height: 140px;
+  display: table-cell;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.replay_grid_cell_info {
+  display: table-cell;
 }

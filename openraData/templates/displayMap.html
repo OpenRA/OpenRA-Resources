@@ -77,16 +77,19 @@
                     <div class="map_description cBlock">
                         <div>
                             <h5>Description:</h5>
-                            <p></p>
+                            <p>
                             {% autoescape off %}
                             {{ map.description|strip_tags|convert_links|nl_to_br }}
                             {% endautoescape %}
+                            </p>
                         </div>
                         {% if map.info %}
                         <div class="map_info">
+                            <p>
                             {% autoescape off %}
                             {{ map.info|strip_tags|convert_links|linebreaks }}
                             {% endautoescape %}
+                            </p>
                         </div>
                         {% endif %}
                     </div>
@@ -95,10 +98,11 @@
                         <div class="map_description cBlock">
                             <div>
                                 <h5>Description:</h5>
-                                <p></p>
+                                <p>
                                 {% autoescape off %}
                                 {{ map.info|strip_tags|convert_links|linebreaks }}
                                 {% endautoescape %}
+                                </p>
                             </div>
                         </div>
                         {% endif %}
@@ -300,14 +304,14 @@
 
                     {% if lints %}
                     <div class="cBlock">
-                        <span class="small-font bold">Lint check status:</span>
+                        <span class="small-font">Lint check status:</span>
                         {% for lint in lints %}
                             <div class="lint_check_line">
                                 <div class="lint_check_line_status">
                                     {% if lint.1 %}
-                                    <span class="small-font green bold">pass</span>
+                                    <span class="small-font green">pass</span>
                                     {% else %}
-                                    <a href="#" class="showLintLog small-font red bold" data-version="{{lint.0}}">fail</a>
+                                    <a href="#" class="showLintLog small-font red" data-version="{{lint.0}}">fail</a>
                                     {% endif %}
                                 </div>
                                 <div class="lint_check_line_version">

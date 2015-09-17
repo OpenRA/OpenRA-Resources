@@ -58,6 +58,7 @@ urlpatterns = patterns('',
 	url(r'^assets/?$', views.assets, name='assets'),
 
 	url(r'^replays/?$', views.replays, name='replays'),
+	url(r'^replays/page/(?P<page>\d+)/?$', views.replays, name='replays_paged'),
 
 	url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
 	url(r'^deletecomment/(?P<arg>\d+)/(?P<itemname>\w+)/(?P<itemid>\w+)/?$', views.deleteComment, name='deleteComment'),

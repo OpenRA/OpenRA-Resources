@@ -25,7 +25,7 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, utility
-from openraData.models import Maps, Lints, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
+from openraData.models import Maps, Replays, Lints, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 
@@ -910,14 +910,36 @@ def assets(request):
 	})
 	return StreamingHttpResponse(template.render(context))
 
-def replays(request):
+def replays(request, page=1):
+	perPage = 20
+	slice_start = perPage*int(page)-perPage
+	slice_end = perPage*int(page)
+	replayObject = Replays.objects.filter().order_by('-posted')
+	replayObject = sorted(replayObject, key=lambda x: (x.posted), reverse=True)
+	amount = len(replayObject)
+	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+	replayObject = replayObject[slice_start:slice_end]
+	amount_this_page = len(replayObject)
+	if amount_this_page == 0 and int(page) != 1:
+		return HttpResponseRedirect("/replays/")
+
 	template = loader.get_template('index.html')
-	context = RequestContext(request, {
+	template_args = {
 		'content': 'replays.html',
 		'request': request,
 		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Replays',
-	})
+		'replays': replayObject,
+		'page': int(page),
+		'range': [i+1 for i in range(rowsRange)],
+		'amount': amount,
+	}
+
+	if settings.SITE_MAINTENANCE:
+		template_args['content'] = 'service/maintenance.html'
+		template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
+
+	context = RequestContext(request, template_args)
 	return StreamingHttpResponse(template.render(context))
 
 def uploadUnit(request):
