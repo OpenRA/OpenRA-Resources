@@ -1535,6 +1535,7 @@ p.registerInfo {
 .lint_check_line_status {
   display: table-cell;
   min-width: 36px;
+  letter-spacing: 0.2px;
 }
 
 .lint_check_line_version {

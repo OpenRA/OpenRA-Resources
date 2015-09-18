@@ -14,7 +14,7 @@ from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
-from openraData.models import Maps, Replays, Lints, Units, Mods, Screenshots
+from openraData.models import Maps, Replays, ReplayPlayers, Lints, Units, Mods, Screenshots
 from openraData import utility, misc
 
 class ReplayHandlers():
@@ -49,6 +49,16 @@ class ReplayHandlers():
 			response['response'] = 'Failed. Unsupported file type.'
 			return response
 
+		command = 'sha1sum %s' % tempname
+		proc = Popen(command.split(), stdout=PIPE).communicate()
+		sha1_hash = proc[0].split()[0].strip()
+
+		sha1sum_exists = Replays.objects.filter(sha1sum=sha1_hash,user=user_id)
+		if sha1sum_exists:
+			response['error'] = True
+			response['response'] = 'Failed. You have already uploaded this replay.'
+			return response
+
 
 		replay_metadata = self.get_replay_metadata(tempname, parser)
 
@@ -62,12 +72,42 @@ class ReplayHandlers():
 			user = userObject,
 			info = post['replay_info'].strip(),
 			metadata = json.dumps(replay_metadata),
+
 			game_mod = replay_metadata['Mod'],
+			map_hash = replay_metadata['MapUid'],
+			version = replay_metadata['Version'],
+			start_time = replay_metadata['StartTimeUtc'],
+			end_time = replay_metadata['EndTimeUtc'],
+
+			sha1sum = sha1_hash,
 			parser = parser_to_db,
-			posted = timezone.now()
+			posted = timezone.now(),
 		)
 		transac.save()
 		self.UID = transac.id
+
+		for pl_key, pl_value in replay_metadata['Players'].iteritems():
+			transac_player = ReplayPlayers(
+				user = userObject,
+				replay_id = transac.id,
+
+				client_index = replay_metadata['Players'][pl_key]['ClientIndex'],
+				color = replay_metadata['Players'][pl_key]['Color'],
+				faction_id = replay_metadata['Players'][pl_key]['FactionId'],
+				faction_name = replay_metadata['Players'][pl_key]['FactionName'],
+				is_bot = replay_metadata['Players'][pl_key]['IsBot'],
+				is_human = replay_metadata['Players'][pl_key]['IsHuman'],
+				is_random_faction = replay_metadata['Players'][pl_key]['IsRandomFaction'],
+				is_random_spawn = replay_metadata['Players'][pl_key]['IsRandomSpawnPoint'],
+				name = replay_metadata['Players'][pl_key]['Name'],
+				outcome = replay_metadata['Players'][pl_key]['Outcome'],
+				outcome_timestamp = replay_metadata['Players'][pl_key]['OutcomeTimestampUtc'],
+				spawn_point = replay_metadata['Players'][pl_key]['SpawnPoint'],
+				team = replay_metadata['Players'][pl_key]['Team'],
+
+				posted = timezone.now(),
+			)
+			transac_player.save()
 
 		replay_directory = self.currentDirectory + __name__.split('.')[0] + '/data/replays/' + str(self.UID) + '/'
 		if not os.path.exists( replay_directory ):
