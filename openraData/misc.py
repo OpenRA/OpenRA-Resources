@@ -1,4 +1,5 @@
 import os
+import shutil
 import datetime
 import time
 from django.core import mail
@@ -41,6 +42,16 @@ def addSlash(path):
 	if not path.endswith('/'):
 		path += '/'
 	return path
+
+def send_email_contacts_form(name, email, message):
+	connection = mail.get_connection()
+	connection.open()
+
+	email = mail.EmailMessage('OpenRA Resource Center - Contacts form', 'Name: %s\nEmail: %s\nMessage: %s\n' % (name, email, message), settings.ADMIN_EMAIL,
+						  [settings.ADMIN_EMAIL], connection=connection)
+
+	email.send()
+	connection.close()
 
 def send_email_to_admin_OnMapFail(tempname):
 	connection = mail.get_connection()
@@ -186,3 +197,15 @@ def Log(data, channel="default"):
 		logfile.write(timestamp + data.strip() + "\n")
 	logfile.close()
 	return True
+
+def copytree(src, dst, symlinks=False, ignore=None):
+	if not os.path.exists(dst):
+		os.makedirs(dst)
+	for item in os.listdir(src):
+		s = os.path.join(src, item)
+		d = os.path.join(dst, item)
+		if os.path.isdir(s):
+			copytree(s, d, symlinks, ignore)
+		else:
+			if not os.path.exists(d) or os.stat(s).st_mtime - os.stat(d).st_mtime > 1:
+				shutil.copy2(s, d)

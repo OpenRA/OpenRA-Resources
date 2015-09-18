@@ -29,7 +29,7 @@
                             <div class="notification_tooltip">
                                 <div>This map can't be automatically downloaded by OpenRA game!
                                 {% if map.requires_upgrade == True %}
-                                    <p>Reason: Requires upgrade, see <a class="showLintLog" data-name="Lint Log">lintlog</a> (Failed for version: {{map.parser}})</p>
+                                    <p>Reason: Requires upgrade, see <a class="showLintLog" data-version="{{map.parser}}">lintlog</a> (Failed for version: {{map.parser}})</p>
                                     <p>Checkout <a href="http://wiki.openra.net/Upgrading-mods-to-a-new-release" target="_blank">upgrade instruction</a></p>
                                 {% elif map.downloading == False %}
                                     <p>Reason: Downloading is manually set to False</p>
@@ -131,6 +131,22 @@
                         </div>
                         </div>
 
+                        {% for lint in lints %}
+                        <div class="Lints popup" data-version="{{lint.0}}">
+                        <div class="popup-content-wrapper">
+                            <div class="closePopup"><label class="x"></label></div>
+                                <div class="lint_check">
+                                    <h3>Lint check for {{ lint.0 }}</h3>
+                                    <div class="lint_output">
+                                        {% autoescape off %}
+                                        {{ lint.2|nl_to_br }}
+                                        {% endautoescape %}
+                                    </div>
+                                </div>
+                        </div>
+                        </div>
+                        {% endfor %}
+
                         <div class="reportMap popup">
                         <div class="popup-content-wrapper">
                             <div class="closePopup"><label class="x"></label></div>                                                      
@@ -145,7 +161,9 @@
 
                         <div class="printMisc popup" style="width: 580px; left: 10%; margin-top: -100px; font-size: 0.9em;"><div class="popupContainer"></div>
                         </div>
+
                         <div class="addScreenshotForm popup"></div>
+
                     </div>
 
                     <div class="map_revisions cBlock">
@@ -281,6 +299,27 @@
                     <div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">{% if map.rsync_allow and map.downloading and reports|length < REPORTS_PENALTY_AMOUNT and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
                     <br />
                     <div class='cBlock'><span class='small-font'>Parsed by: {{map.parser}}</span></div>
+
+                    {% if lints %}
+                    <div class="cBlock">
+                        <span class="small-font bold">Lint check status:</span>
+                        {% for lint in lints %}
+                            <div class="lint_check_line">
+                                <div class="lint_check_line_status">
+                                    {% if lint.1 %}
+                                    <span class="small-font green bold">pass</span>
+                                    {% else %}
+                                    <a href="#" class="showLintLog small-font red bold" data-version="{{lint.0}}">fail</a>
+                                    {% endif %}
+                                </div>
+                                <div class="lint_check_line_version">
+                                    <span class="small-font">{{lint.0}}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
                     <br />
                     <div class="map_data_label">Rating:</div><div class="map_data_text">{% if request.user.is_authenticated %}<div class="five-star-rating" data-average="{{map.rating}}" data-id="{{map.id}}" data-type="map" title="{{ratesAmount}} users rated, average: {{map.rating}}"></div>{% else %}<span title="Authenticate to rate map">{{ map.rating }}</span>{% endif %}</div>
                     <div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
@@ -422,23 +461,7 @@
                     })
 
                     $(".showLintLog").on("click", function() {
-                        $(".popupContainer").empty()
-                        $(".printMisc").empty()
-                        $(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
-                        $(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>'+$(this).data("name")+'</h3></div>'));
-                        $.ajax({
-                            url : "/maps/{{map.id}}/lintlog/",
-                            dataType: "text",
-                            success : function (data) {
-                                $(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
-                                $(".closePopup").on("click", function() {
-                                    $("#overlay").hide()
-                                    $(".popup").hide()
-                                });
-                                noScroll("popupContainer");
-                            }
-                        });
-                        $(".printMisc").show()
+                        $('.Lints[data-version="'+$(this).attr("data-version")+'"]').show()
                         $("#overlay").show()
                     })
 
