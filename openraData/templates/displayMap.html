@@ -6,7 +6,9 @@
                     <div class="map_title left">
                         <div>
                             <div class="title">{{ map.title|strip_tags }}</div>
-                            <div class="author">by {{ map.author|strip_tags }}</div>
+                            {% if map.author %}
+                                <div class="author">by {{ map.author|strip_tags }}</div>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -359,6 +361,7 @@
                     </div>
                     {% endif %}
 
+                    {% if map.author %}
                     <div class="side_img_links">
                         {% if mapsFromAuthor %}
                         <div>More from <a href="/maps/author/{{map.author|proper_space}}/" title="Author">{{ map.author|strip_tags }}</a>:</div>
@@ -367,6 +370,7 @@
                         {% endfor %}
                         {% endif %}
                     </div>
+                    {% endif %}
 
                     {% if similarMaps %}
                     <div class="side_img_links">

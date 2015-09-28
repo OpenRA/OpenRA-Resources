@@ -74,6 +74,8 @@ def search(request):
 		if request.POST.get('qsearch', "").strip() == "":
 			return HttpResponseRedirect('/')
 		search_request = request.POST.get('qsearch', "").strip()
+	else:
+		return HttpResponseRedirect('/')
 	global_search_request = {}
 	global_search_request['maps'] = {'amount': 0, 'hash': None, 'title': None, 'info': None}
 

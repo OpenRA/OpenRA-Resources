@@ -329,7 +329,7 @@ def ReadYaml(item=False, fullpath=""):
 			countAdvanced += 1
 
 	map_data_ordered['spawnpoints'] = spawnpoints.rstrip(",")
-	if countAdvanced > 20:
+	if countAdvanced > 16:
 		map_data_ordered['advanced'] = True
 	if len(map_data_ordered) == 0:
 		return {'response': 'map data is not filled', 'error': True}
