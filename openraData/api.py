@@ -389,6 +389,11 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		downloading = False
 	if mapObject.amount_reports >= settings.REPORTS_PENALTY_AMOUNT:
 		downloading = False
+
+	map_grid_type = 'Rectangular' # ra/cnc/d2k
+	if mapObject.game_mod == 'ts':
+		map_grid_type = 'RectangularIsometric'
+
 	if yaml:
 		response_data = u"""{0}:
 		id: {1}
@@ -417,7 +422,8 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		url: {24}
 		downloading: {25}
 		mapformat: {26}
-		parser: {27}\n""".format(
+		parser: {27}
+		map_grid_type: {28}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
 		cgi.escape(mapObject.title, quote=None),
@@ -446,6 +452,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		downloading,
 		mapObject.mapformat,
 		mapObject.parser,
+		map_grid_type,
 		).replace("\t\t","\t").replace("''", "'")
 		return response_data
 	response_data = {}
@@ -478,6 +485,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	response_data['downloading'] = downloading
 	response_data['mapformat'] = mapObject.mapformat
 	response_data['parser'] = mapObject.parser
+	response_data['map_grid_type'] = map_grid_type
 	return response_data
 
 def get_minimap(mapid, soft=False):
