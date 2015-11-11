@@ -404,10 +404,14 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
 				return response
 			fullpath = path + filename
 
+		os.chmod(fullpath, 0444)
+
 		command = 'mono --debug OpenRA.Utility.exe ' + item.game_mod.lower() + ' --check-yaml ' + fullpath
 		print(command)
 		print('Started Lint check for parser: %s' % current_parser_to_db)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
+
+		os.chmod(fullpath, 0644)
 
 		passing = True
 		output_to_db = ""
