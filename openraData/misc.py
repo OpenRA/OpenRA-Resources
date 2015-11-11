@@ -120,9 +120,9 @@ def get_account_link(userid):
 	obj = SocialAccount.objects.filter(user_id=userid)
 	if obj:
 		if obj[0].provider == "google":
-			return obj[0].extra_data['link']
+			return "" #obj[0].extra_data['link']
 		elif obj[0].provider == "github":
-			return obj[0].extra_data['html_url']
+			return "" #obj[0].extra_data['html_url']
 	else:
 		return ""
 
