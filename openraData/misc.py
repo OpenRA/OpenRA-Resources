@@ -47,8 +47,8 @@ def send_email_contacts_form(name, email, message):
 	connection = mail.get_connection()
 	connection.open()
 
-	email = mail.EmailMessage('OpenRA Resource Center - Contacts form', 'Name: %s\nEmail: %s\nMessage: %s\n' % (name, email, message), settings.ADMIN_EMAIL,
-						  [settings.ADMIN_EMAIL], connection=connection)
+	email = mail.EmailMessage('OpenRA Resource Center - Contacts form', 'Name: %s\nEmail: %s\nMessage: %s\n' % (name, email, message), settings.ADMIN_EMAIL_FROM,
+						  [settings.ADMIN_EMAIL_TO], connection=connection)
 
 	email.send()
 	connection.close()
@@ -56,8 +56,8 @@ def send_email_contacts_form(name, email, message):
 def send_email_to_admin_OnMapFail(tempname):
 	connection = mail.get_connection()
 	connection.open()
-	email = mail.EmailMessage('OpenRA Resource Center - Failed to upload map', 'See attachment', settings.ADMIN_EMAIL,
-						  [settings.ADMIN_EMAIL], connection=connection)
+	email = mail.EmailMessage('OpenRA Resource Center - Failed to upload map', 'See attachment', settings.ADMIN_EMAIL_FROM,
+						  [settings.ADMIN_EMAIL_TO], connection=connection)
 	email.attach_file(tempname)
 	email.send()
 	connection.close()
@@ -66,8 +66,8 @@ def send_email_to_admin_OnReport(args):
 	connection = mail.get_connection()
 	connection.open()
 	body = "Item: http://%s  \nBy user_id: %s  \nReason: %s  \nInfringement: %s" % (args['addr'], args['user_id'], args['reason'], args['infringement'])
-	email = mail.EmailMessage('OpenRA Resource Center(to admin) - New Report', body, settings.ADMIN_EMAIL,
-						  [settings.ADMIN_EMAIL], connection=connection)
+	email = mail.EmailMessage('OpenRA Resource Center(to admin) - New Report', body, settings.ADMIN_EMAIL_FROM,
+						  [settings.ADMIN_EMAIL_TO], connection=connection)
 	email.send()
 	connection.close()
 
@@ -78,7 +78,7 @@ def send_email_to_user_OnReport(args):
 	connection = mail.get_connection()
 	connection.open()
 	body = "Your %s has been reported: %s \nReason: %s" % (args['resource_type'], args['addr'], args['reason'])
-	email = mail.EmailMessage('OpenRA Resource Center - Your content has been reported', body, mail_addr,
+	email = mail.EmailMessage('OpenRA Resource Center - Your content has been reported', body, settings.ADMIN_EMAIL_FROM,
 						  [mail_addr], connection=connection)
 	email.send()
 	connection.close()
@@ -86,7 +86,7 @@ def send_email_to_user_OnReport(args):
 def send_email_to_user_OnLint(email_addr, body):
 	connection = mail.get_connection()
 	connection.open()
-	email = mail.EmailMessage('OpenRA Resource Center - Lint failed', body, email_addr,
+	email = mail.EmailMessage('OpenRA Resource Center - Lint failed', body, settings.ADMIN_EMAIL_FROM,
 						  [email_addr], connection=connection)
 	email.send()
 	connection.close()
@@ -99,7 +99,7 @@ def send_email_to_user_OnComment(itemtype, itemid, email_addr, info=""):
 		body = itemtype.title()+" you've commented, has some activity : " + http_host + "/maps/" + itemid
 	elif info == "owner":
 		body = "Your "+itemtype.title()+" has been commented: " + http_host + "/maps/" + itemid
-	email = mail.EmailMessage('OpenRA Resource Center - New Comment', body, email_addr,
+	email = mail.EmailMessage('OpenRA Resource Center - New Comment', body, settings.ADMIN_EMAIL_FROM,
 						  [email_addr], connection=connection)
 	email.send()
 	connection.close()
@@ -107,7 +107,7 @@ def send_email_to_user_OnComment(itemtype, itemid, email_addr, info=""):
 def send_email_to_admin(title, body):
 	connection = mail.get_connection()
 	connection.open()
-	email = mail.EmailMessage(title, body, settings.ADMIN_EMAIL, [settings.ADMIN_EMAIL], connection=connection)
+	email = mail.EmailMessage(title, body, settings.ADMIN_EMAIL_FROM, [settings.ADMIN_EMAIL_TO], connection=connection)
 	email.send()
 	connection.close()
 

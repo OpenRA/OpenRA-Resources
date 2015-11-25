@@ -154,8 +154,11 @@ GITHUB_API_TOKEN = ''
 GITHUB_USER = ''
 GITHUB_REPO = ''
 
-# Email address of a person who is responsible for fixing map uploading issues
-ADMIN_EMAIL = ''
+# Email address (FROM) in our custom mail methods
+ADMIN_EMAIL_FROM = ''
+
+# Email address (TO) in our custom mail methods, when informing admin
+ADMIN_EMAIL_TO = ''
 
 # Reply-to email address
 DEFAULT_FROM_EMAIL = ''
