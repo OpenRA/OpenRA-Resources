@@ -246,8 +246,13 @@ def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(
 			return {'response': 'can not find map', 'error': True, 'maphash': 'none'}
 		fullpath = path + filename
 
+	os.chmod(fullpath, 0444)
+
 	command = 'mono --debug OpenRA.Utility.exe %s --map-hash %s' % (item.game_mod, fullpath)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
+
+	os.chmod(fullpath, 0644)
+
 	maphash = proc[0].strip()
 	os.chdir(currentDirectory)
 	print('Recalculated hash: %s' % item.id)
@@ -530,9 +535,12 @@ def GenerateMinimap(item, parser=settings.OPENRA_ROOT_PATH + list(reversed( sett
 	if filename == "":
 		os.chdir(currentDirectory)
 		return False
+
+	os.chmod(path + filename, 0444)
 	command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (item.game_mod, path + filename)
 	print(command)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
+	os.chmod(path + filename, 0644)
 	try:
 		shutil.move(parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
 		os.chdir(currentDirectory)
@@ -558,9 +566,11 @@ def GenerateFullPreview(item, userObject, parser=settings.OPENRA_ROOT_PATH + lis
 	if filename == "":
 		os.chdir(currentDirectory)
 		return False
+	os.chmod(path + filename, 0444)
 	command = 'mono --debug OpenRA.Utility.exe %s --full-preview %s' % (item.game_mod, path + filename)
 	print(command)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
+	os.chmod(path + filename, 0644)
 	try:
 		shutil.move(parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")
 		transac = Screenshots(

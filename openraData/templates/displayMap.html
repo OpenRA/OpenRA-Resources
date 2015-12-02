@@ -1,5 +1,4 @@
             {% load customTags %}
-            {% load threadedcomments_tags %}
             <div id="map_data_container">
                 <div class="left_map_content">
 
@@ -222,47 +221,7 @@
                     </div>
                     {% endif %}
 
-                    {% if user.is_authenticated %}
-                    <div class="cBlock">
-                        {% load threadedcomments_tags %}
-                        <h5>Comments [{% get_comment_count for map as amount_of_comments %}{{amount_of_comments}}] for {{ map.title }}:</h5><br />
 
-                        {% get_comment_list for map as comment_list %}
-                        {% for comment in comment_list|fill_tree|annotate_tree %}{% ifchanged comment.parent_id %}{% else %}</li>{% endifchanged %}{% if not comment.open and not comment.close %}</li>{% endif %}{% if comment.open %}
-                        <ul>{% endif %}
-                            <li id="c{{ comment.id }}">
-                                <dl class="comment">
-                                    <dt>
-                                        {{ comment.submit_date }} - {% autoescape off %}{{ comment.name|account_link:comment.user_id }}{% endautoescape %} {% if comment.user == request.user or request.user.is_superuser%}<a href="/deletecomment/{{comment.id}}/maps/{{map.id}}/" onClick='return confirmDelete("comment")' title='delete'>メ</a>{% endif %}
-                                    </dt>
-                                    <dd>
-                                        {{ comment.comment|linebreaks }}
-                                    </dd>
-                                </dl>
-                                {% for close in comment.close %}</li></ul>{% endfor %}
-                        {% endfor %}
-
-                        {% if user.is_authenticated %}
-                        {% get_comment_form for map as comment_form %}
-                        <a name="comments"></a>
-                        <form action="/maps/{{map.id}}/#comments" method="post">{% csrf_token %}
-                            <input id="id_name" maxlength="50" name="name" type="hidden" value="{{user.username}}"/>
-                            <input id="id_email" name="email" type="hidden" value="{{user.email}}"/>
-                        <label for="id_comment"></label><textarea cols="40" id="id_comment" name="comment" rows="10"></textarea>
-
-                        {{ comment_form.content_type }}
-                        {{ comment_form.timestamp }}
-                        {{ comment_form.object_pk }}
-                        {{ comment_form.security_hash }}
-                        {{ comment_form.parent }}
-                        <input id="id_title" maxlength="10" name="title" type="hidden" value='map' />
-                        <p>
-                        <button type="submit">Post</button>
-                        </p>
-                        </form>
-                        {% endif %}
-                    </div>
-                    {% endif %}
                     {% if license %}
                     <div class="map_license cBlock">
                         <div>

@@ -20,7 +20,6 @@ djangorestframework==2.4.4
 ecdsa==0.11
 flup==1.0.2
 FormEncode==1.2.6
-getmail==4.46.0
 gunicorn==19.0.0
 httplib2==0.9
 images2gif==1.0.1
@@ -35,8 +34,6 @@ logutils==0.3.3
 lxml==3.4.0
 Mako==1.0.0
 MarkupSafe==0.23
-mercurial==2.2.2
-mod-python==3.3.1
 MySQL-python==1.2.3
 numpy==1.8.0
 oauth==1.0.1
@@ -60,11 +57,10 @@ Pygments==2.0.1
 pyOpenSSL==0.14
 pyquery==1.2.4
 Pyste==0.9.10
-python-apt==0.8.8.2
 python-magic==0.4.6
 python-openid==2.2.5
 PyYAML==3.10
-requests==2.3.0
+requests==2.8.1
 requests-oauthlib==0.4.0
 SecretStorage==2.1.1
 simplegeneric==0.8.1
@@ -75,7 +71,6 @@ South==0.8.4
 stevedore==1.1.0
 Tempita==0.5.2
 testresources==0.2.7
-tortoisehg==2.4
 urlgrabber==3.9.1
 urllib3==1.8.3
 urwid==1.2.1

@@ -358,8 +358,13 @@ class MapHandlers():
 
 		os.chdir(parser + "/")
 
+		os.chmod(filepath, 0444)
+
 		command = 'mono --debug OpenRA.Utility.exe ra --map-hash ' + filepath
 		proc = Popen(command.split(), stdout=PIPE).communicate()
+
+		os.chmod(filepath, 0644)
+
 		self.maphash = proc[0].strip()
 		self.LOG.append(self.maphash)
 
@@ -368,8 +373,10 @@ class MapHandlers():
 	def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 		os.chdir(parser + "/")
 
+		os.chmod(self.map_full_path_filename, 0444)
 		command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (game_mod, self.map_full_path_filename)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
+		os.chmod(self.map_full_path_filename, 0644)
 
 		try:
 			shutil.move(misc.addSlash(parser + "/") + self.preview_filename,
@@ -384,8 +391,10 @@ class MapHandlers():
 	def GenerateFullPreview(self, userObject, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 		os.chdir(parser)
 
+		os.chmod(self.map_full_path_filename, 0444)
 		command = 'mono --debug OpenRA.Utility.exe %s--full-preview %s' % (game_mod, self.map_full_path_filename)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
+		os.chmod(self.map_full_path_filename, 0644)
 
 		try:
 			shutil.move(misc.addSlash(parser + "/") + self.preview_filename,
