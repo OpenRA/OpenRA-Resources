@@ -237,6 +237,11 @@ class MapHandlers():
 
 		### Check if user has already uploaded the same map
 		self.GetHash(tempname, parser)
+		if 'Converted' in self.maphash and 'to MapFormat' in self.maphash:
+			self.LOG.append('Failed to upload with this parser. MapFormat does not match. Try to upgrade your map or use different parser.')
+			misc.send_email_to_admin_OnMapFail(tempname)
+			return 'Failed to upload with this parser. MapFormat does not match. Try to upgrade your map or use different parser.'
+
 		userObject = User.objects.get(pk=user_id)
 		try:
 			hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
