@@ -150,7 +150,6 @@ class MapHandlers():
 	def __init__(self, map_full_path_filename="", map_full_path_directory="", preview_filename=""):
 		self.map_is_uploaded = False
 		self.minimap_generated = False
-		self.fullpreview_generated = False
 		self.maphash = ""
 		self.LintPassed = False
 		self.advanced_map = False
@@ -343,7 +342,6 @@ class MapHandlers():
 			Maps.objects.filter(id=transac.id).update(requires_upgrade=True)
 
 		self.GenerateMinimap(resp_map_data['game_mod'], parser)
-		#self.GenerateFullPreview(userObject, resp_map_data['game_mod'], parser)
 
 		shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(resp_map_data['game_mod'], parser,), name='shppreview')
 		shp.start()
@@ -390,32 +388,6 @@ class MapHandlers():
 			self.minimap_generated = True
 		except:
 			self.flushLog( ["Failed to generate minimap for this file."] )        
-
-		os.chdir(self.currentDirectory)
-
-	def GenerateFullPreview(self, userObject, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
-		os.chdir(parser)
-
-		os.chmod(self.map_full_path_filename, 0444)
-		command = 'mono --debug OpenRA.Utility.exe %s--full-preview %s' % (game_mod, self.map_full_path_filename)
-		proc = Popen(command.split(), stdout=PIPE).communicate()
-		os.chmod(self.map_full_path_filename, 0644)
-
-		try:
-			shutil.move(misc.addSlash(parser + "/") + self.preview_filename,
-				self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-full.png")
-			self.flushLog(proc)
-			self.fullpreview_generated = True
-			transac = Screenshots(
-				user = userObject,
-				ex_id = int(self.UID),
-				ex_name = "maps",
-				posted =  timezone.now(),
-				map_preview = True,
-				)
-			transac.save()
-		except:
-			self.flushLog( ["Failed to generate fullpreview for this file."] )
 
 		os.chdir(self.currentDirectory)
 
