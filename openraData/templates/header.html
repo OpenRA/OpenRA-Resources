@@ -76,7 +76,12 @@
             </li>
         {% if user.is_authenticated %}
             <li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
-            <li><a href="/upload/map/"><span {% if '/upload' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload</span></a></li>
+            <li><a href="#" onclick="return false;"><span>Upload</span></a>
+                <ul class="arrow_box">
+                    <li><a href="/upload/map/"><span {% if '/upload/map' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload Map</span></a></li>
+                    <li><a href="/upload/replay/"><span {% if '/upload/replay' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload Replay</span></a></li>
+                </ul>
+            </li>
         {% else %}
             <li><a href="/accounts/login/"><span {% if request.path == '/accounts/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>
         {% endif %}
