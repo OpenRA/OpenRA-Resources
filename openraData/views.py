@@ -229,6 +229,41 @@ def activelyDevelopedMap(request):
 	mapObject = random.choice(mapObject)
 	return HttpResponseRedirect('/maps/'+str(mapObject.id))
 
+def displayReplay(request, arg):
+	try:
+		orarepObj = Replays.objects.get(id=arg)
+	except:
+		return HttpResponseRedirect('/')
+
+	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/replays/' + arg
+	disk_size = os.path.getsize(path + '/' + arg + '.orarep')
+	disk_size = misc.sizeof_fmt(disk_size)
+
+	reportedByUser = False
+	reports = []
+	reportObject = Reports.objects.filter(ex_id=orarepObj.id, ex_name='replays')
+	for item in reportObject:
+		reports.append([item.user.username, item.reason, item.infringement, item.posted])
+		if item.user_id == request.user.id:
+			reportedByUser = True
+
+	template = loader.get_template('index.html')
+	context = RequestContext(request, {
+		'content': 'displayReplay.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Replay details - ' + arg,
+		'orarep': orarepObj,
+		'reports': reports,
+		'reported': reportedByUser,
+		'screenshots': 0,
+		'disk_size': disk_size,
+		'duplicates': 0,
+	})
+	return StreamingHttpResponse(template.render(context))
+
+
+
 def displayMap(request, arg):
 	if request.method == 'POST':
 		if request.POST.get('reportReason', "").strip() != "":
@@ -550,6 +585,19 @@ def serveMinimap(request, arg):
 	response = StreamingHttpResponse(open(serveImage), content_type='image/png')
 	response['Content-Disposition'] = 'attachment; filename = %s' % minimap
 	return response
+
+def serveReplay(request, arg):
+	orarep = ""
+	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/replays/' + arg + '/' + arg + '.orarep'
+	if not os.path.isfile(path):
+		return HttpResponseRedirect('/replays/'+arg)
+
+	response = StreamingHttpResponse(open(path), content_type='application/octet-stream')
+	response['Content-Disposition'] = 'attachment; filename = %s' % arg+'.orarep'
+	response['Content-Length'] = os.path.getsize(path)
+	Replays.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
+	return response
+
 
 def serveOramap(request, arg, sync=""):
 	oramap = ""
@@ -909,7 +957,7 @@ def assets(request):
 	return StreamingHttpResponse(template.render(context))
 
 def replays(request, page=1):
-	perPage = 20
+	perPage = 10
 	slice_start = perPage*int(page)-perPage
 	slice_end = perPage*int(page)
 	replayObject = Replays.objects.filter().order_by('-posted')

@@ -2,6 +2,8 @@ import re
 from HTMLParser import HTMLParser
 from django import template
 from openraData import misc
+from openraData.models import Maps, ReplayPlayers
+
 
 register = template.Library()
 
@@ -48,3 +50,44 @@ register.filter('map_real_size', map_real_size)
 def nl_to_br(value):
 	return value.replace('\\n', '<br />')
 register.filter('nl_to_br', nl_to_br)
+
+
+def map_exists_by_hash(value):
+	item = Maps.objects.filter(map_hash=value)
+	if item:
+		return True
+	else:
+		return False
+register.filter('map_exists_by_hash', map_exists_by_hash)
+
+def map_url_by_hash(value):
+	item = Maps.objects.filter(map_hash=value)
+	if item:
+		return "/maps/" + str(item[0].id) + "/"
+	else:
+		return "#"
+register.filter('map_url_by_hash', map_url_by_hash)
+
+def map_minimap_by_hash(value):
+	item = Maps.objects.filter(map_hash=value)
+	if item:
+		return "/maps/" + str(item[0].id) + "/minimap"
+	else:
+		return "#"
+register.filter('map_minimap_by_hash', map_minimap_by_hash)
+
+def map_title_by_hash(value):
+	item = Maps.objects.filter(map_hash=value)
+	if item:
+		return str(item[0].title)
+	else:
+		return ""
+register.filter('map_title_by_hash', map_title_by_hash)
+
+
+def get_replay_players(value):
+	replay_players = ReplayPlayers.objects.filter(replay_id=value)
+	if replay_players:
+		return replay_players
+	return []
+register.filter('get_replay_players', get_replay_players)

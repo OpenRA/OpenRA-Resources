@@ -63,21 +63,21 @@
         <ul id="nav">
             <li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></a></li>
             <li><a href="/maps/"><span {% if '/maps' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
-            <li><a href="#"><span {% if '/units' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Units</span></a></li>      
-            <li><a href="#"><span style="opacity: 0.5;"
+            <li><a href="/replays/"><span {% if '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Replays</span></a></li>      
+            <!--<li><a href="#" onclick="return false;"><span style="opacity: 0.5;"
                 {% if '/mods' in request.path or '/palettes' in request.path or '/screenshots' in request.path or '/assets' in request.path or '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Other</span></a>
                 <ul class="arrow_box">
                     <li><a href="#"><span {% if '/mods' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Mods</span></a></li>            
                     <li><a href="#"><span {% if '/palettes' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Palettes</span></a></li>
                     <li><a href="#"><span {% if '/screenshots' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Screenshots</span></a></li>
                     <li><a href="#"><span {% if '/assets' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Assets Packages</span></a></li>
-                    <li><a href="#"><span {% if '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Replays</span></a></li>
+                    <li><a href="#"><span {% if '/units' in request.path %}{{ 'class="nav-selected"' }}{% endif %} style="opacity: 0.5;">Units</span></a></li>
                 </ul>
-            </li>
+            </li>-->
         {% if user.is_authenticated %}
             <li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
-            <li><a href="#" onclick="return false;"><span>Upload</span></a>
-                <ul class="arrow_box">
+            <li><a href="#" onclick="return false;"><span {% if '/upload' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload</span></a>
+                <ul class="arrow_box arrow_box_upload">
                     <li><a href="/upload/map/"><span {% if '/upload/map' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload Map</span></a></li>
                     <li><a href="/upload/replay/"><span {% if '/upload/replay' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload Replay</span></a></li>
                 </ul>

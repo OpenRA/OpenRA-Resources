@@ -10,15 +10,44 @@
 			<div class="replay_grid_cell">
 				
 				<div class="replay_grid_cell_mod">
-
+					<img src="/static/images/logo_{{item.game_mod}}.svg" alt="logo_{{item.game_mod}}" title="{{item.game_mod|upper}}" />
 				</div>
 
 				<div class="replay_grid_cell_map">
-
+					{% if item.map_hash|map_exists_by_hash %}
+						<a href="{{item.map_hash|map_url_by_hash}}" title="{{item.map_hash|map_title_by_hash}}"><img src="{{item.map_hash|map_minimap_by_hash}}" alt="{{item.map_hash|map_title_by_hash}}" /></a>
+					{% else %}
+						<span>Unknown map</span>
+					{% endif %}
 				</div>
 
 				<div class="replay_grid_cell_info">
+					<a href="/replays/{{item.id}}/">
 
+						<div class="replay_grid_cell_info_row">
+							<b>{{item.user.username}}</b> uploaded on <b>{{item.posted}}</b>
+						</div>
+						<br />
+
+						<div class="replay_grid_cell_info_row">
+							Played with OpenRA version: <b>{{item.version}}</b>
+						</div>
+
+						<div class="replay_grid_cell_info_row">
+							Parsed by (during uploading): <b>{{item.parser}}</b>
+						</div>
+						<br />
+
+						<div class="replay_grid_cell_info_row">
+							<span>Players: </span>
+							<span class="replay_grid_players">
+								{% for player in item.id|get_replay_players %}
+									<b>{{player.name}}</b>{% if not forloop.last %}, {% endif %}
+								{% endfor %}
+							</span>
+						</div>
+
+					</a>
 				</div>
 			</div>
 		{% endfor %}

@@ -60,6 +60,9 @@ urlpatterns = patterns('',
 	url(r'^replays/?$', views.replays, name='replays'),
 	url(r'^replays/page/(?P<page>\d+)/?$', views.replays, name='replays_paged'),
 
+	url(r'^replays/(?P<arg>\d+)/?$', views.displayReplay, name='displayReplay'),
+	url(r'^replays/(?P<arg>\d+)/orarep/?$', views.serveReplay, name='serveReplay'),
+
 	url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
 	url(r'^deletecomment/(?P<arg>\d+)/(?P<itemname>\w+)/(?P<itemid>\w+)/?$', views.deleteComment, name='deleteComment'),
 
