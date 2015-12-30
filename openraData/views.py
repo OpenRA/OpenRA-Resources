@@ -31,10 +31,7 @@ from django.contrib.sites.models import Site
 
 def index(request):
 	scObject = Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
-	if request.user.id:
-		newcomments = len(ReadComments.objects.filter(owner=request.user.id))
-	else:
-		newcomments = False
+
 	template = loader.get_template('index.html')
 	template_args = {
 		'content': 'index_content.html',
@@ -42,7 +39,6 @@ def index(request):
 		'http_host': request.META['HTTP_HOST'],
 		'title': '',
 		'screenshots': scObject,
-		'newcomments': newcomments,
 	}
 	if settings.SITE_MAINTENANCE:
 		template_args['content'] = 'service/maintenance.html'
