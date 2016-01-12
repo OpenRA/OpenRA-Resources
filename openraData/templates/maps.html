@@ -23,10 +23,12 @@
                         <div class="map_tooltip">
                             <div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
                             <table>
+                                {% if item.author %}
                                 <tr>
                                     <td class="tooltip_title">Author: </td>
                                     <td class="tooltip_value">{{ item.author|strip_tags }} </td>
                                 </tr>
+                                {% endif %}
                                 <tr>
                                     <td class="tooltip_title">Uploader: </td>
                                     <td class="tooltip_value">{{ item.user }}</td>

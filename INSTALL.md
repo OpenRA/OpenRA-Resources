@@ -18,6 +18,7 @@ python-pycurl
 libffi-dev
 libxslt1-dev
 python-dev
+python-pgmagick
 mono 2.10 +
 sendmail (or any other mail server)
 curl
@@ -55,7 +56,7 @@ $ pip install -r requirements.txt
  * Change "DEBUG" setting to False if it's True
  * Modify "RSYNC_MAP_PATH" and "RSYNC_MAP_API_PATH" to specify directories where maps will be dumped by website trigger for dedicated servers and Map API mirrors usage. See [Sync Maps over Rsync](https://github.com/OpenRA/OpenRA-Content-Engine/wiki/Sync-maps-over-RSYNC-%28for-dedicated-servers%29) guide for details.
  * Modify GITHUB related settings (user, repository and API token): used to post an issue with info about OpenRA crash report
- * Modify "ADMIN_EMAIL" to specify an email address of a person who is responsible for fixing map uploading issues
+ * Modify "ADMIN_EMAIL_FROM" and "ADMIN_EMAIL_TO" to specify an email address of a person who is responsible for fixing map uploading issues
  * Edit DB related configuration
  * Deploy OpenRA binaries with full permissions for web site unix user, settings OPENRA_ROOT_PATH, OPENRA_VERSIONS, OPENRA_BLEED_HASH_FILE_PATH and OPENRA_BLEED_PARSER are self-explained.
 
@@ -107,9 +108,7 @@ server {
                 alias /path/to/our/primary/application/static/; # MEDIA_ROOT
                 expires 30d;
          }
-        location /static/admin/ {
-                alias /usr/local/lib/python2.7/dist-packages/django/contrib/admin/static/admin/;
-        }
+
         location / {
                 proxy_pass_header Server;
                 proxy_set_header Host $http_host;

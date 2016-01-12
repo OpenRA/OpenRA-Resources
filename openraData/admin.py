@@ -13,6 +13,7 @@ from openraData.models import UserOptions
 from openraData.models import NotifyOfComments
 from openraData.models import ReadComments
 from openraData.models import Rating
+from openraData.models import ReplayPlayers
 
 admin.site.register(Maps)
 admin.site.register(Lints)
@@ -20,6 +21,7 @@ admin.site.register(Units)
 admin.site.register(Mods)
 admin.site.register(Palettes)
 admin.site.register(Replays)
+admin.site.register(ReplayPlayers)
 admin.site.register(CrashReports)
 admin.site.register(Screenshots)
 admin.site.register(Reports)

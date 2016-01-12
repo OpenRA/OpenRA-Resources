@@ -17,14 +17,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'b=jser_9!msujr9-%%jf410&kb=3dhnj0f5mvah45ws8q_%fau'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 SITE_ID = 1
 
@@ -82,6 +82,11 @@ MIDDLEWARE_CLASSES = (
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ALLO_METHODS = (
+    'GET',
+    'POST',
+    )
+
 ROOT_URLCONF = 'systemTool.urls'
 
 WSGI_APPLICATION = 'systemTool.wsgi.application'
@@ -93,9 +98,9 @@ WSGI_APPLICATION = 'systemTool.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django',
-        'USER': 'django',
-        'PASSWORD': 'django',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
         'HOST': 'localhost',
     }
 }
@@ -128,13 +133,14 @@ ACCOUNT_ACTIVATION_DAYS = 7
 
 
 # Path to directory where OpenRA versions are stored
-OPENRA_ROOT_PATH = '/usr/local/openra/'
+OPENRA_ROOT_PATH = ''
 
 # OpenRA Versions matching their directory names
 OPENRA_VERSIONS = {
-    'default': 'release-20141029',
-    '0': 'playtest-20150118',
-    '1': 'bleed', # just a name, see OPENRA_BLEED_PARSER setting
+    3: 'release-20151224',
+    2: 'release-20150919',
+    1: 'release-20150614',
+    0: 'bleed', # just a name, see OPENRA_BLEED_PARSER setting
 }
 
 # Path to file which stores HASH of the latest `bleed` version
@@ -154,8 +160,11 @@ GITHUB_API_TOKEN = ''
 GITHUB_USER = ''
 GITHUB_REPO = ''
 
-# Email address of a person who is responsible for fixing map uploading issues
-ADMIN_EMAIL = ''
+# Email address (FROM) in our custom mail methods
+ADMIN_EMAIL_FROM = ''
+
+# Email address (TO) in our custom mail methods, when informing admin
+ADMIN_EMAIL_TO = ''
 
 # Reply-to email address
 DEFAULT_FROM_EMAIL = ''
@@ -164,11 +173,11 @@ DEFAULT_FROM_EMAIL = ''
 REPORTS_PENALTY_AMOUNT = 3
 
 # Is site under maintenance
-SITE_MAINTENANCE = False
-SITE_MAINTENANCE_OVER = '14:00 GMT' # when we finish technical works
+SITE_MAINTENANCE = False 
+SITE_MAINTENANCE_OVER = '00:00 GMT' # when we finish technical works
 
 # Time limit for some execution processes
 UTILITY_TIME_LIMIT = 20
 
 # HTTP_HOST of this site (ex: resource.openra.net)
-HTTP_HOST = ''
+HTTP_HOST = 'resource.openra.net'

@@ -39,6 +39,8 @@ urlpatterns = patterns('',
 	url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
 	url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
 
+	url(r'^upload/replay/?$', views.uploadReplay, name='uploadReplay'),
+
 	url(r'^units/?$', views.units, name='units'),
 	url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),
 
@@ -56,6 +58,10 @@ urlpatterns = patterns('',
 	url(r'^assets/?$', views.assets, name='assets'),
 
 	url(r'^replays/?$', views.replays, name='replays'),
+	url(r'^replays/page/(?P<page>\d+)/?$', views.replays, name='replays_paged'),
+
+	url(r'^replays/(?P<arg>\d+)/?$', views.displayReplay, name='displayReplay'),
+	url(r'^replays/(?P<arg>\d+)/orarep/?$', views.serveReplay, name='serveReplay'),
 
 	url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
 	url(r'^deletecomment/(?P<arg>\d+)/(?P<itemname>\w+)/(?P<itemid>\w+)/?$', views.deleteComment, name='deleteComment'),

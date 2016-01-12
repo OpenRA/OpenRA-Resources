@@ -246,8 +246,13 @@ def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(
 			return {'response': 'can not find map', 'error': True, 'maphash': 'none'}
 		fullpath = path + filename
 
+	os.chmod(fullpath, 0444)
+
 	command = 'mono --debug OpenRA.Utility.exe %s --map-hash %s' % (item.game_mod, fullpath)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
+
+	os.chmod(fullpath, 0644)
+
 	maphash = proc[0].strip()
 	os.chdir(currentDirectory)
 	print('Recalculated hash: %s' % item.id)
@@ -329,7 +334,7 @@ def ReadYaml(item=False, fullpath=""):
 			countAdvanced += 1
 
 	map_data_ordered['spawnpoints'] = spawnpoints.rstrip(",")
-	if countAdvanced > 20:
+	if countAdvanced > 16:
 		map_data_ordered['advanced'] = True
 	if len(map_data_ordered) == 0:
 		return {'response': 'map data is not filled', 'error': True}
@@ -404,10 +409,14 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
 				return response
 			fullpath = path + filename
 
+		os.chmod(fullpath, 0444)
+
 		command = 'mono --debug OpenRA.Utility.exe ' + item.game_mod.lower() + ' --check-yaml ' + fullpath
 		print(command)
 		print('Started Lint check for parser: %s' % current_parser_to_db)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
+
+		os.chmod(fullpath, 0644)
 
 		passing = True
 		output_to_db = ""
@@ -526,9 +535,12 @@ def GenerateMinimap(item, parser=settings.OPENRA_ROOT_PATH + list(reversed( sett
 	if filename == "":
 		os.chdir(currentDirectory)
 		return False
+
+	os.chmod(path + filename, 0444)
 	command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (item.game_mod, path + filename)
 	print(command)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
+	os.chmod(path + filename, 0644)
 	try:
 		shutil.move(parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
 		os.chdir(currentDirectory)
@@ -537,38 +549,4 @@ def GenerateMinimap(item, parser=settings.OPENRA_ROOT_PATH + list(reversed( sett
 	except:
 		os.chdir(currentDirectory)
 		print('Failed to generate minimap: %s' % item.id)
-		return False
-
-def GenerateFullPreview(item, userObject, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
-	currentDirectory = os.getcwd() + os.sep
-	
-	os.chdir(parser + "/")
-
-	path = currentDirectory + 'openraData/data/maps/' + str(item.id) + os.sep
-	filename = ""
-	Dir = os.listdir(path)
-	for fn in Dir:
-		if fn.endswith('.oramap'):
-			filename = fn
-			break
-	if filename == "":
-		os.chdir(currentDirectory)
-		return False
-	command = 'mono --debug OpenRA.Utility.exe %s --full-preview %s' % (item.game_mod, path + filename)
-	print(command)
-	proc = Popen(command.split(), stdout=PIPE).communicate()
-	try:
-		shutil.move(parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-full.png")
-		transac = Screenshots(
-				user = userObject,
-				ex_id = item.id,
-				ex_name = "maps",
-				posted =  timezone.now(),
-				map_preview = True,
-		)
-		transac.save()
-		os.chdir(currentDirectory)
-		return True
-	except:
-		os.chdir(currentDirectory)
 		return False

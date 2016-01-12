@@ -25,16 +25,13 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, utility
-from openraData.models import Maps, Lints, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
+from openraData.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 
 def index(request):
 	scObject = Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
-	if request.user.id:
-		newcomments = len(ReadComments.objects.filter(owner=request.user.id))
-	else:
-		newcomments = False
+
 	template = loader.get_template('index.html')
 	template_args = {
 		'content': 'index_content.html',
@@ -42,7 +39,6 @@ def index(request):
 		'http_host': request.META['HTTP_HOST'],
 		'title': '',
 		'screenshots': scObject,
-		'newcomments': newcomments,
 	}
 	if settings.SITE_MAINTENANCE:
 		template_args['content'] = 'service/maintenance.html'
@@ -74,6 +70,8 @@ def search(request):
 		if request.POST.get('qsearch', "").strip() == "":
 			return HttpResponseRedirect('/')
 		search_request = request.POST.get('qsearch', "").strip()
+	else:
+		return HttpResponseRedirect('/')
 	global_search_request = {}
 	global_search_request['maps'] = {'amount': 0, 'hash': None, 'title': None, 'info': None}
 
@@ -231,6 +229,41 @@ def activelyDevelopedMap(request):
 	mapObject = random.choice(mapObject)
 	return HttpResponseRedirect('/maps/'+str(mapObject.id))
 
+def displayReplay(request, arg):
+	try:
+		orarepObj = Replays.objects.get(id=arg)
+	except:
+		return HttpResponseRedirect('/')
+
+	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/replays/' + arg
+	disk_size = os.path.getsize(path + '/' + arg + '.orarep')
+	disk_size = misc.sizeof_fmt(disk_size)
+
+	reportedByUser = False
+	reports = []
+	reportObject = Reports.objects.filter(ex_id=orarepObj.id, ex_name='replays')
+	for item in reportObject:
+		reports.append([item.user.username, item.reason, item.infringement, item.posted])
+		if item.user_id == request.user.id:
+			reportedByUser = True
+
+	template = loader.get_template('index.html')
+	context = RequestContext(request, {
+		'content': 'displayReplay.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Replay details - ' + arg,
+		'orarep': orarepObj,
+		'reports': reports,
+		'reported': reportedByUser,
+		'screenshots': 0,
+		'disk_size': disk_size,
+		'duplicates': 0,
+	})
+	return StreamingHttpResponse(template.render(context))
+
+
+
 def displayMap(request, arg):
 	if request.method == 'POST':
 		if request.POST.get('reportReason', "").strip() != "":
@@ -383,6 +416,7 @@ def displayMap(request, arg):
 
 	lints = []
 	lintObject = Lints.objects.filter(map_id=mapObject.id, item_type='maps')
+	lintObject = sorted(lintObject, key=lambda x: (x.posted), reverse=False)
 	for lint_item in lintObject:
 		lints.append([lint_item.version_tag, lint_item.pass_status, lint_item.lint_output])
 
@@ -552,6 +586,19 @@ def serveMinimap(request, arg):
 	response['Content-Disposition'] = 'attachment; filename = %s' % minimap
 	return response
 
+def serveReplay(request, arg):
+	orarep = ""
+	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/replays/' + arg + '/' + arg + '.orarep'
+	if not os.path.isfile(path):
+		return HttpResponseRedirect('/replays/'+arg)
+
+	response = StreamingHttpResponse(open(path), content_type='application/octet-stream')
+	response['Content-Disposition'] = 'attachment; filename = %s' % arg+'.orarep'
+	response['Content-Length'] = os.path.getsize(path)
+	Replays.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
+	return response
+
+
 def serveOramap(request, arg, sync=""):
 	oramap = ""
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
@@ -718,6 +765,43 @@ def DeleteMap(request, arg):
 	})
 	return StreamingHttpResponse(template.render(context))
 
+def uploadReplay(request):
+	if not request.user.is_authenticated():
+		return HttpResponseRedirect('/replays/')
+	response = {'error': False, 'response': ''}
+
+	if request.method == 'POST':
+		if request.FILES.get('replay_file', None) != None:
+
+			replay_file = handlers.ReplayHandlers()
+			response = replay_file.process_uploading(request.user.id, request.FILES['replay_file'], request.POST)
+			if replay_file.UID:
+				if response['error'] == False:
+					return HttpResponseRedirect('/replays/' + str(replay_file.UID) + "/")
+
+	bleed_tag = None
+	if (settings.OPENRA_BLEED_HASH_FILE_PATH != ''):
+		bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
+		bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
+
+	template = loader.get_template('index.html')
+	template_args = {
+		'content': 'uploadReplay.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Uploading Replay',
+		'response': response,
+		'parsers': list(reversed( settings.OPENRA_VERSIONS.values() )),
+		'bleed_tag': bleed_tag,
+	}
+
+	if settings.SITE_MAINTENANCE:
+		template_args['content'] = 'service/maintenance.html'
+		template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
+
+	context = RequestContext(request, template_args)
+	return StreamingHttpResponse(template.render(context))
+
 def SetDownloadingStatus(request, arg):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/maps/'+arg)
@@ -872,14 +956,36 @@ def assets(request):
 	})
 	return StreamingHttpResponse(template.render(context))
 
-def replays(request):
+def replays(request, page=1):
+	perPage = 10
+	slice_start = perPage*int(page)-perPage
+	slice_end = perPage*int(page)
+	replayObject = Replays.objects.filter().order_by('-posted')
+	replayObject = sorted(replayObject, key=lambda x: (x.posted), reverse=True)
+	amount = len(replayObject)
+	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+	replayObject = replayObject[slice_start:slice_end]
+	amount_this_page = len(replayObject)
+	if amount_this_page == 0 and int(page) != 1:
+		return HttpResponseRedirect("/replays/")
+
 	template = loader.get_template('index.html')
-	context = RequestContext(request, {
+	template_args = {
 		'content': 'replays.html',
 		'request': request,
 		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Replays',
-	})
+		'replays': replayObject,
+		'page': int(page),
+		'range': [i+1 for i in range(rowsRange)],
+		'amount': amount,
+	}
+
+	if settings.SITE_MAINTENANCE:
+		template_args['content'] = 'service/maintenance.html'
+		template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
+
+	context = RequestContext(request, template_args)
 	return StreamingHttpResponse(template.render(context))
 
 def uploadUnit(request):

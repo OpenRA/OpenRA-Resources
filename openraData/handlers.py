@@ -4,6 +4,9 @@ import zipfile
 import string
 import re
 import signal
+import random
+import yaml
+import json
 from subprocess import Popen, PIPE
 import multiprocessing
 from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
@@ -11,15 +14,142 @@ from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
-from openraData.models import Maps, Lints, Units, Mods, Screenshots
+from openraData.models import Maps, Replays, ReplayPlayers, Lints, Units, Mods, Screenshots
 from openraData import utility, misc
+
+class ReplayHandlers():
+
+	def __init__(self):
+		self.replay_is_uploaded = False
+		self.UID = False
+		self.currentDirectory = os.getcwd() + os.sep    # web root
+
+	def process_uploading(self, user_id, replay_file, post):
+
+		parser_to_db = list(reversed( settings.OPENRA_VERSIONS.values() ))[0] # default parser = the latest
+		parser = settings.OPENRA_ROOT_PATH + parser_to_db
+
+		if post.get("parser", None) != None:
+			parser_to_db = post['parser']
+			parser = settings.OPENRA_ROOT_PATH + parser_to_db
+			if 'git' in parser:
+				parser = settings.OPENRA_BLEED_PARSER
+
+		response = {'error': False, 'response': ''}
+		tempname = '/tmp/' + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8)) + '.orarep'
+		with open(tempname, 'wb+') as destination:
+			for chunk in replay_file.chunks():
+				destination.write(chunk)
+
+		command = 'file -b --mime-type %s' % tempname
+		proc = Popen(command.split(), stdout=PIPE).communicate()
+		mimetype = proc[0].strip()
+		if not ( mimetype == 'application/octet-stream' and os.path.splitext(replay_file.name)[1].lower() == '.orarep' ):
+			response['error'] = True
+			response['response'] = 'Failed. Unsupported file type.'
+			return response
+
+		command = 'sha1sum %s' % tempname
+		proc = Popen(command.split(), stdout=PIPE).communicate()
+		sha1_hash = proc[0].split()[0].strip()
+
+		sha1sum_exists = Replays.objects.filter(sha1sum=sha1_hash,user=user_id)
+		if sha1sum_exists:
+			response['error'] = True
+			response['response'] = 'Failed. You have already uploaded this replay.'
+			return response
+
+
+		replay_metadata = self.get_replay_metadata(tempname, parser)
+
+		if not replay_metadata:
+			response['error'] = True
+			response['response'] = 'Failed to fetch replay metadata.'
+			return response
+
+		userObject = User.objects.get(pk=user_id)
+		transac = Replays(
+			user = userObject,
+			info = post['replay_info'].strip(),
+			metadata = json.dumps(replay_metadata),
+
+			game_mod = replay_metadata['Mod'],
+			map_hash = replay_metadata['MapUid'],
+			version = replay_metadata['Version'],
+			start_time = replay_metadata['StartTimeUtc'],
+			end_time = replay_metadata['EndTimeUtc'],
+
+			sha1sum = sha1_hash,
+			parser = parser_to_db,
+			posted = timezone.now(),
+		)
+		transac.save()
+		self.UID = transac.id
+
+		for pl_key, pl_value in replay_metadata['Players'].iteritems():
+			transac_player = ReplayPlayers(
+				user = userObject,
+				replay_id = transac.id,
+
+				client_index = replay_metadata['Players'][pl_key]['ClientIndex'],
+				color = replay_metadata['Players'][pl_key]['Color'],
+				faction_id = replay_metadata['Players'][pl_key]['FactionId'],
+				faction_name = replay_metadata['Players'][pl_key]['FactionName'],
+				is_bot = replay_metadata['Players'][pl_key]['IsBot'],
+				is_human = replay_metadata['Players'][pl_key]['IsHuman'],
+				is_random_faction = replay_metadata['Players'][pl_key]['IsRandomFaction'],
+				is_random_spawn = replay_metadata['Players'][pl_key]['IsRandomSpawnPoint'],
+				name = replay_metadata['Players'][pl_key]['Name'],
+				outcome = replay_metadata['Players'][pl_key]['Outcome'],
+				outcome_timestamp = replay_metadata['Players'][pl_key]['OutcomeTimestampUtc'],
+				spawn_point = replay_metadata['Players'][pl_key]['SpawnPoint'],
+				team = replay_metadata['Players'][pl_key]['Team'],
+
+				posted = timezone.now(),
+			)
+			transac_player.save()
+
+		replay_directory = self.currentDirectory + __name__.split('.')[0] + '/data/replays/' + str(self.UID) + '/'
+		if not os.path.exists( replay_directory ):
+			os.makedirs( replay_directory )
+
+		shutil.move(tempname, replay_directory + str(self.UID) + '.orarep')
+
+		self.replay_is_uploaded = True
+
+		response['error'] = False
+		response['response'] = replay_metadata
+		return response
+
+	def get_replay_metadata(self, fullpath, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
+		os.chdir(parser + "/")
+
+		command = 'mono --debug OpenRA.Utility.exe ra --replay-metadata ' + fullpath
+		proc = Popen(command.split(), stdout=PIPE).communicate()
+
+		replay_metadata = ""
+		for res in proc:
+			if res == None:
+				continue
+			lines = res.split("\n")
+			for line in lines:
+				if '.orarep' in line:
+					continue
+				else:
+					if line.strip() != "":
+						replay_metadata += line + "\n"
+
+		replay_metadata = yaml.load(re.sub('\t', '    ', replay_metadata))
+
+		os.chdir(self.currentDirectory)
+		return replay_metadata
+
 
 class MapHandlers():
 	
 	def __init__(self, map_full_path_filename="", map_full_path_directory="", preview_filename=""):
 		self.map_is_uploaded = False
 		self.minimap_generated = False
-		self.fullpreview_generated = False
 		self.maphash = ""
 		self.LintPassed = False
 		self.advanced_map = False
@@ -106,6 +236,11 @@ class MapHandlers():
 
 		### Check if user has already uploaded the same map
 		self.GetHash(tempname, parser)
+		if 'Converted' in self.maphash and 'to MapFormat' in self.maphash:
+			self.LOG.append('Failed to upload with this parser. MapFormat does not match. Try to upgrade your map or use different parser.')
+			misc.send_email_to_admin_OnMapFail(tempname)
+			return 'Failed to upload with this parser. MapFormat does not match. Try to upgrade your map or use different parser.'
+
 		userObject = User.objects.get(pk=user_id)
 		try:
 			hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
@@ -207,7 +342,6 @@ class MapHandlers():
 			Maps.objects.filter(id=transac.id).update(requires_upgrade=True)
 
 		self.GenerateMinimap(resp_map_data['game_mod'], parser)
-		#self.GenerateFullPreview(userObject, resp_map_data['game_mod'], parser)
 
 		shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(resp_map_data['game_mod'], parser,), name='shppreview')
 		shp.start()
@@ -227,8 +361,13 @@ class MapHandlers():
 
 		os.chdir(parser + "/")
 
+		os.chmod(filepath, 0444)
+
 		command = 'mono --debug OpenRA.Utility.exe ra --map-hash ' + filepath
 		proc = Popen(command.split(), stdout=PIPE).communicate()
+
+		os.chmod(filepath, 0644)
+
 		self.maphash = proc[0].strip()
 		self.LOG.append(self.maphash)
 
@@ -237,8 +376,10 @@ class MapHandlers():
 	def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 		os.chdir(parser + "/")
 
+		os.chmod(self.map_full_path_filename, 0444)
 		command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (game_mod, self.map_full_path_filename)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
+		os.chmod(self.map_full_path_filename, 0644)
 
 		try:
 			shutil.move(misc.addSlash(parser + "/") + self.preview_filename,
@@ -247,30 +388,6 @@ class MapHandlers():
 			self.minimap_generated = True
 		except:
 			self.flushLog( ["Failed to generate minimap for this file."] )        
-
-		os.chdir(self.currentDirectory)
-
-	def GenerateFullPreview(self, userObject, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
-		os.chdir(parser)
-
-		command = 'mono --debug OpenRA.Utility.exe %s--full-preview %s' % (game_mod, self.map_full_path_filename)
-		proc = Popen(command.split(), stdout=PIPE).communicate()
-
-		try:
-			shutil.move(misc.addSlash(parser + "/") + self.preview_filename,
-				self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-full.png")
-			self.flushLog(proc)
-			self.fullpreview_generated = True
-			transac = Screenshots(
-				user = userObject,
-				ex_id = int(self.UID),
-				ex_name = "maps",
-				posted =  timezone.now(),
-				map_preview = True,
-				)
-			transac.save()
-		except:
-			self.flushLog( ["Failed to generate fullpreview for this file."] )
 
 		os.chdir(self.currentDirectory)
 

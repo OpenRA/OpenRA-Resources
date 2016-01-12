@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 class UserOptions(models.Model):
 
@@ -79,7 +80,7 @@ class Lints(models.Model):
 	map_id              = models.IntegerField(default=0)
 	version_tag         = models.CharField(max_length=100, default="release-20141029")
 	pass_status         = models.BooleanField(default=False)
-	lint_output         = models.CharField(max_length=100000, default="")
+	lint_output         = models.CharField(max_length=1000000, default="")
 	posted              = models.DateTimeField('date of check')
 
 class Units(models.Model):
@@ -129,13 +130,45 @@ class Replays(models.Model):
 		verbose_name = 'Replay'
 
 	user                = models.ForeignKey(User)
-	title               = models.CharField(max_length=200)
-	info                = models.CharField(max_length=2000)
-	version             = models.CharField(max_length=50)
-	posted              = models.DateTimeField('date published')
+	info                = models.CharField(max_length=2000, default="")
+	metadata            = models.CharField(max_length=100000, default="")
+
+	game_mod            = models.CharField(max_length=100, default="")
+	map_hash            = models.CharField(max_length=200, default="")
+	version             = models.CharField(max_length=100, default="release-20141029")
+	start_time          = models.CharField(max_length=50, default="")
+	end_time            = models.CharField(max_length=50, default="")
+
+	sha1sum             = models.CharField(max_length=200, default="")
+	parser              = models.CharField(max_length=100, default="release-20141029")
+	posted              = models.DateTimeField('date published', default=datetime.datetime.now)
 	viewed              = models.IntegerField(default=0)
 	downloaded          = models.IntegerField(default=0)
 	rating              = models.FloatField(default=0.0)
+
+class ReplayPlayers(models.Model):
+
+	class Meta:
+		verbose_name = "ReplayPlayer"
+
+	user                = models.ForeignKey(User)
+	replay_id           = models.IntegerField(default=0)
+
+	client_index        = models.IntegerField(default=0)
+	color               = models.CharField(max_length=30)
+	faction_id          = models.CharField(max_length=50)
+	faction_name        = models.CharField(max_length=50)
+	is_bot              = models.BooleanField(default=False)
+	is_human            = models.BooleanField(default=True)
+	is_random_faction   = models.BooleanField(default=False)
+	is_random_spawn     = models.BooleanField(default=False)
+	name                = models.CharField(max_length=1000)
+	outcome             = models.CharField(max_length=50)
+	outcome_timestamp   = models.CharField(max_length=50)
+	spawn_point         = models.IntegerField(default=0)
+	team                = models.IntegerField(default=0)
+
+	posted              = models.DateTimeField('date published', default=datetime.datetime.now)
 
 class Palettes(models.Model):
 
