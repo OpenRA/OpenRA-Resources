@@ -604,6 +604,7 @@ def uploadMap(request, previous_rev=0):
 		'uid': uid,
 		'previous_rev': previous_rev,
 		'previous_rev_title': previous_rev_title,
+		'rev': rev,
 		'parsers': list(reversed( settings.OPENRA_VERSIONS.values() )),
 		'bleed_tag': bleed_tag,
 		'error_response': error_response,
