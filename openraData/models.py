@@ -2,35 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime
 
-class UserOptions(models.Model):
-
-	class Meta:
-		verbose_name = 'UserOption'
-
-	user                = models.ForeignKey(User)
-	notifications_email = models.BooleanField(default=False)
-	notifications_site  = models.BooleanField(default=True)
-
-class NotifyOfComments(models.Model):
-
-	class Meta:
-		verbose_name = 'NotifyOfComment'
-
-	user                = models.ForeignKey(User)
-	object_type         = models.CharField(max_length=50)
-	object_id           = models.IntegerField(default=0)
-
-class ReadComments(models.Model):
-
-	class Meta:
-		verbose_name = 'ReadComment'
-
-	owner               = models.ForeignKey(User)
-	object_type         = models.CharField(max_length=50)
-	object_id           = models.IntegerField(default=0)
-	comment_id          = models.IntegerField(default=0)
-	ifread              = models.BooleanField(default=False)
-
 class Maps(models.Model):
 
 	class Meta:

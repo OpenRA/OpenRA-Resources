@@ -23,9 +23,8 @@ from .forms import AddScreenshotForm
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, utility
-from openraData.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
+from openraData.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, Rating
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 
@@ -205,12 +204,6 @@ def mostRatedMap(request):
 	voteObject = random.choice(voteObject)
 	return HttpResponseRedirect('/maps/'+str(voteObject.id))
 
-def mostCommentedMap(request):
-	mapObject = Maps.objects.filter(next_rev=0)
-	comments = misc.count_comments_for_many(mapObject, 'map')
-	mapid = max(comments.iteritems(), key=operator.itemgetter(1))[0]
-	return HttpResponseRedirect('/maps/'+mapid)
-
 def mostViewedMap(request):
 	max_viewed = Maps.objects.all().aggregate(Max('viewed'))['viewed__max']
 	mapObject = Maps.objects.filter(viewed=max_viewed)
@@ -296,106 +289,6 @@ def displayMap(request, arg):
 			form = AddScreenshotForm(request.POST, request.FILES)
 			if form.is_valid():
 				handlers.addScreenshot(request.FILES['scfile'], arg, request.user, 'map')
-		elif request.POST.get('comment', "") != "" and request.POST.get('name', "") != "":
-			content_type = ContentType.objects.filter(name='Map')[0]
-			userObject = User.objects.filter(pk=request.user.id)
-			if not userObject:
-				userObject = None
-			else:
-				userObject = userObject[0]
-			if request.POST.get('email', "") != "":
-				email = request.POST['email']
-			else:
-				email = ""
-			transac = ThreadedComment(
-				content_type = content_type,
-				object_pk = int(request.POST['object_pk']),
-				user = userObject,
-				user_name = request.POST['name'],
-				user_email = email,
-				user_url = '',
-				comment = request.POST['comment'].strip(),
-				title = request.POST['title'],
-				submit_date = timezone.now(),
-				is_public = True,
-				is_removed = False,
-				site_id = 1,
-			)
-			transac.save()
-			comment_id = transac.id
-			mapObj = Maps.objects.get(id=arg)
-			if request.user.id:
-				userID = request.user.id
-			else:
-				userID = 0
-			ntfObj = NotifyOfComments.objects.filter(object_type='map',object_id=arg).exclude(user=userID).exclude(user=mapObj.user_id)
-			for item in ntfObj:
-				singleUserOptions = UserOptions.objects.filter(user=item.user_id)
-				mail_addr = misc.return_email(item.user_id)
-				if not singleUserOptions:
-					transac_uo = UserOptions(
-						user = User.objects.get(pk=item.user_id),
-						notifications_email = True,
-						notifications_site = True,
-					)
-					transac_uo.save()
-					transac_rc = ReadComments(
-						owner = User.objects.get(pk=mapObj.user_id),
-						object_type = 'map',
-						object_id = arg,
-						comment_id = comment_id,
-						ifread = False,
-					)
-					transac_rc.save()
-					if mail_addr:
-						misc.send_email_to_user_OnComment('map', arg, mail_addr)
-				else:
-					if singleUserOptions[0].notifications_email:
-						if mail_addr:
-							misc.send_email_to_user_OnComment('map', arg, mail_addr)
-					if singleUserOptions[0].notifications_site:
-						transac_rc = ReadComments(
-							owner = User.objects.get(pk=mapObj.user_id),
-							object_type = 'map',
-							object_id = arg,
-							comment_id = comment_id,
-							ifread = False,
-						)
-						transac_rc.save()
-			if not ntfObj:
-				transac_rc = ReadComments(
-					owner = User.objects.get(pk=mapObj.user_id),
-					object_type = 'map',
-					object_id = arg,
-					comment_id = comment_id,
-					ifread = False,
-				)
-				transac_rc.save()
-			ntfObj = NotifyOfComments.objects.filter(object_type='map',object_id=arg,user=userID)
-			if not ntfObj:
-				if userID != 0: # not anonymous
-					transac_noc = NotifyOfComments(
-						user = User.objects.get(pk=userID),
-						object_type = 'map',
-						object_id = arg,
-					)
-					transac_noc.save()
-			if mapObj.user_id != userID:
-				sOC = UserOptions.objects.filter(user=mapObj.user_id)
-				mail_addr = misc.return_email(mapObj.user_id)
-				if mail_addr:
-					if sOC:
-						if sOC[0].notifications_email:
-							misc.send_email_to_user_OnComment('map', arg, mail_addr, 'owner')
-					else:
-						transac_uo = UserOptions(
-							user = User.objects.get(pk=mapObj.user_id),
-							notifications_email = True,
-							notifications_site = True,
-						)
-						transac_uo.save()
-						misc.send_email_to_user_OnComment('map', arg, mail_addr, 'owner')
-			return HttpResponseRedirect('/maps/'+arg)
 	fullPreview = False
 	disk_size = 0
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
@@ -513,13 +406,6 @@ def deleteScreenshot(request, itemid):
 			scObject[0].delete()
 			return HttpResponseRedirect("/"+name+"/"+arg)
 	return HttpResponseRedirect("/")
-
-def deleteComment(request, arg, itemname, itemid):
-	comObject = ThreadedComment.objects.filter(id=arg)
-	if comObject:
-		if comObject[0].user == request.user or request.user.is_superuser:
-			comObject[0].delete()
-	return HttpResponseRedirect("/"+itemname+"/"+itemid)
 
 def serveScreenshot(request, itemid, itemname=""):
 	image = ""
@@ -748,7 +634,6 @@ def DeleteMap(request, arg):
 		Screenshots.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
 		Reports.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
 		Lints.objects.filter(map_id=mapObject.id, item_type='maps').delete()
-		ThreadedComment.objects.filter(object_pk=mapObject.id, title='map').delete()
 		if mapObject.pre_rev != 0:
 			Maps.objects.filter(id=mapObject.pre_rev).update(next_rev=mapObject.next_rev)
 		if mapObject.next_rev != 0:
@@ -1035,10 +920,6 @@ def handle404(request):
 	return StreamingHttpResponse(template.render(context))
 
 def profile(request):
-	if request.user.id:
-		newcomments = len(ReadComments.objects.filter(owner=request.user.id))
-	else:
-		newcomments = False
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/')
 	mapObject = Maps.objects.filter(user_id=request.user.id,next_rev=0)
@@ -1055,7 +936,6 @@ def profile(request):
 		'title': ' - Profile',
 		'amountMaps': amountMaps,
 		'ifsocial': ifsocial,
-		'newcomments': newcomments,
 	})
 	return StreamingHttpResponse(template.render(context))
 

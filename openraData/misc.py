@@ -6,7 +6,6 @@ from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from threadedcomments.models import ThreadedComment
 from openraData.models import Maps, Units, Mods, Screenshots, Reports
 
 def selectLicenceInfo(itemObject):
@@ -139,7 +138,7 @@ def count_comments_for_many(mapObject, content):
 		revs = Revisions(content)
 		revisions = revs.GetRevisions(item.id)
 		for rev in revisions:
-			comments[str(item.id)] = len(ThreadedComment.objects.filter(title=content.lower(), object_pk=str(rev)))
+			comments[str(item.id)] = 0
 	return comments
 
 ########## Revisions
