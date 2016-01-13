@@ -736,7 +736,7 @@ def MapRevisions(request, arg, page=1):
 	slice_end = perPage*int(page)
 	revs = misc.Revisions('map')
 	revisions = revs.GetRevisions(arg)
-	mapObject = Maps.objects.filter(id__in=revisions).order_by('-posted')
+	mapObject = Maps.objects.filter(id__in=revisions).order_by('-revision', '-posted')
 	amount = len(mapObject)
 	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
 	mapObject = mapObject[slice_start:slice_end]

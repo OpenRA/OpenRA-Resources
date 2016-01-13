@@ -70,7 +70,7 @@ textarea {
   word-wrap: break-word;
 }
 
-.cBlock p, .cBlock ul {
+.cBlock p, .cBlock ul, .cBlock label {
   font-size: 0.9em;
 }
 
@@ -909,7 +909,7 @@ p.registerInfo {
       cursor: pointer;
     }
     #changePasswordForm label {
-      font-size: 12px;
+      font-size: 13px;
       width: 140px;
       display: inline-block;
     }
@@ -1534,7 +1534,6 @@ p.registerInfo {
 }
 
 .map-store-info {
-  font-size: 0.9em;
   margin-right: 2px;
 }
 
@@ -1590,7 +1589,6 @@ p.registerInfo {
 
 /* Replays and Replay detail pages */
 .bottom-store-info {
-  font-size: 0.9em;
   margin-right: 2px;
 }
 
