@@ -178,9 +178,10 @@ def get_comments_for_all_revisions(request, item_type, item_id):
 				current_user_commented = True
 		
 		unsubscribed = False
-		unsubObj = UnsubscribeComments.objects.filter(item_type=item_type, item_id=rev, user=request.user)
-		if unsubObj:
-			unsubscribed = True
+		if request:
+			unsubObj = UnsubscribeComments.objects.filter(item_type=item_type, item_id=rev, user=request.user)
+			if unsubObj:
+				unsubscribed = True
 
 		comments.append([current_rev, commentsObj, current_user_commented, unsubscribed])
 	return list(reversed(comments))
