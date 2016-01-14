@@ -1692,58 +1692,25 @@ p.registerInfo {
 .post_comment textarea {
   width: 99%;
   height: 100px;
-  font-size: 0.9em;
 }
 
 .cBlock_comments {
   border-left: 1px solid #74c2e7;
   border-right: 1px solid #74c2e7;
   border-bottom: 1px solid #74c2e7;
-
-  padding-left: 14px;
-  padding-right: 14px;
-  padding-top: 14px;
 }
-
-.commentUser {
-
-}
-
-.commentMsg {
-  position: relative;
-  background: rgba(32, 44, 69, 0.4);
-  border: 1px solid #74c2e7;
-  word-wrap: break-word;
-  margin: 10px 0 0 0;
-  padding: 6px;
-  margin-bottom: 20px;
-}
-
-.commentMsg p {
+.cBlock_comment {
+  border-bottom: 1px dashed #74c2e7;
+  padding: 8px;
   margin: 0px;
+  background: rgba(32, 44, 69, 0.4);
+  word-wrap: break-word;
 }
 
-.commentMsg:after, .commentMsg:before {
-  bottom: 100%;
-  left: 9%;
-  border: 2px solid transparent;
-  content: " ";
-  height: 0;
-  width: 0;
-  position: absolute;
-  pointer-events: none;
+.cBlock_comments:nth-child(2) {
+  background: none;
 }
 
-.commentMsg:after {
-  border-color: rgba(136, 183, 213, 0);
-  border-bottom-color: rgba(32, 69, 108, 0.95);
-  border-width: 6px;
-  margin-left: -6px;
-}
-
-.commentMsg:before {
-  border-color: rgba(194, 225, 245, 0);
-  border-bottom-color: #74c2e7;
-  border-width: 8px;
-  margin-left: -8px;
+.cBlock_comments div:last-child {
+  border-bottom: none;
 }

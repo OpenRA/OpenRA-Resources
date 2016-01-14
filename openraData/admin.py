@@ -11,6 +11,8 @@ from openraData.models import Screenshots
 from openraData.models import Reports
 from openraData.models import Rating
 from openraData.models import ReplayPlayers
+from openraData.models import Comments
+from openraData.models import UnsubscribeComments
 
 admin.site.register(Maps)
 admin.site.register(Lints)
@@ -23,3 +25,5 @@ admin.site.register(CrashReports)
 admin.site.register(Screenshots)
 admin.site.register(Reports)
 admin.site.register(Rating)
+admin.site.register(Comments)
+admin.site.register(UnsubscribeComments)

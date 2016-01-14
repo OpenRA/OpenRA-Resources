@@ -222,6 +222,41 @@
                     {% endif %}
 
 
+                    {% if comments %}
+                        <a name="comments"></a>
+                        
+                        {% for revision_comments in comments %}
+                            {% if revision_comments.1 %}
+                                <div class="cBlock">
+                                    <h5>Comments for <a href="{{revision_comments.0.revision|map_id_of_rev:map}}" title="{{revision_comments.0.revision|map_title_of_rev:map}}">revision {{revision_comments.0.revision}}</a>{% if map.revision == revision_comments.0.revision %} (current){% endif %}{% if request.user.is_authenticated and revision_comments.2 and request.user != map.user and revision_comments.3 != True %} (<a href="{{revision_comments.0.revision|map_id_of_rev:map}}/unsubscribe/" title="Unsubscribe from comments to this revision">unsubscribe</a>){% elif request.user.is_authenticated and revision_comments.2 and request.user != map.user and revision_comments.3 == True%} (<a href="{{revision_comments.0.revision|map_id_of_rev:map}}/unsubscribe/" title="Subscribe back to comments to this revision">subscribe</a>){% endif %}:</h5>
+                                </div>
+
+                                <div class="cBlock_comments">
+                                    {% for comment in revision_comments.1 %}
+
+                                        {% autoescape off %}
+                                        <div class="commentUser">{{comment.user.username|account_link:comment.user.id}} commented on {{comment.posted}}{% if request.user.id == comment.user.id %} (<a href="/deletecomment/{{comment.id}}/maps/{{map.id}}/" onClick='return confirmDelete("comment")' title='delete comment'>メ</a>){% endif %}</div>
+                                        <div class="commentMsg">{{comment.content|strip_tags|convert_links|linebreaks}}</div>
+                                        {% endautoescape %}
+
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                    {% endif %}
+
+
+                    {% if request.user.is_authenticated %}
+                        <div class='cBlock'>
+                            <form class='post_comment' method='POST' action='{{request.path}}#comments'>{% csrf_token %}
+                                <textarea name='comment'></textarea>
+                                <input type='submit' value="Comment" class='button'>
+                            </form>
+                        </div>
+                    {% endif %}
+
+
                     {% if license %}
                     <div class="map_license cBlock">
                         <div>
