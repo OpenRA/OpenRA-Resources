@@ -179,7 +179,7 @@ def get_comments_for_all_revisions(request, item_type, item_id):
 		
 		unsubscribed = False
 		if request.user.is_authenticated:
-			unsubObj = UnsubscribeComments.objects.filter(item_type=item_type, item_id=rev, user=request.user)
+			unsubObj = UnsubscribeComments.objects.filter(item_type=item_type, item_id=rev, user=request.user.id)
 			if unsubObj:
 				unsubscribed = True
 

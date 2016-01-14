@@ -449,15 +449,15 @@ def deleteComment(request, arg, item_type, item_id):
 		if comObject[0].user == request.user or request.user.is_superuser:
 			Comments.objects.filter(id=arg).update(is_removed=True)
 
-			coms_exist_for_map_for_user = Comments.objects.filter(id=arg, is_removed=False, user=request.user)
+			coms_exist_for_map_for_user = Comments.objects.filter(id=arg, is_removed=False, user=request.user.id)
 			if not coms_exist_for_map_for_user:
-				UnsubscribeComments.objects.filter(item_type=item_type, item_id=item_id, user=request.user).delete()
+				UnsubscribeComments.objects.filter(item_type=item_type, item_id=item_id, user=request.user.id).delete()
 
 	return HttpResponseRedirect("/"+item_type+"/"+item_id+"/")
 
 def unsubscribe_from_comments(request, item_type, arg):
 	if request.user.is_authenticated:
-		unsubObj = UnsubscribeComments.objects.filter(user=request.user)
+		unsubObj = UnsubscribeComments.objects.filter(user=request.user.id)
 		if not unsubObj:
 			transac = UnsubscribeComments(
 				user = request.user,
