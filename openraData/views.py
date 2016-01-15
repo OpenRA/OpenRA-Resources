@@ -23,9 +23,8 @@ from .forms import AddScreenshotForm
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from threadedcomments.models import ThreadedComment
 from openraData import handlers, misc, utility
-from openraData.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, NotifyOfComments, ReadComments, UserOptions, Rating
+from openraData.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 
@@ -114,7 +113,7 @@ def ControlPanel(request, page=1, filter=""):
 	if len(mapObject) == 0 and int(page) != 1:
 		return HttpResponseRedirect("/panel/")
 
-	comments = misc.count_comments_for_many(mapObject, 'map')
+	comments = misc.count_comments_for_many(mapObject, 'maps')
 
 	template = loader.get_template('index.html')
 	context = RequestContext(request, {
@@ -143,7 +142,7 @@ def maps(request, page=1, filter=""):
 	if amount_this_page == 0 and int(page) != 1:
 		return HttpResponseRedirect("/maps/")
 
-	comments = misc.count_comments_for_many(mapObject, 'map')
+	comments = misc.count_comments_for_many(mapObject, 'maps')
 
 	template = loader.get_template('index.html')
 	template_args = {
@@ -177,7 +176,7 @@ def mapsFromAuthor(request, author, page=1):
 	if len(mapObject) == 0 and int(page) != 1:
 		return HttpResponseRedirect("/maps/author/%s/" % author)
 
-	comments = misc.count_comments_for_many(mapObject, 'map')
+	comments = misc.count_comments_for_many(mapObject, 'maps')
 
 	template = loader.get_template('index.html')
 	context = RequestContext(request, {
@@ -197,37 +196,37 @@ def mapsFromAuthor(request, author, page=1):
 def randomMap(request):
 	mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
 	mapObject = random.choice(mapObject)
-	return HttpResponseRedirect('/maps/'+str(mapObject.id))
+	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
 
 def mostRatedMap(request):
 	max_rating = Maps.objects.all().aggregate(Max('rating'))['rating__max']
 	voteObject = Maps.objects.filter(rating=max_rating)
 	voteObject = random.choice(voteObject)
-	return HttpResponseRedirect('/maps/'+str(voteObject.id))
+	return HttpResponseRedirect('/maps/'+str(voteObject.id)+'/')
 
 def mostCommentedMap(request):
 	mapObject = Maps.objects.filter(next_rev=0)
-	comments = misc.count_comments_for_many(mapObject, 'map')
+	comments = misc.count_comments_for_many(mapObject, 'maps')
 	mapid = max(comments.iteritems(), key=operator.itemgetter(1))[0]
-	return HttpResponseRedirect('/maps/'+mapid)
+	return HttpResponseRedirect('/maps/'+mapid+'/')
 
 def mostViewedMap(request):
 	max_viewed = Maps.objects.all().aggregate(Max('viewed'))['viewed__max']
 	mapObject = Maps.objects.filter(viewed=max_viewed)
 	mapObject = random.choice(mapObject)
-	return HttpResponseRedirect('/maps/'+str(mapObject.id))
+	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
 
 def mostDownloadedMap(request):
 	max_downloaded = Maps.objects.all().aggregate(Max('downloaded'))['downloaded__max']
 	mapObject = Maps.objects.filter(downloaded=max_downloaded)
 	mapObject = random.choice(mapObject)
-	return HttpResponseRedirect('/maps/'+str(mapObject.id))
+	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
 
 def activelyDevelopedMap(request):
 	max_developed = Maps.objects.all().aggregate(Max('revision'))['revision__max']
 	mapObject = Maps.objects.filter(revision=max_developed)
 	mapObject = random.choice(mapObject)
-	return HttpResponseRedirect('/maps/'+str(mapObject.id))
+	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
 
 def displayReplay(request, arg):
 	try:
@@ -296,106 +295,33 @@ def displayMap(request, arg):
 			form = AddScreenshotForm(request.POST, request.FILES)
 			if form.is_valid():
 				handlers.addScreenshot(request.FILES['scfile'], arg, request.user, 'map')
-		elif request.POST.get('comment', "") != "" and request.POST.get('name', "") != "":
-			content_type = ContentType.objects.filter(name='Map')[0]
-			userObject = User.objects.filter(pk=request.user.id)
-			if not userObject:
-				userObject = None
-			else:
-				userObject = userObject[0]
-			if request.POST.get('email', "") != "":
-				email = request.POST['email']
-			else:
-				email = ""
-			transac = ThreadedComment(
-				content_type = content_type,
-				object_pk = int(request.POST['object_pk']),
-				user = userObject,
-				user_name = request.POST['name'],
-				user_email = email,
-				user_url = '',
-				comment = request.POST['comment'].strip(),
-				title = request.POST['title'],
-				submit_date = timezone.now(),
-				is_public = True,
+		elif request.POST.get('comment', "") != "":
+			transac = Comments(
+				item_type = 'maps',
+				item_id = int(arg),
+				user = request.user,
+				content = request.POST['comment'].strip(),
+				posted = timezone.now(),
 				is_removed = False,
-				site_id = 1,
 			)
 			transac.save()
-			comment_id = transac.id
-			mapObj = Maps.objects.get(id=arg)
-			if request.user.id:
-				userID = request.user.id
-			else:
-				userID = 0
-			ntfObj = NotifyOfComments.objects.filter(object_type='map',object_id=arg).exclude(user=userID).exclude(user=mapObj.user_id)
-			for item in ntfObj:
-				singleUserOptions = UserOptions.objects.filter(user=item.user_id)
-				mail_addr = misc.return_email(item.user_id)
-				if not singleUserOptions:
-					transac_uo = UserOptions(
-						user = User.objects.get(pk=item.user_id),
-						notifications_email = True,
-						notifications_site = True,
-					)
-					transac_uo.save()
-					transac_rc = ReadComments(
-						owner = User.objects.get(pk=mapObj.user_id),
-						object_type = 'map',
-						object_id = arg,
-						comment_id = comment_id,
-						ifread = False,
-					)
-					transac_rc.save()
-					if mail_addr:
-						misc.send_email_to_user_OnComment('map', arg, mail_addr)
-				else:
-					if singleUserOptions[0].notifications_email:
-						if mail_addr:
-							misc.send_email_to_user_OnComment('map', arg, mail_addr)
-					if singleUserOptions[0].notifications_site:
-						transac_rc = ReadComments(
-							owner = User.objects.get(pk=mapObj.user_id),
-							object_type = 'map',
-							object_id = arg,
-							comment_id = comment_id,
-							ifread = False,
-						)
-						transac_rc.save()
-			if not ntfObj:
-				transac_rc = ReadComments(
-					owner = User.objects.get(pk=mapObj.user_id),
-					object_type = 'map',
-					object_id = arg,
-					comment_id = comment_id,
-					ifread = False,
-				)
-				transac_rc.save()
-			ntfObj = NotifyOfComments.objects.filter(object_type='map',object_id=arg,user=userID)
-			if not ntfObj:
-				if userID != 0: # not anonymous
-					transac_noc = NotifyOfComments(
-						user = User.objects.get(pk=userID),
-						object_type = 'map',
-						object_id = arg,
-					)
-					transac_noc.save()
-			if mapObj.user_id != userID:
-				sOC = UserOptions.objects.filter(user=mapObj.user_id)
-				mail_addr = misc.return_email(mapObj.user_id)
-				if mail_addr:
-					if sOC:
-						if sOC[0].notifications_email:
-							misc.send_email_to_user_OnComment('map', arg, mail_addr, 'owner')
-					else:
-						transac_uo = UserOptions(
-							user = User.objects.get(pk=mapObj.user_id),
-							notifications_email = True,
-							notifications_site = True,
-						)
-						transac_uo.save()
-						misc.send_email_to_user_OnComment('map', arg, mail_addr, 'owner')
-			return HttpResponseRedirect('/maps/'+arg)
+
+			commented_map_obj = Maps.objects.get(id=arg)
+			if commented_map_obj.user != request.user:
+				misc.send_email_to_user_OnComment('maps', arg, commented_map_obj.user.email, info="owner")
+
+			comsObj = Comments.objects.filter(item_type='maps', item_id=arg, is_removed=False)
+			if comsObj:
+				for com in comsObj:
+					if com.user != request.user and com.user != commented_map_obj.user:
+
+						unsubObj = UnsubscribeComments.objects.filter(item_type='maps', item_id=arg, user=com.user)
+
+						if not unsubObj:
+							misc.send_email_to_user_OnComment('maps', arg, com.user.email)
+
+			return HttpResponseRedirect('/maps/' + arg + '/')
+
 	fullPreview = False
 	disk_size = 0
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
@@ -468,6 +394,8 @@ def displayMap(request, arg):
 	ratesAmount = Rating.objects.filter(ex_id=mapObject.id,ex_name='map')
 	ratesAmount = len(ratesAmount)
 
+	comments = misc.get_comments_for_all_revisions(request, 'maps', arg)
+
 	license, icons = misc.selectLicenceInfo(mapObject)
 	userObject = User.objects.get(pk=mapObject.user_id)
 	Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -496,6 +424,7 @@ def displayMap(request, arg):
 		'ratesAmount': ratesAmount,
 		'REPORTS_PENALTY_AMOUNT': settings.REPORTS_PENALTY_AMOUNT,
 		'lints': lints,
+		'comments': comments,
 	})
 	return StreamingHttpResponse(template.render(context))
 
@@ -514,12 +443,33 @@ def deleteScreenshot(request, itemid):
 			return HttpResponseRedirect("/"+name+"/"+arg)
 	return HttpResponseRedirect("/")
 
-def deleteComment(request, arg, itemname, itemid):
-	comObject = ThreadedComment.objects.filter(id=arg)
+def deleteComment(request, arg, item_type, item_id):
+	comObject = Comments.objects.filter(id=arg)
 	if comObject:
 		if comObject[0].user == request.user or request.user.is_superuser:
-			comObject[0].delete()
-	return HttpResponseRedirect("/"+itemname+"/"+itemid)
+			Comments.objects.filter(id=arg).update(is_removed=True)
+
+			coms_exist_for_map_for_user = Comments.objects.filter(id=arg, is_removed=False, user=request.user.id)
+			if not coms_exist_for_map_for_user:
+				UnsubscribeComments.objects.filter(item_type=item_type, item_id=item_id, user=request.user.id).delete()
+
+	return HttpResponseRedirect("/"+item_type+"/"+item_id+"/")
+
+def unsubscribe_from_comments(request, item_type, arg):
+	if request.user.is_authenticated:
+		unsubObj = UnsubscribeComments.objects.filter(user=request.user.id)
+		if not unsubObj:
+			transac = UnsubscribeComments(
+				user = request.user,
+				item_type = item_type,
+				item_id = arg,
+				unsubscribed = timezone.now(),
+			)
+			transac.save()
+		else:
+			unsubObj.delete()
+
+	return HttpResponseRedirect("/" + item_type + "/" + arg + "/")
 
 def serveScreenshot(request, itemid, itemname=""):
 	image = ""
@@ -718,6 +668,7 @@ def uploadMap(request, previous_rev=0):
 		'uid': uid,
 		'previous_rev': previous_rev,
 		'previous_rev_title': previous_rev_title,
+		'rev': rev,
 		'parsers': list(reversed( settings.OPENRA_VERSIONS.values() )),
 		'bleed_tag': bleed_tag,
 		'error_response': error_response,
@@ -747,8 +698,9 @@ def DeleteMap(request, arg):
 			pass
 		Screenshots.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
 		Reports.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
+		Comments.objects.filter(item_id=mapObject.id, item_type='maps').delete()
+		UnsubscribeComments.objects.filter(item_id=mapObject.id, item_type='maps').delete()
 		Lints.objects.filter(map_id=mapObject.id, item_type='maps').delete()
-		ThreadedComment.objects.filter(object_pk=mapObject.id, title='map').delete()
 		if mapObject.pre_rev != 0:
 			Maps.objects.filter(id=mapObject.pre_rev).update(next_rev=mapObject.next_rev)
 		if mapObject.next_rev != 0:
@@ -849,16 +801,16 @@ def MapRevisions(request, arg, page=1):
 	perPage = 20
 	slice_start = perPage*int(page)-perPage
 	slice_end = perPage*int(page)
-	revs = misc.Revisions('map')
+	revs = misc.Revisions('maps')
 	revisions = revs.GetRevisions(arg)
-	mapObject = Maps.objects.filter(id__in=revisions).order_by('-posted')
+	mapObject = Maps.objects.filter(id__in=revisions).order_by('-revision', '-posted')
 	amount = len(mapObject)
 	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
 	mapObject = mapObject[slice_start:slice_end]
 	if len(mapObject) == 0 and int(page) != 1:
 		return HttpResponseRedirect("/maps/%s/revisions/" % arg)
 
-	comments = misc.count_comments_for_many(mapObject, 'map')
+	comments = misc.count_comments_for_many(mapObject, 'maps')
 
 	template = loader.get_template('index.html')
 	context = RequestContext(request, {
@@ -920,6 +872,37 @@ def screenshots(request):
 		'title': ' - Screenshots',
 	})
 	return StreamingHttpResponse(template.render(context))
+
+def comments(request, page=1):
+	perPage = 20
+	slice_start = perPage*int(page)-perPage
+	slice_end = perPage*int(page)
+
+	comments = Comments.objects.filter(is_removed=False).order_by('-posted')
+	amount = len(comments)
+	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+	comments = comments[slice_start:slice_end]
+	amount_this_page = len(comments)
+
+	last_comment_id_seen = request.COOKIES.get('last_comment_id_seen', comments[0].id)
+
+	template = loader.get_template('index.html')
+	context = RequestContext(request, {
+		'content': 'comments.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Comments',
+		'comments': comments,
+		'amount': amount,
+		'amount_this_page': amount_this_page,
+		'range': [i+1 for i in range(rowsRange)],
+		'page': int(page),
+		'last_comment_id_seen': int(last_comment_id_seen),
+	})
+	response = StreamingHttpResponse(template.render(context))
+	if int(page) == 1:
+		response.set_cookie('last_comment_id_seen', comments[0].id)
+	return response
 
 def assets(request):
 	noErrors = False
@@ -1035,10 +1018,6 @@ def handle404(request):
 	return StreamingHttpResponse(template.render(context))
 
 def profile(request):
-	if request.user.id:
-		newcomments = len(ReadComments.objects.filter(owner=request.user.id))
-	else:
-		newcomments = False
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/')
 	mapObject = Maps.objects.filter(user_id=request.user.id,next_rev=0)
@@ -1055,7 +1034,6 @@ def profile(request):
 		'title': ' - Profile',
 		'amountMaps': amountMaps,
 		'ifsocial': ifsocial,
-		'newcomments': newcomments,
 	})
 	return StreamingHttpResponse(template.render(context))
 

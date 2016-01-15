@@ -1,5 +1,7 @@
             {% load customTags %}
-            <h2>Found {{ amount }} revisions</h2>
+            <div class='cBlock no-pd-bot map-grid-header-info'>
+                <h3>Found {{ amount }} revisions</h3>
+            </div>
             {% if amount != 0 %}
             <div id="map_grid">
                 {% for item in maps %}

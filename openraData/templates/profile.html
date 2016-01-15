@@ -5,7 +5,6 @@
                     {% if ifsocial == False %}
                     <li><a href="/accounts/password/" {% if 'accounts/password/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Password</a></li>
                     {% endif %}
-                    <li><a href="/accounts/notifications/" {% if '/accounts/notifications/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Notifications</a></li>
                 </ul>
             </nav>
 
@@ -94,18 +93,6 @@
                 handlePasswordChanging();
                 </script>
 
-            {% endif %}
-            {% if '/accounts/notifications/' in request.path %}
-                <div>
-                    <form>
-                        <div class="checkbox">
-                            <input type="checkbox" value="1" id="checkboxInput" name="" />
-                            <label class="tick" for="checkboxInput"></label>
-                        </div>
-                        <label for="checkboxInput">Receive email notifications if my upload gets commented</label>
-                    </form>
-                    <p>- Does nothing yet -</p>
-                </div>
             {% endif %}
             </div>
             <div class="clear"></div>

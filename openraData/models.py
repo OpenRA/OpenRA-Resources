@@ -2,39 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime
 
-class UserOptions(models.Model):
-
-	class Meta:
-		verbose_name = 'UserOption'
-
-	user                = models.ForeignKey(User)
-	notifications_email = models.BooleanField(default=False)
-	notifications_site  = models.BooleanField(default=True)
-
-class NotifyOfComments(models.Model):
-
-	class Meta:
-		verbose_name = 'NotifyOfComment'
-
-	user                = models.ForeignKey(User)
-	object_type         = models.CharField(max_length=50)
-	object_id           = models.IntegerField(default=0)
-
-class ReadComments(models.Model):
-
-	class Meta:
-		verbose_name = 'ReadComment'
-
-	owner               = models.ForeignKey(User)
-	object_type         = models.CharField(max_length=50)
-	object_id           = models.IntegerField(default=0)
-	comment_id          = models.IntegerField(default=0)
-	ifread              = models.BooleanField(default=False)
-
 class Maps(models.Model):
 
 	class Meta:
 		verbose_name = 'Map'
+
+	def __unicode__(self):
+		return u'' + str(self.id)
 
 	user                = models.ForeignKey(User)
 	title               = models.CharField(max_length=200)
@@ -83,6 +57,34 @@ class Lints(models.Model):
 	lint_output         = models.CharField(max_length=1000000, default="")
 	posted              = models.DateTimeField('date of check')
 
+class Comments(models.Model):
+
+	class Meta:
+		verbose_name = 'Comment'
+
+	def __unicode__(self):
+		return u'' + self.item_type + ' ' + str(self.item_id) + ' by ' + self.user.username
+
+	user                = models.ForeignKey(User)
+	content             = models.CharField(max_length=10000)
+	item_type           = models.CharField(max_length=16, default="maps")
+	item_id             = models.IntegerField(default=0)
+	posted              = models.DateTimeField('date of comment')
+	is_removed          = models.BooleanField(default=False)
+
+class UnsubscribeComments(models.Model):
+
+	class Meta:
+		verbose_name = 'UnsubscribeComment'
+
+	def __unicode__(self):
+		return u'' + str(self.id)
+
+	user                = models.ForeignKey(User)
+	item_type           = models.CharField(max_length=16, default="maps")
+	item_id             = models.IntegerField(default=0)
+	unsubscribed        = models.DateTimeField('date of unsubscribe')
+
 class Units(models.Model):
 
 	class Meta:
@@ -129,6 +131,9 @@ class Replays(models.Model):
 	class Meta:
 		verbose_name = 'Replay'
 
+	def __unicode__(self):
+		return u'' + str(self.id)
+
 	user                = models.ForeignKey(User)
 	info                = models.CharField(max_length=2000, default="")
 	metadata            = models.CharField(max_length=100000, default="")
@@ -150,6 +155,9 @@ class ReplayPlayers(models.Model):
 
 	class Meta:
 		verbose_name = "ReplayPlayer"
+
+	def __unicode__(self):
+		return u'replay_id: ' + str(self.replay_id)
 
 	user                = models.ForeignKey(User)
 	replay_id           = models.IntegerField(default=0)

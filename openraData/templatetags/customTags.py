@@ -91,3 +91,27 @@ def get_replay_players(value):
 		return replay_players
 	return []
 register.filter('get_replay_players', get_replay_players)
+
+def map_id_of_rev(value, arg):
+	seek_id_by_rev = misc.get_map_id_of_revision(arg, value)
+	if seek_id_by_rev != 0:
+		return "/maps/" + str(seek_id_by_rev) + "/"
+	return "#"
+register.filter('map_id_of_rev', map_id_of_rev)
+
+def map_title_of_rev(value, arg):
+	seek_title_by_rev = misc.get_map_title_of_revision(arg, value)
+	return seek_title_by_rev
+register.filter('map_title_of_rev', map_title_of_rev)
+
+def item_name_by_type_id(value, arg):
+	if arg == "maps":
+		seek = Maps.objects.filter(id=value)
+		if seek:
+			return seek[0].title
+	elif arg == "replays":
+		seek = Replays.objects.filter(id=value)
+		if seek:
+			return seek[0].game_mod.upper() + ' by ' + seek[0].user.username + ' on ' + seek[0].posted
+	return ""
+register.filter('item_name_by_type_id', item_name_by_type_id)

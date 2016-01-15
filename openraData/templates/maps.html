@@ -6,7 +6,7 @@
             <div id="map_grid">
                 {% for item in maps %}
                     <div class="map_grid_cell">
-                        <a href="http://{{http_host}}/maps/{{item.id}}">
+                        <a href="/maps/{{item.id}}/">
                             <div class="cell-link-container">
                                 <div><img src="/maps/{{item.id}}/minimap" alt="{{item.id}}" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
                             </div>
@@ -61,7 +61,7 @@
                         {% if page == i %}
                             <span>{{ i }}</span>
                         {% else %}
-                            <a href="http://{{http_host}}/maps/page/{{i}}">{{ i }}</a>
+                            <a href="/maps/page/{{i}}">{{ i }}</a>
                         {% endif %}
                     {% else %}
                         {% if i < page %}
@@ -98,12 +98,12 @@
             </div>
 
             <div class='cBlock map-store-info'>
-                Custom maps are stored in the user directories with sub-directories per mod.
+                <p>Custom maps are stored in the user directories with sub-directories per mod.</p>
                 <ul>
                     <li><u>Windows:</u> My Documents\OpenRA\maps\&lt;mod name&gt;\</li>
                     <li><u>Mac OSX:</u> ~/Library/Application Support/OpenRA/maps/&lt;mod name&gt;/</li>
                     <li><u>Linux:</u> ~/.openra/maps/&lt;mod name&gt;/</li>
                 </ul>
 
-                Example:  /home/user/.openra/maps/ra/a_path_beyond.oramap
+                <p>Example:  /home/user/.openra/maps/ra/a_path_beyond.oramap</p>
             </div>

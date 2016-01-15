@@ -6,8 +6,7 @@ from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from threadedcomments.models import ThreadedComment
-from openraData.models import Maps, Units, Mods, Screenshots, Reports
+from openraData.models import Maps, Units, Mods, Screenshots, Reports, Comments, UnsubscribeComments
 
 def selectLicenceInfo(itemObject):
 	creative_commons = itemObject.policy_cc
@@ -91,14 +90,16 @@ def send_email_to_user_OnLint(email_addr, body):
 	email.send()
 	connection.close()
 
-def send_email_to_user_OnComment(itemtype, itemid, email_addr, info=""):
-	http_host = 'http://resource.openra.net'
+def send_email_to_user_OnComment(item_type, item_id, email_addr, info=""):
+	if not email_addr:
+		return False
+	http_host = 'http://' + settings.HTTP_HOST
 	connection = mail.get_connection()
 	connection.open()
 	if not info:
-		body = itemtype.title()+" you've commented, has some activity : " + http_host + "/maps/" + itemid
+		body = "New comment on " + item_type.title()[:-1]+" you've commented: " + http_host + "/maps/" + item_id + "/#comments"
 	elif info == "owner":
-		body = "Your "+itemtype.title()+" has been commented: " + http_host + "/maps/" + itemid
+		body = "Your "+item_type.title()[:-1]+" has been commented: " + http_host + "/maps/" + item_id + "/#comments"
 	email = mail.EmailMessage('OpenRA Resource Center - New Comment', body, settings.ADMIN_EMAIL_FROM,
 						  [email_addr], connection=connection)
 	email.send()
@@ -120,11 +121,12 @@ def get_account_link(userid):
 	obj = SocialAccount.objects.filter(user_id=userid)
 	if obj:
 		if obj[0].provider == "google":
-			return "" #obj[0].extra_data['link']
+			if 'link' in obj[0].extra_data:
+				return obj[0].extra_data['link']
 		elif obj[0].provider == "github":
-			return "" #obj[0].extra_data['html_url']
-	else:
-		return ""
+			if 'html_url' in obj[0].extra_data:
+				return obj[0].extra_data['html_url']
+	return ""
 
 def sizeof_fmt(disk_size):
 	for x in ['bytes','KB','MB','GB','TB']:
@@ -132,15 +134,57 @@ def sizeof_fmt(disk_size):
 			return "%3.1f %s" % (disk_size, x)
 		disk_size /= 1024.0
 
-def count_comments_for_many(mapObject, content):
+def count_comments_for_many(mapObject, item_type):
 	comments = {}
 	for item in mapObject:
 		comments[str(item.id)] = 0
-		revs = Revisions(content)
+		revs = Revisions(item_type)
 		revisions = revs.GetRevisions(item.id)
 		for rev in revisions:
-			comments[str(item.id)] = len(ThreadedComment.objects.filter(title=content.lower(), object_pk=str(rev)))
+			comments[str(item.id)] += len(Comments.objects.filter(item_type=item_type.lower(), item_id=rev, is_removed=False))
 	return comments
+
+def get_map_id_of_revision(item, seek_rev):
+	revs = Revisions('maps')
+	revisions = revs.GetRevisions(item.id)
+	for rev in revisions:
+		mapObj = Maps.objects.get(id=rev)
+		if mapObj.revision == seek_rev:
+			return mapObj.id
+	return 0
+
+def get_map_title_of_revision(item, seek_rev):
+	revs = Revisions('maps')
+	revisions = revs.GetRevisions(item.id)
+	for rev in revisions:
+		mapObj = Maps.objects.get(id=rev)
+		if mapObj.revision == seek_rev:
+			return mapObj.title
+	return ""
+
+def get_comments_for_all_revisions(request, item_type, item_id):
+	comments = []
+
+	revs = Revisions(item_type)
+	revisions = revs.GetRevisions(item_id)
+	for rev in revisions:
+
+		current_user_commented = False
+		current_rev = Maps.objects.get(id=rev)
+		commentsObj = Comments.objects.filter(item_type=item_type, item_id=rev, is_removed=False).order_by('posted')
+
+		for com in commentsObj:
+			if com.user == request.user:
+				current_user_commented = True
+		
+		unsubscribed = False
+		if request.user.is_authenticated:
+			unsubObj = UnsubscribeComments.objects.filter(item_type=item_type, item_id=rev, user=request.user.id)
+			if unsubObj:
+				unsubscribed = True
+
+		comments.append([current_rev, commentsObj, current_user_commented, unsubscribed])
+	return list(reversed(comments))
 
 ########## Revisions
 class Revisions():
@@ -151,11 +195,11 @@ class Revisions():
 
 	def GetRevisions(self, itemid, seek_next=False):
 		if seek_next:
-			if self.modelName.lower() == "map":
+			if self.modelName.lower() == "maps":
 				itemObject = Maps.objects.get(id=itemid)
-			elif self.modelName.lower() == "unit":
+			elif self.modelName.lower() == "units":
 				itemObject = Units.objects.get(id=itemid)
-			elif self.modelName.lower() == "mod":
+			elif self.modelName.lower() == "mods":
 				itemObject = Mods.objects.get(id=itemid)
 			if itemObject.next_rev == 0:
 				return
@@ -163,11 +207,11 @@ class Revisions():
 			self.GetRevisions(itemObject.next_rev, True)
 			return
 		self.revisions.insert(0, itemid)
-		if self.modelName.lower() == "map":
+		if self.modelName.lower() == "maps":
 			itemObject = Maps.objects.get(id=itemid)
-		elif self.modelName.lower() == "unit":
+		elif self.modelName.lower() == "units":
 			itemObject = Units.objects.get(id=itemid)
-		elif self.modelName.lower() == "mod":
+		elif self.modelName.lower() == "mods":
 			itemObject = Mods.objects.get(id=itemid)
 		if itemObject.pre_rev == 0:
 			self.GetRevisions(self.revisions[-1], True)
@@ -176,11 +220,11 @@ class Revisions():
 		return self.revisions
 
 	def GetLatestRevisionID(self, itemid):
-		if self.modelName.lower() == "map":
+		if self.modelName.lower() == "maps":
 			itemObject = Maps.objects.get(id=itemid)
-		elif self.modelName.lower() == "unit":
+		elif self.modelName.lower() == "units":
 			itemObject = Units.objects.get(id=itemid)
-		elif self.modelName.lower() == "mod":
+		elif self.modelName.lower() == "mods":
 			itemObject = Mods.objects.get(id=itemid)
 		if itemObject.next_rev == 0:
 			return itemObject.id
