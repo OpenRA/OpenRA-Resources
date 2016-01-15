@@ -873,6 +873,37 @@ def screenshots(request):
 	})
 	return StreamingHttpResponse(template.render(context))
 
+def comments(request, page=1):
+	perPage = 20
+	slice_start = perPage*int(page)-perPage
+	slice_end = perPage*int(page)
+
+	comments = Comments.objects.filter(is_removed=False).order_by('-posted')
+	amount = len(comments)
+	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+	comments = comments[slice_start:slice_end]
+	amount_this_page = len(comments)
+
+	last_comment_id_seen = request.COOKIES.get('last_comment_id_seen', comments[0].id)
+
+	template = loader.get_template('index.html')
+	context = RequestContext(request, {
+		'content': 'comments.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Comments',
+		'comments': comments,
+		'amount': amount,
+		'amount_this_page': amount_this_page,
+		'range': [i+1 for i in range(rowsRange)],
+		'page': int(page),
+		'last_comment_id_seen': int(last_comment_id_seen),
+	})
+	response = StreamingHttpResponse(template.render(context))
+	if int(page) == 1:
+		response.set_cookie('last_comment_id_seen', comments[0].id)
+	return response
+
 def assets(request):
 	noErrors = False
 	mirrors_list = []

@@ -56,6 +56,9 @@ urlpatterns = patterns('',
 	url(r'^screenshots/(?P<itemid>\d+)/delete/?$', views.deleteScreenshot, name='deleteScreenshot'),
 	url(r'^screenshots/(?P<itemid>\d+)/(?P<itemname>\w+)/?$', views.serveScreenshot, name='serveScreenshot'),
 
+	url(r'^comments/?$', views.comments, name='comments'),
+	url(r'^comments/page/(?P<page>\d+)/?$', views.comments, name='comments_paged'),
+
 	url(r'^assets/?$', views.assets, name='assets'),
 
 	url(r'^replays/?$', views.replays, name='replays'),

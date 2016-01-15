@@ -103,3 +103,15 @@ def map_title_of_rev(value, arg):
 	seek_title_by_rev = misc.get_map_title_of_revision(arg, value)
 	return seek_title_by_rev
 register.filter('map_title_of_rev', map_title_of_rev)
+
+def item_name_by_type_id(value, arg):
+	if arg == "maps":
+		seek = Maps.objects.filter(id=value)
+		if seek:
+			return seek[0].title
+	elif arg == "replays":
+		seek = Replays.objects.filter(id=value)
+		if seek:
+			return seek[0].game_mod.upper() + ' by ' + seek[0].user.username + ' on ' + seek[0].posted
+	return ""
+register.filter('item_name_by_type_id', item_name_by_type_id)
