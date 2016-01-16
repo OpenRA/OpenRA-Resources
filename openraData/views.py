@@ -901,7 +901,7 @@ def comments(request, page=1):
 	})
 	response = StreamingHttpResponse(template.render(context))
 	if int(page) == 1:
-		response.set_cookie('last_comment_id_seen', comments[0].id)
+		response.set_cookie('last_comment_id_seen', comments[0].id, max_age=4320000)
 	return response
 
 def assets(request):
