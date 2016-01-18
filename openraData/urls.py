@@ -58,6 +58,8 @@ urlpatterns = patterns('',
 
 	url(r'^comments/?$', views.comments, name='comments'),
 	url(r'^comments/page/(?P<page>\d+)/?$', views.comments, name='comments_paged'),
+	url(r'^comments/user/(?P<arg>\d+)/?$', views.comments_by_user, name='comments_by_user'),
+	url(r'^comments/user/(?P<arg>\d+)/page/(?P<page>\d+)/?$', views.comments_by_user, name='comments_by_user_paged'),
 
 	url(r'^assets/?$', views.assets, name='assets'),
 

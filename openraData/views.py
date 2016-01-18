@@ -884,6 +884,9 @@ def comments(request, page=1):
 	comments = comments[slice_start:slice_end]
 	amount_this_page = len(comments)
 
+	if amount_this_page == 0 and int(page) != 1:
+		return HttpResponseRedirect("/comments/")
+
 	last_comment_id_seen = request.COOKIES.get('last_comment_id_seen', comments[0].id)
 
 	template = loader.get_template('index.html')
@@ -903,6 +906,36 @@ def comments(request, page=1):
 	if int(page) == 1:
 		response.set_cookie('last_comment_id_seen', comments[0].id, max_age=4320000)
 	return response
+
+def comments_by_user(request, arg, page=1):
+	perPage = 20
+	slice_start = perPage*int(page)-perPage
+	slice_end = perPage*int(page)
+
+	comments = Comments.objects.filter(is_removed=False, user=arg).order_by('-posted')
+	amount = len(comments)
+	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+	comments = comments[slice_start:slice_end]
+	amount_this_page = len(comments)
+
+	if amount_this_page == 0 and int(page) != 1:
+		return HttpResponseRedirect("/comments/user/"+arg+"/")
+
+	template = loader.get_template('index.html')
+	context = RequestContext(request, {
+		'content': 'comments.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Comments by ' + comments[0].user.username,
+		'comments': comments,
+		'amount': amount,
+		'amount_this_page': amount_this_page,
+		'range': [i+1 for i in range(rowsRange)],
+		'page': int(page),
+		'last_comment_id_seen': comments[0].id,
+		'comments_by_user': True,
+	})
+	return StreamingHttpResponse(template.render(context))
 
 def assets(request):
 	noErrors = False

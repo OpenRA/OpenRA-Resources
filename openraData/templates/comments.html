@@ -3,7 +3,7 @@
 {% if amount != 0 %}
 
 	<div class="cBlock">
-		<h5>Comments ( page {{page}} ):</h5>
+		<h5>Comments {% if comments_by_user %}by {{comments.0.user.username}} {% endif %}( page {{page}} ):</h5>
 	</div>
 
 	<div class="cBlock_comments">
