@@ -25,5 +25,13 @@ Nothing found
 			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
 		{% endfor %}
 	{% endif %}
+
+	{% if global_search_request.maps.author %}
+		<p>Matches in Map Author:</p>
+		{% for item in global_search_request.maps.author %}
+			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+		{% endfor %}
+	{% endif %}
+
 {% endif %}
 </div>

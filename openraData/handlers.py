@@ -438,7 +438,7 @@ class MapHandlers():
 
 	def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
 		os.chdir(parser + "/")
-		for mod in ['ra','cnc','d2k','ts']:
+		for mod in ['ra','cnc','d2k','ts', 'ra2']:
 			command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
 			proc = Popen(command.split(), stdout=PIPE).communicate()
 			self.LOG.append([proc[0]])

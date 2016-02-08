@@ -89,6 +89,10 @@ def search(request):
 	global_search_request['maps']['amount'] += len(s_by_description)
 	global_search_request['maps']['info'] = [s_by_info, s_by_description]
 
+	s_by_author = Maps.objects.filter(author__icontains=search_request)
+	global_search_request['maps']['author'] = s_by_author
+	global_search_request['maps']['amount'] += len(s_by_author)
+
 	template = loader.get_template('index.html')
 	context = RequestContext(request, {
 		'content': 'search.html',
