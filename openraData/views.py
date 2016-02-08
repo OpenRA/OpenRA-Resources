@@ -926,13 +926,12 @@ def comments_by_user(request, arg, page=1):
 		'content': 'comments.html',
 		'request': request,
 		'http_host': request.META['HTTP_HOST'],
-		'title': ' - Comments by ' + comments[0].user.username,
+		'title': ' - Comments by ' + request.user.username,
 		'comments': comments,
 		'amount': amount,
 		'amount_this_page': amount_this_page,
 		'range': [i+1 for i in range(rowsRange)],
 		'page': int(page),
-		'last_comment_id_seen': comments[0].id,
 		'comments_by_user': True,
 	})
 	return StreamingHttpResponse(template.render(context))
