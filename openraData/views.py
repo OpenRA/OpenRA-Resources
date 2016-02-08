@@ -64,13 +64,18 @@ def feed(request):
 	})
 	return StreamingHttpResponse(template.render(context), content_type='text/xml')
 
-def search(request):
-	if request.method == 'POST':
-		if request.POST.get('qsearch', "").strip() == "":
+def search(request, arg=""):
+
+	if not arg:
+		if request.method == 'POST':
+			if request.POST.get('qsearch', "").strip() == "":
+				return HttpResponseRedirect('/')
+			return HttpResponseRedirect('/search/' + request.POST.get('qsearch', "").strip() )
+		else:
 			return HttpResponseRedirect('/')
-		search_request = request.POST.get('qsearch', "").strip()
-	else:
-		return HttpResponseRedirect('/')
+
+	search_request = arg
+
 	global_search_request = {}
 	global_search_request['maps'] = {'amount': 0, 'hash': None, 'title': None, 'info': None}
 
