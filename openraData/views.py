@@ -64,13 +64,18 @@ def feed(request):
 	})
 	return StreamingHttpResponse(template.render(context), content_type='text/xml')
 
-def search(request):
-	if request.method == 'POST':
-		if request.POST.get('qsearch', "").strip() == "":
+def search(request, arg=""):
+
+	if not arg:
+		if request.method == 'POST':
+			if request.POST.get('qsearch', "").strip() == "":
+				return HttpResponseRedirect('/')
+			return HttpResponseRedirect('/search/' + request.POST.get('qsearch', "").strip() )
+		else:
 			return HttpResponseRedirect('/')
-		search_request = request.POST.get('qsearch', "").strip()
-	else:
-		return HttpResponseRedirect('/')
+
+	search_request = arg
+
 	global_search_request = {}
 	global_search_request['maps'] = {'amount': 0, 'hash': None, 'title': None, 'info': None}
 
@@ -88,6 +93,10 @@ def search(request):
 	s_by_description = Maps.objects.filter(description__icontains=search_request).exclude(info__icontains=search_request)
 	global_search_request['maps']['amount'] += len(s_by_description)
 	global_search_request['maps']['info'] = [s_by_info, s_by_description]
+
+	s_by_author = Maps.objects.filter(author__icontains=search_request)
+	global_search_request['maps']['author'] = s_by_author
+	global_search_request['maps']['amount'] += len(s_by_author)
 
 	template = loader.get_template('index.html')
 	context = RequestContext(request, {
@@ -884,6 +893,9 @@ def comments(request, page=1):
 	comments = comments[slice_start:slice_end]
 	amount_this_page = len(comments)
 
+	if amount_this_page == 0 and int(page) != 1:
+		return HttpResponseRedirect("/comments/")
+
 	last_comment_id_seen = request.COOKIES.get('last_comment_id_seen', comments[0].id)
 
 	template = loader.get_template('index.html')
@@ -901,8 +913,37 @@ def comments(request, page=1):
 	})
 	response = StreamingHttpResponse(template.render(context))
 	if int(page) == 1:
-		response.set_cookie('last_comment_id_seen', comments[0].id)
+		response.set_cookie('last_comment_id_seen', comments[0].id, max_age=4320000)
 	return response
+
+def comments_by_user(request, arg, page=1):
+	perPage = 20
+	slice_start = perPage*int(page)-perPage
+	slice_end = perPage*int(page)
+
+	comments = Comments.objects.filter(is_removed=False, user=arg).order_by('-posted')
+	amount = len(comments)
+	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+	comments = comments[slice_start:slice_end]
+	amount_this_page = len(comments)
+
+	if amount_this_page == 0 and int(page) != 1:
+		return HttpResponseRedirect("/comments/user/"+arg+"/")
+
+	template = loader.get_template('index.html')
+	context = RequestContext(request, {
+		'content': 'comments.html',
+		'request': request,
+		'http_host': request.META['HTTP_HOST'],
+		'title': ' - Comments by ' + request.user.username,
+		'comments': comments,
+		'amount': amount,
+		'amount_this_page': amount_this_page,
+		'range': [i+1 for i in range(rowsRange)],
+		'page': int(page),
+		'comments_by_user': True,
+	})
+	return StreamingHttpResponse(template.render(context))
 
 def assets(request):
 	noErrors = False

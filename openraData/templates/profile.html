@@ -5,6 +5,7 @@
                     {% if ifsocial == False %}
                     <li><a href="/accounts/password/" {% if 'accounts/password/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Password</a></li>
                     {% endif %}
+                    <li><a href="/comments/user/{{request.user.id}}/">My comments</a></li>
                 </ul>
             </nav>
 

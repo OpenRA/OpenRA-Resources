@@ -1008,6 +1008,10 @@ p.registerInfo {
     color: #76f6e5;
     font-weight: bold;
   }
+  .mod_ra2 {
+    color: #FF7A00;
+    font-weight: bold;
+  }
     .map_tooltip .tooltip_title {
       width: 30%;
       color: #dfdfdf;

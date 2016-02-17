@@ -391,7 +391,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		downloading = False
 
 	map_grid_type = 'Rectangular' # ra/cnc/d2k
-	if mapObject.game_mod == 'ts':
+	if mapObject.game_mod in ['ts', 'ra2']:
 		map_grid_type = 'RectangularIsometric'
 
 	if yaml:

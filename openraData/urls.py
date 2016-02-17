@@ -58,6 +58,8 @@ urlpatterns = patterns('',
 
 	url(r'^comments/?$', views.comments, name='comments'),
 	url(r'^comments/page/(?P<page>\d+)/?$', views.comments, name='comments_paged'),
+	url(r'^comments/user/(?P<arg>\d+)/?$', views.comments_by_user, name='comments_by_user'),
+	url(r'^comments/user/(?P<arg>\d+)/page/(?P<page>\d+)/?$', views.comments_by_user, name='comments_by_user_paged'),
 
 	url(r'^assets/?$', views.assets, name='assets'),
 
@@ -78,8 +80,9 @@ urlpatterns = patterns('',
 	url(r'^accounts/profile/?$', views.profile, name='profile'),
 	url(r'^accounts/password/?$', views.profile, name='profile'),
 
-	url(r'^news/feed/?$', views.feed, name='feed'),
-	url(r'^search/', views.search, name='search'),
+	url(r'^news/feed.rss?$', views.feed, name='feed'),
+	url(r'^search/?$', views.search, name='search'),
+	url(r'^search/(?P<arg>[^/]+)/?$', views.search, name='search'),
 
 	url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
 	url(r'^panel/mymaps/?$', views.ControlPanel, name='ControlPanel'),
