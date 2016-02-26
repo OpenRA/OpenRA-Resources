@@ -1758,3 +1758,30 @@ p.registerInfo {
   float: left;
   padding-right: 5px;
 }
+
+
+.google-adsense-block-wide {
+  position: absolute;
+  display: none;
+  top: 0;
+  right: 0;
+}
+
+.google-adsense-block-narrow {
+  position: absolute;
+  display: none;
+  top: 0;
+  right: 0;
+}
+
+@media screen and (min-width: 1280px) {
+  .google-adsense-block-wide {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 1279px) {
+  .google-adsense-block-narrow {
+    display: block;
+  }
+}
