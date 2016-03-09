@@ -1,16 +1,10 @@
 import os
 import json
 from django.utils import timezone
-from django.conf import settings
 from django.http import StreamingHttpResponse
-from django.template import RequestContext, loader
-from django.http import HttpResponseRedirect, Http404
-from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
 
-from django.contrib.auth.models import User
-from openra.models import Maps
-from openra.models import Rating
+from openra.models import Maps, Rating
 
 @csrf_exempt
 def jRating(request, arg):
@@ -31,10 +25,9 @@ def jRating(request, arg):
 			if ratingObject:
 				Rating.objects.filter(ex_id=arData['item_id'],ex_name=arData['item_type'],user=request.user.id).update(rating=arData['rate_by_user'])
 			else:
-				userObject = User.objects.get(pk=request.user.id)
 
 				transac = Rating(
-					user = userObject,
+					user = request.user,
 					ex_id = arData['item_id'],
 					ex_name = arData['item_type'],
 					rating = arData['rate_by_user'],

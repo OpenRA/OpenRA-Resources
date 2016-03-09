@@ -1,19 +1,13 @@
 import os
 import json
 import base64
-import zipfile
-import urllib2
 import cgi
-from subprocess import Popen, PIPE
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
-from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
-from django.db.models import Count
+from django.http import StreamingHttpResponse
 
 from openra.models import Maps
 from openra.models import Reports
-from openra.models import CrashReports
 from django.contrib.auth.models import User
 from openra import misc
 
@@ -521,132 +515,3 @@ def get_minimap(mapid, soft=False):
 def get_url(request, mapid):
 	url = "http://" + request.META['HTTP_HOST'] + "/maps/" + str(mapid) + "/oramap"
 	return url
-
-# Crash Log API
-@csrf_exempt
-def CrashLogs(request):
-	ID = 0
-	gameID = 0
-	desync = False
-	if request.method != 'POST':
-		return HttpResponseRedirect('https://github.com/ihptru/OpenRA/issues')
-
-	if not request.POST.get('gameID', False):
-		raise Http404
-	if not request.POST.get('description', False):
-		raise Http404
-	gameID = request.POST.get('gameID', False)
-	description = request.POST.get('description', False)
-
-	if request.POST.get('desync', False):
-		temp = request.POST.get('desync', False)
-		if temp == 'True':
-			desync = True
-
-	try:
-		openraLogs = request.FILES['logs']
-	except:
-		raise Http404
-
-	transac = CrashReports(
-		gameID = int(gameID),
-		description = description,
-		isdesync = desync,
-		gistID = 0,
-		)
-	transac.save()
-	ID = transac.id
-
-	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/crashlogs/' + str(ID) + os.sep
-	if not os.path.exists(path):
-		os.makedirs(path)
-
-	z = zipfile.ZipFile(openraLogs, mode='a')
-	z.extractall(path)
-	z.close()
-
-	resp = description + "\n"
-	logfiles = os.listdir(path)
-	for filename in logfiles:
-		if filename in ['.','..']:
-			continue
-		resp += "http://" + request.META['HTTP_HOST'] + "/crashlogs/" + str(ID) + os.sep + os.path.splitext(filename)[0] + "\n"
-
-	# perform Gist manipulatons if it's a desync
-	if desync:
-		crashObject = CrashReports.objects.filter(gameID=int(gameID))
-		if len(crashObject) == 1:
-			with open(path + "syncreport.log", "r") as syncContent:
-				fileToGist = syncContent.read()
-			if len(fileToGist) == 0:
-				fileToGist = "empty syncreport"
-			gistContent = {}
-			gistContent['description'] = "desync GameID:"+gameID
-			gistContent['public'] = True
-			gistContent['files'] = {"GameID:"+gameID:{"content":fileToGist}}
-			gistContent = json.dumps(gistContent)
-			command = "curl -k -X POST --data '%s' https://api.github.com/gists?access_token=%s > /dev/null 2>&1" % (gistContent, settings.GITHUB_API_TOKEN)
-			os.system(command)
-			stream = urllib2.urlopen("https://api.github.com/gists?access_token=%s" % settings.GITHUB_API_TOKEN).read().decode()
-			stream = json.loads(stream)
-			foundGIST = 0
-			for item in stream:
-				if item['description'] == "desync GameID:"+gameID:
-					foundGIST = item['id']
-					break
-			if foundGIST != 0:
-				CrashReports.objects.filter(id=ID).update(gistID=int(foundGIST))
-			resp = resp + "\nSyncreport Gist:\nhttps://gist.github.com/%s/%s/revisions" % (settings.GITHUB_USER, foundGIST)
-		else:
-			gistID = str(crashObject[0].gistID)
-			CrashReports.objects.filter(id=ID).update(gistID=gistID)
-			with open(path + "syncreport.log", "r") as syncContent:
-				fileToGist = syncContent.read()
-			gistContent = {}
-			gistContent['description'] = "desync GameID:"+gameID
-			gistContent['files'] = {"GameID:"+gameID:{"content":fileToGist}}
-			gistContent = json.dumps(gistContent)
-			command = "curl -k -X PATCH --data '%s' https://api.github.com/gists/%s?access_token=%s > /dev/null 2>&1" % (gistContent, gistID, settings.GITHUB_API_TOKEN)
-			os.system(command)
-			resp = resp + "\nSyncreport Gist:\nhttps://gist.github.com/%s/%s/revisions" % (settings.GITHUB_USER, gistID)
-
-	# create a new issue at github repository with info about OpenRA crash report or append to an existing issue with the same gameID
-	stream = urllib2.urlopen('https://api.github.com/repos/%s/%s/issues' % (settings.GITHUB_USER, settings.GITHUB_REPO)).read().decode()
-	stream = json.loads(stream)
-	foundID = 0
-	for item in stream:
-		if item['title'] == "GameID:" + gameID:
-			foundID = item['number']
-			break
-	if foundID != 0:
-		content = {}
-		content['body'] = resp
-		content = json.dumps(content)
-		command = "curl -k -X POST --data '%s' https://api.github.com/repos/%s/%s/issues/%s/comments?access_token=%s > /dev/null 2>&1" % (content, settings.GITHUB_USER, settings.GITHUB_REPO, foundID, settings.GITHUB_API_TOKEN)
-		os.system(command)
-	else:
-		content = {}
-		content['title'] = "GameID:" + gameID
-		content['body'] = resp
-		content = json.dumps(content)
-		command = "curl -k -X POST --data '%s' https://api.github.com/repos/%s/%s/issues?access_token=%s > /dev/null 2>&1" % (content, settings.GITHUB_USER, settings.GITHUB_REPO, settings.GITHUB_API_TOKEN)
-		os.system(command)
-	return StreamingHttpResponse('Done, check https://github.com/%s/%s/search?q=GameID:%s&ref=cmdform&type=Issues\n' % (settings.GITHUB_USER, settings.GITHUB_REPO, gameID))
-
-def CrashLogsServe(request, crashid, logfile):
-	logfilename = ""
-	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/crashlogs/' + crashid.lstrip('0')
-	try:
-		Dir = os.listdir(path)
-	except:
-		return HttpResponseRedirect("/")
-	for filename in Dir:
-		if logfile in filename:
-			logfilename = filename
-			break
-	if logfilename == "":
-		return HttpResponseRedirect('/crashlogs/')
-	serveLog = path + os.sep + logfilename
-	response = StreamingHttpResponse(open(serveLog), content_type='plain/text')
-	response['Content-Disposition'] = 'attachment; filename="%s"' % crashid.lstrip('0')+logfilename
-	return response
