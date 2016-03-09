@@ -1,8 +1,8 @@
 import re
 from HTMLParser import HTMLParser
 from django import template
-from openraData import misc
-from openraData.models import Maps, ReplayPlayers
+from openra import misc
+from openra.models import Maps, ReplayPlayers
 
 
 register = template.Library()

@@ -1,8 +1,8 @@
 import os
 import shutil
 from django.conf import settings
-from openraData.models import Maps
-from openraData import misc
+from openra.models import Maps
+from openra import misc
 from django.core.management.base import BaseCommand, CommandError
 
 class Command(BaseCommand):

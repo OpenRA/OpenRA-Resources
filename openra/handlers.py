@@ -14,8 +14,8 @@ from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
-from openraData.models import Maps, Replays, ReplayPlayers, Lints, Units, Mods, Screenshots
-from openraData import utility, misc
+from openra.models import Maps, Replays, ReplayPlayers, Lints, Units, Mods, Screenshots
+from openra import utility, misc
 
 class ReplayHandlers():
 

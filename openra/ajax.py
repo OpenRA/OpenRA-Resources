@@ -9,8 +9,8 @@ from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.models import User
-from openraData.models import Maps
-from openraData.models import Rating
+from openra.models import Maps
+from openra.models import Rating
 
 @csrf_exempt
 def jRating(request, arg):

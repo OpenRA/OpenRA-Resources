@@ -10,8 +10,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count
 from django.utils import timezone
-from openraData.models import Maps, Lints, Screenshots, Reports
-from openraData import misc
+from openra.models import Maps, Lints, Screenshots, Reports
+from openra import misc
 
 
 def map_upgrade(mapObject, engine, parser=list(reversed( settings.OPENRA_VERSIONS.values() ))[0], new_rev_on_upgrade=True):

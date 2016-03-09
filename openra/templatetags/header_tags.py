@@ -1,5 +1,5 @@
 from django import template
-from openraData.models import Comments
+from openra.models import Comments
 
 register = template.Library()
 

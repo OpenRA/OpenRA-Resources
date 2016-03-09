@@ -1,1 +1,0 @@
-Sitemap: http://resource.open-ra.org/sitemap.xml

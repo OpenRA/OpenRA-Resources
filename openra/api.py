@@ -11,11 +11,11 @@ from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.db.models import Count
 
-from openraData.models import Maps
-from openraData.models import Reports
-from openraData.models import CrashReports
+from openra.models import Maps
+from openra.models import Reports
+from openra.models import CrashReports
 from django.contrib.auth.models import User
-from openraData import misc
+from openra import misc
 
 # Map API
 def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
