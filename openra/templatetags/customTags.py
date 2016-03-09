@@ -1,5 +1,5 @@
 import re
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 from django import template
 from openra import misc
 from openra.models import Maps, ReplayPlayers
@@ -15,6 +15,8 @@ register.filter('convert_links', convert_links)
 class MLStripper(HTMLParser):
 	def __init__(self):
 		self.reset()
+		self.strict = False
+		self.convert_charrefs= True
 		self.fed = []
 	def handle_data(self, d):
 		self.fed.append(d)

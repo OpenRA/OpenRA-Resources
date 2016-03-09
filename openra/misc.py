@@ -6,7 +6,7 @@ from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from openra.models import Maps, Units, Mods, Screenshots, Reports, Comments, UnsubscribeComments
+from openra.models import Maps, Screenshots, Reports, Comments, UnsubscribeComments
 
 def selectLicenceInfo(itemObject):
 	creative_commons = itemObject.policy_cc
@@ -197,10 +197,6 @@ class Revisions():
 		if seek_next:
 			if self.modelName.lower() == "maps":
 				itemObject = Maps.objects.get(id=itemid)
-			elif self.modelName.lower() == "units":
-				itemObject = Units.objects.get(id=itemid)
-			elif self.modelName.lower() == "mods":
-				itemObject = Mods.objects.get(id=itemid)
 			if itemObject.next_rev == 0:
 				return
 			self.revisions.append(itemObject.next_rev)
@@ -209,10 +205,6 @@ class Revisions():
 		self.revisions.insert(0, itemid)
 		if self.modelName.lower() == "maps":
 			itemObject = Maps.objects.get(id=itemid)
-		elif self.modelName.lower() == "units":
-			itemObject = Units.objects.get(id=itemid)
-		elif self.modelName.lower() == "mods":
-			itemObject = Mods.objects.get(id=itemid)
 		if itemObject.pre_rev == 0:
 			self.GetRevisions(self.revisions[-1], True)
 			return self.revisions
@@ -222,10 +214,6 @@ class Revisions():
 	def GetLatestRevisionID(self, itemid):
 		if self.modelName.lower() == "maps":
 			itemObject = Maps.objects.get(id=itemid)
-		elif self.modelName.lower() == "units":
-			itemObject = Units.objects.get(id=itemid)
-		elif self.modelName.lower() == "mods":
-			itemObject = Mods.objects.get(id=itemid)
 		if itemObject.next_rev == 0:
 			return itemObject.id
 		return self.GetLatestRevisionID(itemObject.next_rev)
