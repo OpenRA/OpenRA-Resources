@@ -7,10 +7,8 @@ import signal
 from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from subprocess import Popen, PIPE
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.db.models import Count
 from django.utils import timezone
-from openra.models import Maps, Lints, Screenshots, Reports
+from openra.models import Maps, Lints
 from openra import misc
 
 

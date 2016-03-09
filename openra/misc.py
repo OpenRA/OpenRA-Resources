@@ -6,7 +6,7 @@ from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from openra.models import Maps, Screenshots, Reports, Comments, UnsubscribeComments
+from openra.models import Maps, Comments, UnsubscribeComments
 
 def selectLicenceInfo(itemObject):
 	creative_commons = itemObject.policy_cc
