@@ -26,7 +26,7 @@ class ReplayHandlers():
 
 	def process_uploading(self, user_id, replay_file, post):
 
-		parser_to_db = list(reversed( settings.OPENRA_VERSIONS.values() ))[0] # default parser = the latest
+		parser_to_db = list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0] # default parser = the latest
 		parser = settings.OPENRA_ROOT_PATH + parser_to_db
 
 		if post.get("parser", None) != None:
@@ -121,7 +121,7 @@ class ReplayHandlers():
 		response['response'] = replay_metadata
 		return response
 
-	def get_replay_metadata(self, fullpath, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
+	def get_replay_metadata(self, fullpath, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
 		os.chdir(parser + "/")
 
 		command = 'mono --debug OpenRA.Utility.exe ra --replay-metadata ' + fullpath
@@ -177,7 +177,7 @@ class MapHandlers():
 
 	def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
 
-		parser_to_db = list(reversed( settings.OPENRA_VERSIONS.values() ))[0] # default parser = the latest
+		parser_to_db = list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0] # default parser = the latest
 		parser = settings.OPENRA_ROOT_PATH + parser_to_db
 
 		if post.get("parser", None) != None:
@@ -355,31 +355,31 @@ class MapHandlers():
 			pass
 		z.close()
 
-	def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
+	def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
 		if filepath == "":
 			filepath = self.map_full_path_filename
 
 		os.chdir(parser + "/")
 
-		os.chmod(filepath, 0444)
+		os.chmod(filepath, 0o444)
 
 		command = 'mono --debug OpenRA.Utility.exe ra --map-hash ' + filepath
 		proc = Popen(command.split(), stdout=PIPE).communicate()
 
-		os.chmod(filepath, 0644)
+		os.chmod(filepath, 0o644)
 
 		self.maphash = proc[0].strip()
 		self.LOG.append(self.maphash)
 
 		os.chdir(self.currentDirectory)
 
-	def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
+	def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
 		os.chdir(parser + "/")
 
-		os.chmod(self.map_full_path_filename, 0444)
+		os.chmod(self.map_full_path_filename, 0o444)
 		command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (game_mod, self.map_full_path_filename)
 		proc = Popen(command.split(), stdout=PIPE).communicate()
-		os.chmod(self.map_full_path_filename, 0644)
+		os.chmod(self.map_full_path_filename, 0o644)
 
 		try:
 			shutil.move(misc.addSlash(parser + "/") + self.preview_filename,
@@ -391,7 +391,7 @@ class MapHandlers():
 
 		os.chdir(self.currentDirectory)
 
-	def GenerateSHPpreview(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
+	def GenerateSHPpreview(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
 		Dir = os.listdir(self.map_full_path_directory+'content/')
 		for fn in Dir:
 			if fn.endswith('.shp'):
@@ -436,7 +436,7 @@ class MapHandlers():
 				os.chdir(self.currentDirectory)
 				shutil.rmtree(self.map_full_path_directory+'content/png/')
 
-	def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + list(reversed( settings.OPENRA_VERSIONS.values() ))[0]):
+	def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
 		os.chdir(parser + "/")
 		for mod in ['ra','cnc','d2k','ts', 'ra2']:
 			command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
