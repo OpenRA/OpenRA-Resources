@@ -52,6 +52,7 @@ $ pip install -r requirements.txt
  * Directories with compiled OpenRA versions must have write permissions for web site user
  * Make sure web site user can write into '/tmp/'
  * Configure RSYNC server with directory: 'maps' (This name is used in guides)
+ * Copy installed OpenRA Content from your local /home/user/.openra/Content/ to the same directory for web site user
 
 
 
