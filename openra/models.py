@@ -2,13 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime
 
+
+
 class Maps(models.Model):
 
 	class Meta:
-		verbose_name = 'Map'
+		verbose_name_plural = 'Maps'
 
-	def __unicode__(self):
-		return u'' + str(self.id)
+	def __str__(self):
+		return str(self.id)
 
 	user                = models.ForeignKey(User)
 	title               = models.CharField(max_length=200)
@@ -45,10 +47,12 @@ class Maps(models.Model):
 	policy_adaptations  = models.CharField(max_length=30)
 	policy_commercial   = models.BooleanField(default=False)
 
+
+
 class Lints(models.Model):
 
 	class Meta:
-		verbose_name = 'Lint'
+		verbose_name_plural = 'Lints'
 
 	item_type           = models.CharField(max_length=16, default="maps")
 	map_id              = models.IntegerField(default=0)
@@ -57,13 +61,15 @@ class Lints(models.Model):
 	lint_output         = models.CharField(max_length=1000000, default="")
 	posted              = models.DateTimeField('date of check')
 
+
+
 class Comments(models.Model):
 
 	class Meta:
-		verbose_name = 'Comment'
+		verbose_name_plural = 'Comments'
 
-	def __unicode__(self):
-		return u'' + self.item_type + ' ' + str(self.item_id) + ' by ' + self.user.username
+	def __str__(self):
+		return self.item_type + ' ' + str(self.item_id) + ' by ' + self.user.username
 
 	user                = models.ForeignKey(User)
 	content             = models.CharField(max_length=10000)
@@ -72,67 +78,30 @@ class Comments(models.Model):
 	posted              = models.DateTimeField('date of comment')
 	is_removed          = models.BooleanField(default=False)
 
+
+
 class UnsubscribeComments(models.Model):
 
 	class Meta:
-		verbose_name = 'UnsubscribeComment'
+		verbose_name_plural = 'Unsubscribed From Comments'
 
-	def __unicode__(self):
-		return u'' + str(self.id)
+	def __str__(self):
+		return str(self.id)
 
 	user                = models.ForeignKey(User)
 	item_type           = models.CharField(max_length=16, default="maps")
 	item_id             = models.IntegerField(default=0)
 	unsubscribed        = models.DateTimeField('date of unsubscribe')
 
-class Units(models.Model):
 
-	class Meta:
-		verbose_name = 'Unit'
-
-	user                = models.ForeignKey(User)
-	title               = models.CharField(max_length=200)
-	info                = models.CharField(max_length=400)
-	unit_type           = models.CharField(max_length=16)
-	category            = models.CharField(max_length=16)
-	palette             = models.CharField(max_length=16)
-	revision            = models.IntegerField(default=1)
-	pre_rev             = models.IntegerField(default=0)
-	next_rev            = models.IntegerField(default=0)
-	posted              = models.DateTimeField('date published')
-	viewed              = models.IntegerField(default=0)
-	downloaded          = models.IntegerField(default=0)
-	rating              = models.FloatField(default=0.0)
-	policy_cc           = models.BooleanField(default=False)
-	policy_adaptations  = models.CharField(max_length=30)
-	policy_commercial   = models.BooleanField(default=False)
-
-class Mods(models.Model):
-
-	class Meta:
-		verbose_name = 'Mod'
-
-	user                = models.ForeignKey(User)
-	title               = models.CharField(max_length=200)
-	info                = models.CharField(max_length=2000)
-	revision            = models.IntegerField(default=1)
-	pre_rev             = models.IntegerField(default=0)
-	next_rev            = models.IntegerField(default=0)
-	posted              = models.DateTimeField('date published')
-	viewed              = models.IntegerField(default=0)
-	downloaded          = models.IntegerField(default=0)
-	rating              = models.FloatField(default=0.0)
-	policy_cc           = models.BooleanField(default=False)
-	policy_adaptations  = models.CharField(max_length=30)
-	policy_commercial   = models.BooleanField(default=False)
 
 class Replays(models.Model):
 
 	class Meta:
-		verbose_name = 'Replay'
+		verbose_name_plural = 'Replays'
 
-	def __unicode__(self):
-		return u'' + str(self.id)
+	def __str__(self):
+		return str(self.id)
 
 	user                = models.ForeignKey(User)
 	info                = models.CharField(max_length=2000, default="")
@@ -151,13 +120,15 @@ class Replays(models.Model):
 	downloaded          = models.IntegerField(default=0)
 	rating              = models.FloatField(default=0.0)
 
+
+
 class ReplayPlayers(models.Model):
 
 	class Meta:
-		verbose_name = "ReplayPlayer"
+		verbose_name_plural = "ReplayPlayers"
 
-	def __unicode__(self):
-		return u'replay_id: ' + str(self.replay_id)
+	def __str__(self):
+		return 'replay_id: ' + str(self.replay_id)
 
 	user                = models.ForeignKey(User)
 	replay_id           = models.IntegerField(default=0)
@@ -178,22 +149,12 @@ class ReplayPlayers(models.Model):
 
 	posted              = models.DateTimeField('date published', default=datetime.datetime.now)
 
-class Palettes(models.Model):
 
-	class Meta:
-		verbose_name = 'Palette'
-
-	user                = models.ForeignKey(User)
-	title               = models.CharField(max_length=200)
-	info                = models.CharField(max_length=400)
-	used                = models.IntegerField(default=0)
-	posted              = models.DateTimeField('date published')
-	rating              = models.FloatField(default=0.0)
 
 class Reports(models.Model):
 
 	class Meta:
-		verbose_name = 'Report'
+		verbose_name_plural = 'Reports'
 
 	user                = models.ForeignKey(User)
 	reason              = models.CharField(max_length=400)
@@ -202,10 +163,12 @@ class Reports(models.Model):
 	infringement        = models.BooleanField(default=False)
 	posted              = models.DateTimeField('date published')
 
+
+
 class Screenshots(models.Model):
 
 	class Meta:
-		verbose_name = 'Screenshot'
+		verbose_name_plural = 'Screenshots'
 
 	user                = models.ForeignKey(User)
 	ex_id               = models.IntegerField(default=0)
@@ -213,20 +176,12 @@ class Screenshots(models.Model):
 	posted              = models.DateTimeField('date published')
 	map_preview         = models.BooleanField(default=False)
 
-class CrashReports(models.Model):
 
-	class Meta:
-		verbose_name = 'CrashReport'
-
-	gameID              = models.IntegerField(default=0)
-	description         = models.CharField(max_length=400)
-	isdesync            = models.BooleanField(default=False)
-	gistID              = models.IntegerField(default=0)
 
 class Rating(models.Model):
 
 	class Meta:
-		verbose_name = 'Rating'
+		verbose_name_plural = 'Ratings'
 
 	user                = models.ForeignKey(User)
 	ex_id               = models.IntegerField(default=0)
