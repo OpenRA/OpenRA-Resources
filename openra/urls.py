@@ -85,8 +85,8 @@ urlpatterns = [
 		name='registration_register'), 
 	url(r'^auth/', include('registration.backends.default.urls')),
 
-	url(r'^auth/login/?$', views.login, name='login'),
-	url(r'^auth/logout/?$', views.logoutView, name='logoutView'),
+	url(r'^login/?$', views.loginView, name='loginView'),
+	url(r'^logout/?$', views.logoutView, name='logoutView'),
 
 	url(r'^accounts/profile/?$', views.profile, name='profile'),
 	url(r'^accounts/password/?$', views.profile, name='profile'),

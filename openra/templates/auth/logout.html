@@ -1,0 +1,14 @@
+{% include 'header.html' %}
+
+<h2>Sign Out</h2>
+
+<div class="cBlock">
+	<p>Are you sure you want to sign out?</p>
+
+	<form method="POST" action="/logout/">
+	{% csrf_token %}
+		<button type="submit">Sign Out</button>
+	</form>
+</div>
+
+{% include 'footer.html' %}
