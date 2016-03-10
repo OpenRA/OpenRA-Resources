@@ -62,7 +62,6 @@ def feed(request):
 	template = loader.get_template('feed.html')
 	template_args = {
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': 'OpenRA Resource Center - RSS Feed',
 		'lastBuildDate': lastBuildDate,
 		'mapObject': mapObject,

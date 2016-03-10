@@ -3,21 +3,21 @@
 <channel>
 	<atom:link href="/news/feed/" rel="self" type="application/rss+xml"/>
 	<title>{{title}}</title>
-	<link>http://{{http_host}}</link>
+	<link>http://{{request.META.HTTP_HOST}}</link>
 	<description/>
 	<lastBuildDate>{{lastBuildDate}}</lastBuildDate>
 	{% for item in mapObject %}
 	<item>
 		<guid isPermaLink="false">
-		http://{{http_host}}/maps/{{item.id}}/
+		http://{{request.META.HTTP_HOST}}/maps/{{item.id}}/
 		</guid>
 		<title>{{item.title|strip_tags}}</title>
 		<link>
-		http://{{http_host}}/maps/{{item.id}}/
+		http://{{request.META.HTTP_HOST}}/maps/{{item.id}}/
 		</link>
 		<description>
 		{% autoescape off %}
-		<![CDATA[<img align="left" hspace="5" src="http://{{http_host}}/maps/{{item.id}}/minimap"/>
+		<![CDATA[<img align="left" hspace="5" src="http://{{request.META.HTTP_HOST}}/maps/{{item.id}}/minimap"/>
 		{% if item.description != "" %}Description: {{item.description|nl_to_br}}<br />{% endif %}Mod: {{item.game_mod}}<br />Type: {{item.map_type}}<br />Revision: {{item.revision}}<br />Max Players: {{item.players}}<br />Tileset: {{item.tileset}}<br />Hash: {{item.map_hash}}
 		{% if item.info != "" %}
 		<br />
