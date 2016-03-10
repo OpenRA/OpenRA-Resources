@@ -6,7 +6,7 @@
             <div id="map_grid">
                 {% for item in maps %}
                     <div class="map_grid_cell">
-                        <a href="http://{{http_host}}/maps/{{item.id}}">
+                        <a href="/maps/{{item.id}}">
                             <div class="cell-link-container">
                                 <div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
                             </div>
@@ -59,7 +59,7 @@
                         {% if page == i %}
                             <span>{{ i }}</span>
                         {% else %}
-                            <a href="http://{{http_host}}/maps/{{arg}}/revisions/page/{{i}}">{{ i }}</a>
+                            <a href="/maps/{{arg}}/revisions/page/{{i}}">{{ i }}</a>
                         {% endif %}
                     {% else %}
                         {% if i < page %}

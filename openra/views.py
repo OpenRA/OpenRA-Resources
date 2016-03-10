@@ -4,7 +4,6 @@ import re
 import urllib.request
 import datetime
 import shutil
-import multiprocessing
 import random
 import operator
 import json
@@ -14,8 +13,6 @@ from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, Http404
-from django.db import connection
-from django.db.models import Count
 from django.db.models import Max
 from django.utils import timezone
 
@@ -25,8 +22,6 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openra import handlers, misc, utility
 from openra.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
 
 
 
@@ -37,7 +32,6 @@ def index(request):
 	template_args = {
 		'content': 'index_content.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': '',
 		'screenshots': scObject,
 	}
@@ -108,7 +102,6 @@ def search(request, arg=""):
 	template_args = {
 		'content': 'search.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Search',
 		'global_search_request': global_search_request,
 		'search_request': search_request,
@@ -136,7 +129,6 @@ def ControlPanel(request, page=1, filter=""):
 	template_args = {
 		'content': 'control_panel.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - My Content',
 		'maps': mapObject,
 		'page': int(page),
@@ -165,7 +157,6 @@ def maps(request, page=1, filter=""):
 	template_args = {
 		'content': 'maps.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Maps',
 		'maps': mapObject,
 		'page': int(page),
@@ -200,7 +191,6 @@ def mapsFromAuthor(request, author, page=1):
 	template_args = {
 		'content': 'mapsFromAuthor.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Maps From ' + author,
 		'maps': mapObject,
 		'page': int(page),
@@ -282,7 +272,6 @@ def displayReplay(request, arg):
 	template_args = {
 		'content': 'displayReplay.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Replay details - ' + arg,
 		'orarep': orarepObj,
 		'reports': reports,
@@ -401,9 +390,9 @@ def displayMap(request, arg):
 
 	mapsFromAuthor = Maps.objects.filter(author=mapObject.author,next_rev=0).exclude(id=mapObject.id).distinct('map_hash').order_by('map_hash', '-posted').exclude(map_hash=mapObject.map_hash)
 	if len(mapsFromAuthor) >= 8:
-		mapsFromAuthor = random.sample(mapsFromAuthor, 8)
+		mapsFromAuthor = random.sample(list(mapsFromAuthor), 8)
 	else:
-		mapsFromAuthor = random.sample(mapsFromAuthor, len(mapsFromAuthor))
+		mapsFromAuthor = random.sample(list(mapsFromAuthor), len(mapsFromAuthor))
 
 	similarMaps = Maps.objects.filter(next_rev=0,game_mod=mapObject.game_mod,tileset=mapObject.tileset,players=mapObject.players,map_type=mapObject.map_type,width=mapObject.width,height=mapObject.height).exclude(map_hash=mapObject.map_hash)[0:8]
 
@@ -432,7 +421,6 @@ def displayMap(request, arg):
 	template_args = {
 		'content': 'displayMap.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Map details - ' + mapObject.title,
 		'map': mapObject,
 		'userid': userObject,
@@ -588,7 +576,7 @@ def serveOramap(request, arg, sync=""):
 		serveOramap = path + os.sep + oramap
 		if sync == "sync":
 				oramap = arg + ".oramap"
-		response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
+		response = StreamingHttpResponse(open(serveOramap, 'rb'), content_type='application/zip')
 		response['Content-Disposition'] = 'attachment; filename = %s' % oramap
 		response['Content-Length'] = os.path.getsize(serveOramap)
 		Maps.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
@@ -695,13 +683,12 @@ def uploadMap(request, previous_rev=0):
 	template_args = {
 		'content': 'uploadMap.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Uploading Map',
 		'uid': uid,
 		'previous_rev': previous_rev,
 		'previous_rev_title': previous_rev_title,
 		'rev': rev,
-		'parsers': list(reversed( settings.OPENRA_VERSIONS.values() )),
+		'parsers': list(reversed( list(settings.OPENRA_VERSIONS.values()) )),
 		'bleed_tag': bleed_tag,
 		'error_response': error_response,
 	}
@@ -743,7 +730,6 @@ def DeleteMap(request, arg):
 	template_args = {
 		'content': 'deleteMap.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': 'Delete Map',
 		'mapTitle': mapTitle,
 		'mapAuthor': mapAuthor,
@@ -775,10 +761,9 @@ def uploadReplay(request):
 	template_args = {
 		'content': 'uploadReplay.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Uploading Replay',
 		'response': response,
-		'parsers': list(reversed( settings.OPENRA_VERSIONS.values() )),
+		'parsers': list(reversed( list(settings.OPENRA_VERSIONS.values()) )),
 		'bleed_tag': bleed_tag,
 	}
 
@@ -831,7 +816,6 @@ def addScreenshot(request, arg, item):
 	template = loader.get_template('addScreenshotForm.html')
 	template_args = {
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'arg': arg,
 		'form': form,
 	}
@@ -858,7 +842,6 @@ def MapRevisions(request, arg, page=1):
 	template_args = {
 		'content': 'revisionsMap.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Revisions',
 		'maps': mapObject,
 		'page': int(page),
@@ -884,7 +867,6 @@ def screenshots(request):
 	template_args = {
 		'content': 'screenshots.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Screenshots',
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
@@ -911,7 +893,6 @@ def comments(request, page=1):
 	template_args = {
 		'content': 'comments.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Comments',
 		'comments': comments,
 		'amount': amount,
@@ -945,7 +926,6 @@ def comments_by_user(request, arg, page=1):
 	template_args = {
 		'content': 'comments.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Comments by ' + request.user.username,
 		'comments': comments,
 		'amount': amount,
@@ -975,7 +955,6 @@ def replays(request, page=1):
 	template_args = {
 		'content': 'replays.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Replays',
 		'replays': replayObject,
 		'page': int(page),
@@ -996,10 +975,9 @@ def handle404(request):
 	template_args = {
 		'content': '404.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Page not found',
 	}
-	return StreamingHttpResponse(template.render(template_args, request))
+	return StreamingHttpResponse(template.render(template_args, request), status=404)
 
 
 
@@ -1016,7 +994,6 @@ def profile(request):
 	template_args = {
 		'content': 'profile.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Profile',
 		'amountMaps': amountMaps,
 		'ifsocial': ifsocial,
@@ -1030,7 +1007,6 @@ def faq(request):
 	template_args = {
 		'content': 'faq.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - FAQ',
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
@@ -1042,7 +1018,6 @@ def links(request):
 	template_args = {
 		'content': 'links.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Links',
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
@@ -1062,7 +1037,6 @@ def contacts(request):
 	template_args = {
 		'content': 'contacts.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Contacts',
 		'message_sent': message_sent,
 	}
@@ -1076,7 +1050,6 @@ def contacts_sent(request):
 	template_args = {
 		'content': 'contacts.html',
 		'request': request,
-		'http_host': request.META['HTTP_HOST'],
 		'title': ' - Contacts',
 		'message_sent': message_sent,
 	}
