@@ -42,6 +42,16 @@ def index(request):
 
 
 
+def login(request):
+	template = loader.get_template('auth/login.html')
+	template_args = {
+		'request': request,
+		'title': 'OpenRA Resource Center - Sign In',
+	}
+	return StreamingHttpResponse(template.render(template_args, request))
+
+
+
 def logoutView(request):
 	if request.user.is_authenticated():
 		logout(request)

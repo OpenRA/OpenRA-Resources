@@ -81,12 +81,16 @@ urlpatterns = [
 
 	url(r'^deletecomment/(?P<arg>\d+)/(?P<item_type>\w+)/(?P<item_id>\w+)/?$', views.deleteComment, name='deleteComment'),
 
-	url(r'^accounts/register/?$', RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),
+	url(r'^auth/register/?$', RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),
 		name='registration_register'), 
-	url(r'^accounts/', include('registration.backends.default.urls')),
-	url(r'^logout/?$', views.logoutView, name='logoutView'),
+	url(r'^auth/', include('registration.backends.default.urls')),
+
+	url(r'^auth/login/?$', views.login, name='login'),
+	url(r'^auth/logout/?$', views.logoutView, name='logoutView'),
+
 	url(r'^accounts/profile/?$', views.profile, name='profile'),
 	url(r'^accounts/password/?$', views.profile, name='profile'),
+
 
 	url(r'^news/feed.rss?$', views.feed, name='feed'),
 	url(r'^search/?$', views.search, name='search'),

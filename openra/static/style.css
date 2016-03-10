@@ -749,16 +749,16 @@ p.registerInfo {
   border: 2px solid #74c2e7;
 }
 
-#accountsmain {
+.accountsmain {
   height: 240px;  
   font-size: 0.9em;
 }
 
-#localaccount {  
+.localaccount {  
   float: left;
 }
 
-#localaccount form {
+.localaccount form {
   width: 300px;
   padding: 10px;
 }
