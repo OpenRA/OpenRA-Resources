@@ -69,7 +69,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 		for line in proc:
 			if line == None:
 				continue
-			if line.strip() != "":
+			if line.decode().strip() != "":
 				upgraded = False
 
 		os.chdir(currentDirectory)
@@ -251,7 +251,7 @@ def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(
 
 	os.chmod(fullpath, 0o644)
 
-	maphash = proc[0].strip()
+	maphash = proc[0].decode().strip()
 	os.chdir(currentDirectory)
 	print('Recalculated hash: %s' % item.id)
 
@@ -293,7 +293,7 @@ def ReadYaml(item=False, fullpath=""):
 	shouldCountRules = False
 	expectspawn = False
 	spawnpoints = ""
-	for line in string.split(yamlData, '\n'):
+	for line in yamlData.split('\n'):
 		if line[0:5] == "Title":
 			map_data_ordered['title'] = line[6:].strip().replace("'", "''")
 		if line[0:11] == "RequiresMod":
@@ -370,7 +370,7 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
 
 	currentDirectory = os.getcwd() + os.sep
 
-	available_parsers = list(reversed( settings.OPENRA_VERSIONS.values() ))
+	available_parsers = list(reversed( list(settings.OPENRA_VERSIONS.values()) ))
 
 	for current_parser in available_parsers:
 		if current_parser == "bleed":
@@ -421,7 +421,7 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
 		for res in proc:
 			if res == None:
 				continue
-			lines = res.split("\n")
+			lines = res.decode().split("\n")
 			for line in lines:
 				if 'Testing map' in line:
 					print(line)

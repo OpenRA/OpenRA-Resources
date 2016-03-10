@@ -221,7 +221,7 @@ def mostRatedMap(request):
 def mostCommentedMap(request):
 	mapObject = Maps.objects.filter(next_rev=0)
 	comments = misc.count_comments_for_many(mapObject, 'maps')
-	mapid = max(comments.iteritems(), key=operator.itemgetter(1))[0]
+	mapid = max(comments.items(), key=operator.itemgetter(1))[0]
 	return HttpResponseRedirect('/maps/'+mapid+'/')
 
 
@@ -945,7 +945,7 @@ def replays(request, page=1):
 	perPage = 10
 	slice_start = perPage*int(page)-perPage
 	slice_end = perPage*int(page)
-	replayObject = Replays.objects.filter().order_by('-posted')
+	replayObject = Replays.objects.filter().distinct('sha1sum').order_by('sha1sum', '-posted')
 	replayObject = sorted(replayObject, key=lambda x: (x.posted), reverse=True)
 	amount = len(replayObject)
 	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows

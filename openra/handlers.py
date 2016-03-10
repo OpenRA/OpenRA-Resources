@@ -43,15 +43,15 @@ class ReplayHandlers():
 
 		command = 'file -b --mime-type %s' % tempname
 		proc = Popen(command.split(), stdout=PIPE).communicate()
-		mimetype = proc[0].strip()
-		if not ( mimetype == 'application/octet-stream' and os.path.splitext(replay_file.name)[1].lower() == '.orarep' ):
+		mimetype = proc[0].decode().strip()
+		if not ( (mimetype == 'application/octet-stream' or mimetype == 'application/zip') and os.path.splitext(replay_file.name)[1].lower() == '.orarep' ):
 			response['error'] = True
 			response['response'] = 'Failed. Unsupported file type.'
 			return response
 
 		command = 'sha1sum %s' % tempname
 		proc = Popen(command.split(), stdout=PIPE).communicate()
-		sha1_hash = proc[0].split()[0].strip()
+		sha1_hash = proc[0].decode().split()[0].strip()
 
 		sha1sum_exists = Replays.objects.filter(sha1sum=sha1_hash,user=user_id)
 		if sha1sum_exists:
@@ -86,7 +86,7 @@ class ReplayHandlers():
 		transac.save()
 		self.UID = transac.id
 
-		for pl_key, pl_value in replay_metadata['Players'].iteritems():
+		for pl_key, pl_value in replay_metadata['Players'].items():
 			transac_player = ReplayPlayers(
 				user = userObject,
 				replay_id = transac.id,
@@ -131,7 +131,7 @@ class ReplayHandlers():
 		for res in proc:
 			if res == None:
 				continue
-			lines = res.split("\n")
+			lines = res.decode().split("\n")
 			for line in lines:
 				if '.orarep' in line:
 					continue
@@ -204,7 +204,7 @@ class MapHandlers():
 
 		command = 'file -b --mime-type %s' % tempname
 		proc = Popen(command.split(), stdout=PIPE).communicate()
-		mimetype = proc[0].strip()
+		mimetype = proc[0].decode().strip()
 		if not ( mimetype == 'application/zip' and os.path.splitext(f.name)[1].lower() == '.oramap' ):
 			if not ( mimetype == 'text/plain' and os.path.splitext(f.name)[1].lower() in ['.mpr', '.ini'] ):
 				self.LOG.append('Failed. Unsupported file type.')
@@ -326,10 +326,7 @@ class MapHandlers():
 		shutil.move(tempname, self.map_full_path_filename)
 
 		self.map_is_uploaded = True
-		self.flushLog( ['Map was successfully uploaded as "%s"' % name] )
-		if post['info'] != "":
-			self.flushLog( ['Info: ' + post['info']] )
-		
+
 		self.UnzipMap()
 
 		lint_check_response = utility.LintCheck(transac, self.map_full_path_filename, parser)
@@ -345,6 +342,7 @@ class MapHandlers():
 
 		shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(resp_map_data['game_mod'], parser,), name='shppreview')
 		shp.start()
+		print("--- New map: %s" % self.UID)
 		return False # no errors
 
 	def UnzipMap(self):
@@ -368,7 +366,7 @@ class MapHandlers():
 
 		os.chmod(filepath, 0o644)
 
-		self.maphash = proc[0].strip()
+		self.maphash = proc[0].decode().strip()
 		self.LOG.append(self.maphash)
 
 		os.chdir(self.currentDirectory)
@@ -384,10 +382,9 @@ class MapHandlers():
 		try:
 			shutil.move(misc.addSlash(parser + "/") + self.preview_filename,
 				self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-mini.png")
-			self.flushLog(proc)
 			self.minimap_generated = True
 		except:
-			self.flushLog( ["Failed to generate minimap for this file."] )        
+			pass # failed to generate minimap
 
 		os.chdir(self.currentDirectory)
 
@@ -411,7 +408,6 @@ class MapHandlers():
 
 				try:
 					proc = Popen(command.split(), stdout=PIPE).communicate()
-					self.flushLog(proc)
 					signal.alarm(0)
 				except:
 					err = 'Error: failed to generate SHP preview for %s (map: %s)' % (fn, self.UID)
@@ -435,18 +431,19 @@ class MapHandlers():
 				imgs.writeImages(self.map_full_path_directory+'content/'+fn+'.gif')
 				os.chdir(self.currentDirectory)
 				shutil.rmtree(self.map_full_path_directory+'content/png/')
+		exit()
 
 	def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
 		os.chdir(parser + "/")
 		for mod in ['ra','cnc','d2k','ts', 'ra2']:
 			command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
 			proc = Popen(command.split(), stdout=PIPE).communicate()
-			self.LOG.append([proc[0]])
-			if "Error" in proc[0] or "Unknown" in proc[0]:
+			self.LOG.append([proc[0].decode()])
+			if "Error" in proc[0].decode() or "Unknown" in proc[0].decode():
 				continue
 			else:
-				if "saved" in proc[0]:
-					self.legacy_name = proc[0].split(' saved')[0]
+				if "saved" in proc[0].decode():
+					self.legacy_name = proc[0].decode().split(' saved')[0]
 					os.chdir(self.currentDirectory)
 					return True
 				else:
@@ -454,15 +451,7 @@ class MapHandlers():
 		os.chdir(self.currentDirectory)
 		return False
 
-	def flushLog(self, output=[], lint=""):
-		logfile = open(self.map_full_path_directory + lint + "log", "a")
-		for line in output:
-			if line != None:
-				logfile.write(line.strip() + "\n")
-				if lint == "":
-					self.LOG.append(line.strip())
-		logfile.close()
-		return True
+
 
 def addScreenshot(f, arg, user_id, item):
 	if item == 'map':
@@ -480,7 +469,7 @@ def addScreenshot(f, arg, user_id, item):
 
 	command = 'file -b --mime-type %s' % tempname
 	proc = Popen(command.split(), stdout=PIPE).communicate()
-	mimetype = proc[0].strip()
+	mimetype = proc[0].decode().strip()
 	if mimetype not in ['image/jpeg','image/png','image/gif']:
 		return False
 
