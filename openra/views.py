@@ -458,7 +458,7 @@ def deleteScreenshot(request, itemid):
 			except:
 				pass
 			scObject[0].delete()
-			return HttpResponseRedirect("/"+name+"/"+arg)
+			return HttpResponseRedirect("/"+name+"/"+arg+"/")
 	return HttpResponseRedirect("/")
 
 
@@ -498,7 +498,10 @@ def unsubscribe_from_comments(request, item_type, arg):
 def serveScreenshot(request, itemid, itemname=""):
 	image = ""
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid
-	Dir = os.listdir(path)
+	try:
+		Dir = os.listdir(path)
+	except:
+		return HttpResponseRedirect("/")
 	for fn in Dir:
 		if "-mini." in fn:
 			if itemname == "mini":
