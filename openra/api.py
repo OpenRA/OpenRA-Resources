@@ -297,7 +297,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 			raise Http404
 		serveOramap = path + os.sep + oramap
 		oramap = os.path.splitext(oramap)[0] + "-" + str(mapObject.revision) + ".oramap"
-		response = StreamingHttpResponse(open(serveOramap), content_type='application/zip')
+		response = StreamingHttpResponse(open(serveOramap, 'rb'), content_type='application/zip')
 		response['Content-Disposition'] = 'attachment; filename = %s' % oramap
 		response['Content-Length'] = os.path.getsize(serveOramap)
 		Maps.objects.filter(id=mapObject.id).update(downloaded=mapObject.downloaded+1)
@@ -509,7 +509,7 @@ def get_minimap(mapid, soft=False):
 		else:
 			raise Http404
 	with open(serveImage, "rb") as image_file:
-		minimap = base64.b64encode(image_file.read())
+		minimap = base64.b64encode(image_file.read()).decode()
 	return minimap
 
 def get_url(request, mapid):
