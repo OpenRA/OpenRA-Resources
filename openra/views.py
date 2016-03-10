@@ -28,6 +28,8 @@ from openra.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Repo
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 
+
+
 def index(request):
 	scObject = Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
 
@@ -44,10 +46,14 @@ def index(request):
 		template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
 	return StreamingHttpResponse(template.render(template_args, request))
 
+
+
 def logoutView(request):
 	if request.user.is_authenticated():
 		logout(request)
 	return HttpResponseRedirect('/')
+
+
 
 def feed(request):
 	mapObject = Maps.objects.order_by("-posted")[0:20]
@@ -62,6 +68,8 @@ def feed(request):
 		'mapObject': mapObject,
 	}
 	return StreamingHttpResponse(template.render(template_args, request), content_type='text/xml')
+
+
 
 def search(request, arg=""):
 
@@ -107,6 +115,8 @@ def search(request, arg=""):
 		'search_request': search_request,
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
+
+
 
 def ControlPanel(request, page=1, filter=""):
 	if not request.user.is_authenticated():
@@ -171,6 +181,8 @@ def maps(request, page=1, filter=""):
 
 	return StreamingHttpResponse(template.render(template_args, request))
 
+
+
 def mapsFromAuthor(request, author, page=1):
 	perPage = 20
 	slice_start = perPage*int(page)-perPage
@@ -200,10 +212,14 @@ def mapsFromAuthor(request, author, page=1):
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
+
+
 def randomMap(request):
 	mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
 	mapObject = random.choice(mapObject)
 	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
+
+
 
 def mostRatedMap(request):
 	max_rating = Maps.objects.all().aggregate(Max('rating'))['rating__max']
@@ -211,11 +227,15 @@ def mostRatedMap(request):
 	voteObject = random.choice(voteObject)
 	return HttpResponseRedirect('/maps/'+str(voteObject.id)+'/')
 
+
+
 def mostCommentedMap(request):
 	mapObject = Maps.objects.filter(next_rev=0)
 	comments = misc.count_comments_for_many(mapObject, 'maps')
 	mapid = max(comments.iteritems(), key=operator.itemgetter(1))[0]
 	return HttpResponseRedirect('/maps/'+mapid+'/')
+
+
 
 def mostViewedMap(request):
 	max_viewed = Maps.objects.all().aggregate(Max('viewed'))['viewed__max']
@@ -223,17 +243,23 @@ def mostViewedMap(request):
 	mapObject = random.choice(mapObject)
 	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
 
+
+
 def mostDownloadedMap(request):
 	max_downloaded = Maps.objects.all().aggregate(Max('downloaded'))['downloaded__max']
 	mapObject = Maps.objects.filter(downloaded=max_downloaded)
 	mapObject = random.choice(mapObject)
 	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
 
+
+
 def activelyDevelopedMap(request):
 	max_developed = Maps.objects.all().aggregate(Max('revision'))['revision__max']
 	mapObject = Maps.objects.filter(revision=max_developed)
 	mapObject = random.choice(mapObject)
 	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
+
+
 
 def displayReplay(request, arg):
 	try:
@@ -329,14 +355,11 @@ def displayMap(request, arg):
 
 			return HttpResponseRedirect('/maps/' + arg + '/')
 
-	fullPreview = False
 	disk_size = 0
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
 	try:
 		mapDir = os.listdir(path)
 		for filename in mapDir:
-			if filename.endswith("-full.png"):
-				fullPreview = True
 			if filename.endswith(".oramap"):
 				disk_size = os.path.getsize(path + '/' + filename)
 				disk_size = misc.sizeof_fmt(disk_size)
@@ -415,7 +438,6 @@ def displayMap(request, arg):
 		'map': mapObject,
 		'userid': userObject,
 		'arg': arg,
-		'fullPreview': fullPreview,
 		'license': license,
 		'icons': icons,
 		'reports': reports,
@@ -435,6 +457,8 @@ def displayMap(request, arg):
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
+
+
 def deleteScreenshot(request, itemid):
 	scObject = Screenshots.objects.filter(id=itemid)
 	if scObject:
@@ -450,6 +474,8 @@ def deleteScreenshot(request, itemid):
 			return HttpResponseRedirect("/"+name+"/"+arg)
 	return HttpResponseRedirect("/")
 
+
+
 def deleteComment(request, arg, item_type, item_id):
 	comObject = Comments.objects.filter(id=arg)
 	if comObject:
@@ -461,6 +487,8 @@ def deleteComment(request, arg, item_type, item_id):
 				UnsubscribeComments.objects.filter(item_type=item_type, item_id=item_id, user=request.user.id).delete()
 
 	return HttpResponseRedirect("/"+item_type+"/"+item_id+"/")
+
+
 
 def unsubscribe_from_comments(request, item_type, arg):
 	if request.user.is_authenticated:
@@ -478,10 +506,11 @@ def unsubscribe_from_comments(request, item_type, arg):
 
 	return HttpResponseRedirect("/" + item_type + "/" + arg + "/")
 
+
+
 def serveScreenshot(request, itemid, itemname=""):
 	image = ""
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid
-	print(path)
 	Dir = os.listdir(path)
 	for fn in Dir:
 		if "-mini." in fn:
@@ -496,28 +525,11 @@ def serveScreenshot(request, itemid, itemname=""):
 				break
 	if image == "":
 		return StreamingHttpResponse("")
-	response = StreamingHttpResponse(open(image), content_type='image/'+mime)
+	response = StreamingHttpResponse(open(image, 'rb'), content_type='image/'+mime)
 	response['Content-Disposition'] = 'attachment; filename = %s' % fn
 	return response
 
-def serveRender(request, arg):
-	render = ""
-	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
-	try:
-		mapDir = os.listdir(path)
-	except:
-		return HttpResponseRedirect("/")
-	for filename in mapDir:
-		if filename.endswith("-full.png"):
-			render = filename
-			break
-	if render == "":
-		return HttpResponseRedirect('/maps/'+arg)
-	else:
-		serveImage = path + os.sep + render
-		response = StreamingHttpResponse(open(serveImage), content_type='image/png')
-		response['Content-Disposition'] = 'attachment; filename = %s' % render
-		return response
+
 
 def serveMinimap(request, arg):
 	minimap = ""
@@ -540,9 +552,11 @@ def serveMinimap(request, arg):
 	if minimap == "":
 		minimap = "nominimap.png"
 		serveImage = os.getcwd() + os.sep + __name__.split('.')[0] + '/static/images/nominimap.png'
-	response = StreamingHttpResponse(open(serveImage), content_type='image/png')
+	response = StreamingHttpResponse(open(serveImage, 'rb'), content_type='image/png')
 	response['Content-Disposition'] = 'attachment; filename = %s' % minimap
 	return response
+
+
 
 def serveReplay(request, arg):
 	orarep = ""
@@ -550,11 +564,12 @@ def serveReplay(request, arg):
 	if not os.path.isfile(path):
 		return HttpResponseRedirect('/replays/'+arg)
 
-	response = StreamingHttpResponse(open(path), content_type='application/octet-stream')
+	response = StreamingHttpResponse(open(path, 'rb'), content_type='application/octet-stream')
 	response['Content-Disposition'] = 'attachment; filename = %s' % arg+'.orarep'
 	response['Content-Length'] = os.path.getsize(path)
 	Replays.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
 	return response
+
 
 
 def serveOramap(request, arg, sync=""):
@@ -580,11 +595,15 @@ def serveOramap(request, arg, sync=""):
 		Maps.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
 		return response
 
+
+
 def serveYaml(request, arg):
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
 	response = StreamingHttpResponse(cgi.escape(open(path).read(), quote=None), content_type='application/plain')
 	response['Content-Disposition'] = 'attachment; filename = map.yaml'
 	return response
+
+
 
 def serveYamlRules(request, arg):
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
@@ -602,6 +621,8 @@ def serveYamlRules(request, arg):
 	response['Content-Disposition'] = 'attachment; filename = advanced.%s' % arg
 	return response
 
+
+
 def serveLua(request, arg, name):
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/'
 	fname = ""
@@ -616,6 +637,8 @@ def serveLua(request, arg, name):
 	response = StreamingHttpResponse(cgi.escape(open(path+fname).read(), quote=None), content_type='application/plain')
 	response['Content-Disposition'] = 'attachment; filename = %s' % fname
 	return response
+
+
 
 def serveMapSHP(request, arg, name, request_type='preview'):
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + '/content/'
@@ -634,9 +657,11 @@ def serveMapSHP(request, arg, name, request_type='preview'):
 					break
 	if fname == "":
 		raise Http404
-	response = StreamingHttpResponse(open(path+fname), content_type='image/gif')
+	response = StreamingHttpResponse(open(path+fname, 'rb'), content_type='image/gif')
 	response['Content-Disposition'] = 'attachment; filename = %s' % fname
 	return response
+
+
 
 def uploadMap(request, previous_rev=0):
 	if not request.user.is_authenticated():
@@ -688,6 +713,8 @@ def uploadMap(request, previous_rev=0):
 
 	return StreamingHttpResponse(template.render(template_args, request))
 
+
+
 def DeleteMap(request, arg):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/maps/')
@@ -723,6 +750,8 @@ def DeleteMap(request, arg):
 		'mapAuthor': mapAuthor,
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
+
+
 
 def uploadReplay(request):
 	if not request.user.is_authenticated():
@@ -760,6 +789,8 @@ def uploadReplay(request):
 
 	return StreamingHttpResponse(template.render(template_args, request))
 
+
+
 def SetDownloadingStatus(request, arg):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/maps/'+arg)
@@ -773,6 +804,8 @@ def SetDownloadingStatus(request, arg):
 		else:
 			Maps.objects.filter(id=arg).update(downloading=True)
 	return HttpResponseRedirect('/maps/'+arg)
+
+
 
 def ChangeRsyncStatus(request, arg):
 	if not request.user.is_authenticated():
@@ -788,6 +821,8 @@ def ChangeRsyncStatus(request, arg):
 			Maps.objects.filter(id=arg).update(rsync_allow=True)
 	return HttpResponseRedirect('/maps/'+arg)
 
+
+
 def addScreenshot(request, arg, item):
 	if item == 'map':
 		Object = Maps.objects.filter(id=arg)
@@ -802,6 +837,8 @@ def addScreenshot(request, arg, item):
 		'form': form,
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
+
+
 
 def MapRevisions(request, arg, page=1):
 	perPage = 20
@@ -833,41 +870,15 @@ def MapRevisions(request, arg, page=1):
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
+
+
 def cancelReport(request, name, arg):
 	if not request.user.is_authenticated:
 		return HttpResponseRedirect('/')
 	Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name=name).delete()
 	return HttpResponseRedirect('/'+name+'/'+arg)
 
-def units(request):
-	template = loader.get_template('index.html')
-	template_args = {
-		'content': 'units.html',
-		'request': request,
-		'http_host': request.META['HTTP_HOST'],
-		'title': ' - Units',
-	}
-	return StreamingHttpResponse(template.render(template_args, request))
 
-def mods(request):
-	template = loader.get_template('index.html')
-	template_args = {
-		'content': 'mods.html',
-		'request': request,
-		'http_host': request.META['HTTP_HOST'],
-		'title': ' - Mods',
-	}
-	return StreamingHttpResponse(template.render(template_args, request))
-
-def palettes(request):
-	template = loader.get_template('index.html')
-	template_args = {
-		'content': 'palettes.html',
-		'request': request,
-		'http_host': request.META['HTTP_HOST'],
-		'title': ' - Palettes',
-	}
-	return StreamingHttpResponse(template.render(template_args, request))
 
 def screenshots(request):
 	template = loader.get_template('index.html')
@@ -878,6 +889,8 @@ def screenshots(request):
 		'title': ' - Screenshots',
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
+
+
 
 def comments(request, page=1):
 	perPage = 20
@@ -913,6 +926,8 @@ def comments(request, page=1):
 		response.set_cookie('last_comment_id_seen', comments[0].id, max_age=4320000)
 	return response
 
+
+
 def comments_by_user(request, arg, page=1):
 	perPage = 20
 	slice_start = perPage*int(page)-perPage
@@ -942,40 +957,7 @@ def comments_by_user(request, arg, page=1):
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
-def assets(request):
-	noErrors = False
-	mirrors_list = []
-	url = 'http://open-ra.org/packages/'
-	try:
-		data = urllib.request.urlopen(url).read()
-		data = data.split('Parent Directory</a>')[1].split('<hr />')[0]
-		mirrors = re.findall('<a href="(.*)">', data)
-		for mirror in mirrors:
-			links_list = []
-			name = os.path.splitext(mirror)[0].replace('-',' ')
-			links = urllib.request.urlopen(url + mirror).read()
-			links = links.split('\n')[0:-1]
-			for onelink in links:
-				try:
-					status = urllib.request.urlopen(onelink)
-					status = "online"
-				except HTTPError as e:
-					status = "offline"
-				links_list.append([onelink, status])
-			mirrors_list.append([name, links_list])
-			noErrors = True
-	except:
-		pass
-	template = loader.get_template('index.html')
-	template_args = {
-		'content': 'assets.html',
-		'request': request,
-		'http_host': request.META['HTTP_HOST'],
-		'title': ' - Assets Packages Mirrors',
-		'noerrors': noErrors,
-		'mirrors_list': mirrors_list,
-	}
-	return StreamingHttpResponse(template.render(template_args, request))
+
 
 def replays(request, page=1):
 	perPage = 10
@@ -1008,41 +990,7 @@ def replays(request, page=1):
 
 	return StreamingHttpResponse(template.render(template_args, request))
 
-def uploadUnit(request):
-	if not request.user.is_authenticated():
-		return HttpResponseRedirect('/units/')
-	template = loader.get_template('index.html')
-	template_args = {
-		'content': 'uploadUnit.html',
-		'request': request,
-		'http_host': request.META['HTTP_HOST'],
-		'title': ' - Uploading Unit',
-	}
-	return StreamingHttpResponse(template.render(template_args, request))
 
-def uploadMod(request):
-	if not request.user.is_authenticated():
-		return HttpResponseRedirect('/mods/')
-	template = loader.get_template('index.html')
-	template_args = {
-		'content': 'uploadMod.html',
-		'request': request,
-		'http_host': request.META['HTTP_HOST'],
-		'title': ' - Uploading Mod',
-	}
-	return StreamingHttpResponse(template.render(template_args, request))
-
-def uploadPalette(request):
-	if not request.user.is_authenticated():
-		return HttpResponseRedirect('/palettes/')
-	template = loader.get_template('index.html')
-	template_args = {
-		'content': 'uploadPalette.html',
-		'request': request,
-		'http_host': request.META['HTTP_HOST'],
-		'title': ' - Uploading Palette',
-	}
-	return StreamingHttpResponse(template.render(template_args, request))
 
 def handle404(request):
 	template = loader.get_template('index.html')
@@ -1053,6 +1001,8 @@ def handle404(request):
 		'title': ' - Page not found',
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
+
+
 
 def profile(request):
 	if not request.user.is_authenticated():
@@ -1074,6 +1024,8 @@ def profile(request):
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
+
+
 def faq(request):
 	template = loader.get_template('index.html')
 	template_args = {
@@ -1084,6 +1036,8 @@ def faq(request):
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
+
+
 def links(request):
 	template = loader.get_template('index.html')
 	template_args = {
@@ -1093,6 +1047,8 @@ def links(request):
 		'title': ' - Links',
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
+
+
 
 def contacts(request):
 	message_sent = False
@@ -1112,6 +1068,8 @@ def contacts(request):
 		'message_sent': message_sent,
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
+
+
 
 def contacts_sent(request):
 	message_sent = True

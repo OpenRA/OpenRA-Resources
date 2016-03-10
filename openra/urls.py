@@ -30,7 +30,6 @@ urlpatterns = [
 	url(r'^maps/?$', views.maps, name='maps'),
 	url(r'^maps/(?P<arg>\d+)/?$', views.displayMap, name='displayMap'),
 	url(r'^maps/(?P<arg>\d+)/minimap/?$', views.serveMinimap, name='serveMinimap'),
-	url(r'^maps/(?P<arg>\d+)/render/?$', views.serveRender, name='serveRender'),
 	url(r'^maps/(?P<arg>\d+)/oramap/?$', views.serveOramap, name='serveOramap'),
 	url(r'^maps/(?P<arg>\d+)/oramap/(?P<sync>\w+)/?$', views.serveOramap, name='serverSyncOramap'),
 	url(r'^maps/(?P<arg>\d+)/delete/?$', views.DeleteMap, name='DeleteMap'),
@@ -61,14 +60,6 @@ urlpatterns = [
 
 	url(r'^upload/replay/?$', views.uploadReplay, name='uploadReplay'),
 
-	url(r'^units/?$', views.units, name='units'),
-	url(r'^units/upload/?$', views.uploadUnit, name='uploadUnit'),
-
-	url(r'^mods/?$', views.mods, name='mods'),
-	url(r'^mods/upload/?$', views.uploadMod, name='uploadMod'),
-
-	url(r'^palettes/?$', views.mods, name='palettes'),
-	url(r'^palettes/upload/?$', views.uploadPalette, name='uploadPalette'),
 
 	url(r'^screenshots/?$', views.screenshots, name='screenshots'),
 	url(r'^screenshots/(?P<itemid>\d+)/?$', views.serveScreenshot, name='serveScreenshot'),
@@ -79,8 +70,6 @@ urlpatterns = [
 	url(r'^comments/page/(?P<page>\d+)/?$', views.comments, name='comments_paged'),
 	url(r'^comments/user/(?P<arg>\d+)/?$', views.comments_by_user, name='comments_by_user'),
 	url(r'^comments/user/(?P<arg>\d+)/page/(?P<page>\d+)/?$', views.comments_by_user, name='comments_by_user_paged'),
-
-	url(r'^assets/?$', views.assets, name='assets'),
 
 	url(r'^replays/?$', views.replays, name='replays'),
 	url(r'^replays/page/(?P<page>\d+)/?$', views.replays, name='replays_paged'),
