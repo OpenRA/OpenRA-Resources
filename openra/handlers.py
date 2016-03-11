@@ -10,8 +10,6 @@ import json
 from subprocess import Popen, PIPE
 import multiprocessing
 from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
-import PIL
-from PIL import Image as PILImage
 
 from django.conf import settings
 from django.utils import timezone
@@ -491,12 +489,18 @@ def addScreenshot(f, arg, user_id, item):
 	shutil.move(tempname, path + arg + "." + mimetype.split('/')[1])
 
 
-	basewidth = 300
-	sc_img = PILImage.open(path + arg + "." + mimetype.split('/')[1])
-	wpercent = (basewidth/float(sc_img.size[0]))
-	hsize = int((float(sc_img.size[1])*float(wpercent)))
+	command = 'identify -format "%w,%h" {0}'.format(path + arg + "." + mimetype.split('/')[1])
+	proc = Popen(command.split(), stdout=PIPE).communicate()
+	details = proc[0].decode().strip().strip('"').split(',')
 
-	sc_img = sc_img.resize((basewidth*2,hsize*2), PIL.Image.ANTIALIAS)
-	sc_img = sc_img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-	sc_img.save(str(path + arg + "-mini." + mimetype.split('/')[1]))
-	return True
+	im = Image( str(path + arg + "." + mimetype.split('/')[1]) )
+	
+	scaleH = int(details[0]) / 100.0
+	scaleH = 250 / scaleH
+	scaleH = int(details[1]) / 100.0 * scaleH
+
+	im.quality(100)
+	im.filterType(FilterTypes.SincFilter)
+	im.scale('250x%s' % scaleH)
+	im.sharpen(1.0)
+	im.write(str(path + arg + "-mini." + mimetype.split('/')[1]))
