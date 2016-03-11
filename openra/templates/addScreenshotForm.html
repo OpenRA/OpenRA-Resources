@@ -1,0 +1,16 @@
+{% if request.user.is_authenticated %}
+	<div class="upload_container">
+		<form action="/maps/{{arg}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+			<h3>Upload screenshot of your map</h3>
+			<div class='addScreenshotForm'>
+				<div>
+					{% if form.scfile.errors %} <span class="error">{{ form.scfile.errors|join:", " }}</span>{% endif %}
+					{{ form.scfile }}
+				</div>
+				<div>
+					<button type="submit">Upload</button>
+				</div>
+			</div>
+		</form>
+	</div>
+{% endif %}
