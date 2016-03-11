@@ -12,6 +12,7 @@ path.py==8.1.2
 pexpect==4.0.1
 pgmagick==0.6.1
 pickleshare==0.6
+Pillow==3.1.1
 psycopg2==2.6.1
 ptyprocess==0.5.1
 python3-openid==3.0.9
