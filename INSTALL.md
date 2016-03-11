@@ -1,7 +1,7 @@
 ```
 Developed using:
 	Python 3.4.2
-	Django 1.9.3
+	Django 1.9.4
 	Database is PostgreSQL 9.4
 	Mail server is exim4.84-8 # for outgoing emails
 ```

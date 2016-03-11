@@ -22,6 +22,8 @@ from registration.backends.default.views import RegistrationView
 
 from openra import views, api, ajax
 
+
+
 urlpatterns = [
 	url(r'^admin/', admin.site.urls),
 
@@ -88,8 +90,8 @@ urlpatterns = [
 	url(r'^login/?$', views.loginView, name='loginView'),
 	url(r'^logout/?$', views.logoutView, name='logoutView'),
 
+	url(r'^accounts/', include('allauth.urls')),
 	url(r'^accounts/profile/?$', views.profile, name='profile'),
-	url(r'^accounts/password/?$', views.profile, name='profile'),
 
 
 	url(r'^news/feed.rss?$', views.feed, name='feed'),

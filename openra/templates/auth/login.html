@@ -44,7 +44,7 @@
 
 					<div class="row">
 						<div class="innerCellLeft"><br/>
-							<a href="#">Forgot Password?</a>
+							<a href='/accounts/password/reset/'>Forgot Password?</a>
 						</div>
 						<div class="innerCellRight">
 							<button class="primaryAction" type="submit">Sign In</button>
@@ -65,34 +65,21 @@
 
 
 		{% load socialaccount %}
-		{% if socialaccount.providers  %}
-		{% include "socialaccount/snippets/login_extra.html" %}
+		{% get_providers as socialaccount_providers %}
 		<div id="socialaccounts">
 			<p>Or just log in with one of these social accounts:</p>
 
 			<div class="frame">
 				<ul id="socialaccounts_providers">
-					 {% for provider in socialaccount.providers %}
-	                            {% if provider.id == "openid" %}
-	                            {% for brand in provider.get_brands %}
-	                            <li>
-	                              <a title="{{brand.name}}" 
-	                                 class="socialaccount_provider {{provider.id}} {{brand.id}}" 
-	                                 href="{% provider_login_url provider.id openid=brand.openid_url process=process %}"
-	                                >{{brand.name}}</a>
-	                            </li>
-	                            {% endfor %}
-	                            {% endif %}
-	                            <li><a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}" 
-	                                 href="{% provider_login_url provider.id process=process %}"><img src="/static/images/{{provider.id}}.svg" alt="{{provider.name}}"></a></li>
-	                            {% endfor %}
+					 {% for provider in socialaccount_providers %}
+						<li><a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}" 
+							 href="{% provider_login_url provider.id process=process %}"><img src="/static/images/{{provider.id}}.svg" alt="{{provider.name}}"></a>
+						</li>
+					{% endfor %}
 				</ul>
 			</div>
-			  
-			<br/>
-			You'll just be asked to authorize this website to use your login.
+			<p>You'll just be asked to authorize this website to use your login.</p>
 		</div>
-		{% endif %}
 	</div>
 
 {% endif %}

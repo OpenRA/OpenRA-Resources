@@ -58,7 +58,7 @@ def loginView(request):
 
 		if not remember:
 			request.session.set_expiry(0) # the user’s session cookie will expire when the user’s Web browser is closed.
-		print(request.session.get_expiry_age())
+
 		account = authenticate(username=username, password=password)
 		if account is not None:
 			if account.is_active:
@@ -72,7 +72,7 @@ def loginView(request):
 	referer = request.META.get('HTTP_REFERER', '/')
 	if input_referer != '/':
 		referer = input_referer
-	if 'auth' in referer:
+	if 'auth' in referer or 'account' in referer:
 		referer = '/'
 
 	template = loader.get_template('auth/login.html')

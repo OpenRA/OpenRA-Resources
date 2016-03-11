@@ -2,9 +2,6 @@
 	<nav class="side_nav">
 		<ul>
 			<li><a href="/accounts/profile/" {% if '/accounts/profile/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Summary</a></li>
-			{% if ifsocial == False %}
-			<li><a href="/accounts/password/" {% if 'accounts/password/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Password</a></li>
-			{% endif %}
 			<li><a href="/comments/user/{{request.user.id}}/">My comments</a></li>
 		</ul>
 	</nav>
@@ -19,7 +16,7 @@
 			{% if ifsocial == False %}
 			<div class="profile_row">
 				<div class="label">Password:</div>
-				<div>**************** <a href="/accounts/password/">(change)</a></div>
+				<div>**************** <a href="/accounts/password/reset/">(change)</a></div>
 			</div>
 			{% endif %}
 		</div>
