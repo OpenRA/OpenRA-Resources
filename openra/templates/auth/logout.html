@@ -1,5 +1,7 @@
 {% include 'header.html' %}
 
+{% if user.is_authenticated %}
+
 <h2>Sign Out</h2>
 
 <div class="cBlock">
@@ -7,8 +9,11 @@
 
 	<form method="POST" action="/logout/">
 	{% csrf_token %}
+		<input type="hidden" name="referer" value="{{referer}}">
 		<button type="submit">Sign Out</button>
 	</form>
 </div>
+
+{% endif %}
 
 {% include 'footer.html' %}

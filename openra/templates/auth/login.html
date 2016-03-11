@@ -7,28 +7,41 @@
 	<div class="accountsmain">
 
 		<div class="localaccount">
-		<p>Please sign in with your local account.</p>
+			<p>Please sign in with your local account.</p>
 
 			<div class="frame">
+
+				{% if errors %}
+					{% for error in errors %}
+						<div class="login_errors">{{ error }}</div>
+					{% endfor %}
+				{% endif %}
+
 				<form id="login" method="POST" action="/login/">{% csrf_token %}
+
+					<input type="hidden" name="referer" value="{{referer}}">
+
 					<div class="row">
 						<div class="innerCellLeft">
 							<label for="id_login">Username:</label>
 						</div>
 						<div class="innerCellRight"><input type="text" name="ora_username"></div>
 					</div>
+
 					<div class="row">
 						<div class="innerCellLeft">
 							<label for="id_password">Password:</label>
 						</div>
 						<div class="innerCellRight"><input type="password" name="ora_password"></div>
 					</div>
+
 					<div class="row">
 						<div class="innerCellLeft">
 							<label for="id_remember">Remember Me:  </label>
-							<input type="checkbox" name="ora_remember">
+							<input type="checkbox" name="ora_remember" checked=checked>
 						</div>
 					</div>
+
 					<div class="row">
 						<div class="innerCellLeft"><br/>
 							<a href="#">Forgot Password?</a>
@@ -37,13 +50,18 @@
 							<button class="primaryAction" type="submit">Sign In</button>
 						</div>
 					</div>
+
 				</form>
 			</div>
-		<br/>
-		Don't have an account? <a href="/auth/register/">Create one now</a>.
+
+			<p></p>
+
+			<div class="cBlock">
+				Don't have an account? <a href="/auth/register/">Create one now</a>.
+			</div>
 
 		</div>
-		
+
 
 
 		{% load socialaccount %}

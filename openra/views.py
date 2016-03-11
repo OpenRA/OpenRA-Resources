@@ -43,10 +43,44 @@ def index(request):
 
 
 def loginView(request):
+
+	if request.user.is_authenticated():
+		return HttpResponseRedirect('/')
+
+	errors = []
+
+	username = request.POST.get('ora_username', '').strip()
+	password = request.POST.get('ora_password', '').strip()
+	remember = request.POST.get('ora_remember', '')
+	input_referer = request.POST.get('referer', '/')
+
+	if username != '' and password != '':
+
+		if not remember:
+			request.session.set_expiry(0) # the user’s session cookie will expire when the user’s Web browser is closed.
+		print(request.session.get_expiry_age())
+		account = authenticate(username=username, password=password)
+		if account is not None:
+			if account.is_active:
+				login(request, account)
+				return HttpResponseRedirect(input_referer)
+			else:
+				errors.append("User is inactive, please activate account first.")
+		else:
+			errors.append("Incorrect username or password.")
+
+	referer = request.META.get('HTTP_REFERER', '/')
+	if input_referer != '/':
+		referer = input_referer
+	if 'auth' in referer:
+		referer = '/'
+
 	template = loader.get_template('auth/login.html')
 	template_args = {
 		'request': request,
 		'title': 'OpenRA Resource Center - Sign In',
+		'referer': referer if request.META['HTTP_HOST'] in referer else '/',
+		'errors': errors,
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
@@ -59,12 +93,15 @@ def logoutView(request):
 
 	if request.method == "POST":
 		logout(request)
-		return HttpResponseRedirect('/')
+		return HttpResponseRedirect(request.POST.get('referer','/'))
+
+	referer = request.META.get('HTTP_REFERER', '/')
 
 	template = loader.get_template('auth/logout.html')
 	template_args = {
 		'request': request,
 		'title': 'OpenRA Resource Center - Sign Out',
+		'referer': referer if request.META['HTTP_HOST'] in referer else '/',
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
