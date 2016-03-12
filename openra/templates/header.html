@@ -1,0 +1,112 @@
+{% load header_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=1024" />
+	<title>OpenRA Resource Center{{ title }}</title>
+	<link href="/static/style.css" rel="stylesheet" type="text/css">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
+
+	{% if map %}
+		<script type="text/javascript" src="/static/js/highslide/highslide-with-gallery.packed.js" ></script>
+		<script type="text/javascript" src="/static/js/highslide/highslide.config.js" charset="utf-8" ></script>
+		<link href="/static/js/highslide/highslide.css" rel="stylesheet">
+	{% endif %}
+	<script type="text/javascript" src="/static/js/jRating/jRating.jquery.js"></script>
+	<link rel="stylesheet" type="text/css" href="/static/js/jRating/jRating.jquery.css" media="screen" />
+
+	<script type="text/javascript" src="/static/js/script.js"></script>
+	<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link href="/static/favicon.ico" rel="shortcut icon" type="image/x-icon">
+	<link href="/news/feed/" rel="alternate" type="application/atom+xml">
+</head>
+<body>
+	<div id="overlay"></div>
+
+	<div id="rssfeed">
+		<a class="feed" href="/news/feed.rss">RSS Feed</a>
+	{% if user.is_authenticated %}
+		<a class="userManageTop" style="text-decoration: underline;" href="/logout/">Sign out</a>
+		<a class="userManageTop" style="text-decoration: underline; padding-right: 30px;" href="/accounts/profile/">Profile ({{ user.username}})</a>
+		<a class="userManageTop" style="text-decoration: none; padding-right: 30px;" href="/comments/">{{request.COOKIES.last_comment_id_seen|new_comments:request.user.id}}<span style="text-decoration: underline;">Comments</span></a>
+	{% endif %}
+	</div>
+
+
+	<div class="google-adsense-block-wide">
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<!-- resource.openra.net wide -->
+		<ins class="adsbygoogle"
+			 style="display:inline-block;width:220px;height:400px"
+			 data-ad-client="ca-pub-1502331739186135"
+			 data-ad-slot="5455125809"></ins>
+		<script>
+		(adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+	</div>
+
+	<div class="google-adsense-block-narrow">
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<!-- resource.openra.net narrow -->
+		<ins class="adsbygoogle"
+			 style="display:inline-block;width:120px;height:400px"
+			 data-ad-client="ca-pub-1502331739186135"
+			 data-ad-slot="6931859004"></ins>
+		<script>
+		(adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+	</div>
+
+
+	<div id="container">
+		<div id="header">
+			<h1>
+				<img src="/static/images/soviet-logo.svg" onerror='this.onerror = null; this.src="/static/images/soviet-logo-fallback.png"' alt="logo">OpenRA Resource Center
+			</h1>
+		</div>
+
+		<a id="ghbanner" href="http://openra.net" target="_blank" title="Go to the official OpenRA Website">
+			<img alt="Go to the official OpenRA Website" src="/static/images/openra-net.svg" onerror='this.onerror = null; this.src="/static/images/openra-net-fallback.png"'>
+		</a>
+
+		<form id="quick-search" method="POST" action="/search/">{% csrf_token %}
+			<input id="qsearch"
+				type="text"
+				title="Search maps, units, mods, authors..."
+				value="Search..."
+				onblur="this.value=!this.value?'Search...':this.value;"
+				onfocus="this.select()"
+				onclick="this.value='';"
+				name="qsearch">
+
+			<input class="btn"
+				type="image"
+				src="/static/images/search.svg"
+				onerror='this.onerror = null; this.src="/static/images/search-fallback.png"'
+				title="Search"
+				name="searchsubmit"
+				alt="Search">
+		</form>
+
+		<ul id="nav">
+			<li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></a></li>
+			<li><a href="/maps/"><span {% if '/maps' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
+			<li><a href="/replays/"><span {% if '/replays' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Replays</span></a></li>
+		{% if user.is_authenticated %}
+			<li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
+			<li><a href="#" onclick="return false;"><span {% if '/upload' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload</span></a>
+				<ul class="arrow_box arrow_box_upload">
+					<li><a href="/upload/map/"><span {% if '/upload/map' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload Map</span></a></li>
+					<li><a href="/upload/replay/"><span {% if '/upload/replay' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload Replay</span></a></li>
+				</ul>
+			</li>
+		{% else %}
+			<li><a href="/login/"><span {% if request.path == '/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>
+		{% endif %}
+		</ul>
+
+		<div id="content">

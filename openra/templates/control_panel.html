@@ -1,0 +1,84 @@
+{% load customTags %}
+<div id="panel_content">
+	<nav class="side_nav">
+		<ul>
+			<li><a href="/panel/mymaps/" {% if '/panel/mymaps/' in request.path %}{{'class="nav-selected"'}}{% endif %}>My Maps ({{ amount_maps }})</a></li>
+			<li><a style="opacity: 0.5;" href="#" {% if '/panel/myunits/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Units (0)</a></li>
+			<li><a style="opacity: 0.5;" href="#" {% if '/panel/mymods/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Mods (0)</a></li>
+			<li><a style="opacity: 0.5;" href="#" {% if '/panel/mypalettes/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Palettes (0)</a></li>
+			<li><a style="opacity: 0.5;" href="#" {% if '/panel/myscreenshots/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Screenshots (0)</a></li>
+		</ul>
+	</nav>
+
+	<div class="side_nav_content">
+	{% if '/panel/mymaps/' in request.path %}
+		{% if amount_maps != 0 %}
+		<div id="map_grid">
+		{% for item in maps %}
+			<div class="map_grid_cell">
+				<a href="/maps/{{item.id}}/">
+					<div class="cell-link-container">
+						<div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
+					</div>
+					{% if item.downloading == False or item.requires_upgrade == True or item.players == 0  or item.amount_reports >= 3 %}
+					<div class="map-custom-status"><img src="/static/images/attention-mini.jpg" /></div>
+					{% endif %}
+					{% if item.advanced_map %}
+					<div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" /></div>
+					{% endif %}
+					{% if item.lua %}
+					<div class="map-custom-status"><img src="/static/images/lua-mini.jpg" /></div>
+					{% endif %}
+				</a>
+				<div class="map_tooltip">
+					<div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
+					<table>
+						<tr>
+							<td class="tooltip_title">Author: </td>
+							<td class="tooltip_value">{{ item.author|strip_tags }} </td>
+						</tr>
+					</table>
+					<table>
+						<tr>
+							<td class="tooltip_title_misc">Revision: </td>
+							<td class="tooltip_value_misc">{{ item.revision }}</td>
+							<td class="tooltip_title_misc">Players: </td>
+							<td class="tooltip_value_misc">{{ item.players }}</td>
+						</tr>
+						<tr>
+							<td class="tooltip_title_misc">Comments: </td>
+							<td class="tooltip_value_misc">{{ comments|amount_comments:item.id }}</td>
+							<td class="tooltip_title_misc">Rating: </td>
+							<td class="tooltip_value_misc">{{ item.rating }}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		{% endfor %}
+		</div>
+		<div class="clear"></div>
+		{% if 2 in range %}
+		<div id="paging">
+		{% for i in range %}
+			<div class="paging_cell">
+			{% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
+				{% if page == i %}
+					<span>{{ i }}</span>
+				{% else %}
+					<a href="/panel/mymaps/page/{{i}}">{{ i }}</a>
+				{% endif %}
+			{% else %}
+				{% if i < page %}
+					<span class='no-page-before hide_block'>...</span>
+				{% else %}
+					<span class='no-page-after hide_block'>...</span>
+				{% endif %}
+			{% endif %}
+			</div>
+		{% endfor %}
+	</div>
+		{% endif %}
+		{% endif %}
+	{% endif %}
+	</div>
+</div>

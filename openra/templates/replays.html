@@ -1,0 +1,95 @@
+{% load customTags %}
+
+<div class='cBlock no-pd-bot replay-grid-header-info'>
+	<h3>Found {{ amount }} replays, ( beta )</h3>
+</div>
+
+{% if amount != 0 %}
+	<div class="replay_grid">
+		{% for item in replays %}
+			<div class="replay_grid_cell">
+				
+				<div class="replay_grid_cell_mod">
+					<img src="/static/images/logo_{{item.game_mod}}.svg" alt="logo_{{item.game_mod}}" title="{{item.game_mod|upper}}" />
+				</div>
+
+				<div class="replay_grid_cell_map">
+					{% if item.map_hash|map_exists_by_hash %}
+						<a href="{{item.map_hash|map_url_by_hash}}" title="{{item.map_hash|map_title_by_hash}}"><img src="{{item.map_hash|map_minimap_by_hash}}" alt="{{item.map_hash|map_title_by_hash}}" /></a>
+					{% else %}
+						<span>Unknown map</span>
+					{% endif %}
+				</div>
+
+				<div class="replay_grid_cell_info">
+					<a href="/replays/{{item.id}}/">
+
+						<div class="replay_grid_cell_info_row">
+							<b>{{item.user.username}}</b> uploaded on <b>{{item.posted}}</b>
+						</div>
+						<br />
+
+						<div class="replay_grid_cell_info_row">
+							Played with OpenRA version: <b>{{item.version}}</b>
+						</div>
+
+						<div class="replay_grid_cell_info_row">
+							Parsed by (during uploading): <b>{{item.parser}}</b>
+						</div>
+						<br />
+
+						<div class="replay_grid_cell_info_row">
+							<span>Players: </span>
+							<span class="replay_grid_players">
+								{% for player in item.id|get_replay_players %}
+									<b>{{player.name}}</b>{% if not forloop.last %}, {% endif %}
+								{% endfor %}
+							</span>
+						</div>
+
+					</a>
+				</div>
+			</div>
+		{% endfor %}
+		<div class="clear"></div>
+	</div>
+
+
+	{% if 2 in range %}
+	<div id="paging">
+		{% for i in range %}
+			<div class="paging_cell">
+			{% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
+				{% if page == i %}
+					<span>{{ i }}</span>
+				{% else %}
+					<a href="/replays/page/{{i}}">{{ i }}</a>
+				{% endif %}
+			{% else %}
+				{% if i < page %}
+					<span class='no-page-before hide_block'>...</span>
+				{% else %}
+					<span class='no-page-after hide_block'>...</span>
+				{% endif %}
+			{% endif %}
+			</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+	<div class="clear"></div>
+{% endif %}
+
+<div class='cBlock bottom-store-info'>
+	<p>Replays are stored in the user directories with sub-directories per mod/version.</p>
+	<ul>
+		<li><u>Windows:</u> My Documents\OpenRA\replays\&lt;mod name&gt;\&lt;version&gt;\</li>
+		<li><u>Mac OSX:</u> ~/Library/Application Support/OpenRA/replays/&lt;mod name&gt;/&lt;version&gt;/</li>
+		<li><u>Linux:</u> ~/.openra/replays/&lt;mod name&gt;/&lt;version&gt;/</li>
+	</ul>
+
+	<p>Example:  /home/user/.openra/replays/ra/playtest-20150815/OpenRA-2015-09-17T084350Z.orarep</p>
+</div>
+
+<div class='cBlock bottom-store-info'>
+	<p>More replays can be found at <a href="http://www.gamereplays.org/openra/replays.php?game=92" target="_blank">http://www.gamereplays.org/openra/replays.php?game=92</a></p>
+</div>

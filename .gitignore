@@ -3,6 +3,5 @@
 /__pycache__/*
 /__init__.py
 /logs
-/openraData/data
-/openraData/data/*
-/systemTool/settings.py
+/openra/data/*
+/openra/settings.py

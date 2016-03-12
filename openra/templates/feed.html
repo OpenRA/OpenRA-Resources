@@ -1,0 +1,38 @@
+{% load customTags %}
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<channel>
+	<atom:link href="/news/feed/" rel="self" type="application/rss+xml"/>
+	<title>{{title}}</title>
+	<link>http://{{request.META.HTTP_HOST}}</link>
+	<description/>
+	<lastBuildDate>{{lastBuildDate}}</lastBuildDate>
+	{% for item in mapObject %}
+	<item>
+		<guid isPermaLink="false">
+		http://{{request.META.HTTP_HOST}}/maps/{{item.id}}/
+		</guid>
+		<title>{{item.title|strip_tags}}</title>
+		<link>
+		http://{{request.META.HTTP_HOST}}/maps/{{item.id}}/
+		</link>
+		<description>
+		{% autoescape off %}
+		<![CDATA[<img align="left" hspace="5" src="http://{{request.META.HTTP_HOST}}/maps/{{item.id}}/minimap"/>
+		{% if item.description != "" %}Description: {{item.description|nl_to_br}}<br />{% endif %}Mod: {{item.game_mod}}<br />Type: {{item.map_type}}<br />Revision: {{item.revision}}<br />Max Players: {{item.players}}<br />Tileset: {{item.tileset}}<br />Hash: {{item.map_hash}}
+		{% if item.info != "" %}
+		<br />
+		Info by uploader: {{item.info|nl_to_br}}
+		{% endif %}
+		{% if item.advanced_map == True %}
+		<br /><br />Map is advanced{% if item.lua == True %} and contains Lua logic{% endif %}
+		{% endif %} ]]>
+		{% endautoescape %}
+		</description>
+		<pubDate>{{item.posted}}</pubDate>
+		<author>
+		<name>{{item.author|strip_tags}}</name>
+		</author>
+	</item>
+	{% endfor %}
+</channel>
+</rss>
