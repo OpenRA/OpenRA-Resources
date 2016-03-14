@@ -42,11 +42,11 @@ $ pip install -r requirements.txt
  * Create new user for web site in your Linux system
  * Web site user must have ```.openra``` directory in it's home and have owner rights to it (for OpenRA.Utility)
  * Compile several OpenRA releases (directory names must match version tag), structure example:
- ```
+```
 	/home/openra/engines/
 		/home/openra/engines/release-20151224/
 		/home/openra/engines/release-20150919/
- ```
+```
  * Compile OpenRA bleed version (directory name is any)
  * Create text file and put git hash of compiled bleed to it (Compiling bleed should be automated, like in production)
  * Directories with compiled OpenRA versions must have write permissions for web site user
@@ -59,21 +59,20 @@ $ pip install -r requirements.txt
 ### Edit openra/settings.py
 
  * Generate a new Django secret key and change "SECRET_KEY" setting
- * Change "DEBUG" setting to False if it's True
- * Modify "RSYNC_MAP_PATH" to specify directory where maps will be dumped by website trigger (cron) for dedicated servers. See [Sync Maps over Rsync](https://github.com/OpenRA/OpenRA-Resources/wiki/Sync-maps-over-RSYNC-%28for-dedicated-servers%29) guide for details
- * Modify "ADMIN_EMAIL_FROM" and "ADMIN_EMAIL_TO" to specify an email address of a person who is responsible for fixing map uploading issues
+ * Change ```DEBUG``` setting to False if it's True
+ * Modify ```ADMIN_EMAIL_FROM``` and ```ADMIN_EMAIL_TO``` to specify an email address of a person who is responsible for fixing map uploading issues
  * Edit Database connection settings
- * Change OPENRA_ROOT_PATH, using example above, it will be ```/home/openra/engines/```
- * Change OPENRA_VERSIONS, it will be just version tag names
- * Change OPENRA_BLEED_HASH_FILE_PATH to specify path to text file where you store git hash of compiled bleed version
- * Change OPENRA_BLEED_PARSER to specify directory where bleed version is compiled
+ * Change ```OPENRA_ROOT_PATH```, using example above, it will be ```/home/openra/engines/```
+ * Change ```OPENRA_VERSIONS```, it will be just version tag names
+ * Change ```OPENRA_BLEED_HASH_FILE_PATH``` to specify path to text file where you store git hash of compiled bleed version
+ * Change ```OPENRA_BLEED_PARSER``` to specify directory where bleed version is compiled
 
 
 
 ### Initialize django database (this will create all tables)
 
 ```
-python manage.py makemigrations
+python manage.py makemigrations && python manage.py makemigrations openra
 python manage.py migrate
 python manage.py createsuperuser
 ```
@@ -87,7 +86,7 @@ Running gunicorn (WSGI HTTP Server) (10 instances, max timeout 300 seconds) in `
 ```
 screen -S resource_site
 workon resource_site # see info about configuring virtualenv above
-cd \<repository root\>
+cd <repository root>
 gunicorn openra.wsgi -w 10 -t 300 --log-file=/path/to/gunicorn.log -b 127.0.0.1:8000
 ```
 
@@ -149,11 +148,3 @@ server {
  * Go to "Social Apps"; Add a new social app (set a proper client id and secret, chose a proper site)
  * Load http://yoursitedomain.com/accounts/github/login/  to authorize your new application at github
  * Do the similar actions to create and set up Google Application (without creating new site over django admin)
-
-### CRON config
-#### Sync maps for rsync directory ( `rsync`   is a django-admin command, path:  `openra/management/commands/rsync.py` )
-```
-WORKON_HOME=~/Envs
-
-*/5 * * * * source /usr/local/bin/virtualenvwrapper.sh && workon resource_site && cd <full path to repository root directory> && python manage.py rsync
-```

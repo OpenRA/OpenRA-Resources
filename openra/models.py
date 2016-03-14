@@ -15,7 +15,7 @@ class Maps(models.Model):
 	user                = models.ForeignKey(User)
 	title               = models.CharField(max_length=200)
 	description         = models.CharField(max_length=4000)
-	info                = models.CharField(max_length=4000)
+	info                = models.CharField(max_length=4000, blank=True, null=True)
 	author              = models.CharField(max_length=200)
 	map_type            = models.CharField(max_length=100)
 	players             = models.IntegerField(default=0)
@@ -44,7 +44,7 @@ class Maps(models.Model):
 	rsync_allow         = models.BooleanField(default=True)
 	amount_reports      = models.IntegerField(default=0)
 	policy_cc           = models.BooleanField(default=False)
-	policy_adaptations  = models.CharField(max_length=30)
+	policy_adaptations  = models.CharField(max_length=30, blank=True, null=True)
 	policy_commercial   = models.BooleanField(default=False)
 
 

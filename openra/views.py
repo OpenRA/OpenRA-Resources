@@ -993,7 +993,7 @@ def comments_by_user(request, arg, page=1):
 		'amount_this_page': amount_this_page,
 		'range': [i+1 for i in range(rowsRange)],
 		'page': int(page),
-		'comments_by_user': True,
+		'comments_by_user': User.objects.filter(id=arg).first(),
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
