@@ -390,11 +390,12 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		map_grid_type = 'RectangularIsometric'
 
 	category_lst = []
-	categories = json.loads(mapObject.categories)
-	for cat_id in categories:
-		catObj = MapCategories.objects.filter(id=cat_id).first()
-		if catObj:
-			category_lst.append(catObj.category_name)
+	if mapObject.categories:
+		categories = json.loads(mapObject.categories)
+		for cat_id in categories:
+			catObj = MapCategories.objects.filter(id=cat_id).first()
+			if catObj:
+				category_lst.append(catObj.category_name)
 
 	if yaml:
 		response_data = u"""{0}:
