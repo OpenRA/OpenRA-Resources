@@ -327,7 +327,8 @@ class MapHandlers():
 		else:
 			Maps.objects.filter(id=transac.id).update(requires_upgrade=True)
 
-		self.GenerateMinimap(resp_map_data['game_mod'], parser)
+		if int(resp_map_data['mapformat']) < 10:
+			self.GenerateMinimap(resp_map_data['game_mod'], parser)
 
 		shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(resp_map_data['game_mod'], parser,), name='shppreview')
 		shp.start()

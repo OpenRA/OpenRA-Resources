@@ -457,7 +457,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		mapObject.mapformat,
 		mapObject.parser,
 		map_grid_type,
-		cgi.escape(",".join(category_lst), quote=None)
+		cgi.escape(", ".join(category_lst), quote=None)
 		).replace("\t\t","\t").replace("''", "'")
 		return response_data
 	response_data = {}
@@ -491,30 +491,33 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	response_data['mapformat'] = mapObject.mapformat
 	response_data['parser'] = mapObject.parser
 	response_data['map_grid_type'] = map_grid_type
-	response_data['categories'] = cgi.escape(",".join(category_lst), quote=None)
+	response_data['categories'] = category_lst
 	return response_data
 
 def get_minimap(mapid, soft=False):
 	minimap = ""
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapid)
+
 	try:
-		mapDir = os.listdir(path)
+		contentDir = os.listdir(path + '/content/')
 	except:
 		if soft:
 			return ""
 		else:
 			raise Http404
-	for filename in mapDir:
-		if filename.endswith("-mini.png"):
-			minimap = filename
-			serveImage = path + os.sep + minimap
-			break
-	contentDir = os.listdir(path + '/content/')
 	for filename in contentDir:
 		if filename == "map.png":
 			minimap = filename
 			serveImage = path + '/content/' + minimap
 			break
+
+	if minimap == "":
+		mapDir = os.listdir(path)
+		for filename in mapDir:
+			if filename.endswith("-mini.png"):
+				minimap = filename
+				serveImage = path + os.sep + minimap
+				break
 	if minimap == "":
 		if soft:
 			return ""

@@ -583,20 +583,21 @@ def serveMinimap(request, arg):
 	minimap = ""
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
 	try:
-		mapDir = os.listdir(path)
+		contentDir = os.listdir(path + '/content/')
 	except:
 		return HttpResponseRedirect("/")
-	for filename in mapDir:
-		if filename.endswith("-mini.png"):
-			minimap = filename
-			serveImage = path + os.sep + minimap
-			break
-	contentDir = os.listdir(path + '/content/')
 	for filename in contentDir:
 		if filename == "map.png":
 			minimap = filename
 			serveImage = path + '/content/' + minimap
 			break
+	if minimap == "":
+		mapDir = os.listdir(path)
+		for filename in mapDir:
+			if filename.endswith("-mini.png"):
+				minimap = filename
+				serveImage = path + os.sep + minimap
+				break
 	if minimap == "":
 		minimap = "nominimap.png"
 		serveImage = os.getcwd() + os.sep + __name__.split('.')[0] + '/static/images/nominimap.png'
@@ -888,6 +889,12 @@ def MapRevisions(request, arg, page=1):
 	perPage = 20
 	slice_start = perPage*int(page)-perPage
 	slice_end = perPage*int(page)
+
+	try:
+		tempObj = Maps.objects.get(id=arg)
+	except:
+		return HttpResponseRedirect('/')
+
 	revs = misc.Revisions('maps')
 	revisions = revs.GetRevisions(arg)
 	mapObject = Maps.objects.filter(id__in=revisions).order_by('-revision', '-posted')

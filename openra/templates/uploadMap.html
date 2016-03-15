@@ -88,9 +88,6 @@
 	<div class='cBlock'>
 		<p>Error:</p>
 		<p>{{error_response}}</p>
-		{% if error_response == 'Yaml check failed.' %}
-			<p>See <a href={{ '/maps/' }}{{ uid }}{{ '/lintlog' }}>lintlog</a></p>
-		{% endif %}
 		{% if uid %}
 			<p><a href={{ '/maps/' }}{{ uid }}{{'/'}}>
 			<img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>

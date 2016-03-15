@@ -550,6 +550,11 @@ def GenerateSHPpreview(mapObject, parser=settings.OPENRA_ROOT_PATH + list(revers
 	return True
 
 def GenerateMinimap(item, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
+
+	if int(item.mapformat) >= 10:
+		print('MapFormat 10 and newer does not support generating minimap. Using included map.png instead.')
+		return False
+
 	currentDirectory = os.getcwd() + os.sep
 	
 	os.chdir(parser + "/")
