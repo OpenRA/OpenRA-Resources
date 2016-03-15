@@ -1,7 +1,8 @@
 import re
+import json
 from django import template
 from openra import misc
-from openra.models import Maps, ReplayPlayers
+from openra.models import Maps, ReplayPlayers, MapCategories
 
 
 
@@ -130,3 +131,17 @@ def item_name_by_type_id(value, arg):
 			return seek[0].game_mod.upper() + ' by ' + seek[0].user.username + ' on ' + seek[0].posted
 	return ""
 register.filter('item_name_by_type_id', item_name_by_type_id)
+
+
+
+def map_categories(value):
+	ready_lst = []
+
+	categories = json.loads(value)
+	for cat_id in categories:
+		catObj = MapCategories.objects.filter(id=cat_id).first()
+		if catObj:
+			ready_lst.append(catObj.category_name)
+
+	return ",".join(ready_lst)
+register.filter('map_categories', map_categories)

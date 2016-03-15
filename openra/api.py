@@ -8,6 +8,7 @@ from django.http import StreamingHttpResponse
 
 from openra.models import Maps
 from openra.models import Reports
+from openra.models import MapCategories
 from django.contrib.auth.models import User
 from openra import misc
 
@@ -388,6 +389,13 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	if mapObject.game_mod in ['ts', 'ra2']:
 		map_grid_type = 'RectangularIsometric'
 
+	category_lst = []
+	categories = json.loads(mapObject.categories)
+	for cat_id in categories:
+		catObj = MapCategories.objects.filter(id=cat_id).first()
+		if catObj:
+			category_lst.append(catObj.category_name)
+
 	if yaml:
 		response_data = u"""{0}:
 		id: {1}
@@ -417,7 +425,8 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		downloading: {25}
 		mapformat: {26}
 		parser: {27}
-		map_grid_type: {28}\n""".format(
+		map_grid_type: {28}
+		categories: {29}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
 		cgi.escape(mapObject.title, quote=None),
@@ -447,6 +456,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		mapObject.mapformat,
 		mapObject.parser,
 		map_grid_type,
+		cgi.escape(",".join(category_lst), quote=None)
 		).replace("\t\t","\t").replace("''", "'")
 		return response_data
 	response_data = {}
@@ -480,6 +490,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	response_data['mapformat'] = mapObject.mapformat
 	response_data['parser'] = mapObject.parser
 	response_data['map_grid_type'] = map_grid_type
+	response_data['categories'] = cgi.escape(",".join(category_lst), quote=None)
 	return response_data
 
 def get_minimap(mapid, soft=False):

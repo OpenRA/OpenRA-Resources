@@ -4,11 +4,12 @@ import zipfile
 import string
 import random
 import signal
+import json
 from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from subprocess import Popen, PIPE
 from django.conf import settings
 from django.utils import timezone
-from openra.models import Maps, Lints
+from openra.models import Maps, Lints, MapCategories
 from openra import misc
 
 
@@ -151,6 +152,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 				Maps.objects.filter(id=item.id).update(author=resp_map_data['author'])
 				Maps.objects.filter(id=item.id).update(tileset=resp_map_data['tileset'])
 				Maps.objects.filter(id=item.id).update(map_type=resp_map_data['map_type'])
+				Maps.objects.filter(id=item.id).update(categories=resp_map_data['categories'])
 				Maps.objects.filter(id=item.id).update(description=resp_map_data['description'])
 				Maps.objects.filter(id=item.id).update(players=resp_map_data['players'])
 				Maps.objects.filter(id=item.id).update(bounds=resp_map_data['bounds'])
@@ -177,6 +179,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 					info = item.info,
 					author = resp_map_data['author'],
 					map_type = resp_map_data['map_type'],
+					categories = resp_map_data['categories'],
 					players = resp_map_data['players'],
 					game_mod = resp_map_data['game_mod'],
 					map_hash = recalculate_hash_response['maphash'],
@@ -275,6 +278,8 @@ def ReadYaml(item=False, fullpath=""):
 	map_data_ordered['advanced'] = False
 	map_data_ordered['players'] = 0
 	map_data_ordered['description'] = ""
+	map_data_ordered['map_type'] = ""
+	map_data_ordered['categories'] = ""
 	map_data_ordered['shellmap'] = False
 
 	z = zipfile.ZipFile(fullpath, mode='a')
@@ -294,38 +299,66 @@ def ReadYaml(item=False, fullpath=""):
 	expectspawn = False
 	spawnpoints = ""
 	for line in yamlData.split('\n'):
+
 		if line[0:5] == "Title":
 			map_data_ordered['title'] = line[6:].strip().replace("'", "''")
+
 		if line[0:11] == "RequiresMod":
 			map_data_ordered['game_mod'] = line[12:].strip().lower()
+
 		if line[0:6] == "Author":
 			map_data_ordered['author'] = line[7:].strip().replace("'", "''")
+
 		if line[0:7] == "Tileset":
 			map_data_ordered['tileset'] = line[8:].strip().lower()
-		if line[0:4] == "Type":
+
+		if line[0:4] == "Type": # gone in MapFormat 11
 			map_data_ordered['map_type'] = line[5:].strip()
-		if line[0:11] == "Description":
+
+		if "Categories:" in line:
+			category_id_list = []
+			for category_item in line.split(':')[1].strip().split(','):
+				category = MapCategories.objects.filter(category_name=category_item.strip()).first()
+				if not category:
+					category_transac = MapCategories(
+						category_name = category_item.strip(),
+						posted = timezone.now(),
+					)
+					category_transac.save()
+					category_id_list.append(category_transac.id)
+				else:
+					category_id_list.append(category.id)
+			map_data_ordered['categories'] = json.dumps(category_id_list)
+
+		if line[0:11] == "Description": # gone in MapFormat 9
 			map_data_ordered['description'] = line[12:].strip().replace("'", "''")
+
 		if line[0:7] == "MapSize":
 			map_data_ordered['width'] = line[8:].strip().split(',')[0]
 			map_data_ordered['height'] = line[8:].strip().split(',')[1]
+
 		if line[0:6] == "Bounds":
 			map_data_ordered['bounds'] = line[7:].strip()
+
 		if line[0:9] == "MapFormat":
 			map_data_ordered['mapformat'] = int(line[10:].strip())
+
 		if line.strip()[-7:] == "mpspawn":
 			expectspawn = True
 		if line.strip()[0:8] == "Location":
 			if expectspawn:
 				spawnpoints += line.split(':')[1].strip()+","
 				expectspawn = False
+
 		if line.strip()[0:8] == "Playable":
 			state = line.split(':')[1]
 			if state.strip().lower() in ['true', 'on', 'yes', 'y']:
 				map_data_ordered['players'] += 1
+
 		if line[0:10] == "Visibility":
 			if line[11:].strip() == "Shellmap":
 				map_data_ordered['shellmap'] = True
+
 		if line.strip()[0:5] == "Rules":
 			shouldCountRules = True
 		if shouldCountRules:
@@ -334,8 +367,6 @@ def ReadYaml(item=False, fullpath=""):
 	map_data_ordered['spawnpoints'] = spawnpoints.rstrip(",")
 	if countAdvanced > 16:
 		map_data_ordered['advanced'] = True
-	if len(map_data_ordered) == 0:
-		return {'response': 'map data is not filled', 'error': True}
 
 	return {'response': map_data_ordered, 'error': False}
 

@@ -163,18 +163,6 @@ class MapHandlers():
 		self.legacy_name = ""
 		self.legacy_map = False
 
-		self.MapFormat = 6
-		self.MapMod = ""
-		self.MapTitle = ""
-		self.MapAuthor = ""
-		self.MapTileset = ""
-		self.MapType = ""
-		self.MapSize = ""
-		self.MapDesc = ""
-		self.MapPlayers = 0
-		self.Bounds = ""
-		self.spawnpoints = ""
-
 	def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
 
 		parser_to_db = list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0] # default parser = the latest
@@ -287,6 +275,7 @@ class MapHandlers():
 			info = post['info'].strip(),
 			author = resp_map_data['author'],
 			map_type = resp_map_data['map_type'],
+			categories = resp_map_data['categories'],
 			players = resp_map_data['players'],
 			game_mod = resp_map_data['game_mod'],
 			map_hash = self.maphash.strip(),

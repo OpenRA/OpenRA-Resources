@@ -108,7 +108,7 @@ server {
 		}
 
 		location = /favicon.ico {
-				alias /path/to/our/primary/application/static/favicon.png;
+				alias /path/to/our/primary/application/static/favicon.ico;
 		}
 
 		gzip on;
