@@ -107,6 +107,10 @@ server {
 				expires 30d;
 		}
 
+		location = /favicon.ico {
+				alias /path/to/our/primary/application/static/favicon.png;
+		}
+
 		gzip on;
 		gzip_disable "msie6";
 

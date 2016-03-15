@@ -117,6 +117,7 @@ urlpatterns = [
 
 
 	url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
+	url(r'^robots.txt$', views.robots, name='robots.txt'),
 
 	url(r'^ajax/jRating/(?P<arg>\w+)/?$', ajax.jRating, name='ajax.jRating'),
 
