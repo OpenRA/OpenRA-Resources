@@ -1801,6 +1801,13 @@ p.registerInfo {
 }
 
 .filter_section_checks {
-	padding-right: 35px;
+	padding-right: 16px;
 	display: table-cell;
+}
+
+.filter_latest_revision {
+	font-size: 0.9em;
+	position: absolute;
+	left: 520px;
+	top: 90px;
 }

@@ -1,19 +1,6 @@
 {% load customTags %}
 
 
-<!--
-mod
-category
-mapformat
-tileset
-version tag
-advanced
-lua
-hide maps with problems ( requires_upgrade true )
-sort by (latest first, oldest first, title, title in reverse order, lately commented, players)
-players amount
-with reports
--->
 <div class='cBlock'>
 	<form name='filter_maps' class='filter_maps' action='{{request.path}}' method='GET'>
 		<div class='filter_container'>
@@ -21,58 +8,66 @@ with reports
 
 			<div class='filter_section'>
 				<span class="">Mod:</span>
-				<select name="mod">
-					<option value="">any</option>
-					<option value="">ra</option>
-					<option value="">cnc</option>
-					<option value="">d2k</option>
+				<select name="mod" multiple class="noscroll">
+					<option value="any" {% if 'any' in selected_filter.mod %}selected{% endif %}>any</option>
+					{% for mod in filter_prepare.mods %}
+						<option value="{{mod}}" {% if mod in selected_filter.mod %}selected{% endif %}>{{mod|upper}}</option>
+					{% endfor %}
 				</select>
 			</div>
 
 			<div class='filter_section'>
 				<span class="">Category:</span>
-				<select name="">
-					<option value="">any</option>
-					<option value="">Conquest</option>
-					<option value="">Minigame</option>
+				<select name="category" multiple class="noscroll">
+					<option value="any" {% if 'any' in selected_filter.category %}selected{% endif %}>any</option>
+					{% for category in filter_prepare.categories %}
+						<option value="{{category}}" {% if category in selected_filter.category %}selected{% endif %}>{{category}}</option>
+					{% endfor %}
 				</select>
 			</div>
 
 			<div class='filter_section'>
 				<span class="">Format:</span>
-				<select name="">
-					<option value="">any</option>
-					<option value="">11</option>
-					<option value="">8</option>
-					<option value="">7</option>
+				<select name="format" multiple class="noscroll">
+					<option value="any" {% if 'any' in selected_filter.format %}selected{% endif %}>any</option>
+					{% for format in filter_prepare.formats %}
+						<option value="{{format}}" {% if format in selected_filter.format %}selected{% endif %}>{{format}}
+					{% endfor %}
 				</select>
 			</div>
 
 			<div class='filter_section'>
 				<span class="">Parsed by:</span>
-				<select name="">
-					<option value="">any</option>
-					<option value="">release-20151224</option>
-					<option value="">bleed (any)</option>
+				<select name="parser" multiple class="noscroll">
+					<option value="any" {% if 'any' in selected_filter.parser %}selected{% endif %}>any</option>
+					<option value="bleed" {% if 'bleed' in selected_filter.parser %}selected{% endif %}>bleed (any)</option>
+					{% for parser in filter_prepare.parsers %}
+						<option value="{{parser}}" {% if parser in selected_filter.parser %}selected{% endif %}>{{parser}}
+					{% endfor %}
 				</select>
 			</div>
 
 			<div class='filter_section'>
 				<span class="">Players:</span>
-				<input type='text' placeholder='any'>
+				<input type='text' placeholder='any' name='players' value="{% if selected_filter.players %}{{selected_filter.players}}{% endif %}">
 			</div>
 
 			<div class='filter_section'>
 				<span class="">Sort by:</span>
-				<select name="">
-					<option value="">latest first</option>
-					<option value="">oldest first</option>
-					<option value="">title</option>
-					<option value="">title in reverse</option>
-					<option value="">players</option>
-					<option value="">lately commented</option>
-					<option value="">rating</option>
+				<select name="sort_by">
+					<option value="latest" {% if 'latest' in selected_filter.sort_by or not selected_filter.sort_by %}selected{% endif %}>latest first</option>
+					<option value="oldest" {% if 'oldest' in selected_filter.sort_by %}selected{% endif%}>oldest first</option>
+					<option value="title" {% if 'title' in selected_filter.sort_by %}selected{% endif %}>title</option>
+					<option value="title_reversed" {% if 'title_reversed' in selected_filter.sort_by %}selected{% endif %}>title in reverse</option>
+					<option value="players" {% if 'players' in selected_filter.sort_by %}selected{% endif %}>players</option>
+					<option value="lately_commented" {% if 'lately_commented' in selected_filter.sort_by %}selected{% endif %}>lately commented</option>
+					<option value="rating" {% if 'rating' in selected_filter.sort_by %}selected{% endif %}>rating</option>
 				</select>
+			</div>
+
+			<div class="filter_latest_revision">
+				<input type='checkbox' {% if selected_filter.show_all_revisions == 'on' %}checked{% endif %} name='show_all_revisions'>
+				<span class="">Show all revisions</span>
 			</div>
 
 
@@ -88,26 +83,26 @@ with reports
 				<div class='filter_section'>
 
 					<div class='filter_section_checks'>
-						<input type='checkbox'>
-						<span class="">Hide with problems</span>
+						<input type='checkbox' name='hide_with_problems' {% if selected_filter.hide_with_problems == 'on' %}checked{% endif %}>
+						<span class="">Hide maps with problems</span>
 						<br />
-						<input type='checkbox'>
-						<span class="">Only with reports</span>
+						<input type='checkbox' name='show_with_reports' {% if selected_filter.show_with_reports == 'on' %}checked{% endif %}>
+						<span class="">Show only with reports</span>
 					</div>
 
 					<div class='filter_section_checks'>
-						<input type='checkbox'>
+						<input type='checkbox' name='only_advanced' {% if selected_filter.only_advanced == 'on' %}checked{% endif %}>
 						<span class="">Only Advanced</span>
 						<br />
-						<input type='checkbox'>
+						<input type='checkbox' name='only_lua' {% if selected_filter.only_lua == 'on' %}checked{% endif %}>
 						<span class="">Only Lua</span>
 					</div>
 
 					<div class='filter_section_checks'>
-						<input type='checkbox'>
+						<input type='checkbox' name='with_duplicates' {% if selected_filter.with_duplicates == 'on' %}checked{% endif %}>
 						<span class="">With duplicates</span>
 						<br />
-						<input type='checkbox'>
+						<input type='checkbox' name='outdated' {% if selected_filter.outdated == 'on' %}checked{% endif %}>
 						<span class="">Outdated</span>
 					</div>
 

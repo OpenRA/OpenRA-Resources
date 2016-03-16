@@ -1,6 +1,7 @@
 /*	code: prevent scrolling inside of block */
 	$(document).ready(function (){
 		noScroll('popup-content-wrapper');
+		noScroll('noscroll');
 	});
 
 	function noScroll(className) {

@@ -21,7 +21,7 @@ from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openra import handlers, misc, utility
-from openra.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments
+from openra.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments, MapCategories
 
 
 
@@ -197,6 +197,46 @@ def ControlPanel(request, page=1, filter=""):
 	return StreamingHttpResponse(template.render(template_args, request))
 
 def maps(request, page=1, filter=""):
+
+	selected_filter = {}
+	filter_prepare = {}
+
+	filter_prepare['mods'] = sorted(Maps.objects.values_list('game_mod', flat=True).distinct())
+	filter_prepare['categories'] = sorted(MapCategories.objects.values_list('category_name', flat=True))
+	filter_prepare['formats'] = sorted(Maps.objects.values_list('mapformat', flat=True).distinct())
+	filter_prepare['formats'] = [str(val) for val in filter_prepare['formats']]
+	filter_prepare['parsers'] = Maps.objects.values_list('parser', flat=True).distinct()
+	filter_prepare['parsers'] = sorted([val for val in filter_prepare['parsers'] if 'git' not in val])
+
+
+	selected_filter['mod'] = request.GET.getlist('mod', None)
+	selected_filter['category'] = request.GET.getlist('category', None)
+	selected_filter['format'] = request.GET.getlist('format', None)
+	selected_filter['parser'] = request.GET.getlist('parser', None)
+
+	selected_filter['players'] = request.GET.get('players', None)
+	try:
+		selected_filter['players'] = int(selected_filter['players'])
+		if selected_filter['players'] < 0:
+			selected_filter['players'] = None
+	except:
+		selected_filter['players'] = None
+
+
+	selected_filter['sort_by'] = request.GET.get('sort_by', None)
+
+
+	selected_filter['show_all_revisions'] = request.GET.get('show_all_revisions', None)
+
+	selected_filter['hide_with_problems'] = request.GET.get('hide_with_problems', None)
+	selected_filter['show_with_reports'] = request.GET.get('show_with_reports', None)
+	selected_filter['only_advanced'] = request.GET.get('only_advanced', None)
+	selected_filter['only_lua'] = request.GET.get('only_lua', None)
+	selected_filter['with_duplicates'] = request.GET.get('with_duplicates', None)
+	selected_filter['outdated'] = request.GET.get('outdated', None)
+
+
+
 	perPage = 20
 	slice_start = perPage*int(page)-perPage
 	slice_end = perPage*int(page)
@@ -221,6 +261,9 @@ def maps(request, page=1, filter=""):
 		'range': [i+1 for i in range(rowsRange)],
 		'amount': amount,
 		'comments': comments,
+
+		'filter_prepare': filter_prepare,
+		'selected_filter': selected_filter,
 	}
 
 	if settings.SITE_MAINTENANCE:

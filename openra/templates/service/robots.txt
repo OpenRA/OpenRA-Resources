@@ -2,6 +2,8 @@ User-agent: bingbot
 Disallow: /
 User-agent: bing
 Disallow: /
+User-agent: AhrefsBot
+Disallow: /
 
 User-agent: *
 Disallow: *shp*
