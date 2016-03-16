@@ -1765,28 +1765,42 @@ p.registerInfo {
 }
 
 
-.google-adsense-block-wide {
-	position: absolute;
-	display: none;
-	top: 0;
-	right: 0;
+
+/* *** Filter Maps *** */
+.filter_container {
+
 }
 
-.google-adsense-block-narrow {
-	position: absolute;
-	display: none;
-	top: 0;
-	right: 0;
+.filter_section {
+	display: table-cell;
+	padding: 5px;
+	font-size: 0.9em;
 }
 
-@media screen and (min-width: 1280px) {
-	.google-adsense-block-wide {
-		display: block;
-	}
+.filter_end {
+	display: table;
 }
 
-@media screen and (max-width: 1279px) {
-	.google-adsense-block-narrow {
-		display: block;
-	}
+.filter_apply {
+	display: table-cell;
+	padding: 5px;
+	padding-right: 40px;
+	vertical-align: bottom;
+}
+
+.filter_section input[type="text"] {
+	width: 27px;
+	margin-top: 2px;
+}
+
+.filter_section select {
+	margin-top: 2px;
+	background: url("/static/images/subNavBg.png") #204770;
+	color: #fff;
+	border: 1px solid #74c2e7;
+}
+
+.filter_section_checks {
+	padding-right: 35px;
+	display: table-cell;
 }

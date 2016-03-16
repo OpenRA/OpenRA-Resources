@@ -1,4 +1,128 @@
 {% load customTags %}
+
+
+<!--
+mod
+category
+mapformat
+tileset
+version tag
+advanced
+lua
+hide maps with problems ( requires_upgrade true )
+sort by (latest first, oldest first, title, title in reverse order, lately commented, players)
+players amount
+with reports
+-->
+<div class='cBlock'>
+	<form name='filter_maps' class='filter_maps' action='{{request.path}}' method='GET'>
+		<div class='filter_container'>
+
+
+			<div class='filter_section'>
+				<span class="">Mod:</span>
+				<select name="mod">
+					<option value="">any</option>
+					<option value="">ra</option>
+					<option value="">cnc</option>
+					<option value="">d2k</option>
+				</select>
+			</div>
+
+			<div class='filter_section'>
+				<span class="">Category:</span>
+				<select name="">
+					<option value="">any</option>
+					<option value="">Conquest</option>
+					<option value="">Minigame</option>
+				</select>
+			</div>
+
+			<div class='filter_section'>
+				<span class="">Format:</span>
+				<select name="">
+					<option value="">any</option>
+					<option value="">11</option>
+					<option value="">8</option>
+					<option value="">7</option>
+				</select>
+			</div>
+
+			<div class='filter_section'>
+				<span class="">Parsed by:</span>
+				<select name="">
+					<option value="">any</option>
+					<option value="">release-20151224</option>
+					<option value="">bleed (any)</option>
+				</select>
+			</div>
+
+			<div class='filter_section'>
+				<span class="">Players:</span>
+				<input type='text' placeholder='any'>
+			</div>
+
+			<div class='filter_section'>
+				<span class="">Sort by:</span>
+				<select name="">
+					<option value="">latest first</option>
+					<option value="">oldest first</option>
+					<option value="">title</option>
+					<option value="">title in reverse</option>
+					<option value="">players</option>
+					<option value="">lately commented</option>
+					<option value="">rating</option>
+				</select>
+			</div>
+
+
+			<div class='clear'></div>
+
+
+			<div class='filter_end'>
+
+				<div class="filter_apply">
+					<button type="submit">Apply Filter/Sorting</button>
+				</div>
+
+				<div class='filter_section'>
+
+					<div class='filter_section_checks'>
+						<input type='checkbox'>
+						<span class="">Hide with problems</span>
+						<br />
+						<input type='checkbox'>
+						<span class="">Only with reports</span>
+					</div>
+
+					<div class='filter_section_checks'>
+						<input type='checkbox'>
+						<span class="">Only Advanced</span>
+						<br />
+						<input type='checkbox'>
+						<span class="">Only Lua</span>
+					</div>
+
+					<div class='filter_section_checks'>
+						<input type='checkbox'>
+						<span class="">With duplicates</span>
+						<br />
+						<input type='checkbox'>
+						<span class="">Outdated</span>
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+	</form>
+</div>
+
+
+
+
+
 <div class='cBlock no-pd-bot map-grid-header-info'>
 	<h3>Found {{ amount }} maps</h3>
 </div>
