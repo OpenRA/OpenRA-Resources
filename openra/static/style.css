@@ -1793,7 +1793,7 @@ p.registerInfo {
 	margin-top: 2px;
 }
 
-.filter_section select {
+.filter_container select {
 	margin-top: 2px;
 	background: url("/static/images/subNavBg.png") #204770;
 	color: #fff;
@@ -1805,9 +1805,9 @@ p.registerInfo {
 	display: table-cell;
 }
 
-.filter_latest_revision {
+.filter_problems {
 	font-size: 0.9em;
 	position: absolute;
-	left: 520px;
-	top: 90px;
+	left: 525px;
+	top: 84px;
 }

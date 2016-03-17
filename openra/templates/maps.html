@@ -49,7 +49,7 @@
 
 			<div class='filter_section'>
 				<span class="">Players:</span>
-				<input type='text' placeholder='any' name='players' value="{% if selected_filter.players %}{{selected_filter.players}}{% endif %}">
+				<input type='text' placeholder='any' name='players' {% if selected_filter.players %}value="{{selected_filter.players}}"{% endif %}>
 			</div>
 
 			<div class='filter_section'>
@@ -65,9 +65,15 @@
 				</select>
 			</div>
 
-			<div class="filter_latest_revision">
-				<input type='checkbox' {% if selected_filter.show_all_revisions == 'on' %}checked{% endif %} name='show_all_revisions'>
-				<span class="">Show all revisions</span>
+			<div class="filter_problems">
+				<span class="">Maps with problems:</span>
+				<select name="maps_with_problems">
+					<option value="show">Show</option>
+					<option value="">Hide if Lint failed</option>
+					<option value="">Show only if Lint failed</option>
+					<option value="">API downloading disabled</option>
+					<option value="">Too many reports</option>
+				</select>
 			</div>
 
 
@@ -83,8 +89,8 @@
 				<div class='filter_section'>
 
 					<div class='filter_section_checks'>
-						<input type='checkbox' name='hide_with_problems' {% if selected_filter.hide_with_problems == 'on' %}checked{% endif %}>
-						<span class="">Hide maps with problems</span>
+						<input type='checkbox' {% if selected_filter.show_all_revisions == 'on' %}checked{% endif %} name='show_all_revisions'>
+						<span class="">Show all revisions</span>
 						<br />
 						<input type='checkbox' name='show_with_reports' {% if selected_filter.show_with_reports == 'on' %}checked{% endif %}>
 						<span class="">Show only with reports</span>

@@ -93,7 +93,7 @@ def send_email_to_user_OnLint(email_addr, body):
 def send_email_to_user_OnComment(item_type, item_id, email_addr, info=""):
 	if not email_addr:
 		return False
-	http_host = 'http://' + settings.HTTP_HOST
+	http_host = 'http://resource.openra.net'
 	connection = mail.get_connection()
 	connection.open()
 	if not info:

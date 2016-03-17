@@ -228,7 +228,6 @@ def maps(request, page=1, filter=""):
 
 	selected_filter['show_all_revisions'] = request.GET.get('show_all_revisions', None)
 
-	selected_filter['hide_with_problems'] = request.GET.get('hide_with_problems', None)
 	selected_filter['show_with_reports'] = request.GET.get('show_with_reports', None)
 	selected_filter['only_advanced'] = request.GET.get('only_advanced', None)
 	selected_filter['only_lua'] = request.GET.get('only_lua', None)
@@ -236,12 +235,20 @@ def maps(request, page=1, filter=""):
 	selected_filter['outdated'] = request.GET.get('outdated', None)
 
 
+	###
+	mapObject = Maps.objects.filter()
+
+	if selected_filter['show_all_revisions'] != 'on':
+		mapObject = mapObject.filter(next_rev=0)
+
+	mapObject = mapObject.distinct('map_hash').order_by('map_hash', '-posted')
+	mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+	###
 
 	perPage = 20
 	slice_start = perPage*int(page)-perPage
 	slice_end = perPage*int(page)
-	mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash').order_by('map_hash', '-posted')
-	mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+
 	amount = len(mapObject)
 	rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
 	mapObject = mapObject[slice_start:slice_end]
@@ -735,7 +742,10 @@ def serveLua(request, arg, name):
 def serveMapSHP(request, arg, name, request_type='preview'):
 	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + '/content/'
 	fname = ""
-	listdir = os.listdir(path)
+	try:
+		listdir = os.listdir(path)
+	except:
+		return Http404
 	for fn in listdir:
 		if request_type == 'preview':
 			if fn.endswith('.shp.gif'):
