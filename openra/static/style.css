@@ -1800,6 +1800,10 @@ p.registerInfo {
 	border: 1px solid #74c2e7;
 }
 
+.filter_container select[name="category"] {
+	width: 118px;
+}
+
 .filter_section_checks {
 	padding-right: 16px;
 	display: table-cell;

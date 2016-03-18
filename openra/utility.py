@@ -325,9 +325,9 @@ def ReadYaml(item=False, fullpath=""):
 						posted = timezone.now(),
 					)
 					category_transac.save()
-					category_id_list.append(category_transac.id)
+					category_id_list.append('_'+str(category_transac.id)+'_')
 				else:
-					category_id_list.append(category.id)
+					category_id_list.append('_'+str(category.id)+'_')
 			map_data_ordered['categories'] = json.dumps(category_id_list)
 
 		if line[0:11] == "Description": # gone in MapFormat 9

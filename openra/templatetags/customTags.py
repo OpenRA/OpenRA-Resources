@@ -139,7 +139,7 @@ def map_categories(value):
 
 	categories = json.loads(value)
 	for cat_id in categories:
-		catObj = MapCategories.objects.filter(id=cat_id).first()
+		catObj = MapCategories.objects.filter(id=cat_id.strip('_')).first()
 		if catObj:
 			ready_lst.append(catObj.category_name)
 

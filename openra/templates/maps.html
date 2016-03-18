@@ -55,24 +55,18 @@
 			<div class='filter_section'>
 				<span class="">Sort by:</span>
 				<select name="sort_by">
-					<option value="latest" {% if 'latest' in selected_filter.sort_by or not selected_filter.sort_by %}selected{% endif %}>latest first</option>
-					<option value="oldest" {% if 'oldest' in selected_filter.sort_by %}selected{% endif%}>oldest first</option>
-					<option value="title" {% if 'title' in selected_filter.sort_by %}selected{% endif %}>title</option>
-					<option value="title_reversed" {% if 'title_reversed' in selected_filter.sort_by %}selected{% endif %}>title in reverse</option>
-					<option value="players" {% if 'players' in selected_filter.sort_by %}selected{% endif %}>players</option>
-					<option value="lately_commented" {% if 'lately_commented' in selected_filter.sort_by %}selected{% endif %}>lately commented</option>
-					<option value="rating" {% if 'rating' in selected_filter.sort_by %}selected{% endif %}>rating</option>
+					{% for sorting in filter_prepare.sort_by %}
+						<option value="{{sorting.0}}" {% if sorting.0 in selected_filter.sort_by %}selected{% endif %}>{{sorting.1}}</option>
+					{% endfor %}
 				</select>
 			</div>
 
 			<div class="filter_problems">
 				<span class="">Maps with problems:</span>
-				<select name="maps_with_problems">
-					<option value="show">Show</option>
-					<option value="">Hide if Lint failed</option>
-					<option value="">Show only if Lint failed</option>
-					<option value="">API downloading disabled</option>
-					<option value="">Too many reports</option>
+				<select name="with_problems">
+					{% for problem in filter_prepare.with_problems %}
+						<option value="{{problem.0}}" {% if problem.0 in selected_filter.with_problems %}selected{% endif %}>{{problem.1}}</option>
+					{% endfor %}
 				</select>
 			</div>
 
@@ -125,7 +119,7 @@
 
 
 <div class='cBlock no-pd-bot map-grid-header-info'>
-	<h3>Found {{ amount }} maps</h3>
+	<h3>Found {{ amount }} maps{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
 </div>
 {% if amount != 0 %}
 <div id="map_grid">
@@ -186,7 +180,11 @@
 			{% if page == i %}
 				<span>{{ i }}</span>
 			{% else %}
-				<a href="/maps/page/{{i}}">{{ i }}</a>
+				{% if request.META.QUERY_STRING %}
+					<a href="/maps/page/{{i}}/?{{request.META.QUERY_STRING}}">{{ i }}</a>
+				{% else %}
+					<a href="/maps/pages/{{i}}/">{{ i }}</a>
+				{% endif %}
 			{% endif %}
 		{% else %}
 			{% if i < page %}
