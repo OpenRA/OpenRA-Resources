@@ -159,7 +159,6 @@ class MapHandlers():
 		self.preview_filename = preview_filename
 		self.currentDirectory = os.getcwd() + os.sep    # web root
 		self.UID = False
-		self.LOG = []
 		self.legacy_name = ""
 		self.legacy_map = False
 
@@ -177,10 +176,8 @@ class MapHandlers():
 		if pre_r != 0:
 			mapObject = Maps.objects.filter(id=pre_r, user_id=user_id)
 			if not mapObject:
-				self.LOG.append('Failed. You do not own map for which you want to upload a new revision.')
 				return 'Failed. You do not own map for which you want to upload a new revision.'
 			if mapObject[0].next_rev != 0:
-				self.LOG.append('Failed. Unable to upload a new revision for map which already has one.')
 				return 'Failed. Unable to upload a new revision for map which already has one.'
 			previous_policy_cc = mapObject[0].policy_cc
 			previous_policy_commercial = mapObject[0].policy_commercial
@@ -195,7 +192,6 @@ class MapHandlers():
 		mimetype = proc[0].decode().strip()
 		if not ( mimetype == 'application/zip' and os.path.splitext(f.name)[1].lower() == '.oramap' ):
 			if not ( mimetype == 'text/plain' and os.path.splitext(f.name)[1].lower() in ['.mpr', '.ini'] ):
-				self.LOG.append('Failed. Unsupported file type.')
 				return 'Failed. Unsupported file type.'
 
 		name = f.name
@@ -207,32 +203,25 @@ class MapHandlers():
 		findBadChars = re.findall(r'(\W+)', name)
 		for bc in findBadChars:
 			if bc not in ['.','-']:
-				self.LOG.append('Failed. Your filename is bogus; rename and try again.')
 				return 'Failed. Your filename is bogus; rename and try again.'
 
 		if mimetype == 'text/plain':
 			if not self.LegacyImport(tempname, parser):
-				self.LOG.append('Failed to import legacy map.')
 				misc.send_email_to_admin_OnMapFail(tempname)
 				return 'Failed to import legacy map.'
-			try:    # catch exception, TODO: remove after new release in 2015
-				shutil.move(parser + "/" + self.legacy_name, tempname)
-			except:
-				pass
+			shutil.move(parser + "/" + self.legacy_name, tempname)
 			name = os.path.splitext(name)[0] + '.oramap'
 			self.legacy_map = True
 
 		### Check if user has already uploaded the same map
 		self.GetHash(tempname, parser)
 		if 'Converted' in self.maphash and 'to MapFormat' in self.maphash:
-			self.LOG.append('Failed to upload with this parser. MapFormat does not match. Try to upgrade your map or use different parser.')
 			misc.send_email_to_admin_OnMapFail(tempname)
 			return 'Failed to upload with this parser. MapFormat does not match. Try to upgrade your map or use different parser.'
 
 		userObject = User.objects.get(pk=user_id)
 		try:
 			hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
-			self.LOG.append("Failed. You've already uploaded this map.")
 			self.UID = str(hashExists.id)
 			return "Failed. You've already uploaded this map."
 		except:
@@ -242,7 +231,6 @@ class MapHandlers():
 		read_yaml_response = utility.ReadYaml(False, tempname)
 		resp_map_data = read_yaml_response['response']
 		if read_yaml_response['error']:
-			self.LOG.append(resp_map_data)
 			misc.send_email_to_admin_OnMapFail(tempname)
 			return resp_map_data
 
@@ -357,7 +345,6 @@ class MapHandlers():
 		os.chmod(filepath, 0o644)
 
 		self.maphash = proc[0].decode().strip()
-		self.LOG.append(self.maphash)
 
 		os.chdir(self.currentDirectory)
 
@@ -425,15 +412,26 @@ class MapHandlers():
 
 	def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
 		os.chdir(parser + "/")
-		for mod in ['ra','cnc','d2k','ts', 'ra2']:
-			command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
+		for mod in ['ra','cnc']:
+
+			assign_mod = mod
+			if mod == 'cnc':
+				assign_mod = 'td'
+
+			pre_command = 'mono --debug OpenRA.Utility.exe ra'
+			pre_proc = Popen(pre_command.split(), stdout=PIPE).communicate()
+			if '--import-' in pre_proc[0].decode():
+				command = 'mono --debug OpenRA.Utility.exe %s --import-%s-map %s' % (mod, assign_mod, mapPath)
+			else:
+				command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
+
 			proc = Popen(command.split(), stdout=PIPE).communicate()
-			self.LOG.append([proc[0].decode()])
-			if "Error" in proc[0].decode() or "Unknown" in proc[0].decode():
+
+			if "Error" in proc[0].decode():
 				continue
 			else:
 				if "saved" in proc[0].decode():
-					self.legacy_name = proc[0].decode().split(' saved')[0]
+					self.legacy_name = proc[0].decode().split("\n")[-2].split(' saved')[0]
 					os.chdir(self.currentDirectory)
 					return True
 				else:
