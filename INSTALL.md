@@ -13,8 +13,7 @@ Developed using:
 ```
 python3
 python3-dev # is required to install some packages like psycopg2 via pip
-libgraphicsmagick++1-dev # is required for pgmagick package
-libboost-python-dev # is required for pgmagick package
+imagemagick
 ```
 
 

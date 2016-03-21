@@ -5,7 +5,6 @@ import string
 import random
 import signal
 import json
-from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 from subprocess import Popen, PIPE
 from django.conf import settings
 from django.utils import timezone
@@ -534,17 +533,10 @@ def GenerateSHPpreview(mapObject, parser=settings.OPENRA_ROOT_PATH + list(revers
 					shutil.rmtree(path+'content/png/')
 
 					continue
-				pngsdir = os.listdir(path + 'content/png/')
-				imglist = []
-				for pngfn in pngsdir:
-					if pngfn.endswith('.png'):
-						imglist.append(pngfn)
-				imglist.sort()
-				imgs = ImageList()
-				for img in imglist:
-					imgs.append(Image(path+'content/png/'+img))
-				imgs.animationDelayImages(50)
-				imgs.writeImages(path+'content/'+fn+'.gif')
+
+				convert_command = 'convert -delay 50 -loop 1 '+path+'content/png/*.png %s' % (path+'content/'+fn+'.gif')
+				convert_proc = Popen(convert_command.split(), stdout=PIPE).communicate()
+
 				os.chdir(currentDirectory)
 				shutil.rmtree(path+'content/png/')
 	return True

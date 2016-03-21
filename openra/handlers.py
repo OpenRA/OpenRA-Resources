@@ -9,7 +9,6 @@ import yaml
 import json
 from subprocess import Popen, PIPE
 import multiprocessing
-from pgmagick import Image, ImageList, Geometry, FilterTypes, Blob
 
 from django.conf import settings
 from django.utils import timezone
@@ -395,17 +394,10 @@ class MapHandlers():
 					shutil.rmtree(self.map_full_path_directory+'content/png/')
 
 					continue
-				pngsdir = os.listdir(self.map_full_path_directory+'content/png/')
-				imglist = []
-				for pngfn in pngsdir:
-					if pngfn.endswith('.png'):
-						imglist.append(pngfn)
-				imglist.sort()
-				imgs = ImageList()
-				for img in imglist:
-					imgs.append(Image(self.map_full_path_directory+'content/png/'+img))
-				imgs.animationDelayImages(50)
-				imgs.writeImages(self.map_full_path_directory+'content/'+fn+'.gif')
+
+				convert_command = 'convert -delay 50 -loop 1 '+self.map_full_path_directory+'content/png/*.png %s' % (self.map_full_path_directory+'content/'+fn+'.gif')
+				convert_proc = Popen(convert_command.split(), stdout=PIPE).communicate()
+
 				os.chdir(self.currentDirectory)
 				shutil.rmtree(self.map_full_path_directory+'content/png/')
 		exit()
@@ -474,21 +466,10 @@ def addScreenshot(f, arg, user_id, item):
 	if not os.path.exists(path):
 		os.makedirs(path)
 
-	shutil.move(tempname, path + arg + "." + mimetype.split('/')[1])
+	sc_full_name = path + arg + "." + mimetype.split('/')[1]
+	sc_mini_name = path + arg + "-mini." + mimetype.split('/')[1]
 
+	shutil.move(tempname, sc_full_name)
 
-	command = 'identify -format "%w,%h" {0}'.format(path + arg + "." + mimetype.split('/')[1])
+	command = 'convert -resize 250x -quality 100 -sharpen 1.0 %s %s' % (sc_full_name, sc_mini_name)
 	proc = Popen(command.split(), stdout=PIPE).communicate()
-	details = proc[0].decode().strip().strip('"').split(',')
-
-	im = Image( str(path + arg + "." + mimetype.split('/')[1]) )
-	
-	scaleH = int(details[0]) / 100.0
-	scaleH = 250 / scaleH
-	scaleH = int(details[1]) / 100.0 * scaleH
-
-	im.quality(100)
-	im.filterType(FilterTypes.SincFilter)
-	im.scale('250x%s' % scaleH)
-	im.sharpen(1.0)
-	im.write(str(path + arg + "-mini." + mimetype.split('/')[1]))
