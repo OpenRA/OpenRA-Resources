@@ -210,6 +210,7 @@ def maps(request, page=1, filter=""):
 	filter_prepare['formats'] = [str(val) for val in filter_prepare['formats']]
 	filter_prepare['parsers'] = Maps.objects.values_list('parser', flat=True).distinct()
 	filter_prepare['parsers'] = sorted([val for val in filter_prepare['parsers'] if 'git' not in val])
+	filter_prepare['tilesets'] = sorted(Maps.objects.values_list('tileset', flat=True).distinct())
 
 	filter_prepare['sort_by'] = [
 		['latest', 'latest first'],
@@ -234,6 +235,7 @@ def maps(request, page=1, filter=""):
 	selected_filter['category'] = request.GET.getlist('category', None)
 	selected_filter['format'] = request.GET.getlist('format', None)
 	selected_filter['parser'] = request.GET.getlist('parser', None)
+	selected_filter['tileset'] = request.GET.getlist('tileset', None)
 
 	selected_filter['players'] = request.GET.get('players', None)
 	try:
@@ -291,6 +293,10 @@ def maps(request, page=1, filter=""):
 			mapObject = mapObject_copy0 | mapObject_copy1
 		else:
 			mapObject = mapObject_copy0
+
+	# filter by tileset
+	if selected_filter['tileset'] and 'any' not in selected_filter['tileset']:
+		mapObject = mapObject.filter(tileset__in=selected_filter['tileset'])
 
 	# filter by amount of spawn slots
 	if selected_filter['players']:

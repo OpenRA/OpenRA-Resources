@@ -1775,17 +1775,37 @@ p.registerInfo {
 	display: table-cell;
 	padding: 5px;
 	font-size: 0.9em;
+	vertical-align: bottom;
+}
+
+.filter_section.filter_checks {
+	width: 302px;
 }
 
 .filter_end {
 	display: table;
 }
 
+.filter_sort_by {
+	padding: 5px;
+	padding-top: 0px;
+	padding-left: 0px;
+}
+.filter_sort_by select {
+	margin-left: 5px;
+}
+
 .filter_apply {
 	display: table-cell;
-	padding: 5px;
-	padding-right: 40px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	padding-right: 12px;
+	padding-top: 5px;
 	vertical-align: bottom;
+}
+
+.filter_apply button {
+	width: 180px;
 }
 
 .filter_section input[type="text"] {
@@ -1800,18 +1820,32 @@ p.registerInfo {
 	border: 1px solid #74c2e7;
 }
 
+.filter_container select[name="mod"] {
+	width: 70px;
+}
 .filter_container select[name="category"] {
-	width: 118px;
+	width: 130px;
+}
+.filter_container select[name="format"] {
+	width: 50px;
+}
+.filter_container select[name="parser"] {
+	width: 150px;
+}
+.filter_container select[name="tileset"] {
+	width: 100px;
+}
+.filter_container select[name="with_problems"] {
+	width: 130px;
+	margin-bottom: 5px;
+}
+
+.filter_container input[name="players"] {
+	margin-left: 5px;
 }
 
 .filter_section_checks {
 	padding-right: 16px;
 	display: table-cell;
-}
-
-.filter_problems {
-	font-size: 0.9em;
-	position: absolute;
-	left: 525px;
-	top: 84px;
+	vertical-align: bottom;
 }

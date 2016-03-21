@@ -42,30 +42,17 @@
 					<option value="any" {% if 'any' in selected_filter.parser %}selected{% endif %}>any</option>
 					<option value="bleed" {% if 'bleed' in selected_filter.parser %}selected{% endif %}>bleed (any)</option>
 					{% for parser in filter_prepare.parsers %}
-						<option value="{{parser}}" {% if parser in selected_filter.parser %}selected{% endif %}>{{parser}}
+						<option value="{{parser}}" {% if parser in selected_filter.parser %}selected{% endif %}>{{parser}}</option>
 					{% endfor %}
 				</select>
 			</div>
 
 			<div class='filter_section'>
-				<span class="">Players:</span>
-				<input type='text' placeholder='any' name='players' {% if selected_filter.players %}value="{{selected_filter.players}}"{% endif %}>
-			</div>
-
-			<div class='filter_section'>
-				<span class="">Sort by:</span>
-				<select name="sort_by">
-					{% for sorting in filter_prepare.sort_by %}
-						<option value="{{sorting.0}}" {% if sorting.0 in selected_filter.sort_by %}selected{% endif %}>{{sorting.1}}</option>
-					{% endfor %}
-				</select>
-			</div>
-
-			<div class="filter_problems">
-				<span class="">Maps with problems:</span>
-				<select name="with_problems">
-					{% for problem in filter_prepare.with_problems %}
-						<option value="{{problem.0}}" {% if problem.0 in selected_filter.with_problems %}selected{% endif %}>{{problem.1}}</option>
+				<span class="">Tileset:</span>
+				<select name="tileset" multiple class="noscroll">
+					<option value="any" {% if 'any' in selected_filter.tileset %}selected{% endif %}>any</option>
+					{% for tileset in filter_prepare.tilesets %}
+						<option value="{{tileset}}" {% if tileset in selected_filter.tileset %}selected{% endif %}>{{tileset}}</option>
 					{% endfor %}
 				</select>
 			</div>
@@ -76,11 +63,22 @@
 
 			<div class='filter_end'>
 
-				<div class="filter_apply">
-					<button type="submit">Apply Filter/Sorting</button>
+				<div class='filter_section'>
+					<div class='filter_sort_by'>
+						<span class="">Sort by:</span>
+						<select name="sort_by">
+							{% for sorting in filter_prepare.sort_by %}
+								<option value="{{sorting.0}}" {% if sorting.0 in selected_filter.sort_by %}selected{% endif %}>{{sorting.1}}</option>
+							{% endfor %}
+						</select>
+					</div>
+
+					<div class="filter_apply">
+						<button type="submit">Apply Filter/Sorting</button>
+					</div>
 				</div>
 
-				<div class='filter_section'>
+				<div class='filter_section filter_checks'>
 
 					<div class='filter_section_checks'>
 						<input type='checkbox' {% if selected_filter.show_all_revisions == 'on' %}checked{% endif %} name='show_all_revisions'>
@@ -88,6 +86,9 @@
 						<br />
 						<input type='checkbox' name='show_with_reports' {% if selected_filter.show_with_reports == 'on' %}checked{% endif %}>
 						<span class="">Show only with reports</span>
+						<br />
+						<input type='checkbox' name='with_duplicates' {% if selected_filter.with_duplicates == 'on' %}checked{% endif %}>
+						<span class="">With duplicates</span>
 					</div>
 
 					<div class='filter_section_checks'>
@@ -96,16 +97,25 @@
 						<br />
 						<input type='checkbox' name='only_lua' {% if selected_filter.only_lua == 'on' %}checked{% endif %}>
 						<span class="">Only Lua</span>
-					</div>
-
-					<div class='filter_section_checks'>
-						<input type='checkbox' name='with_duplicates' {% if selected_filter.with_duplicates == 'on' %}checked{% endif %}>
-						<span class="">With duplicates</span>
 						<br />
 						<input type='checkbox' name='outdated' {% if selected_filter.outdated == 'on' %}checked{% endif %}>
 						<span class="">Outdated</span>
 					</div>
 
+				</div>
+
+				<div class='filter_section'>
+					<span class="">Maps with problems:</span>
+					<select name="with_problems">
+						{% for problem in filter_prepare.with_problems %}
+							<option value="{{problem.0}}" {% if problem.0 in selected_filter.with_problems %}selected{% endif %}>{{problem.1}}</option>
+						{% endfor %}
+					</select>
+
+					<br />
+
+					<span class="">Players:</span>
+					<input type='text' placeholder='any' name='players' {% if selected_filter.players %}value="{{selected_filter.players}}"{% endif %}>
 				</div>
 
 			</div>
