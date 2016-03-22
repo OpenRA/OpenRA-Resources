@@ -233,6 +233,16 @@ class MapHandlers():
 			misc.send_email_to_admin_OnMapFail(tempname)
 			return resp_map_data
 
+		### Read Rules ###
+		base64_rules = {}
+		base64_rules['data'] = ''
+		if int(resp_map_data['mapformat']) >= 10:
+			base64_rules = utility.ReadRules(False, tempname, parser)
+			if (base64_rules['error']):
+				print(base64_rules['response'])
+		if base64_rules['data']:
+			resp_map_data['advanced'] = True
+
 		### Define license information
 		cc = False
 		commercial = False
@@ -273,6 +283,7 @@ class MapHandlers():
 			spawnpoints = resp_map_data['spawnpoints'],
 			tileset = resp_map_data['tileset'],
 			shellmap = resp_map_data['shellmap'],
+			base64_rules = base64_rules['data'],
 			legacy_map = self.legacy_map,
 			revision = rev,
 			pre_rev = pre_r,

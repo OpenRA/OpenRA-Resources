@@ -5,6 +5,7 @@ import string
 import random
 import signal
 import json
+import base64
 from subprocess import Popen, PIPE
 from django.conf import settings
 from django.utils import timezone
@@ -123,8 +124,9 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 
 			continue
 
-		read_yaml_response = ReadYaml(item, ora_temp_dir_name+filename)
 
+		### Read Yaml ###
+		read_yaml_response = ReadYaml(item, ora_temp_dir_name+filename)
 
 		resp_map_data = read_yaml_response['response']
 		if read_yaml_response['error']:
@@ -135,6 +137,17 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 				shutil.rmtree(ora_temp_dir_name)
 
 			continue
+
+
+		### Read Rules ###
+		base64_rules = {}
+		base64_rules['data'] = ''
+		if int(resp_map_data['mapformat']) >= 10:
+			base64_rules = utility.ReadRules(item, ora_temp_dir_name+filename, parser)
+			print(base64_rules['response'])
+		if base64_rules['data']:
+			resp_map_data['advanced'] = True
+
 
 		if upgraded and recalculate_hash_response['error'] == False and if_map_requires_upgrade == False and unzipped_map and read_yaml_response['error'] == False:
 
@@ -160,6 +173,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 				Maps.objects.filter(id=item.id).update(width=resp_map_data['width'])
 				Maps.objects.filter(id=item.id).update(height=resp_map_data['height'])
 				Maps.objects.filter(id=item.id).update(shellmap=resp_map_data['shellmap'])
+				Maps.objects.filter(id=item.id).update(base64_rules=base64_rules['data'])
 				Maps.objects.filter(id=item.id).update(lua=resp_map_data['lua'])
 				Maps.objects.filter(id=item.id).update(advanced_map=resp_map_data['advanced'])
 				Maps.objects.filter(id=item.id).update(parser=parser_to_db)
@@ -189,6 +203,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 					spawnpoints = resp_map_data['spawnpoints'],
 					tileset = resp_map_data['tileset'],
 					shellmap = resp_map_data['shellmap'],
+					base64_rules = base64_rules['data'],
 					legacy_map = False,
 					revision = rev,
 					pre_rev = item.id,
@@ -259,6 +274,8 @@ def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(
 
 	return {'response': 'success', 'error': False, 'maphash': maphash}
 
+
+
 def ReadYaml(item=False, fullpath=""):
 	if fullpath == "":
 		if item == False:
@@ -295,6 +312,7 @@ def ReadYaml(item=False, fullpath=""):
 
 	countAdvanced = 0
 	shouldCountRules = False
+
 	expectspawn = False
 	spawnpoints = ""
 	for line in yamlData.split('\n'):
@@ -358,16 +376,43 @@ def ReadYaml(item=False, fullpath=""):
 			if line[11:].strip() == "Shellmap":
 				map_data_ordered['shellmap'] = True
 
-		if line.strip()[0:5] == "Rules":
+		if line.strip()[0:5] == "Rules":	# for MapFormat < 11
 			shouldCountRules = True
 		if shouldCountRules:
 			countAdvanced += 1
 
 	map_data_ordered['spawnpoints'] = spawnpoints.rstrip(",")
-	if countAdvanced > 16:
+	if countAdvanced > 16 and int(map_data_ordered['mapformat']) < 10:
 		map_data_ordered['advanced'] = True
 
 	return {'response': map_data_ordered, 'error': False}
+
+
+
+def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
+
+	currentDirectory = os.getcwd() + os.sep
+	os.chdir(parser + "/")
+
+	if fullpath == "":
+		if item == False:
+			return {'data':'', 'error':True, 'response':'wrong method call'}
+		path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
+		Dir = os.listdir(path)
+		for fn in Dir:
+			if fn.endswith('.oramap'):
+				fullpath = path + fn
+				break
+		if fullpath == "":
+			return {'data':'','error':True, 'response':'could not find .oramap'}
+
+	command = 'mono --debug OpenRA.Utility.exe ra --map-rules %s' % (fullpath)
+	proc = Popen(command.split(), stdout=PIPE).communicate()
+
+	os.chdir(currentDirectory)
+	return {'data': base64.b64encode(proc[0]).decode(), 'error':False, 'response':'fetched rules and base64 encoded'}
+
+
 
 def UnzipMap(item, fullpath=""):
 	if fullpath == "":
