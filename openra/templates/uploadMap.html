@@ -34,7 +34,7 @@
 			<div class='upload-map-form-left'>
 
 				<div class='upload-map-form-info'>
-					<textarea class="id_info" name="info" placeholder="Additional information**" title="Additional information**"></textarea>
+					<textarea class="id_info" name="info" placeholder="Description" title="Description"></textarea>
 				</div>
 
 				<div class='upload-map-form-file'>
@@ -47,7 +47,7 @@
 			<div class='upload-map-form-right'>
 
 				<div class='upload-map-form-parser'>
-					Parse with OpenRA version:<br />
+					Parse with OpenRA version<span class="red">**</span>:<br />
 					<select name="parser" size="4">
 						{% for parser in parsers %}
 							{% if parser == 'bleed' %}
@@ -99,7 +99,7 @@
 	<div class='cBlock'>
 		<div class='upload-map-form-stars'>
 			<span class='red'>*</span>&nbsp;&nbsp;&nbsp;<span>Format of original Red Alert maps (MPR, INI); will automatically import it during uploading</span><br />
-			<span class='red'>**</span>&nbsp;&nbsp;<span>Optional map information which will append to default Description, fetched from map.yaml</span>
+			<span class='red'>**</span>&nbsp;&nbsp;<span>Choose version the map was created for. If a newer version of OpenRA is available, you will be able to update the map after uploading using the <b>Upgrade Map</b> button.</span>
 		</div>
 	</div>
 	{% endif %}
