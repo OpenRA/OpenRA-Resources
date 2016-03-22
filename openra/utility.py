@@ -174,6 +174,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 				Maps.objects.filter(id=item.id).update(height=resp_map_data['height'])
 				Maps.objects.filter(id=item.id).update(shellmap=resp_map_data['shellmap'])
 				Maps.objects.filter(id=item.id).update(base64_rules=base64_rules['data'])
+				Maps.objects.filter(id=item.id).update(base64_players=resp_map_data['base64_players'])
 				Maps.objects.filter(id=item.id).update(lua=resp_map_data['lua'])
 				Maps.objects.filter(id=item.id).update(advanced_map=resp_map_data['advanced'])
 				Maps.objects.filter(id=item.id).update(parser=parser_to_db)
@@ -204,6 +205,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 					tileset = resp_map_data['tileset'],
 					shellmap = resp_map_data['shellmap'],
 					base64_rules = base64_rules['data'],
+					base64_players = resp_map_data['base64_players'],
 					legacy_map = False,
 					revision = rev,
 					pre_rev = item.id,
@@ -313,6 +315,9 @@ def ReadYaml(item=False, fullpath=""):
 	countAdvanced = 0
 	shouldCountRules = False
 
+	inPlayersBlock = False
+	map_data_ordered['base64_players'] = ''
+
 	expectspawn = False
 	spawnpoints = ""
 	for line in yamlData.split('\n'):
@@ -376,14 +381,29 @@ def ReadYaml(item=False, fullpath=""):
 			if line[11:].strip() == "Shellmap":
 				map_data_ordered['shellmap'] = True
 
+
+		if line[0:7] == "Players":
+			inPlayersBlock = True
+
+		if line[0:6] == "Actors":
+			inPlayersBlock = False
+
+		if inPlayersBlock and line.strip() != "":
+			map_data_ordered['base64_players'] += line + "\n"
+
+
 		if line.strip()[0:5] == "Rules":	# for MapFormat < 11
 			shouldCountRules = True
 		if shouldCountRules:
 			countAdvanced += 1
 
+
 	map_data_ordered['spawnpoints'] = spawnpoints.rstrip(",")
 	if countAdvanced > 16 and int(map_data_ordered['mapformat']) < 10:
 		map_data_ordered['advanced'] = True
+
+	if map_data_ordered['base64_players']:
+		map_data_ordered['base64_players'] = base64.b64encode(map_data_ordered['base64_players'].encode()).decode()
 
 	return {'response': map_data_ordered, 'error': False}
 

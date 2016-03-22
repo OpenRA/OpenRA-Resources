@@ -428,7 +428,8 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		parser: {27}
 		map_grid_type: {28}
 		categories: {29}
-		rules: {30}\n""".format(
+		rules: {30}
+		players_block: {31}\n""".format(
 		mapObject.map_hash,
 		mapObject.id,
 		cgi.escape(mapObject.title, quote=None),
@@ -459,7 +460,8 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 		mapObject.parser,
 		map_grid_type,
 		cgi.escape(", ".join(category_lst), quote=None),
-		mapObject.base64_rules
+		mapObject.base64_rules,
+		mapObject.base64_players
 		).replace("\t\t","\t").replace("''", "'")
 		return response_data
 	response_data = {}
@@ -495,6 +497,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 	response_data['map_grid_type'] = map_grid_type
 	response_data['categories'] = category_lst
 	response_data['rules'] = mapObject.base64_rules
+	response_data['players_block'] = mapObject.base64_players
 	return response_data
 
 def get_minimap(mapid, soft=False):

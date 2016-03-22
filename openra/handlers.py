@@ -284,6 +284,7 @@ class MapHandlers():
 			tileset = resp_map_data['tileset'],
 			shellmap = resp_map_data['shellmap'],
 			base64_rules = base64_rules['data'],
+			base64_players = resp_map_data['base64_players'],
 			legacy_map = self.legacy_map,
 			revision = rev,
 			pre_rev = pre_r,
