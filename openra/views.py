@@ -220,9 +220,9 @@ def maps(request, page=1, filter=""):
 		['players', 'players'],
 		['lately_commented', 'lately commented'],
 		['rating', 'rating'],
-		['views', 'amount of views'],
-		['downloads', 'amount of downloads'],
-		['revisions', 'amount of revisions']
+		['views', 'views'],
+		['downloads', 'downloads'],
+		['revisions', 'upgrade activity']
 	]
 
 	filter_prepare['with_problems'] = [
