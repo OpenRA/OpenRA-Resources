@@ -219,7 +219,10 @@ def maps(request, page=1, filter=""):
 		['title_reversed', 'title in reverse'],
 		['players', 'players'],
 		['lately_commented', 'lately commented'],
-		['rating', 'rating']
+		['rating', 'rating'],
+		['views', 'amount of views'],
+		['downloads', 'amount of downloads'],
+		['revisions', 'amount of revisions']
 	]
 
 	filter_prepare['with_problems'] = [
@@ -373,6 +376,12 @@ def maps(request, page=1, filter=""):
 
 		elif selected_filter['sort_by'] == 'rating':
 			mapObject = sorted(mapObject, key=lambda x: (x.rating), reverse=True)
+		elif selected_filter['sort_by'] == 'views':
+			mapObject = sorted(mapObject, key=lambda x: (x.viewed), reverse=True)
+		elif selected_filter['sort_by'] == 'downloads':
+			mapObject = sorted(mapObject, key=lambda x: (x.downloaded), reverse=True)
+		elif selected_filter['sort_by'] == 'revisions':
+			mapObject = sorted(mapObject, key=lambda x: (x.revision), reverse=True)
 	else:
 		mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
 	####################
@@ -453,43 +462,11 @@ def randomMap(request):
 
 
 
-def mostRatedMap(request):
-	max_rating = Maps.objects.all().aggregate(Max('rating'))['rating__max']
-	voteObject = Maps.objects.filter(rating=max_rating)
-	voteObject = random.choice(voteObject)
-	return HttpResponseRedirect('/maps/'+str(voteObject.id)+'/')
-
-
-
 def mostCommentedMap(request):
 	mapObject = Maps.objects.filter(next_rev=0)
 	comments = misc.count_comments_for_many(mapObject, 'maps')
 	mapid = max(comments.items(), key=operator.itemgetter(1))[0]
 	return HttpResponseRedirect('/maps/'+mapid+'/')
-
-
-
-def mostViewedMap(request):
-	max_viewed = Maps.objects.all().aggregate(Max('viewed'))['viewed__max']
-	mapObject = Maps.objects.filter(viewed=max_viewed)
-	mapObject = random.choice(mapObject)
-	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
-
-
-
-def mostDownloadedMap(request):
-	max_downloaded = Maps.objects.all().aggregate(Max('downloaded'))['downloaded__max']
-	mapObject = Maps.objects.filter(downloaded=max_downloaded)
-	mapObject = random.choice(mapObject)
-	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
-
-
-
-def activelyDevelopedMap(request):
-	max_developed = Maps.objects.all().aggregate(Max('revision'))['revision__max']
-	mapObject = Maps.objects.filter(revision=max_developed)
-	mapObject = random.choice(mapObject)
-	return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
 
 
 

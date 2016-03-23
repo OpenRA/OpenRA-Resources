@@ -52,11 +52,7 @@ urlpatterns = [
 	url(r'^maps/(?P<arg>\d+)/lua/(?P<name>[^/]+)/?$', views.serveLua, name='printLua'),
 	url(r'^maps/(?P<arg>\d+)/shp/(?P<name>[^/]+)/(?P<request_type>[^/]+)/?$', views.serveMapSHP, name='printMapSHP'),
 	url(r'^maps/random/?$', views.randomMap, name='randomMap'),
-	url(r'^maps/mostRated/?$', views.mostRatedMap, name='mostRatedMap'),
-	url(r'^maps/mostViewed/?$', views.mostViewedMap, name='mostViewedMap'),
 	url(r'^maps/mostCommented/?$', views.mostCommentedMap, name='mostCommentedMap'),
-	url(r'^maps/mostDownloaded/?$', views.mostDownloadedMap, name='mostDownloadedMap'),
-	url(r'^maps/activelyDeveloped/?$', views.activelyDevelopedMap, name='activelyDevelopedMap'),
 
 	url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
 	url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
