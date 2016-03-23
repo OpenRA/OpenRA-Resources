@@ -277,6 +277,11 @@
 		<div class="map_download">
 			<a href="/maps/{{arg}}/oramap" title="{{disk_size}}" class="button">Download</a>
 		</div>
+		{% if show_upgrade_map_button %}
+			<div class="map_download">
+				<a href="/maps/{{arg}}/upgrade/" title="Upgrade to the latest OpenRA engine version" class="button">Upgrade Map</a>
+			</div>
+		{% endif %}
 		<div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
 		<div class="map_data_label">File Size:</div><div class="map_data_text">{{disk_size}}</div>
 		{% if map.map_type %}

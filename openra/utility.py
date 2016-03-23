@@ -6,6 +6,7 @@ import random
 import signal
 import json
 import base64
+import multiprocessing
 from subprocess import Popen, PIPE
 from django.conf import settings
 from django.utils import timezone
@@ -13,12 +14,14 @@ from openra.models import Maps, Lints, MapCategories
 from openra import misc
 
 
-def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0], new_rev_on_upgrade=True):
+def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False):
 
 	parser_to_db = parser
 	parser = settings.OPENRA_ROOT_PATH + parser
 
 	currentDirectory = os.getcwd() + os.sep
+
+	upgraded_maps = []
 
 	for item in mapObject:
 
@@ -52,7 +55,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 		if not new_rev_on_upgrade:
 			if_new_rev = "WITHOUT creating new revision"
 
-		print('\nStarting map upgrade action %s on map: %s' % (if_new_rev, item.id))
+		print('\nStarting map upgrade action %s on map: %s. Using parser: %s' % (if_new_rev, item.id, parser_to_db))
 		print('All operations are performed in temporarily location until success: %s' % ora_temp_dir_name)
 		###
 
@@ -93,7 +96,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 				shutil.rmtree(ora_temp_dir_name)
 
 			continue
-		if recalculate_hash_response['maphash'] == item.map_hash:
+		if recalculate_hash_response['maphash'] == item.map_hash and upgrade_if_hash_matches == False:
 			print("Upgrade is not required, map hash after running `--upgrade-map` is idetical to original: %s" % (item.id))
 			print("Interrupted map upgrade: %s" % (item.id))
 
@@ -104,13 +107,14 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 
 		lint_check_response = LintCheck(item, ora_temp_dir_name+filename, parser, new_rev_on_upgrade)
 		if lint_check_response['error'] == True or lint_check_response['response'] != 'pass_for_requested_parser':
-			print("Lint check failed for requested parser: %s" % parser_to_db)
-			print("Interrupted map upgrade: %s" % (item.id))
+			if upgrade_if_lint_fails == False:
+				print("Lint check failed for requested parser: %s" % parser_to_db)
+				print("Interrupted map upgrade: %s" % (item.id))
 
-			if os.path.isdir(ora_temp_dir_name):
-				shutil.rmtree(ora_temp_dir_name)
-			
-			continue
+				if os.path.isdir(ora_temp_dir_name):
+					shutil.rmtree(ora_temp_dir_name)
+				
+				continue
 		if_map_requires_upgrade = True
 		if lint_check_response['error'] == False and lint_check_response['response'] == 'pass_for_requested_parser':
 			if_map_requires_upgrade = False
@@ -149,7 +153,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 			resp_map_data['advanced'] = True
 
 
-		if upgraded and recalculate_hash_response['error'] == False and if_map_requires_upgrade == False and unzipped_map and read_yaml_response['error'] == False:
+		if upgraded and recalculate_hash_response['error'] == False and unzipped_map and read_yaml_response['error'] == False:
 
 			if not new_rev_on_upgrade:
 				# copy directory tree from temporarily location to old location
@@ -181,6 +185,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 				print('Updated data, fetched from Yaml: %s' % item.id)
 
 				print('Finished upgrading map %s: %s \n' % (if_new_rev, item.id))
+				upgraded_maps.append(item.id)
 			else:
 				# create new revision after successfully upgrading map in temporarily location
 
@@ -232,16 +237,20 @@ def map_upgrade(mapObject, engine, parser=list(reversed( list(settings.OPENRA_VE
 				misc.copytree(ora_temp_dir_name, new_path)
 
 				print('Finished upgrading map %s %s. New ID: %s \n' % (item.id, if_new_rev, transac.id))
+				upgraded_maps.append(transac.id)
 
-				print('Running Lint checks for successfully upgraded map')
-
+				print("\nRunning Lint checks for successfully upgraded map\n")
 				LintCheck(transac, "", parser)
+
+				print("\nRunning SHPtoGIF generator, in case there are SHP files\n")
+				shp = multiprocessing.Process(target=GenerateSHPpreview, args=(item, parser,), name='SHPtoGIF')
+				shp.start()
 
 			if os.path.isdir(ora_temp_dir_name):
 				shutil.rmtree(ora_temp_dir_name)
 
 	os.chdir(currentDirectory)
-	return True
+	return upgraded_maps
 
 def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
 
@@ -295,6 +304,7 @@ def ReadYaml(item=False, fullpath=""):
 	map_data_ordered['lua'] = False
 	map_data_ordered['advanced'] = False
 	map_data_ordered['players'] = 0
+	map_data_ordered['author'] = ""
 	map_data_ordered['description'] = ""
 	map_data_ordered['map_type'] = ""
 	map_data_ordered['categories'] = ""
@@ -561,49 +571,49 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
 		os.chdir(currentDirectory)
 	return response
 
-def GenerateSHPpreview(mapObject, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
+def GenerateSHPpreview(item, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):
 	# generates gif preview of shp files for every mapObject in list of objects
 	currentDirectory = os.getcwd()
-	for item in mapObject:
-		path = os.getcwd() + os.sep + 'openra/data/maps/' + str(item.id) + os.sep
-		Dir = os.listdir(path + 'content/')
-		if os.path.isdir(path+'content/png/'):
-			shutil.rmtree(path+'content/png/')
-		for fn in Dir:
-			if fn.endswith('.shp'):
-				os.mkdir(path + 'content/png/')
-				os.chdir(path + 'content/png/')
-				command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", item.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
-				print(command)
 
-				class TimedOut(Exception): # Raised if timed out.
-					pass
+	path = os.getcwd() + os.sep + 'openra/data/maps/' + str(item.id) + os.sep
+	Dir = os.listdir(path + 'content/')
+	if os.path.isdir(path+'content/png/'):
+		shutil.rmtree(path+'content/png/')
+	for fn in Dir:
+		if fn.endswith('.shp'):
+			os.mkdir(path + 'content/png/')
+			os.chdir(path + 'content/png/')
+			command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", item.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+			print(command)
 
-				def signal_handler(signum, frame):
-					raise TimedOut("Timed out!")
+			class TimedOut(Exception): # Raised if timed out.
+				pass
 
-				signal.signal(signal.SIGALRM, signal_handler)
+			def signal_handler(signum, frame):
+				raise TimedOut("Timed out!")
 
-				signal.alarm(settings.UTILITY_TIME_LIMIT)    # Limit command execution time
+			signal.signal(signal.SIGALRM, signal_handler)
 
-				try:
-					proc = Popen(command.split(), stdout=PIPE).communicate()
-					signal.alarm(0)
-				except:
-					err = 'Error: failed to generate SHP preview for %s (map: %s)' % (fn, item.id)
-					print(err)
-					misc.send_email_to_admin('ORC: Failed to generate SHP preview', '%s \n\n %s' % (err, command))
+			signal.alarm(settings.UTILITY_TIME_LIMIT)    # Limit command execution time
 
-					os.chdir(currentDirectory)
-					shutil.rmtree(path+'content/png/')
-
-					continue
-
-				convert_command = 'convert -delay 50 -loop 1 '+path+'content/png/*.png %s' % (path+'content/'+fn+'.gif')
-				convert_proc = Popen(convert_command.split(), stdout=PIPE).communicate()
+			try:
+				proc = Popen(command.split(), stdout=PIPE).communicate()
+				signal.alarm(0)
+			except:
+				err = 'Error: failed to generate SHP preview for %s (map: %s)' % (fn, item.id)
+				print(err)
+				misc.send_email_to_admin('ORC: Failed to generate SHP preview', '%s \n\n %s' % (err, command))
 
 				os.chdir(currentDirectory)
 				shutil.rmtree(path+'content/png/')
+
+				continue
+
+			convert_command = 'convert -delay 50 -loop 1 '+path+'content/png/*.png %s' % (path+'content/'+fn+'.gif')
+			convert_proc = Popen(convert_command.split(), stdout=PIPE).communicate()
+
+			os.chdir(currentDirectory)
+			shutil.rmtree(path+'content/png/')
 	return True
 
 def GenerateMinimap(item, parser=settings.OPENRA_ROOT_PATH + list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]):

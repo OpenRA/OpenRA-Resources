@@ -40,6 +40,7 @@ urlpatterns = [
 	url(r'^maps/(?P<arg>\d+)/add(?P<item>\w+)sc/?$', views.addScreenshot, name='addScreenshot'),
 	url(r'^maps/(?P<arg>\d+)/revisions/?$', views.MapRevisions, name='MapRevisions'),
 	url(r'^maps/(?P<arg>\d+)/revisions/page/(?P<page>\d+)/?$', views.MapRevisions, name='MapRevisions'),
+	url(r'^maps/(?P<arg>\d+)/upgrade/?$', views.upgradeMap, name='upgradeMap'),
 	url(r'^(?P<item_type>\w+)/(?P<arg>\d+)/unsubscribe/?$', views.unsubscribe_from_comments, name='Unsubscribe from comments to item'),
 	url(r'^maps/author/(?P<author>[^/]+)/?$', views.mapsFromAuthor, name='mapsFromAuthor'),
 	url(r'^maps/author/(?P<author>[^/]+)/page/(?P<page>\d+)/?$', views.mapsFromAuthor, name='mapsFromAuthor'),

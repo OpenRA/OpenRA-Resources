@@ -1849,3 +1849,24 @@ p.registerInfo {
 	display: table-cell;
 	vertical-align: bottom;
 }
+
+
+.upgrade_map_col {
+	display: table-cell;
+	vertical-align: top;
+	padding: 10px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.parser {
+	background: transparent;
+	color: #fff;
+	width: 260px;
+	background: url("/static/images/subNavBg.png") #204770;
+	border: 1px solid #74c2e7;
+}
+
+.center {
+	text-align: center;
+}

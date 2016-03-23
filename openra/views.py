@@ -645,21 +645,40 @@ def displayMap(request, arg):
 
 	screenshots = Screenshots.objects.filter(ex_name="maps",ex_id=arg)
 
-	played_counter = urllib.request.urlopen("http://master.openra.net/map_stats?hash=%s" % mapObject.map_hash).read().decode()
-	played_counter = json.loads(played_counter)
-	if played_counter:
-		played_counter = played_counter["played"]
-	else:
-		played_counter = 0
+	try:
+		played_counter = urllib.request.urlopen("http://master.openra.net/map_stats?hash=%s" % mapObject.map_hash).read().decode()
+		played_counter = json.loads(played_counter)
+		if played_counter:
+			played_counter = played_counter["played"]
+		else:
+			played_counter = 0
+	except:
+		played_counter = 'unknown'
 
 	ratesAmount = Rating.objects.filter(ex_id=mapObject.id,ex_name='map')
 	ratesAmount = len(ratesAmount)
 
 	comments = misc.get_comments_for_all_revisions(request, 'maps', arg)
 
+	### showing upgrade map button
+	show_upgrade_map_button = True
+
+	if not (request.user == mapObject.user or request.user.is_superuser):
+		show_upgrade_map_button = False
+
+	if 'git' in mapObject.parser:
+		show_upgrade_map_button = False # can't upgrade maps uploaded with bleed parser
+	if mapObject.next_rev != 0:
+		show_upgrade_map_button = False # upgrade only the latest revision
+
+	if mapObject.parser == list(reversed( list(settings.OPENRA_VERSIONS.values()) ))[0]:
+		show_upgrade_map_button = False # map is up-to-date
+	###
+
 	license, icons = misc.selectLicenceInfo(mapObject)
 	userObject = User.objects.get(pk=mapObject.user_id)
 	Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
+
 	template = loader.get_template('index.html')
 	template_args = {
 		'content': 'displayMap.html',
@@ -684,6 +703,66 @@ def displayMap(request, arg):
 		'REPORTS_PENALTY_AMOUNT': settings.REPORTS_PENALTY_AMOUNT,
 		'lints': lints,
 		'comments': comments,
+		'show_upgrade_map_button': show_upgrade_map_button,
+	}
+	return StreamingHttpResponse(template.render(template_args, request))
+
+
+
+def upgradeMap(request, arg):
+
+	mapObject = Maps.objects.filter(id=arg)
+	if not mapObject[0]:
+		return HttpResponseRedirect('/')
+	if mapObject[0].user != request.user:
+		if not request.user.is_superuser:
+			return HttpResponseRedirect('/maps/' + arg + '/')
+
+	if 'git' in mapObject[0].parser:
+		return HttpResponseRedirect('/maps/' + arg + '/') # can't upgrade maps uploaded with bleed parser
+
+	if mapObject[0].next_rev != 0:
+		return HttpResponseRedirect('/maps/' + arg + '/') # upgrade only the latest revision
+
+	parsers = list(reversed( list(settings.OPENRA_VERSIONS.values()) ))
+	parsers.remove('bleed')
+
+	if mapObject[0].parser == parsers[0]:
+		return HttpResponseRedirect('/maps/' + arg + '/') # map is up-to-date
+
+
+	##########
+	no_effect = False
+	failed_to_upgrade = False
+	if request.method == 'POST':
+		upgrade_to_parser = request.POST.get('upgrade_to_parser', None)
+
+		if upgrade_to_parser:
+
+			if int(mapObject[0].parser.split('-')[1]) >= int(upgrade_to_parser.split('-')[1]):
+				no_effect = True
+			else:
+
+				upgrade_with_creating_new_rev = True
+				upgrade_if_hash_matches = True
+				upgrade_if_lint_fails = True
+				upgrade_res = utility.map_upgrade(mapObject, mapObject[0].parser.split('-')[1], upgrade_to_parser, upgrade_with_creating_new_rev, upgrade_if_hash_matches, upgrade_if_lint_fails)
+				if upgrade_res:
+					return HttpResponseRedirect('/maps/%s/' % upgrade_res[0])
+				else:
+					failed_to_upgrade = True
+	##########
+
+
+	template = loader.get_template('index.html')
+	template_args = {
+		'content': 'upgradeMap.html',
+		'request': request,
+		'title': ' - Upgrade Map - ' + mapObject[0].title,
+		'map': mapObject[0],
+		'parsers': parsers,
+		'no_effect': no_effect,
+		'failed_to_upgrade': failed_to_upgrade,
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
