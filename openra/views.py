@@ -725,7 +725,8 @@ def upgradeMap(request, arg):
 		return HttpResponseRedirect('/maps/' + arg + '/') # upgrade only the latest revision
 
 	parsers = list(reversed( list(settings.OPENRA_VERSIONS.values()) ))
-	parsers.remove('bleed')
+	if 'bleed' in parsers:
+		parsers.remove('bleed')
 
 	if mapObject[0].parser == parsers[0]:
 		return HttpResponseRedirect('/maps/' + arg + '/') # map is up-to-date
