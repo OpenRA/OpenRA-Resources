@@ -13,7 +13,13 @@
 
 		<div class="map_image_container left">
 			<div class="map_image">
-				<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} alt="minimap" />
+				{% if map_preview %}
+					<a class="map_full_preview" href="/screenshots/{{map_preview.id}}/" onclick="return hs.expand(this, config_minimap)">
+						<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} alt="minimap" />
+					</a>
+				{% else %}
+					<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} alt="minimap" />
+				{% endif %}
 			</div>
 		</div>
 		<div class="clear"></div>
@@ -277,9 +283,19 @@
 		<div class="map_download">
 			<a href="/maps/{{arg}}/oramap" title="{{disk_size}}" class="button">Download</a>
 		</div>
+		{% if show_upgrade_map_button %}
+			<div class="map_download">
+				<a href="/maps/{{arg}}/upgrade/" title="Upgrade to the latest OpenRA engine version" class="button">Upgrade Map</a>
+			</div>
+		{% endif %}
 		<div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
 		<div class="map_data_label">File Size:</div><div class="map_data_text">{{disk_size}}</div>
-		<div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>
+		{% if map.map_type %}
+			<div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>
+		{% endif %}
+		{% if map.categories %}
+			<div class="map_data_label">Categories:</div><div class="map_data_text">{{ map.categories|map_categories }}</div>
+		{% endif %}
 		<div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
 		<div class="map_data_label">Players:</div><div class="map_data_text">{{ map.players }}</div>
 		<div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>

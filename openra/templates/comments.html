@@ -1,7 +1,7 @@
 {% load customTags %}
 
 <div class="cBlock">
-	<h5>Comments {% if comments_by_user %}by {{request.user.username}} {% endif %}( page {{page}} ):</h5>
+	<h5>Comments {% if comments_by_user %}by {{comments_by_user.username}} {% endif %}( page {{page}} ):</h5>
 </div>
 
 {% if amount != 0 %}
@@ -43,7 +43,7 @@
 {% else %}
 
 	<div class="cBlock_comments">
-		<p>You have not made any comments yet.</p>
+		<p>No comments from {{comments_by_user.username}}</p>
 	</div>
 
 {% endif %}

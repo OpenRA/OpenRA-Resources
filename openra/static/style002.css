@@ -1379,10 +1379,10 @@ p.registerInfo {
 		margin: 0 0 0 140px;
 	}
 
-.addScreenshotForm {
-	font-size: 0.9em;
-	float: right;
-	padding-top: 50px;
+.screenshot_form {
+	padding: 20px;
+	text-align: left;
+	margin-bottom: 30px;
 }
 
 /* */
@@ -1765,28 +1765,108 @@ p.registerInfo {
 }
 
 
-.google-adsense-block-wide {
-	position: absolute;
-	display: none;
-	top: 0;
-	right: 0;
+
+/* *** Filter Maps *** */
+.filter_container {
+
 }
 
-.google-adsense-block-narrow {
-	position: absolute;
-	display: none;
-	top: 0;
-	right: 0;
+.filter_section {
+	display: table-cell;
+	padding: 5px;
+	font-size: 0.9em;
+	vertical-align: bottom;
 }
 
-@media screen and (min-width: 1280px) {
-	.google-adsense-block-wide {
-		display: block;
-	}
+.filter_section.filter_checks {
+	width: 302px;
 }
 
-@media screen and (max-width: 1279px) {
-	.google-adsense-block-narrow {
-		display: block;
-	}
+.filter_end {
+	display: table;
+}
+
+.filter_sort_by {
+	padding: 5px;
+	padding-top: 0px;
+	padding-left: 0px;
+}
+.filter_sort_by select {
+	margin-left: 5px;
+}
+
+.filter_apply {
+	display: table-cell;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	padding-right: 12px;
+	padding-top: 5px;
+	vertical-align: bottom;
+}
+
+.filter_apply button {
+	width: 180px;
+}
+
+.filter_section input[type="text"] {
+	width: 27px;
+	margin-top: 2px;
+}
+
+.filter_container select {
+	margin-top: 2px;
+	background: url("/static/images/subNavBg.png") #204770;
+	color: #fff;
+	border: 1px solid #74c2e7;
+}
+
+.filter_container select[name="mod"] {
+	width: 70px;
+}
+.filter_container select[name="category"] {
+	width: 130px;
+}
+.filter_container select[name="format"] {
+	width: 50px;
+}
+.filter_container select[name="parser"] {
+	width: 150px;
+}
+.filter_container select[name="tileset"] {
+	width: 100px;
+}
+.filter_container select[name="with_problems"] {
+	width: 130px;
+	margin-bottom: 5px;
+}
+
+.filter_container input[name="players"] {
+	margin-left: 5px;
+}
+
+.filter_section_checks {
+	padding-right: 16px;
+	display: table-cell;
+	vertical-align: bottom;
+}
+
+
+.upgrade_map_col {
+	display: table-cell;
+	vertical-align: top;
+	padding: 10px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.parser {
+	background: transparent;
+	color: #fff;
+	width: 260px;
+	background: url("/static/images/subNavBg.png") #204770;
+	border: 1px solid #74c2e7;
+}
+
+.center {
+	text-align: center;
 }

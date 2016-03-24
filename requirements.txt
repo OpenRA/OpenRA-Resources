@@ -10,11 +10,11 @@ ipython-genutils==0.1.0
 oauthlib==1.0.3
 path.py==8.1.2
 pexpect==4.0.1
-pgmagick==0.6.1
 pickleshare==0.6
 psycopg2==2.6.1
 ptyprocess==0.5.1
 python3-openid==3.0.9
+pytz==2016.1
 PyYAML==3.11
 requests==2.9.1
 requests-oauthlib==0.6.1

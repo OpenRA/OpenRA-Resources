@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: *shp*
+Disallow: *minimap*
+
+User-agent: bingbot
+Disallow: /
+User-agent: bing
+Disallow: /
+User-agent: AhrefsBot
+Disallow: /
+
+Host: http://resource.openra.net
