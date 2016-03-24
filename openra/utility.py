@@ -490,11 +490,15 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
 		if current_parser == "bleed":
 
 			bleed_tag = None
-			if (settings.OPENRA_BLEED_HASH_FILE_PATH != ''):
+			if (settings.OPENRA_BLEED_HASH_FILE_PATH != '' and os.path.isfile(settings.OPENRA_BLEED_HASH_FILE_PATH)):
 				bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
 				bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
 			if bleed_tag == None:
 				continue
+
+			if not os.path.isfile(settings.OPENRA_BLEED_PARSER + 'OpenRA.Utility.exe'):
+				continue
+
 			current_parser_to_db = bleed_tag
 			current_parser_path = settings.OPENRA_BLEED_PARSER
 		else:

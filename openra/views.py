@@ -982,9 +982,12 @@ def uploadMap(request, previous_rev=0):
 					return HttpResponseRedirect('/maps/' + uid + "/")
 
 	bleed_tag = None
-	if (settings.OPENRA_BLEED_HASH_FILE_PATH != ''):
+	if (settings.OPENRA_BLEED_HASH_FILE_PATH != '' and os.path.isfile(settings.OPENRA_BLEED_HASH_FILE_PATH)):
 		bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
 		bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
+	if 'bleed' in parsers:
+		if not os.path.isfile(settings.OPENRA_BLEED_PARSER + 'OpenRA.Utility.exe'):
+			parsers.remove('bleed')
 
 	template = loader.get_template('index.html')
 	template_args = {
