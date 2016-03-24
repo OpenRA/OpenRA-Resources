@@ -290,7 +290,7 @@ class MapHandlers():
 			pre_rev = pre_r,
 			next_rev = 0,
 			downloading = True,
-			requires_upgrade = not self.LintPassed,
+			requires_upgrade = True,
 			advanced_map = resp_map_data['advanced'],
 			lua = resp_map_data['lua'],
 			posted = timezone.now(),
@@ -317,6 +317,7 @@ class MapHandlers():
 
 		self.UnzipMap()
 
+
 		lint_check_response = utility.LintCheck(transac, self.map_full_path_filename, parser)
 		if lint_check_response['error'] == False and lint_check_response['response'] == 'pass_for_requested_parser':
 			self.LintPassed = True
@@ -325,6 +326,7 @@ class MapHandlers():
 			Maps.objects.filter(id=transac.id).update(requires_upgrade=False)
 		else:
 			Maps.objects.filter(id=transac.id).update(requires_upgrade=True)
+
 
 		if int(resp_map_data['mapformat']) < 10:
 			self.GenerateMinimap(resp_map_data['game_mod'], parser)
@@ -445,18 +447,18 @@ class MapHandlers():
 
 
 
-def addScreenshot(f, arg, user_id, item):
+def addScreenshot(request, arg, item):
 	if item == 'map':
 		Object = Maps.objects.filter(id=arg)
 		if not Object:
 			return False
-		if not (Object[0].user_id == user_id.id or user_id.is_superuser):
+		if not (Object[0].user_id == request.user.id or request.user.is_superuser):
 			return False
 	else:
 		return False
 	tempname = '/tmp/screenshot.temp'
 	with open(tempname, 'wb+') as destination:
-		for chunk in f.chunks():
+		for chunk in request.FILES['screenshot'].chunks():
 			destination.write(chunk)
 
 	command = 'file -b --mime-type %s' % tempname
@@ -465,12 +467,17 @@ def addScreenshot(f, arg, user_id, item):
 	if mimetype not in ['image/jpeg','image/png','image/gif']:
 		return False
 
+	map_preview = False
+	preview = request.POST.get('map_preview', None)
+	if preview == 'on':
+		map_preview = True
+
 	transac = Screenshots(
 		user = Object[0].user,
 		ex_id = int(arg),
 		ex_name = item+"s",
 		posted =  timezone.now(),
-		map_preview = False,
+		map_preview = map_preview,
 		)
 	transac.save()
 

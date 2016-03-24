@@ -1379,10 +1379,10 @@ p.registerInfo {
 		margin: 0 0 0 140px;
 	}
 
-.addScreenshotForm {
-	font-size: 0.9em;
-	float: right;
-	padding-top: 50px;
+.screenshot_form {
+	padding: 20px;
+	text-align: left;
+	margin-bottom: 30px;
 }
 
 /* */

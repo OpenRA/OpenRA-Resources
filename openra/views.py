@@ -10,16 +10,15 @@ import json
 import cgi
 import pytz
 import copy
+import base64
 from functools import reduce
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, Http404
-from django.db.models import Max
 from django.utils import timezone
 
-from .forms import AddScreenshotForm
 from django.db.models import F, Count, Q
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
@@ -532,10 +531,10 @@ def displayMap(request, arg):
 			else:
 				Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())
 			return HttpResponseRedirect('/maps/'+arg)
-		elif request.FILES.get('scfile', False) != False:
-			form = AddScreenshotForm(request.POST, request.FILES)
-			if form.is_valid():
-				handlers.addScreenshot(request.FILES['scfile'], arg, request.user, 'map')
+		elif request.FILES.get('screenshot', False) != False:
+
+				handlers.addScreenshot(request, arg, 'map')
+
 		elif request.POST.get('comment', "") != "":
 			transac = Comments(
 				item_type = 'maps',
@@ -652,6 +651,11 @@ def displayMap(request, arg):
 		show_upgrade_map_button = False # map is up-to-date
 	###
 
+	map_preview = None
+	for sc_item in screenshots:
+		if sc_item.map_preview:
+			map_preview = sc_item
+
 	license, icons = misc.selectLicenceInfo(mapObject)
 	userObject = User.objects.get(pk=mapObject.user_id)
 	Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -681,6 +685,7 @@ def displayMap(request, arg):
 		'lints': lints,
 		'comments': comments,
 		'show_upgrade_map_button': show_upgrade_map_button,
+		'map_preview': map_preview,
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 
@@ -897,17 +902,27 @@ def serveYaml(request, arg):
 
 
 def serveYamlRules(request, arg):
-	path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
+
 	result = ""
-	start = False
-	fn = open(path, 'r')
-	lines = fn.readlines()
-	fn.close()
-	for line in lines:
-		if "Rules:" in line:
-			start = True
-		if start:
-			result += line
+
+	mapObject = Maps.objects.filter(id=arg).first()
+	if mapObject:
+		if int(mapObject.mapformat) < 10:
+			path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
+			start = False
+			fn = open(path, 'r')
+			lines = fn.readlines()
+			fn.close()
+			for line in lines:
+				if "Rules:" in line:
+					start = True
+				if start:
+					result += line
+		else:
+			result = base64.b64decode(mapObject.base64_rules).decode()
+	else:
+		HttpResponseRedirect('/')
+
 	response = StreamingHttpResponse(cgi.escape(result, quote=None), content_type='application/plain')
 	response['Content-Disposition'] = 'attachment; filename = advanced.%s' % arg
 	return response
@@ -1124,12 +1139,10 @@ def addScreenshot(request, arg, item):
 		Object = Maps.objects.filter(id=arg)
 	if not (Object[0].user_id == request.user.id or request.user.is_superuser):
 		return StreamingHttpResponse("")
-	form = AddScreenshotForm()
 	template = loader.get_template('addScreenshotForm.html')
 	template_args = {
 		'request': request,
 		'arg': arg,
-		'form': form,
 	}
 	return StreamingHttpResponse(template.render(template_args, request))
 

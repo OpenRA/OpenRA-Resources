@@ -1,11 +1,20 @@
 {% if request.user.is_authenticated %}
 	<div class="upload_container">
 		<form action="/maps/{{arg}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
-			<h3>Upload screenshot of your map</h3>
-			<div class='addScreenshotForm'>
+			<div class='cBlock no-pd-bot'>
+				<h3>Upload screenshot of your map</h3>
+			</div>
+
+			<div class='cBlock screenshot_form'>
 				<div>
-					{% if form.scfile.errors %} <span class="error">{{ form.scfile.errors|join:", " }}</span>{% endif %}
-					{{ form.scfile }}
+					<input name="screenshot" type="file">
+					<br />
+					<p>
+						<input name="map_preview" type="checkbox"> Map full preview <span class="red">*</span>
+					</p>
+					<p>
+						<span class="red">*</span>  Last uploaded Map full preview is available via click on minimap.
+					</p>
 				</div>
 				<div>
 					<button type="submit">Upload</button>

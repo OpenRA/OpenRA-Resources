@@ -47,3 +47,8 @@ var config1 = {
 	slideshowGroup: 'group1',
 	transitions: ['expand', 'crossfade']
 };
+
+var config_minimap = {
+	slideshowGroup: 'map_preview',
+	transitions: ['expand', 'crossfade']
+}

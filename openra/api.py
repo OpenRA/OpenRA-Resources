@@ -38,7 +38,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
 	# get detailed map info by hash
 	elif arg == "hash":
 		map_hashes = arg1.split(',')
-		mapObject = Maps.objects.filter(map_hash__in=map_hashes)
+		mapObject = Maps.objects.filter(map_hash__in=map_hashes).distinct('map_hash')
 		if not mapObject:
 			raise Http404
 		if arg2 == "yaml":
