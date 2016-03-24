@@ -29,6 +29,10 @@ class Command(BaseCommand):
 
 		# object: container of all accepted for rsync maps
 		mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1,rsync_allow=True,amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT,next_rev=0).distinct("map_hash")
+		# TEMP: after upgrading all maps from release 20151224, comment upper line and uncommented next:
+		#mapObject = Maps.objects.filter(requires_upgrade=False,downloading=True,players__gte=1,rsync_allow=True,amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT,last_for_rsync=True).distinct("map_hash")
+
+
 		all_Remote_MapsID = [m.id for m in mapObject]
 
 		# delete outdated local maps

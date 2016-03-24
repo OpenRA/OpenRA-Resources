@@ -49,6 +49,7 @@ class Maps(models.Model):
 	policy_cc           = models.BooleanField(default=False)
 	policy_adaptations  = models.CharField(max_length=30, blank=True, null=True)
 	policy_commercial   = models.BooleanField(default=False)
+	last_for_rsync      = models.BooleanField(default=False) # temp field, required for upgrade from release 20151224
 
 
 
