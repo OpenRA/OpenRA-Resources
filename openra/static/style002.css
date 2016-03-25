@@ -1160,6 +1160,9 @@ p.registerInfo {
 					display: block;
 					margin: 0 auto;
 				}
+				.left_map_content .map_image_container .map_image a img:hover {
+					box-shadow: 0 0 1px 1px #74C2E7;
+				}
 		.map_hash_block {
 			position: relative;
 			font-size: 0.9em;

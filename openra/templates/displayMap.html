@@ -14,7 +14,7 @@
 		<div class="map_image_container left">
 			<div class="map_image">
 				{% if map_preview %}
-					<a class="map_full_preview" href="/screenshots/{{map_preview.id}}/" onclick="return hs.expand(this, config_minimap)">
+					<a class="map_full_preview" href="/screenshots/{{map_preview.id}}/" onclick="return hs.expand(this, config_minimap)" title="Open full preview">
 						<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} alt="minimap" />
 					</a>
 				{% else %}
