@@ -480,7 +480,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
             cgi.escape(", ".join(category_lst), quote=None),
             mapObject.base64_rules,
             mapObject.base64_players
-        ).replace("''", "'").strip()
+        ).replace("''", "'").lstrip()
         return response_data
     response_data = {}
     response_data['id'] = mapObject.id
