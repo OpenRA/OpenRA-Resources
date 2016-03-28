@@ -341,7 +341,7 @@ def ReadYaml(item=False, fullpath=""):
             map_data_ordered['author'] = line[7:].strip().replace("'", "''")
 
         if line[0:7] == "Tileset":
-            map_data_ordered['tileset'] = line[8:].strip().lower()
+            map_data_ordered['tileset'] = line[8:].strip()
 
         if line[0:4] == "Type":  # gone in MapFormat 11
             map_data_ordered['map_type'] = line[5:].strip()
