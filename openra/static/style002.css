@@ -74,6 +74,11 @@ textarea {
 	font-size: 0.9em;
 }
 
+.cBlock p label {
+	font-size: inherit;
+	padding-right: 10px;
+}
+
 .cBlockNoPadding {
 	border: 1px solid #74c2e7;
 	margin: 12px 0 0;

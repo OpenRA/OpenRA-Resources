@@ -143,7 +143,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
         base64_rules = {}
         base64_rules['data'] = ''
         if int(resp_map_data['mapformat']) >= 10:
-            base64_rules = utility.ReadRules(item, ora_temp_dir_name+filename, parser)
+            base64_rules = utility.ReadRules(item, ora_temp_dir_name+filename, parser, item.game_mod)
             print(base64_rules['response'])
         if base64_rules['data']:
             resp_map_data['advanced'] = True
@@ -414,7 +414,7 @@ def ReadYaml(item=False, fullpath=""):
     return {'response': map_data_ordered, 'error': False}
 
 
-def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
+def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], game_mod="ra"):
 
     currentDirectory = os.getcwd() + os.sep
     os.chdir(parser + "/")
@@ -431,7 +431,7 @@ def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(r
         if fullpath == "":
             return {'data': '', 'error': True, 'response': 'could not find .oramap'}
 
-    command = 'mono --debug OpenRA.Utility.exe ra --map-rules %s' % (fullpath)
+    command = 'mono --debug OpenRA.Utility.exe %s --map-rules %s' % (game_mod, fullpath)
     proc = Popen(command.split(), stdout=PIPE).communicate()
 
     os.chdir(currentDirectory)

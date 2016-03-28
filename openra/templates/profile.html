@@ -13,6 +13,17 @@
 				<div class="label">Username:</div>
 				<div>{% if user.is_authenticated %} {{ user }} {% endif %}</div>
 			</div>
+
+			<div class="profile_row">
+				<div class="label">Email:</div>
+
+				{% if user.email %}
+					<div> {{ user.email }} </div>
+				{% else %}
+					<div><a href="/accounts/email/">Add Email</a> (recommented)</div>
+				{% endif %}
+			</div>
+
 			{% if ifsocial == False %}
 			<div class="profile_row">
 				<div class="label">Password:</div>
