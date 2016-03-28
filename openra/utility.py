@@ -396,8 +396,8 @@ def ReadYaml(item=False, fullpath=""):
         if line[0:6] == "Actors":
             inPlayersBlock = False
 
-        if inPlayersBlock and line.strip() != "":
-            map_data_ordered['base64_players'] += line + "\n"
+        if inPlayersBlock and line.strip() != "" and line[0:7] != "Players":
+            map_data_ordered['base64_players'] += line[1:] + "\n"
 
         if line.strip()[0:5] == "Rules":  # for MapFormat < 10
             shouldCountRules = True
