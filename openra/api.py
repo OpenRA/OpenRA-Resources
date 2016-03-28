@@ -340,7 +340,7 @@ def serialize_minimap_map_info(request, mapObject, yaml=""):
             url,
             mapObject.revision,
             last_revision,
-        ).strip()
+        ).lstrip()
         return response_data
     response_data = {}
     response_data['id'] = mapObject.id
@@ -370,7 +370,7 @@ def serialize_url_map_info(request, mapObject, yaml=""):
             url,
             mapObject.revision,
             last_revision,
-        ).strip()
+        ).lstrip()
         return response_data
     response_data = {}
     response_data['id'] = mapObject.id
