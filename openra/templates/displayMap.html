@@ -47,8 +47,16 @@
 			<div class="notification map_advanced">
 				<label class="tick"></label>
 				<div class="notification_label printRulesShow" data-name="Custom Rules">Advanced</div>
-				<div class="notification_tooltip">
-					<div>This map is advanced.<br /><br />Click to see custom Rules.</div>
+				<div class="notification_tooltip printRulesShow" data-name="Custom Rules">
+					<div>This map is advanced:
+						<br />
+						<ul>
+							<li>defines Rules</li>
+							{% if contains_shp %}
+								<li>includes SHP files</li>
+							{% endif %}
+						</ul>
+						Click to see custom Rules.</div>
 				</div>
 			</div>
 			{% endif %}

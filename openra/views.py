@@ -514,6 +514,7 @@ def displayMap(request, arg):
 
             return HttpResponseRedirect('/maps/' + arg + '/')
 
+    contains_shp = False
     disk_size = 0
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
@@ -522,6 +523,12 @@ def displayMap(request, arg):
             if filename.endswith(".oramap"):
                 disk_size = os.path.getsize(path + '/' + filename)
                 disk_size = misc.sizeof_fmt(disk_size)
+                break
+        mapDir = os.listdir(path + '/content/')
+        for filename in mapDir:
+            if filename.endswith(".shp"):
+                contains_shp = True
+                break
     except:
         pass
     try:
@@ -638,6 +645,7 @@ def displayMap(request, arg):
         'comments': comments,
         'show_upgrade_map_button': show_upgrade_map_button,
         'map_preview': map_preview,
+        'contains_shp': contains_shp,
     }
     return StreamingHttpResponse(template.render(template_args, request))
 

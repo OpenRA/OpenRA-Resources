@@ -20,12 +20,9 @@ from openra import utility, misc
 class MapHandlers():
 
     def __init__(self, map_full_path_filename="", map_full_path_directory="", preview_filename=""):
-        self.map_is_uploaded = False
         self.minimap_generated = False
         self.maphash = ""
         self.LintPassed = False
-        self.advanced_map = False
-        self.lua_map = False
         self.map_full_path_directory = map_full_path_directory
         self.map_full_path_filename = map_full_path_filename
         self.preview_filename = preview_filename
@@ -184,8 +181,6 @@ class MapHandlers():
         self.preview_filename = os.path.splitext(name)[0] + ".png"
 
         shutil.move(tempname, self.map_full_path_filename)
-
-        self.map_is_uploaded = True
 
         self.UnzipMap()
 
