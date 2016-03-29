@@ -146,7 +146,6 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
         try:
             mapObject = Maps.objects.filter(
                 game_mod=mod.lower(),
-                players__gte=1,
                 requires_upgrade=False,
                 downloading=True,
                 amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT).distinct('map_hash')
@@ -230,8 +229,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
         try:
             mapObject = Maps.objects.filter(
                 game_mod=mod.lower(),
-                next_rev=0,
-                players__gte=1)
+                next_rev=0)
             mapObject = mapObject.filter(
                 requires_upgrade=False,
                 downloading=True,
@@ -392,15 +390,6 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
         license = "Creative Commons " + license
     else:
         license = "null"
-    downloading = True
-    if mapObject.requires_upgrade:
-        downloading = False
-    if not mapObject.downloading:
-        downloading = False
-    if mapObject.players == 0:
-        downloading = False
-    if mapObject.amount_reports >= settings.REPORTS_PENALTY_AMOUNT:
-        downloading = False
 
     map_grid_type = 'Rectangular'  # ra/cnc/d2k
     if mapObject.game_mod in ['ts', 'ra2']:
@@ -447,7 +436,8 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 \tmap_grid_type: {28}
 \tcategories: {29}
 \trules: {30}
-\tplayers_block: {31}\n""".format(
+\tplayers_block: {31}
+\treports: {32}\n""".format(
             mapObject.map_hash,
             mapObject.id,
             cgi.escape(mapObject.title, quote=None),
@@ -473,13 +463,14 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
             license,
             minimap,
             url,
-            downloading,
+            mapObject.downloading,
             mapObject.mapformat,
             mapObject.parser,
             map_grid_type,
             cgi.escape(", ".join(category_lst), quote=None),
             mapObject.base64_rules,
-            mapObject.base64_players
+            mapObject.base64_players,
+            mapObject.amount_reports
         ).replace("''", "'").lstrip()
         return response_data
     response_data = {}
@@ -509,13 +500,14 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
     response_data['license'] = license
     response_data['minimap'] = minimap
     response_data['url'] = url
-    response_data['downloading'] = downloading
+    response_data['downloading'] = mapObject.downloading
     response_data['mapformat'] = mapObject.mapformat
     response_data['parser'] = mapObject.parser
     response_data['map_grid_type'] = map_grid_type
     response_data['categories'] = category_lst
     response_data['rules'] = mapObject.base64_rules
     response_data['players_block'] = mapObject.base64_players
+    response_data['reports'] = mapObject.amount_reports
     return response_data
 
 

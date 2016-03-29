@@ -25,7 +25,7 @@
 		<div class="clear"></div>
 
 		<div class="notification_container">
-			{% if map.downloading == False or map.requires_upgrade == True or map.players == 0 or reports|length >= REPORTS_PENALTY_AMOUNT %}
+			{% if map.downloading == False or map.requires_upgrade == True or reports|length >= REPORTS_PENALTY_AMOUNT %}
 			<div class="notification map_attention">
 				<label class="x"></label>
 				<div class="notification_label">Attention!</div>
@@ -38,8 +38,6 @@
 						<p>Reason: Downloading is manually set to False</p>
 					{% elif reports|length >= REPORTS_PENALTY_AMOUNT %}
 						<p>Reason: More then 2 <a class="allReportsShow">active reports</a>!</p>
-					{% elif map.players == 0 %}
-						<p>Reason: Map is unplayable! Max slots: 0</p>
 					{% endif %}
 					</div>
 				</div>

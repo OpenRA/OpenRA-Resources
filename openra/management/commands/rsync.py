@@ -33,7 +33,6 @@ class Command(BaseCommand):
         mapObject = Maps.objects.filter(
                 requires_upgrade=False,
                 downloading=True,
-                players__gte=1,
                 rsync_allow=True,
                 amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT,
                 next_rev=0).distinct("map_hash")
@@ -41,7 +40,6 @@ class Command(BaseCommand):
         # comment upper line and uncommented next:
         # mapObject = Maps.objects.filter(requires_upgrade=False,
         # downloading=True,
-        # players__gte=1,
         # rsync_allow=True,
         # amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT,
         # last_for_rsync=True).distinct("map_hash")
