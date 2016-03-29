@@ -56,8 +56,6 @@ urlpatterns = [
     url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
     url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
 
-    url(r'^upload/replay/?$', views.uploadReplay, name='uploadReplay'),
-
 
     url(r'^screenshots/?$', views.screenshots, name='screenshots'),
     url(r'^screenshots/(?P<itemid>\d+)/?$', views.serveScreenshot, name='serveScreenshot'),
@@ -69,11 +67,6 @@ urlpatterns = [
     url(r'^comments/user/(?P<arg>\d+)/?$', views.comments_by_user, name='comments_by_user'),
     url(r'^comments/user/(?P<arg>\d+)/page/(?P<page>\d+)/?$', views.comments_by_user, name='comments_by_user_paged'),
 
-    url(r'^replays/?$', views.replays, name='replays'),
-    url(r'^replays/page/(?P<page>\d+)/?$', views.replays, name='replays_paged'),
-
-    url(r'^replays/(?P<arg>\d+)/?$', views.displayReplay, name='displayReplay'),
-    url(r'^replays/(?P<arg>\d+)/orarep/?$', views.serveReplay, name='serveReplay'),
 
     url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
 

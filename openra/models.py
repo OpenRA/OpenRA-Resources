@@ -106,60 +106,6 @@ class UnsubscribeComments(models.Model):
     unsubscribed        = models.DateTimeField('date of unsubscribe')
 
 
-class Replays(models.Model):
-
-    class Meta:
-        verbose_name_plural = 'Replays'
-
-    def __str__(self):
-        return str(self.id)
-
-    user                = models.ForeignKey(User)
-    info                = models.CharField(max_length=2000, default="")
-    metadata            = models.CharField(max_length=100000, default="")
-
-    game_mod            = models.CharField(max_length=100, default="")
-    map_hash            = models.CharField(max_length=200, default="")
-    version             = models.CharField(max_length=100, default="release-20141029")
-    start_time          = models.CharField(max_length=50, default="")
-    end_time            = models.CharField(max_length=50, default="")
-
-    sha1sum             = models.CharField(max_length=200, default="")
-    parser              = models.CharField(max_length=100, default="release-20141029")
-    posted              = models.DateTimeField('date published', default=datetime.datetime.now)
-    viewed              = models.IntegerField(default=0)
-    downloaded          = models.IntegerField(default=0)
-    rating              = models.FloatField(default=0.0)
-
-
-class ReplayPlayers(models.Model):
-
-    class Meta:
-        verbose_name_plural = "ReplayPlayers"
-
-    def __str__(self):
-        return 'replay_id: ' + str(self.replay_id)
-
-    user                = models.ForeignKey(User)
-    replay_id           = models.IntegerField(default=0)
-
-    client_index        = models.IntegerField(default=0)
-    color               = models.CharField(max_length=30)
-    faction_id          = models.CharField(max_length=50)
-    faction_name        = models.CharField(max_length=50)
-    is_bot              = models.BooleanField(default=False)
-    is_human            = models.BooleanField(default=True)
-    is_random_faction   = models.BooleanField(default=False)
-    is_random_spawn     = models.BooleanField(default=False)
-    name                = models.CharField(max_length=1000)
-    outcome             = models.CharField(max_length=50)
-    outcome_timestamp   = models.CharField(max_length=50)
-    spawn_point         = models.IntegerField(default=0)
-    team                = models.IntegerField(default=0)
-
-    posted              = models.DateTimeField('date published', default=datetime.datetime.now)
-
-
 class Reports(models.Model):
 
     class Meta:

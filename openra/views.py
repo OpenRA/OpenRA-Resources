@@ -23,7 +23,7 @@ from django.db.models import F, Count, Q
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openra import handlers, misc, utility
-from openra.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments, MapCategories
+from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments, MapCategories
 
 
 def index(request):
@@ -455,39 +455,6 @@ def mostCommentedMap(request):
     return HttpResponseRedirect('/maps/'+mapid+'/')
 
 
-def displayReplay(request, arg):
-    try:
-        orarepObj = Replays.objects.get(id=arg)
-    except:
-        return HttpResponseRedirect('/')
-
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/replays/' + arg
-    disk_size = os.path.getsize(path + '/' + arg + '.orarep')
-    disk_size = misc.sizeof_fmt(disk_size)
-
-    reportedByUser = False
-    reports = []
-    reportObject = Reports.objects.filter(ex_id=orarepObj.id, ex_name='replays')
-    for item in reportObject:
-        reports.append([item.user.username, item.reason, item.infringement, item.posted])
-        if item.user_id == request.user.id:
-            reportedByUser = True
-
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'displayReplay.html',
-        'request': request,
-        'title': ' - Replay details - ' + arg,
-        'orarep': orarepObj,
-        'reports': reports,
-        'reported': reportedByUser,
-        'screenshots': 0,
-        'disk_size': disk_size,
-        'duplicates': 0,
-    }
-    return StreamingHttpResponse(template.render(template_args, request))
-
-
 def displayMap(request, arg):
     if request.method == 'POST':
         if request.POST.get('reportReason', "").strip() != "":
@@ -830,19 +797,6 @@ def serveMinimap(request, arg):
     return response
 
 
-def serveReplay(request, arg):
-    orarep = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/replays/' + arg + '/' + arg + '.orarep'
-    if not os.path.isfile(path):
-        return HttpResponseRedirect('/replays/'+arg)
-
-    response = StreamingHttpResponse(open(path, 'rb'), content_type='application/octet-stream')
-    response['Content-Disposition'] = 'attachment; filename = %s' % arg+'.orarep'
-    response['Content-Length'] = os.path.getsize(path)
-    Replays.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
-    return response
-
-
 def serveOramap(request, arg, sync=""):
     oramap = ""
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
@@ -1033,42 +987,6 @@ def DeleteMap(request, arg):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def uploadReplay(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/replays/')
-    response = {'error': False, 'response': ''}
-
-    if request.method == 'POST':
-        if request.FILES.get('replay_file', None) is not None:
-
-            replay_file = handlers.ReplayHandlers()
-            response = replay_file.process_uploading(request.user.id, request.FILES['replay_file'], request.POST)
-            if replay_file.UID:
-                if response['error'] is False:
-                    return HttpResponseRedirect('/replays/' + str(replay_file.UID) + "/")
-
-    bleed_tag = None
-    if (settings.OPENRA_BLEED_HASH_FILE_PATH != ''):
-        bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
-        bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
-
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'uploadReplay.html',
-        'request': request,
-        'title': ' - Uploading Replay',
-        'response': response,
-        'parsers': list(reversed(list(settings.OPENRA_VERSIONS.values()))),
-        'bleed_tag': bleed_tag,
-    }
-
-    if settings.SITE_MAINTENANCE:
-        template_args['content'] = 'service/maintenance.html'
-        template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
-
-    return StreamingHttpResponse(template.render(template_args, request))
-
-
 def SetDownloadingStatus(request, arg):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/'+arg)
@@ -1225,37 +1143,6 @@ def comments_by_user(request, arg, page=1):
         'page': int(page),
         'comments_by_user': User.objects.filter(id=arg).first(),
     }
-    return StreamingHttpResponse(template.render(template_args, request))
-
-
-def replays(request, page=1):
-    perPage = 10
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
-    replayObject = Replays.objects.filter().distinct('sha1sum').order_by('sha1sum', '-posted')
-    replayObject = sorted(replayObject, key=lambda x: (x.posted), reverse=True)
-    amount = len(replayObject)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
-    replayObject = replayObject[slice_start:slice_end]
-    amount_this_page = len(replayObject)
-    if amount_this_page == 0 and int(page) != 1:
-        return HttpResponseRedirect("/replays/")
-
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'replays.html',
-        'request': request,
-        'title': ' - Replays',
-        'replays': replayObject,
-        'page': int(page),
-        'range': [i+1 for i in range(rowsRange)],
-        'amount': amount,
-    }
-
-    if settings.SITE_MAINTENANCE:
-        template_args['content'] = 'service/maintenance.html'
-        template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
-
     return StreamingHttpResponse(template.render(template_args, request))
 
 

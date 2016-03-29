@@ -1499,53 +1499,6 @@ p.registerInfo {
 	font-size: 0.9em;
 }
 
-.upload-replay-form-file {
-	margin-top: 25px;
-}
-
-.replay_file {
-	max-width: 330px;
-	min-width: 330px;
-}
-
-.upload-replay-form-left {
-	width: 100%;
-	font-size: 0.9em;
-	display: table-cell;
-}
-
-.upload-replay-form-left textarea {
-	width: 405px;
-	height: 100px;
-	font-size: 0.95em;
-}
-
-.upload-replay-form-right {
-	font-size: 0.9em;
-	display: table-cell;
-	vertical-align: top;
-	width: 220px;
-}
-
-.upload-replay-form-info {
-	width: 430px;
-	display: table-cell;
-	vertical-align: top;
-}
-
-.upload-replay-form-parser {
-	display: table-cell;
-	vertical-align: top;
-}
-
-.upload-replay-form-parser select {
-	background: transparent;
-	color: #fff;
-	width: 260px;
-	height: 140px;
-	margin-top: 10px;
-}
-
 .small-font {
 	font-size: 0.9em;
 }
@@ -1603,105 +1556,8 @@ p.registerInfo {
 	display: inline-block;
 }
 
-
-/* Replays and Replay detail pages */
 .bottom-store-info {
 	margin-right: 2px;
-}
-
-.replay-grid-header-info {
-	margin-left: 1px;
-	margin-right: 2px;
-	border: 2px solid #74c2e7;;
-}
-
-.replay_grid {
-	font-size: 0.9em;
-	text-align: center;
-	margin-left: 3px;
-	position: relative;
-
-	margin-left: 1px;
-	margin-right: 2px;
-	border-left: 2px solid #74c2e7;
-	border-right: 2px solid #74c2e7;
-}
-
-.replay_grid_cell {
-	border-bottom: 2px solid #74c2e7;
-
-	background: rgba(32, 44, 69, 0.4);
-	position: relative;
-}
-
-.replay_grid_cell:hover {
-	background: rgba(32, 44, 69, 0.7);
-	transition: all 0.6s ease;
-}
-
-.replay_grid_cell_mod {
-	width: 140px;
-	height: 140px;
-	display: table-cell;
-	padding: 0;
-	margin: 0;
-	position: relative;
-	border-right: 1px solid #74c2e7;
-	border-left: 1px solid #74c2e7;
-	left: -1px;
-	vertical-align: middle;
-}
-
-.replay_grid_cell_mod img {
-	max-width: 100px;
-	max-height: 100px;
-}
-
-.replay_grid_cell_map {
-	width: 140px;
-	height: 140px;
-	display: table-cell;
-	padding: 0;
-	margin: 0;
-	position: relative;
-	border-right: 1px solid #74c2e7;
-	border-left: 1px solid #74c2e7;
-	vertical-align: middle;
-	left: -2px;
-}
-
-.replay_grid_cell_map img {
-	max-width: 140px;
-	max-height: 140px;
-}
-
-.replay_grid_cell_info {
-	display: table-cell;
-	border-left: 1px solid #74c2e7;
-	left: -3px;
-	width: 410px;
-	position: relative;
-	text-align: left;
-}
-
-.replay_grid_cell_info a {
-	display: block;
-	width: 100%;
-	max-width: 410px;
-	height: 140px;
-	max-height: 140px;
-	overflow: hidden;
-	color: #fff;
-	text-decoration: none;
-	padding: 10px;
-}
-
-.replay_grid_cell_info a:hover {
-	text-decoration: none;
-}
-
-.replay_grid_cell_info_row {
-	padding-bottom: 7px;
 }
 
 

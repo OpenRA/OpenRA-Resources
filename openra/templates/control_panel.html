@@ -3,7 +3,6 @@
 	<nav class="side_nav">
 		<ul>
 			<li><a href="/panel/mymaps/" {% if '/panel/mymaps/' in request.path %}{{'class="nav-selected"'}}{% endif %}>My Maps ({{ amount_maps }})</a></li>
-			<li><a style="opacity: 0.5;" href="#" {% if '/panel/myreplays/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Replays (0)</a></li>
 			<li><a style="opacity: 0.5;" href="#" {% if '/panel/myscreenshots/' == request.path %}{{'class="nav-selected"'}}{% endif %}>My Screenshots (0)</a></li>
 		</ul>
 	</nav>
