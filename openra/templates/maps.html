@@ -217,6 +217,17 @@
 		<button class="maps_page_buttons" type="submit">Most Commented</button>
 	</form>
 </div>
+<div class="features">
+	<div class='cBlock no-pd-bot no-pd-top'>
+		<p>
+			{% if request.META.QUERY_STRING %}
+				<a href="/maps/zip/?{{request.META.QUERY_STRING}}" title='Downloaded filtered result as zip archive' onClick='return confirmZipDownload("{{amount}}")'>Downloaded filtered result as zip archive ({{amount}} maps)</a>
+			{% else %}
+				<a href="/maps/zip/" title='Downloaded filtered result as zip archive' onClick='return confirmZipDownload("{{amount}}")'>Download filtered result as zip archive ({{amount}} maps)</a>
+			{% endif %}
+		</p>
+	</div>
+</div>
 
 <div class='cBlock map-store-info'>
 	<p>Custom maps are stored in the user directories with sub-directories per mod.</p>
@@ -228,3 +239,12 @@
 
 	<p>Example:  /home/user/.openra/maps/ra/a_path_beyond.oramap</p>
 </div>
+
+<script>
+	function confirmZipDownload(amount)
+	{
+		var agree = confirm("Are you sure you want to download Zip archive of "+amount+" maps?\n\nFile size might be huge.\n")
+		if (agree) return true
+		else return false
+	}
+</script>

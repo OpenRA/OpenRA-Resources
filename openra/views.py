@@ -11,9 +11,11 @@ import cgi
 import pytz
 import copy
 import base64
+import zipfile
+from io import BytesIO
 from functools import reduce
 from django.conf import settings
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, Http404
@@ -411,6 +413,153 @@ def maps(request, page=1, filter=""):
         template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
 
     return StreamingHttpResponse(template.render(template_args, request))
+
+
+def maps_zip(request):
+
+    selected_filter = {}
+
+    selected_filter['mod'] = request.GET.getlist('mod', None)
+    selected_filter['category'] = request.GET.getlist('category', None)
+    selected_filter['format'] = request.GET.getlist('format', None)
+    selected_filter['parser'] = request.GET.getlist('parser', None)
+    selected_filter['tileset'] = request.GET.getlist('tileset', None)
+
+    selected_filter['players'] = request.GET.get('players', None)
+    try:
+        selected_filter['players'] = int(selected_filter['players'])
+        if selected_filter['players'] < 0:
+            selected_filter['players'] = None
+        elif selected_filter['players'] == 0:
+            selected_filter['players'] = str(selected_filter['players'])
+    except:
+        selected_filter['players'] = None
+
+    selected_filter['sort_by'] = request.GET.get('sort_by', None)
+
+    selected_filter['with_problems'] = request.GET.get('with_problems', None)
+
+    selected_filter['show_all_revisions'] = request.GET.get('show_all_revisions', None)
+
+    selected_filter['show_with_reports'] = request.GET.get('show_with_reports', None)
+    selected_filter['only_advanced'] = request.GET.get('only_advanced', None)
+    selected_filter['only_lua'] = request.GET.get('only_lua', None)
+    selected_filter['with_duplicates'] = request.GET.get('with_duplicates', None)
+    selected_filter['outdated'] = request.GET.get('outdated', None)
+
+    ####################
+    ####################
+    mapObject = Maps.objects.filter()
+
+    # filter by game mod
+    if selected_filter['mod'] and 'any' not in selected_filter['mod']:
+        mapObject = mapObject.filter(game_mod__in=selected_filter['mod'])
+
+    # filter by map category
+    if selected_filter['category'] and 'any' not in selected_filter['category']:
+        query_category = MapCategories.objects.filter(category_name__in=selected_filter['category'])
+        query_category = ['_'+str(cat.id)+'_' for cat in query_category]
+
+        mapObject = mapObject.filter(reduce(lambda x, y: x | y, [Q(categories__contains=item) for item in query_category]))
+
+    # filter by MapFormat
+    if selected_filter['format'] and 'any' not in selected_filter['format']:
+        mapObject = mapObject.filter(mapformat__in=selected_filter['format'])
+
+    # filter by engine parser
+    if selected_filter['parser'] and 'any' not in selected_filter['parser']:
+        mapObject_copy0 = copy.copy(mapObject)
+        mapObject_copy1 = copy.copy(mapObject)
+
+        mapObject_copy0 = mapObject_copy0.filter(parser__in=selected_filter['parser'])
+
+        if 'bleed' in selected_filter['parser']:
+            mapObject_copy1 = mapObject_copy1.filter(parser__contains='git')
+
+            mapObject = mapObject_copy0 | mapObject_copy1
+        else:
+            mapObject = mapObject_copy0
+
+    # filter by tileset
+    if selected_filter['tileset'] and 'any' not in selected_filter['tileset']:
+        mapObject = mapObject.filter(tileset__in=selected_filter['tileset'])
+
+    # filter by amount of spawn slots
+    if selected_filter['players']:
+        mapObject = mapObject.filter(players=selected_filter['players'])
+
+    # filter: show all revisions or only the latest
+    if selected_filter['show_all_revisions'] != 'on':
+        mapObject = mapObject.filter(next_rev=0)
+
+    # filter: show only maps with reports
+    if selected_filter['show_with_reports'] == 'on':
+        mapObject = mapObject.exclude(amount_reports=0)
+
+    # filter: show only advanced maps
+    if selected_filter['only_advanced'] == 'on':
+        mapObject = mapObject.filter(advanced_map=True)
+
+    # filter: show only maps with Lua scripts
+    if selected_filter['only_lua'] == 'on':
+        mapObject = mapObject.filter(lua=True)
+
+    # filter: show only maps with duplicates (by map_hash)
+    if selected_filter['with_duplicates'] == 'on':
+        dup_Ob = Maps.objects.values_list('map_hash', flat=True).annotate(Count('id')).order_by().filter(id__count__gt=1)
+        mapObject = mapObject.filter(map_hash__in=[dup_it for dup_it in dup_Ob])
+
+    # filter: show only last revisions of maps where parser is not equal to the latest official
+    if selected_filter['outdated'] == 'on':
+        latest_official_parser = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]
+        mapObject = mapObject.filter(next_rev=0).exclude(parser=latest_official_parser)
+
+    # filter options for maps with problems
+    if selected_filter['with_problems'] and selected_filter['with_problems'] != 'show':
+        if selected_filter['with_problems'] == 'hide_lint_failed':
+            mapObject = mapObject.filter(requires_upgrade=False)
+        elif selected_filter['with_problems'] == 'show_only_lint_failed':
+            mapObject = mapObject.filter(requires_upgrade=True)
+        elif selected_filter['with_problems'] == 'api_dl_disabled':
+            mapObject = mapObject.filter(downloading=False)
+        elif selected_filter['with_problems'] == 'many_reports':
+            mapObject = mapObject.filter(amount_reports__gte=3)
+    ####################
+    ####################
+
+    s = BytesIO()
+    zf = zipfile.ZipFile(s, "w", zipfile.ZIP_DEFLATED)
+
+    zip_filename = "resource_center_maps.zip"
+
+    for item in mapObject:
+        oramap = ""
+        item_path = os.getcwd() + '/openra/data/maps/' + str(item.id) + '/'
+        try:
+            mapDir = os.listdir(item_path)
+        except:
+            continue
+        for filename in mapDir:
+            if filename.endswith(".oramap"):
+                oramap = filename
+                break
+        if not oramap:
+            continue
+
+        zip_path = "maps/%s/%s" % (item.game_mod, oramap)
+
+        if zip_path in zf.namelist(): # duplicate name
+            lst_oramap = oramap.split('.')
+            lst_name = lst_oramap[0] + '_' + str(random.randrange(1,10)) + str(random.randrange(1,10))
+            zip_path = "maps/%s/%s.oramap" % (item.game_mod, lst_name)
+
+        zf.write(os.path.join(item_path, oramap), zip_path, zipfile.ZIP_DEFLATED)
+    zf.close()
+
+    response = HttpResponse(s.getvalue(), content_type='application/x-zip-compressed')
+    response['Content-Disposition'] = 'attachment; filename = %s' % zip_filename
+    response['Content-Length'] = s.tell()
+    return response
 
 
 def mapsFromAuthor(request, author, page=1):

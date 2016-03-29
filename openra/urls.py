@@ -53,6 +53,8 @@ urlpatterns = [
     url(r'^maps/random/?$', views.randomMap, name='randomMap'),
     url(r'^maps/mostCommented/?$', views.mostCommentedMap, name='mostCommentedMap'),
 
+    url(r'^maps/zip/', views.maps_zip, name='maps_zip'),
+
     url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
     url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
 
@@ -96,6 +98,7 @@ urlpatterns = [
     url(r'^links/?$', views.links, name='links'),
     url(r'^contacts/?$', views.contacts, name='contacts'),
     url(r'^contacts/sent/?$', views.contacts_sent, name='contacts_sent'),
+
 
     url(r'^map/(?P<arg>\w+)/?$', api.mapAPI, name='mapAPI_download'),
     url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/?$', api.mapAPI, name='mapAPI'),

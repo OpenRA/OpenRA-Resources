@@ -1435,6 +1435,9 @@ p.registerInfo {
 .no-pd-bot {
 	padding-bottom: 0px !important;
 }
+.no-pd-top {
+	padding-top: 0px !important;
+}
 
 .red {
 	color: #FD2B2B !important;
