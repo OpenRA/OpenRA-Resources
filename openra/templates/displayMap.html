@@ -79,7 +79,7 @@
 		<div class="map_hash_block cBlockNoPadding">
 			<div class="map_hash_block_element"><a href="/map/hash/{{map.map_hash}}" target='_blank'>API</a></div>
 			<div class="map_hash_block_element"><a href="http://master.openra.net/map_stats?hash={{map.map_hash}}" title='Master Server statistics for this Hash' target="_blank">stats</a></div>
-			<div class="map_hash">{% if duplicates %}<a href="#" title='duplicates'>Ξ</a> {% endif %}<span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span></div>
+			<div class="map_hash">{% if duplicates %}<a href="/maps/duplicates/{{map.map_hash}}/" title='Show duplicates'>Ξ</a> {% endif %}<span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span></div>
 		</div>
 
 		{% if map.description and map.description != "Describe your map here" %}
