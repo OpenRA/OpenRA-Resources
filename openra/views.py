@@ -236,7 +236,8 @@ def maps(request, page=1):
 
 def maps_zip(request):
 
-    mapObject, filter_prepare, selected_filter = misc.map_filter(request)
+    mapObject = Maps.objects.filter()
+    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
 
     s = BytesIO()
     zf = zipfile.ZipFile(s, "w", zipfile.ZIP_DEFLATED)
