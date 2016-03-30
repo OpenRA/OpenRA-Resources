@@ -268,7 +268,7 @@ def maps_zip(request):
     return response
 
 
-def mapsFromAuthor(request, author, page=1):
+def maps_author(request, author, page=1):
 
     mapObject = Maps.objects.filter(author=author.replace("%20", " "))
     mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
@@ -297,6 +297,47 @@ def mapsFromAuthor(request, author, page=1):
         'range': [i+1 for i in range(rowsRange)],
         'amount': amount,
         'author': author,
+        'comments': comments,
+
+        'filter_prepare': filter_prepare,
+        'selected_filter': selected_filter,
+    }
+    return StreamingHttpResponse(template.render(template_args, request))
+
+
+def maps_uploader(request, arg, page=1):
+
+    mapObject = Maps.objects.filter(user__id=arg)
+    if not mapObject:
+        HttpResponseRedirect('/maps/')
+
+    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
+
+    perPage = 20
+    slice_start = perPage*int(page)-perPage
+    slice_end = perPage*int(page)
+
+    amount = len(mapObject)
+    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    mapObject = mapObject[slice_start:slice_end]
+    if len(mapObject) == 0 and int(page) != 1:
+        if request.META['QUERY_STRING']:
+            return HttpResponseRedirect("/maps/uploader/%s/?%s" % (arg, request.META['QUERY_STRING']))
+        return HttpResponseRedirect("/maps/uploader/%s/" % arg)
+
+    comments = misc.count_comments_for_many(mapObject, 'maps')
+
+    template = loader.get_template('index.html')
+    template_args = {
+        'content': 'maps_uploader.html',
+        'request': request,
+        'title': ' - Maps uploaded by ' + mapObject[0].user.username,
+        'maps': mapObject,
+        'page': int(page),
+        'range': [i+1 for i in range(rowsRange)],
+        'amount': amount,
+        'uploader': mapObject[0].user.username,
+        'arg': arg,
         'comments': comments,
 
         'filter_prepare': filter_prepare,
@@ -901,7 +942,7 @@ def addScreenshot(request, arg, item):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def MapRevisions(request, arg, page=1):
+def maps_revisions(request, arg, page=1):
     perPage = 20
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)

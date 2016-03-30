@@ -155,12 +155,12 @@
 					{% if item.author %}
 					<tr>
 						<td class="tooltip_title">Author: </td>
-						<td class="tooltip_value">{{ item.author|strip_tags }} </td>
+						<td class="tooltip_value"><a href="/maps/author/{{item.author|proper_space}}/" title="Show maps authored by {{item.author|strip_tags}}">{{ item.author|strip_tags }}</a></td>
 					</tr>
 					{% endif %}
 					<tr>
 						<td class="tooltip_title">Uploader: </td>
-						<td class="tooltip_value">{{ item.user }}</td>
+						<td class="tooltip_value"><a href="/maps/uploader/{{item.user.id}}/" title="Show maps uploaded by {{item.user.username}}">{{ item.user.username }}</a></td>
 					</tr>
 				</table>
 				<table>

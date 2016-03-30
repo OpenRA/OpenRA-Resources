@@ -128,7 +128,7 @@
 
 
 <div class='cBlock no-pd-bot map-grid-header-info'>
-	<h3>Found {{ amount }} maps authored by <u>{{author|strip_tags}}</u>{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
+	<h3>Found {{ amount }} maps uploaded by <u>{{uploader}}</u>{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
 </div>
 {% if amount != 0 %}
 <div id="map_grid">
@@ -188,9 +188,9 @@
 				<span>{{ i }}</span>
 			{% else %}
 				{% if request.META.QUERY_STRING %}
-					<a href="/maps/author/{{author}}/page/{{i}}/?{{request.META.QUERY_STRING}}">{{ i }}</a>
+					<a href="/maps/uploader/{{arg}}/page/{{i}}/?{{request.META.QUERY_STRING}}">{{ i }}</a>
 				{% else %}
-					<a href="/maps/author/{{author}}/page/{{i}}/">{{ i }}</a>
+					<a href="/maps/uploader/{{arg}}/page/{{i}}/">{{ i }}</a>
 				{% endif %}
 			{% endif %}
 		{% else %}

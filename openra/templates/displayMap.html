@@ -6,7 +6,7 @@
 			<div>
 				<div class="title">{{ map.title|strip_tags }}</div>
 				{% if map.author %}
-					<div class="author">by {{ map.author|strip_tags }}</div>
+					<div class="author">by <a href="/maps/author/{{map.author|proper_space}}/" title="Show maps authored by {{map.author|strip_tags}}">{{ map.author|strip_tags }}</a></div>
 				{% endif %}
 			</div>
 		</div>
@@ -302,7 +302,7 @@
 		{% if map.categories %}
 			<div class="map_data_label">Categories:</div><div class="map_data_text">{{ map.categories|map_categories }}</div>
 		{% endif %}
-		<div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
+		<div class="map_data_label">Uploader:</div><div class="map_data_text"><a href="/maps/uploader/{{userid.id}}/" title="Show maps uploaded by {{userid.username}}">{{ userid.username }}</a></div>
 		<div class="map_data_label">Players:</div><div class="map_data_text">{{ map.players }}</div>
 		<div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
 		<div class="map_data_label">Size:</div><div class="map_data_text">{{ map.bounds|map_real_size }}</div>

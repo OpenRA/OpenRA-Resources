@@ -1033,6 +1033,10 @@ p.registerInfo {
 			padding: 1px 0;
 			word-break: break-word;
 		}
+		.map_tooltip .tooltip_value a {
+			display: inherit;
+			color: #95d5f4;
+		}
 		.map_tooltip .tooltip_title_misc {
 			width: 35%;
 			color: #dfdfdf;
