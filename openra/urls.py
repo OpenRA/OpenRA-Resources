@@ -45,7 +45,6 @@ urlpatterns = [
     url(r'^maps/author/(?P<author>[^/]+)/page/(?P<page>\d+)/?$', views.mapsFromAuthor, name='mapsFromAuthor'),
     url(r'^maps/page/(?P<page>\d+)/?$', views.maps, name='maps_paged'),
     url(r'^maps/page/(?P<page>\d+)/filter/(?P<filter>\w+)/?$', views.maps, name='maps_paged_filtered'),
-    url(r'^maps/filter/(?P<filter>\w+)/?$', views.maps, name='maps_filtered'),
     url(r'^maps/(?P<arg>\d+)/yaml/?$', views.serveYaml, name='printYaml'),
     url(r'^maps/(?P<arg>\d+)/rules/?$', views.serveYamlRules, name='printYamlRules'),
     url(r'^maps/(?P<arg>\d+)/lua/(?P<name>[^/]+)/?$', views.serveLua, name='printLua'),
