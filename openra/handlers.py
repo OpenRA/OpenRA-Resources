@@ -110,7 +110,7 @@ class MapHandlers():
             base64_rules = utility.ReadRules(False, tempname, parser, resp_map_data['game_mod'])
             if (base64_rules['error']):
                 print(base64_rules['response'])
-        if base64_rules['data']:
+        if base64_rules['advanced']:
             resp_map_data['advanced'] = True
 
         # Define license information

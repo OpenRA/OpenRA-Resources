@@ -147,7 +147,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
         if int(resp_map_data['mapformat']) >= 10:
             base64_rules = ReadRules(item, ora_temp_dir_name+filename, parser, item.game_mod)
             print(base64_rules['response'])
-        if base64_rules['data']:
+        if base64_rules['advanced']:
             resp_map_data['advanced'] = True
 
         if upgraded and recalculate_hash_response['error'] is False and unzipped_map and read_yaml_response['error'] is False:
@@ -435,9 +435,16 @@ def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(r
 
     command = 'mono --debug OpenRA.Utility.exe %s --map-rules %s' % (game_mod, fullpath)
     proc = Popen(command.split(), stdout=PIPE).communicate()
+    resp = {
+        'data': base64.b64encode(proc[0]).decode(),
+        'error': False,
+        'response': 'fetched rules and base64 encoded',
+        'advanced': False}
+    if len(proc[0].decode().split("\n")) > 8:
+        resp['advanced'] = True
 
     os.chdir(currentDirectory)
-    return {'data': base64.b64encode(proc[0]).decode(), 'error': False, 'response': 'fetched rules and base64 encoded'}
+    return resp
 
 
 def UnzipMap(item, fullpath=""):
