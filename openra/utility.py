@@ -145,7 +145,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
         base64_rules = {}
         base64_rules['data'] = ''
         if int(resp_map_data['mapformat']) >= 10:
-            base64_rules = utility.ReadRules(item, ora_temp_dir_name+filename, parser, item.game_mod)
+            base64_rules = ReadRules(item, ora_temp_dir_name+filename, parser, item.game_mod)
             print(base64_rules['response'])
         if base64_rules['data']:
             resp_map_data['advanced'] = True
