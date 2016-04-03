@@ -72,6 +72,8 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
         for line in proc:
             if line is None:
                 continue
+            if 'Converted' in line.decode() and 'MapFormat' in line.decode():
+                continue
             if line.decode().strip() != "":
                 upgraded = False
 
