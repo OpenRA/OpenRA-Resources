@@ -106,6 +106,7 @@ class MapHandlers():
         # Read Rules
         base64_rules = {}
         base64_rules['data'] = ''
+        base64_rules['advanced'] = resp_map_data['advanced']
         if int(resp_map_data['mapformat']) >= 10:
             base64_rules = utility.ReadRules(False, tempname, parser, resp_map_data['game_mod'])
             if (base64_rules['error']):
