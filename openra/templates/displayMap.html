@@ -323,18 +323,20 @@
 		<div class="cBlock">
 			<span class="small-font bold">Lint check status:</span>
 			{% for lint in lints %}
-				<div class="lint_check_line">
-					<div class="lint_check_line_status">
-						{% if lint.1 %}
-						<span class="small-font green">pass</span>
-						{% else %}
-						<a href="#" class="showLintLog small-font red" data-version="{{lint.0}}">fail</a>
-						{% endif %}
+				{% if not map.requires_upgrade and lint.0 == map.parser  or  map.requires_upgrade %}
+					<div class="lint_check_line">
+						<div class="lint_check_line_status">
+							{% if lint.1 %}
+							<span class="small-font green">pass</span>
+							{% else %}
+							<a href="#" class="showLintLog small-font red" data-version="{{lint.0}}">fail</a>
+							{% endif %}
+						</div>
+						<div class="lint_check_line_version">
+							<span class="small-font">{{lint.0}}</span>
+						</div>
 					</div>
-					<div class="lint_check_line_version">
-						<span class="small-font">{{lint.0}}</span>
-					</div>
-				</div>
+				{% endif %}
 			{% endfor %}
 		</div>
 		{% endif %}
