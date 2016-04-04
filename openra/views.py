@@ -555,6 +555,8 @@ def displayMap(request, arg):
         if sc_item.map_preview:
             map_preview = sc_item
 
+    last_parser = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]
+
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -586,6 +588,7 @@ def displayMap(request, arg):
         'show_upgrade_map_button': show_upgrade_map_button,
         'map_preview': map_preview,
         'contains_shp': contains_shp,
+        'last_parser': last_parser,
     }
     return StreamingHttpResponse(template.render(template_args, request))
 

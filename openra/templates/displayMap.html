@@ -323,7 +323,7 @@
 		<div class="cBlock">
 			<span class="small-font bold">Lint check status:</span>
 			{% for lint in lints %}
-				{% if not map.requires_upgrade and lint.0 == map.parser  or  map.requires_upgrade %}
+				{% if not map.requires_upgrade and lint.0 == map.parser  or  map.requires_upgrade  or  not map.requires_upgrade and lint.0 == last_parser %}
 					<div class="lint_check_line">
 						<div class="lint_check_line_status">
 							{% if lint.1 %}
