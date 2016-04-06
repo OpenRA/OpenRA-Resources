@@ -134,6 +134,11 @@ class MapHandlers():
             commercial = previous_policy_commercial
             adaptations = previous_policy_adaptations
 
+        # temp field:
+        last_for_rsync = False
+        if parser_to_db == 'release-20151224':
+            last_for_rsync = True
+
         # Add record to Database
         transac = Maps(
             user=userObject,
@@ -169,6 +174,7 @@ class MapHandlers():
             policy_commercial=commercial,
             policy_adaptations=adaptations,
             parser=parser_to_db,
+            last_for_rsync=last_for_rsync,
         )
         transac.save()
         self.UID = str(transac.id)
