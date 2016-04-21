@@ -1,6 +1,7 @@
 User-agent: *
 Disallow: *shp*
 Disallow: *minimap*
+Disallow: *upgrade*
 
 User-agent: bingbot
 Disallow: /

@@ -596,6 +596,8 @@ def displayMap(request, arg):
 def upgradeMap(request, arg):
 
     mapObject = Maps.objects.filter(id=arg)
+    if not mapObject:
+        return HttpResponseRedirect('/')
     if not mapObject[0]:
         return HttpResponseRedirect('/')
     if mapObject[0].user != request.user:
