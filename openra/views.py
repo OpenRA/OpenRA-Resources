@@ -1175,7 +1175,6 @@ def contacts(request):
                 )
                 resp = urllib.request.urlopen(req).read().decode('utf-8')
                 json_resp = json.loads(resp)
-                print(resp)
                 if json_resp['success']:
                     misc.send_email_contacts_form(name, email, message)
                     return HttpResponseRedirect('/contacts/sent/')
