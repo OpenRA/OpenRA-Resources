@@ -1169,7 +1169,7 @@ def contacts(request):
                 r = http.request('POST', 'https://www.google.com/recaptcha/api/siteverify',
                     headers={'Content-Type': 'application/json'},
                     body=encoded_body)
-                print r.read()
+                print(r.read())
 
                 #misc.send_email_contacts_form(name, email, message)
                 #return HttpResponseRedirect('/contacts/sent/')
