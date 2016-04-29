@@ -23,6 +23,11 @@
 	<![endif]-->
 	<link href="/static/favicon.ico" rel="shortcut icon" type="image/x-icon">
 	<link href="/news/feed/" rel="alternate" type="application/atom+xml">
+
+	{% if '/contacts' in request.path %}
+		<script src='https://www.google.com/recaptcha/api.js'></script>
+	{% endif %}
+
 </head>
 <body>
 	<div id="overlay"></div>

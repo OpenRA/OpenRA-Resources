@@ -208,3 +208,5 @@ SITE_MAINTENANCE_OVER = '00:00 GMT'  # when we finish technical works
 
 # Time limit for some execution processes
 UTILITY_TIME_LIMIT = 60
+
+GOOGLE_RECAPTCHA_SECRET_KEY = "YOUR-PRIVATE-KEY"

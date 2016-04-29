@@ -2,6 +2,7 @@ import os
 import math
 import re
 import urllib.request
+import urllib3.poolmanager
 import datetime
 import shutil
 import random
@@ -1156,8 +1157,22 @@ def contacts(request):
             name = request.POST.get('name', "")
             email = request.POST.get('email', "")
             message = request.POST.get('message', "")
-            misc.send_email_contacts_form(name, email, message)
-            return HttpResponseRedirect('/contacts/sent/')
+
+            g_recaptcha_response = request.POST.get('g-recaptcha-response', "")
+            if g_recaptcha_response:
+                encoded_body = json.dumps({
+                    'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                    'response': g_recaptcha_response,
+                    'remoteip': request.META.get("REMOTE_ADDR", None),
+                })
+                http = urllib3.PoolManager()
+                r = http.request('POST', 'https://www.google.com/recaptcha/api/siteverify',
+                    headers={'Content-Type': 'application/json'},
+                    body=encoded_body)
+                print r.read()
+
+                #misc.send_email_contacts_form(name, email, message)
+                #return HttpResponseRedirect('/contacts/sent/')
     template = loader.get_template('index.html')
     template_args = {
         'content': 'contacts.html',
