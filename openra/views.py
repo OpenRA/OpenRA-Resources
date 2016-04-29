@@ -1163,10 +1163,10 @@ def contacts(request):
                     'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
                     'response': g_recaptcha_response,
                     'remoteip': request.META.get("REMOTE_ADDR", None),
-                }).encode('utf8')
+                }).encode('utf-8')
                 req = urllib.request.Request('https://www.google.com/recaptcha/api/siteverify', data=encoded_body,
                             headers={'content-type': 'application/json'})
-                resp = urllib.request.urlopen(req)
+                resp = urllib.request.urlopen(req).read().decode()
                 print(resp)
 
                 #misc.send_email_contacts_form(name, email, message)
