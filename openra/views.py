@@ -10,6 +10,7 @@ import json
 import cgi
 import base64
 import zipfile
+from urllib.parse import urlencode
 from io import BytesIO
 from django.conf import settings
 from django.http import StreamingHttpResponse, HttpResponse
@@ -1159,18 +1160,26 @@ def contacts(request):
 
             g_recaptcha_response = request.POST.get('g-recaptcha-response', "")
             if g_recaptcha_response:
-                encoded_body = json.dumps({
+                params = urlencode({
                     'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
                     'response': g_recaptcha_response,
-                    'remoteip': request.META.get("REMOTE_ADDR", None),
+                    'remoteip': request.META.get("REMOTE_ADDR", ""),
                 }).encode('utf-8')
-                req = urllib.request.Request('https://www.google.com/recaptcha/api/siteverify', data=encoded_body,
-                            headers={'content-type': 'application/json'})
-                resp = urllib.request.urlopen(req).read().decode()
+                req = urllib.request.Request(
+                    url="https://www.google.com/recaptcha/api/siteverify",
+                    data=params,
+                    headers={
+                        "Content-type": "application/x-www-form-urlencoded",
+                        "User-agent": "reCAPTCHA Python"
+                    }
+                )
+                resp = urllib.request.urlopen(req).read().decode('utf-8')
+                json_resp = json.loads(resp)
                 print(resp)
-
-                #misc.send_email_contacts_form(name, email, message)
-                #return HttpResponseRedirect('/contacts/sent/')
+                if json_resp['success']:
+                    misc.send_email_contacts_form(name, email, message)
+                    return HttpResponseRedirect('/contacts/sent/')
+            return HttpResponseRedirect('/contacts/')
     template = loader.get_template('index.html')
     template_args = {
         'content': 'contacts.html',
