@@ -179,6 +179,14 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 Maps.objects.filter(id=item.id).update(lua=resp_map_data['lua'])
                 Maps.objects.filter(id=item.id).update(advanced_map=resp_map_data['advanced'])
                 Maps.objects.filter(id=item.id).update(parser=parser_to_db)
+
+                if resp_map_data['mapformat'] >= 9: # Description is gone in MapFormat 9
+                    if item.description:
+                        new_info = item.description+'\n\n'+item.info
+                    else:
+                        new_info = item.info
+                    Maps.objects.filter(id=item.id).update(info=new_info)
+
                 print('Updated data, fetched from Yaml: %s' % item.id)
 
                 print('Finished upgrading map %s: %s \n' % (if_new_rev, item.id))
@@ -230,6 +238,13 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 if last_for_rsync:
                     Maps.objects.filter(id=item.id).update(last_for_rsync=last_for_rsync)
                 #######################
+
+                if resp_map_data['mapformat'] >= 9:  # Description is gone in MapFormat 9
+                    if item.description:
+                        new_info = item.description+'\n\n'+item.info
+                    else:
+                        new_info = item.info
+                    Maps.objects.filter(id=transac.id).update(info=new_info)
 
                 new_path = currentDirectory + 'openra/data/maps/' + str(transac.id) + '/'
                 if not os.path.exists(new_path):
