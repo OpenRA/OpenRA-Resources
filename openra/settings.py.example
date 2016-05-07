@@ -195,6 +195,7 @@ ADMIN_EMAIL_TO = ''
 
 # Reply-to email address
 DEFAULT_FROM_EMAIL = ''
+EMAIL_HOST='127.0.0.1'
 
 
 # Determining amount of reports for item, required to forbid in-game downloading, synchronization with servers, etc.
