@@ -254,6 +254,7 @@ class Revisions():
             return
         self.revisions.insert(0, itemid)
         if self.modelName.lower() == "maps":
+            print(itemid)
             itemObject = Maps.objects.get(id=itemid)
         if itemObject.pre_rev == 0:
             self.GetRevisions(self.revisions[-1], True)
