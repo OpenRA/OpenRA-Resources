@@ -43,12 +43,10 @@ class Maps(models.Model):
     viewed              = models.IntegerField(default=0)
     downloaded          = models.IntegerField(default=0)
     rating              = models.FloatField(default=0.0)
-    rsync_allow         = models.BooleanField(default=True)
     amount_reports      = models.IntegerField(default=0)
     policy_cc           = models.BooleanField(default=False)
     policy_adaptations  = models.CharField(max_length=30, blank=True, null=True)
     policy_commercial   = models.BooleanField(default=False)
-    last_for_rsync      = models.BooleanField(default=False)  # temp field, required for upgrade from release 20151224
 
 
 class MapCategories(models.Model):

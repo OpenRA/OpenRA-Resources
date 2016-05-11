@@ -14,7 +14,7 @@ from openra.models import Maps, Lints, MapCategories
 from openra import misc
 
 
-def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False, last_for_rsync=False):
+def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False):
 
     parser_to_db = parser
     parser = settings.OPENRA_ROOT_PATH + parser
@@ -233,11 +233,6 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 )
                 transac.save()
                 Maps.objects.filter(id=item.id).update(next_rev=transac.id)
-
-                # temp field, required for upgrade from release 20151224, remove after upgrading all maps.
-                if last_for_rsync:
-                    Maps.objects.filter(id=item.id).update(last_for_rsync=last_for_rsync)
-                #######################
 
                 if resp_map_data['mapformat'] >= 9:  # Description is gone in MapFormat 9
                     if item.description:
