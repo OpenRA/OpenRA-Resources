@@ -29,8 +29,8 @@ class Maps(models.Model):
     mapformat           = models.IntegerField(default=6)
     parser              = models.CharField(max_length=100, default="release-20141029")
     shellmap            = models.BooleanField(default=False)
-    base64_rules        = models.CharField(max_length=1000000, blank=True, null=True, default="")
-    base64_players      = models.CharField(max_length=1000000, blank=True, null=True, default="")
+    base64_rules        = models.CharField(max_length=10000000, blank=True, null=True, default="")
+    base64_players      = models.CharField(max_length=10000000, blank=True, null=True, default="")
     legacy_map          = models.BooleanField(default=False)
     revision            = models.IntegerField(default=1)
     pre_rev             = models.IntegerField(default=0)
@@ -70,7 +70,7 @@ class Lints(models.Model):
     map_id              = models.IntegerField(default=0)
     version_tag         = models.CharField(max_length=100, default="release-20141029")
     pass_status         = models.BooleanField(default=False)
-    lint_output         = models.CharField(max_length=1000000, default="")
+    lint_output         = models.CharField(max_length=10000000, default="")
     posted              = models.DateTimeField('date of check')
 
 
