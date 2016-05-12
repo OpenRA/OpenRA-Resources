@@ -925,6 +925,7 @@ def DeleteMap(request, arg):
         Comments.objects.filter(item_id=mapObject.id, item_type='maps').delete()
         UnsubscribeComments.objects.filter(item_id=mapObject.id, item_type='maps').delete()
         Lints.objects.filter(map_id=mapObject.id, item_type='maps').delete()
+        Rating.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
         if mapObject.pre_rev != 0:
             Maps.objects.filter(id=mapObject.pre_rev).update(next_rev=mapObject.next_rev)
         if mapObject.next_rev != 0:
