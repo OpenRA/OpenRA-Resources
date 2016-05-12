@@ -6,6 +6,7 @@ import random
 import signal
 import json
 import base64
+import time
 import multiprocessing
 from subprocess import Popen, PIPE
 from django.conf import settings
@@ -192,6 +193,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 print('Finished upgrading map %s: %s \n' % (if_new_rev, item.id))
                 upgraded_maps.append(item.id)
             else:
+                time.sleep(1)
                 # create new revision after successfully upgrading map in temporarily location
 
                 rev = item.revision + 1
