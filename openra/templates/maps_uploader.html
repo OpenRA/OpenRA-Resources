@@ -1,6 +1,5 @@
 {% load customTags %}
 
-
 <div class='cBlock'>
 	<form name='filter_maps' class='filter_maps' action='{{request.path}}' method='GET'>
 		<div class='filter_container'>
@@ -129,7 +128,7 @@
 
 
 <div class='cBlock no-pd-bot map-grid-header-info'>
-	<h3>Found {{ amount }} maps{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
+	<h3>Found {{ amount }} maps uploaded by <u>{{uploader}}</u>{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
 </div>
 {% if amount != 0 %}
 <div id="map_grid">
@@ -137,27 +136,25 @@
 		<div class="map_grid_cell">
 			<a href="/maps/{{item.id}}/">
 				<div class="cell-link-container">
-					<div><img src="/maps/{{item.id}}/minimap" alt="{{item.id}}" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
+					<div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
 				</div>
 				{% if item.downloading == False or item.requires_upgrade == True or item.players == 0  or item.amount_reports >= 3 %}
-				<div class="map-custom-status"><img src="/static/images/attention-mini.jpg" alt="attention" /></div>
+				<div class="map-custom-status"><img src="/static/images/attention-mini.jpg" /></div>
 				{% endif %}
 				{% if item.advanced_map %}
-				<div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" alt="advanced" /></div>
+				<div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" /></div>
 				{% endif %}
 				{% if item.lua %}
-				<div class="map-custom-status"><img src="/static/images/lua-mini.jpg" alt="lua" /></div>
+				<div class="map-custom-status"><img src="/static/images/lua-mini.jpg" /></div>
 				{% endif %}
 			</a>
 			<div class="map_tooltip">
 				<div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
 				<table>
-					{% if item.author %}
 					<tr>
 						<td class="tooltip_title">Author: </td>
 						<td class="tooltip_value"><a href="/maps/author/{{item.author|proper_space}}/" title="Show maps authored by {{item.author|strip_tags}}">{{ item.author|strip_tags }}</a></td>
 					</tr>
-					{% endif %}
 					<tr>
 						<td class="tooltip_title">Uploader: </td>
 						<td class="tooltip_value"><a href="/maps/uploader/{{item.user.id}}/" title="Show maps uploaded by {{item.user.username}}">{{ item.user.username }}</a></td>
@@ -191,9 +188,9 @@
 				<span>{{ i }}</span>
 			{% else %}
 				{% if request.META.QUERY_STRING %}
-					<a href="/maps/page/{{i}}/?{{request.META.QUERY_STRING}}">{{ i }}</a>
+					<a href="/maps/uploader/{{arg}}/page/{{i}}/?{{request.META.QUERY_STRING}}">{{ i }}</a>
 				{% else %}
-					<a href="/maps/page/{{i}}/">{{ i }}</a>
+					<a href="/maps/uploader/{{arg}}/page/{{i}}/">{{ i }}</a>
 				{% endif %}
 			{% endif %}
 		{% else %}
@@ -209,44 +206,3 @@
 {% endif %}
 <div class="clear"></div>
 {% endif %}
-<div class="features">
-	<form class="maps_page_buttons_form" method="GET" action="/maps/random/">
-		<button class="maps_page_buttons" type="submit">Random Map</button>
-	</form>
-	<form class="maps_page_buttons_form" method="GET" action="/maps/mostCommented/">
-		<button class="maps_page_buttons" type="submit">Most Commented</button>
-	</form>
-</div>
-{% if amount %}
-	<div class="features">
-		<div class='cBlock no-pd-bot no-pd-top'>
-			<p>
-				{% if request.META.QUERY_STRING %}
-					<a href="/maps/zip/?{{request.META.QUERY_STRING}}" title='Downloaded filtered result as zip archive' onClick='return confirmZipDownload("{{amount}}")'>Downloaded filtered result as zip archive ({{amount}} maps)</a>
-				{% else %}
-					<a href="/maps/zip/" title='Downloaded filtered result as zip archive' onClick='return confirmZipDownload("{{amount}}")'>Download filtered result as zip archive ({{amount}} maps)</a>
-				{% endif %}
-			</p>
-		</div>
-	</div>
-{% endif %}
-
-<div class='cBlock map-store-info'>
-	<p>Custom maps are stored in the user directories with sub-directories per mod.</p>
-	<ul>
-		<li><u>Windows:</u> My Documents\OpenRA\maps\&lt;mod name&gt;\</li>
-		<li><u>Mac OSX:</u> ~/Library/Application Support/OpenRA/maps/&lt;mod name&gt;/</li>
-		<li><u>Linux:</u> ~/.openra/maps/&lt;mod name&gt;/</li>
-	</ul>
-
-	<p>Example:  /home/user/.openra/maps/ra/a_path_beyond.oramap</p>
-</div>
-
-<script>
-	function confirmZipDownload(amount)
-	{
-		var agree = confirm("Are you sure you want to download Zip archive of "+amount+" maps?\n\nFile size might be huge.\n")
-		if (agree) return true
-		else return false
-	}
-</script>

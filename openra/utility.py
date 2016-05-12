@@ -6,6 +6,7 @@ import random
 import signal
 import json
 import base64
+import time
 import multiprocessing
 from subprocess import Popen, PIPE
 from django.conf import settings
@@ -14,7 +15,7 @@ from openra.models import Maps, Lints, MapCategories
 from openra import misc
 
 
-def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False, last_for_rsync=False):
+def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False):
 
     parser_to_db = parser
     parser = settings.OPENRA_ROOT_PATH + parser
@@ -71,6 +72,8 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
         upgraded = True
         for line in proc:
             if line is None:
+                continue
+            if 'Converted' in line.decode() and 'MapFormat' in line.decode():
                 continue
             if line.decode().strip() != "":
                 upgraded = False
@@ -142,10 +145,11 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
         # Read Rules
         base64_rules = {}
         base64_rules['data'] = ''
+        base64_rules['advanced'] = resp_map_data['advanced']
         if int(resp_map_data['mapformat']) >= 10:
-            base64_rules = utility.ReadRules(item, ora_temp_dir_name+filename, parser)
+            base64_rules = ReadRules(item, ora_temp_dir_name+filename, parser, item.game_mod)
             print(base64_rules['response'])
-        if base64_rules['data']:
+        if base64_rules['advanced']:
             resp_map_data['advanced'] = True
 
         if upgraded and recalculate_hash_response['error'] is False and unzipped_map and read_yaml_response['error'] is False:
@@ -176,11 +180,20 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 Maps.objects.filter(id=item.id).update(lua=resp_map_data['lua'])
                 Maps.objects.filter(id=item.id).update(advanced_map=resp_map_data['advanced'])
                 Maps.objects.filter(id=item.id).update(parser=parser_to_db)
+
+                if resp_map_data['mapformat'] >= 9: # Description is gone in MapFormat 9
+                    if item.description:
+                        new_info = item.description+'\n\n'+item.info
+                    else:
+                        new_info = item.info
+                    Maps.objects.filter(id=item.id).update(info=new_info)
+
                 print('Updated data, fetched from Yaml: %s' % item.id)
 
                 print('Finished upgrading map %s: %s \n' % (if_new_rev, item.id))
                 upgraded_maps.append(item.id)
             else:
+                time.sleep(1)
                 # create new revision after successfully upgrading map in temporarily location
 
                 rev = item.revision + 1
@@ -223,10 +236,12 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 transac.save()
                 Maps.objects.filter(id=item.id).update(next_rev=transac.id)
 
-                # temp field, required for upgrade from release 20151224, remove after upgrading all maps.
-                if last_for_rsync:
-                    Maps.objects.filter(id=item.id).update(last_for_rsync=last_for_rsync)
-                #######################
+                if resp_map_data['mapformat'] >= 9:  # Description is gone in MapFormat 9
+                    if item.description:
+                        new_info = item.description+'\n\n'+item.info
+                    else:
+                        new_info = item.info
+                    Maps.objects.filter(id=transac.id).update(info=new_info)
 
                 new_path = currentDirectory + 'openra/data/maps/' + str(transac.id) + '/'
                 if not os.path.exists(new_path):
@@ -341,7 +356,7 @@ def ReadYaml(item=False, fullpath=""):
             map_data_ordered['author'] = line[7:].strip().replace("'", "''")
 
         if line[0:7] == "Tileset":
-            map_data_ordered['tileset'] = line[8:].strip().lower()
+            map_data_ordered['tileset'] = line[8:].strip()
 
         if line[0:4] == "Type":  # gone in MapFormat 11
             map_data_ordered['map_type'] = line[5:].strip()
@@ -396,8 +411,8 @@ def ReadYaml(item=False, fullpath=""):
         if line[0:6] == "Actors":
             inPlayersBlock = False
 
-        if inPlayersBlock and line.strip() != "":
-            map_data_ordered['base64_players'] += line + "\n"
+        if inPlayersBlock and line.strip() != "" and line[0:7] != "Players":
+            map_data_ordered['base64_players'] += line[1:] + "\n"
 
         if line.strip()[0:5] == "Rules":  # for MapFormat < 10
             shouldCountRules = True
@@ -414,7 +429,7 @@ def ReadYaml(item=False, fullpath=""):
     return {'response': map_data_ordered, 'error': False}
 
 
-def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
+def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], game_mod="ra"):
 
     currentDirectory = os.getcwd() + os.sep
     os.chdir(parser + "/")
@@ -431,11 +446,18 @@ def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(r
         if fullpath == "":
             return {'data': '', 'error': True, 'response': 'could not find .oramap'}
 
-    command = 'mono --debug OpenRA.Utility.exe ra --map-rules %s' % (fullpath)
+    command = 'mono --debug OpenRA.Utility.exe %s --map-rules %s' % (game_mod, fullpath)
     proc = Popen(command.split(), stdout=PIPE).communicate()
+    resp = {
+        'data': base64.b64encode(proc[0]).decode(),
+        'error': False,
+        'response': 'fetched rules and base64 encoded',
+        'advanced': False}
+    if len(proc[0].decode().split("\n")) > 8:
+        resp['advanced'] = True
 
     os.chdir(currentDirectory)
-    return {'data': base64.b64encode(proc[0]).decode(), 'error': False, 'response': 'fetched rules and base64 encoded'}
+    return resp
 
 
 def UnzipMap(item, fullpath=""):

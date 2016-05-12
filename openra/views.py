@@ -8,22 +8,22 @@ import random
 import operator
 import json
 import cgi
-import pytz
-import copy
 import base64
-from functools import reduce
+import zipfile
+from urllib.parse import urlencode
+from io import BytesIO
 from django.conf import settings
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponse
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, Http404
 from django.utils import timezone
 
-from django.db.models import F, Count, Q
+from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openra import handlers, misc, utility
-from openra.models import Maps, Replays, ReplayPlayers, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments, MapCategories
+from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments, MapCategories
 
 
 def index(request):
@@ -193,188 +193,10 @@ def ControlPanel(request, page=1, filter=""):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def maps(request, page=1, filter=""):
+def maps(request, page=1):
 
-    selected_filter = {}
-    filter_prepare = {}
-
-    filter_prepare['mods'] = sorted(Maps.objects.values_list('game_mod', flat=True).distinct())
-    filter_prepare['categories'] = sorted(MapCategories.objects.values_list('category_name', flat=True))
-    filter_prepare['formats'] = sorted(Maps.objects.values_list('mapformat', flat=True).distinct())
-    filter_prepare['formats'] = [str(val) for val in filter_prepare['formats']]
-    filter_prepare['parsers'] = Maps.objects.values_list('parser', flat=True).distinct()
-    filter_prepare['parsers'] = sorted([val for val in filter_prepare['parsers'] if 'git' not in val])
-    filter_prepare['tilesets'] = sorted(Maps.objects.values_list('tileset', flat=True).distinct())
-
-    filter_prepare['sort_by'] = [
-        ['latest', 'latest first'],
-        ['oldest', 'oldest first'],
-        ['title', 'title'],
-        ['title_reversed', 'title in reverse'],
-        ['players', 'players'],
-        ['lately_commented', 'lately commented'],
-        ['rating', 'rating'],
-        ['views', 'views'],
-        ['downloads', 'downloads'],
-        ['revisions', 'upgrade activity']
-    ]
-
-    filter_prepare['with_problems'] = [
-        ['show', 'Show'],
-        ['hide_lint_failed', 'Hide if Lint failed'],
-        ['show_only_lint_failed', 'Show only if Lint failed'],
-        ['api_dl_disabled', 'API downloading disabled'],
-        ['many_reports', 'Too many reports']
-    ]
-
-    selected_filter['mod'] = request.GET.getlist('mod', None)
-    selected_filter['category'] = request.GET.getlist('category', None)
-    selected_filter['format'] = request.GET.getlist('format', None)
-    selected_filter['parser'] = request.GET.getlist('parser', None)
-    selected_filter['tileset'] = request.GET.getlist('tileset', None)
-
-    selected_filter['players'] = request.GET.get('players', None)
-    try:
-        selected_filter['players'] = int(selected_filter['players'])
-        if selected_filter['players'] < 0:
-            selected_filter['players'] = None
-        elif selected_filter['players'] == 0:
-            selected_filter['players'] = str(selected_filter['players'])
-    except:
-        selected_filter['players'] = None
-
-    selected_filter['sort_by'] = request.GET.get('sort_by', None)
-
-    selected_filter['with_problems'] = request.GET.get('with_problems', None)
-
-    selected_filter['show_all_revisions'] = request.GET.get('show_all_revisions', None)
-
-    selected_filter['show_with_reports'] = request.GET.get('show_with_reports', None)
-    selected_filter['only_advanced'] = request.GET.get('only_advanced', None)
-    selected_filter['only_lua'] = request.GET.get('only_lua', None)
-    selected_filter['with_duplicates'] = request.GET.get('with_duplicates', None)
-    selected_filter['outdated'] = request.GET.get('outdated', None)
-
-    ####################
-    ####################
     mapObject = Maps.objects.filter()
-
-    # filter by game mod
-    if selected_filter['mod'] and 'any' not in selected_filter['mod']:
-        mapObject = mapObject.filter(game_mod__in=selected_filter['mod'])
-
-    # filter by map category
-    if selected_filter['category'] and 'any' not in selected_filter['category']:
-        query_category = MapCategories.objects.filter(category_name__in=selected_filter['category'])
-        query_category = ['_'+str(cat.id)+'_' for cat in query_category]
-
-        mapObject = mapObject.filter(reduce(lambda x, y: x | y, [Q(categories__contains=item) for item in query_category]))
-
-    # filter by MapFormat
-    if selected_filter['format'] and 'any' not in selected_filter['format']:
-        mapObject = mapObject.filter(mapformat__in=selected_filter['format'])
-
-    # filter by engine parser
-    if selected_filter['parser'] and 'any' not in selected_filter['parser']:
-        mapObject_copy0 = copy.copy(mapObject)
-        mapObject_copy1 = copy.copy(mapObject)
-
-        mapObject_copy0 = mapObject_copy0.filter(parser__in=selected_filter['parser'])
-
-        if 'bleed' in selected_filter['parser']:
-            mapObject_copy1 = mapObject_copy1.filter(parser__contains='git')
-
-            mapObject = mapObject_copy0 | mapObject_copy1
-        else:
-            mapObject = mapObject_copy0
-
-    # filter by tileset
-    if selected_filter['tileset'] and 'any' not in selected_filter['tileset']:
-        mapObject = mapObject.filter(tileset__in=selected_filter['tileset'])
-
-    # filter by amount of spawn slots
-    if selected_filter['players']:
-        mapObject = mapObject.filter(players=selected_filter['players'])
-
-    # filter: show all revisions or only the latest
-    if selected_filter['show_all_revisions'] != 'on':
-        mapObject = mapObject.filter(next_rev=0)
-
-    # filter: show only maps with reports
-    if selected_filter['show_with_reports'] == 'on':
-        mapObject = mapObject.exclude(amount_reports=0)
-
-    # filter: show only advanced maps
-    if selected_filter['only_advanced'] == 'on':
-        mapObject = mapObject.filter(advanced_map=True)
-
-    # filter: show only maps with Lua scripts
-    if selected_filter['only_lua'] == 'on':
-        mapObject = mapObject.filter(lua=True)
-
-    # filter: show only maps with duplicates (by map_hash)
-    if selected_filter['with_duplicates'] == 'on':
-        dup_Ob = Maps.objects.values_list('map_hash', flat=True).annotate(Count('id')).order_by().filter(id__count__gt=1)
-        mapObject = mapObject.filter(map_hash__in=[dup_it for dup_it in dup_Ob])
-
-    # filter: show only last revisions of maps where parser is not equal to the latest official
-    if selected_filter['outdated'] == 'on':
-        latest_official_parser = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]
-        mapObject = mapObject.filter(next_rev=0).exclude(parser=latest_official_parser)
-
-    # filter options for maps with problems
-    if selected_filter['with_problems'] and selected_filter['with_problems'] != 'show':
-        if selected_filter['with_problems'] == 'hide_lint_failed':
-            mapObject = mapObject.filter(requires_upgrade=False)
-        elif selected_filter['with_problems'] == 'show_only_lint_failed':
-            mapObject = mapObject.filter(requires_upgrade=True)
-        elif selected_filter['with_problems'] == 'api_dl_disabled':
-            mapObject = mapObject.filter(downloading=False)
-        elif selected_filter['with_problems'] == 'many_reports':
-            mapObject = mapObject.filter(amount_reports__gte=3)
-    ####################
-    ####################
-
-    ####################
-    # Sorting
-    ####################
-    mapObject = mapObject.distinct('map_hash').order_by('map_hash')
-
-    if selected_filter['sort_by'] and selected_filter['sort_by'] != 'latest':
-        if selected_filter['sort_by'] == 'oldest':
-            mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=False)
-        elif selected_filter['sort_by'] == 'title':
-            mapObject = sorted(mapObject, key=lambda x: (x.title), reverse=False)
-        elif selected_filter['sort_by'] == 'title_reversed':
-            mapObject = sorted(mapObject, key=lambda x: (x.title), reverse=True)
-        elif selected_filter['sort_by'] == 'players':
-            mapObject = sorted(mapObject, key=lambda x: (x.players), reverse=True)
-        elif selected_filter['sort_by'] == 'lately_commented':
-
-            copy_maps = []
-            copy_comments = {}
-            for mp in mapObject:
-
-                copy_maps.append(mp.id)
-
-                comments_for_map = Comments.objects.filter(is_removed=False, item_type='maps', item_id=mp.id).first()
-                if comments_for_map:
-                    copy_comments[mp.id] = comments_for_map.posted
-                else:
-                    copy_comments[mp.id] = datetime.datetime(2000, 1, 1, 1, 00, 00, tzinfo=pytz.UTC)
-            mapObject = sorted(mapObject, key=lambda x: (copy_comments[x.id]), reverse=True)
-
-        elif selected_filter['sort_by'] == 'rating':
-            mapObject = sorted(mapObject, key=lambda x: (x.rating), reverse=True)
-        elif selected_filter['sort_by'] == 'views':
-            mapObject = sorted(mapObject, key=lambda x: (x.viewed), reverse=True)
-        elif selected_filter['sort_by'] == 'downloads':
-            mapObject = sorted(mapObject, key=lambda x: (x.downloaded), reverse=True)
-        elif selected_filter['sort_by'] == 'revisions':
-            mapObject = sorted(mapObject, key=lambda x: (x.revision), reverse=True)
-    else:
-        mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
-    ####################
+    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
 
     perPage = 20
     slice_start = perPage*int(page)-perPage
@@ -413,23 +235,63 @@ def maps(request, page=1, filter=""):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def mapsFromAuthor(request, author, page=1):
+def maps_zip(request):
+
+    mapObject = Maps.objects.filter()
+    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
+
+    s = BytesIO()
+    zf = zipfile.ZipFile(s, "w", zipfile.ZIP_DEFLATED)
+
+    zip_filename = "resource_center_maps.zip"
+
+    for item in mapObject:
+        oramap = ""
+        item_path = os.getcwd() + '/openra/data/maps/' + str(item.id) + '/'
+        try:
+            mapDir = os.listdir(item_path)
+        except:
+            continue
+        for filename in mapDir:
+            if filename.endswith(".oramap"):
+                oramap = filename
+                break
+        if not oramap:
+            continue
+
+        zip_path = "maps/%s/%s.oramap" % (item.game_mod, item.id)
+
+        zf.write(os.path.join(item_path, oramap), zip_path, zipfile.ZIP_DEFLATED)
+    zf.close()
+
+    response = HttpResponse(s.getvalue(), content_type='application/x-zip-compressed')
+    response['Content-Disposition'] = 'attachment; filename = %s' % zip_filename
+    response['Content-Length'] = s.tell()
+    return response
+
+
+def maps_author(request, author, page=1):
+
+    mapObject = Maps.objects.filter(author=author.replace("%20", " "))
+    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
+
     perPage = 20
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
-    mapObject = Maps.objects.filter(next_rev=0, author=author.replace("%20", " ")).distinct('map_hash').order_by('map_hash', '-posted')
-    mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
+        if request.META['QUERY_STRING']:
+            return HttpResponseRedirect("/maps/author/%s/?%s" % (author, request.META['QUERY_STRING']))
         return HttpResponseRedirect("/maps/author/%s/" % author)
 
     comments = misc.count_comments_for_many(mapObject, 'maps')
 
     template = loader.get_template('index.html')
     template_args = {
-        'content': 'mapsFromAuthor.html',
+        'content': 'maps_author.html',
         'request': request,
         'title': ' - Maps From ' + author,
         'maps': mapObject,
@@ -437,6 +299,85 @@ def mapsFromAuthor(request, author, page=1):
         'range': [i+1 for i in range(rowsRange)],
         'amount': amount,
         'author': author,
+        'comments': comments,
+
+        'filter_prepare': filter_prepare,
+        'selected_filter': selected_filter,
+    }
+    return StreamingHttpResponse(template.render(template_args, request))
+
+
+def maps_uploader(request, arg, page=1):
+
+    mapObject = Maps.objects.filter(user__id=arg)
+    if not mapObject:
+        HttpResponseRedirect('/maps/')
+
+    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
+
+    perPage = 20
+    slice_start = perPage*int(page)-perPage
+    slice_end = perPage*int(page)
+
+    amount = len(mapObject)
+    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    mapObject = mapObject[slice_start:slice_end]
+    if len(mapObject) == 0 and int(page) != 1:
+        if request.META['QUERY_STRING']:
+            return HttpResponseRedirect("/maps/uploader/%s/?%s" % (arg, request.META['QUERY_STRING']))
+        return HttpResponseRedirect("/maps/uploader/%s/" % arg)
+
+    comments = misc.count_comments_for_many(mapObject, 'maps')
+
+    template = loader.get_template('index.html')
+    template_args = {
+        'content': 'maps_uploader.html',
+        'request': request,
+        'title': ' - Maps uploaded by ' + mapObject[0].user.username,
+        'maps': mapObject,
+        'page': int(page),
+        'range': [i+1 for i in range(rowsRange)],
+        'amount': amount,
+        'uploader': mapObject[0].user.username,
+        'arg': arg,
+        'comments': comments,
+
+        'filter_prepare': filter_prepare,
+        'selected_filter': selected_filter,
+    }
+    return StreamingHttpResponse(template.render(template_args, request))
+
+
+def maps_duplicates(request, maphash, page=1):
+
+    mapObject = Maps.objects.filter(map_hash=maphash)
+    if not mapObject:
+        HttpResponseRedirect('/maps/')
+
+    mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+
+    perPage = 20
+    slice_start = perPage*int(page)-perPage
+    slice_end = perPage*int(page)
+
+    amount = len(mapObject)
+    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    mapObject = mapObject[slice_start:slice_end]
+    if len(mapObject) == 0 and int(page) != 1:
+        return HttpResponseRedirect("/maps/duplicates/%s/" % maphash)
+
+    comments = misc.count_comments_for_many(mapObject, 'maps')
+
+    template = loader.get_template('index.html')
+    template_args = {
+        'content': 'maps_duplicates.html',
+        'request': request,
+        'title': ' - Duplicates of ' + mapObject[0].title,
+        'maps': mapObject,
+        'page': int(page),
+        'range': [i+1 for i in range(rowsRange)],
+        'amount': amount,
+        'maphash': maphash,
         'comments': comments,
     }
     return StreamingHttpResponse(template.render(template_args, request))
@@ -453,39 +394,6 @@ def mostCommentedMap(request):
     comments = misc.count_comments_for_many(mapObject, 'maps')
     mapid = max(comments.items(), key=operator.itemgetter(1))[0]
     return HttpResponseRedirect('/maps/'+mapid+'/')
-
-
-def displayReplay(request, arg):
-    try:
-        orarepObj = Replays.objects.get(id=arg)
-    except:
-        return HttpResponseRedirect('/')
-
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/replays/' + arg
-    disk_size = os.path.getsize(path + '/' + arg + '.orarep')
-    disk_size = misc.sizeof_fmt(disk_size)
-
-    reportedByUser = False
-    reports = []
-    reportObject = Reports.objects.filter(ex_id=orarepObj.id, ex_name='replays')
-    for item in reportObject:
-        reports.append([item.user.username, item.reason, item.infringement, item.posted])
-        if item.user_id == request.user.id:
-            reportedByUser = True
-
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'displayReplay.html',
-        'request': request,
-        'title': ' - Replay details - ' + arg,
-        'orarep': orarepObj,
-        'reports': reports,
-        'reported': reportedByUser,
-        'screenshots': 0,
-        'disk_size': disk_size,
-        'duplicates': 0,
-    }
-    return StreamingHttpResponse(template.render(template_args, request))
 
 
 def displayMap(request, arg):
@@ -547,6 +455,7 @@ def displayMap(request, arg):
 
             return HttpResponseRedirect('/maps/' + arg + '/')
 
+    contains_shp = False
     disk_size = 0
     path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
     try:
@@ -555,6 +464,12 @@ def displayMap(request, arg):
             if filename.endswith(".oramap"):
                 disk_size = os.path.getsize(path + '/' + filename)
                 disk_size = misc.sizeof_fmt(disk_size)
+                break
+        mapDir = os.listdir(path + '/content/')
+        for filename in mapDir:
+            if filename.endswith(".shp"):
+                contains_shp = True
+                break
     except:
         pass
     try:
@@ -641,6 +556,8 @@ def displayMap(request, arg):
         if sc_item.map_preview:
             map_preview = sc_item
 
+    last_parser = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]
+
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
@@ -671,6 +588,8 @@ def displayMap(request, arg):
         'comments': comments,
         'show_upgrade_map_button': show_upgrade_map_button,
         'map_preview': map_preview,
+        'contains_shp': contains_shp,
+        'last_parser': last_parser,
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
@@ -678,6 +597,8 @@ def displayMap(request, arg):
 def upgradeMap(request, arg):
 
     mapObject = Maps.objects.filter(id=arg)
+    if not mapObject:
+        return HttpResponseRedirect('/')
     if not mapObject[0]:
         return HttpResponseRedirect('/')
     if mapObject[0].user != request.user:
@@ -827,19 +748,6 @@ def serveMinimap(request, arg):
         serveImage = os.getcwd() + os.sep + __name__.split('.')[0] + '/static/images/nominimap.png'
     response = StreamingHttpResponse(open(serveImage, 'rb'), content_type='image/png')
     response['Content-Disposition'] = 'attachment; filename = %s' % minimap
-    return response
-
-
-def serveReplay(request, arg):
-    orarep = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/replays/' + arg + '/' + arg + '.orarep'
-    if not os.path.isfile(path):
-        return HttpResponseRedirect('/replays/'+arg)
-
-    response = StreamingHttpResponse(open(path, 'rb'), content_type='application/octet-stream')
-    response['Content-Disposition'] = 'attachment; filename = %s' % arg+'.orarep'
-    response['Content-Length'] = os.path.getsize(path)
-    Replays.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
     return response
 
 
@@ -1017,6 +925,7 @@ def DeleteMap(request, arg):
         Comments.objects.filter(item_id=mapObject.id, item_type='maps').delete()
         UnsubscribeComments.objects.filter(item_id=mapObject.id, item_type='maps').delete()
         Lints.objects.filter(map_id=mapObject.id, item_type='maps').delete()
+        Rating.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
         if mapObject.pre_rev != 0:
             Maps.objects.filter(id=mapObject.pre_rev).update(next_rev=mapObject.next_rev)
         if mapObject.next_rev != 0:
@@ -1030,42 +939,6 @@ def DeleteMap(request, arg):
         'mapTitle': mapTitle,
         'mapAuthor': mapAuthor,
     }
-    return StreamingHttpResponse(template.render(template_args, request))
-
-
-def uploadReplay(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/replays/')
-    response = {'error': False, 'response': ''}
-
-    if request.method == 'POST':
-        if request.FILES.get('replay_file', None) is not None:
-
-            replay_file = handlers.ReplayHandlers()
-            response = replay_file.process_uploading(request.user.id, request.FILES['replay_file'], request.POST)
-            if replay_file.UID:
-                if response['error'] is False:
-                    return HttpResponseRedirect('/replays/' + str(replay_file.UID) + "/")
-
-    bleed_tag = None
-    if (settings.OPENRA_BLEED_HASH_FILE_PATH != ''):
-        bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
-        bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
-
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'uploadReplay.html',
-        'request': request,
-        'title': ' - Uploading Replay',
-        'response': response,
-        'parsers': list(reversed(list(settings.OPENRA_VERSIONS.values()))),
-        'bleed_tag': bleed_tag,
-    }
-
-    if settings.SITE_MAINTENANCE:
-        template_args['content'] = 'service/maintenance.html'
-        template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
-
     return StreamingHttpResponse(template.render(template_args, request))
 
 
@@ -1084,21 +957,6 @@ def SetDownloadingStatus(request, arg):
     return HttpResponseRedirect('/maps/'+arg)
 
 
-def ChangeRsyncStatus(request, arg):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/maps/'+arg)
-    try:
-        mapObject = Maps.objects.get(id=arg)
-    except:
-        return HttpResponseReirect('/maps/')
-    if mapObject.user_id == request.user.id or request.user.is_superuser:
-        if mapObject.rsync_allow:
-            Maps.objects.filter(id=arg).update(rsync_allow=False)
-        else:
-            Maps.objects.filter(id=arg).update(rsync_allow=True)
-    return HttpResponseRedirect('/maps/'+arg)
-
-
 def addScreenshot(request, arg, item):
     if item == 'map':
         Object = Maps.objects.filter(id=arg)
@@ -1112,7 +970,7 @@ def addScreenshot(request, arg, item):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def MapRevisions(request, arg, page=1):
+def maps_revisions(request, arg, page=1):
     perPage = 20
     slice_start = perPage*int(page)-perPage
     slice_end = perPage*int(page)
@@ -1135,7 +993,7 @@ def MapRevisions(request, arg, page=1):
 
     template = loader.get_template('index.html')
     template_args = {
-        'content': 'revisionsMap.html',
+        'content': 'maps_revisions.html',
         'request': request,
         'title': ' - Revisions',
         'maps': mapObject,
@@ -1228,37 +1086,6 @@ def comments_by_user(request, arg, page=1):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def replays(request, page=1):
-    perPage = 10
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
-    replayObject = Replays.objects.filter().distinct('sha1sum').order_by('sha1sum', '-posted')
-    replayObject = sorted(replayObject, key=lambda x: (x.posted), reverse=True)
-    amount = len(replayObject)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
-    replayObject = replayObject[slice_start:slice_end]
-    amount_this_page = len(replayObject)
-    if amount_this_page == 0 and int(page) != 1:
-        return HttpResponseRedirect("/replays/")
-
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'replays.html',
-        'request': request,
-        'title': ' - Replays',
-        'replays': replayObject,
-        'page': int(page),
-        'range': [i+1 for i in range(rowsRange)],
-        'amount': amount,
-    }
-
-    if settings.SITE_MAINTENANCE:
-        template_args['content'] = 'service/maintenance.html'
-        template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
-
-    return StreamingHttpResponse(template.render(template_args, request))
-
-
 def handle404(request):
     template = loader.get_template('index.html')
     template_args = {
@@ -1316,8 +1143,28 @@ def contacts(request):
             name = request.POST.get('name', "")
             email = request.POST.get('email', "")
             message = request.POST.get('message', "")
-            misc.send_email_contacts_form(name, email, message)
-            return HttpResponseRedirect('/contacts/sent/')
+
+            g_recaptcha_response = request.POST.get('g-recaptcha-response', "")
+            if g_recaptcha_response:
+                params = urlencode({
+                    'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                    'response': g_recaptcha_response,
+                    'remoteip': request.META.get("REMOTE_ADDR", ""),
+                }).encode('utf-8')
+                req = urllib.request.Request(
+                    url="https://www.google.com/recaptcha/api/siteverify",
+                    data=params,
+                    headers={
+                        "Content-type": "application/x-www-form-urlencoded",
+                        "User-agent": "reCAPTCHA Python"
+                    }
+                )
+                resp = urllib.request.urlopen(req).read().decode('utf-8')
+                json_resp = json.loads(resp)
+                if json_resp['success']:
+                    misc.send_email_contacts_form(name, email, message)
+                    return HttpResponseRedirect('/contacts/sent/')
+            return HttpResponseRedirect('/contacts/')
     template = loader.get_template('index.html')
     template_args = {
         'content': 'contacts.html',

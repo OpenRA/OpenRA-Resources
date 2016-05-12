@@ -29,8 +29,8 @@ class Maps(models.Model):
     mapformat           = models.IntegerField(default=6)
     parser              = models.CharField(max_length=100, default="release-20141029")
     shellmap            = models.BooleanField(default=False)
-    base64_rules        = models.CharField(max_length=100000, blank=True, null=True, default="")
-    base64_players      = models.CharField(max_length=10000, blank=True, null=True, default="")
+    base64_rules        = models.CharField(max_length=10000000, blank=True, null=True, default="")
+    base64_players      = models.CharField(max_length=10000000, blank=True, null=True, default="")
     legacy_map          = models.BooleanField(default=False)
     revision            = models.IntegerField(default=1)
     pre_rev             = models.IntegerField(default=0)
@@ -43,12 +43,10 @@ class Maps(models.Model):
     viewed              = models.IntegerField(default=0)
     downloaded          = models.IntegerField(default=0)
     rating              = models.FloatField(default=0.0)
-    rsync_allow         = models.BooleanField(default=True)
     amount_reports      = models.IntegerField(default=0)
     policy_cc           = models.BooleanField(default=False)
     policy_adaptations  = models.CharField(max_length=30, blank=True, null=True)
     policy_commercial   = models.BooleanField(default=False)
-    last_for_rsync      = models.BooleanField(default=False)  # temp field, required for upgrade from release 20151224
 
 
 class MapCategories(models.Model):
@@ -72,7 +70,7 @@ class Lints(models.Model):
     map_id              = models.IntegerField(default=0)
     version_tag         = models.CharField(max_length=100, default="release-20141029")
     pass_status         = models.BooleanField(default=False)
-    lint_output         = models.CharField(max_length=1000000, default="")
+    lint_output         = models.CharField(max_length=10000000, default="")
     posted              = models.DateTimeField('date of check')
 
 
@@ -104,60 +102,6 @@ class UnsubscribeComments(models.Model):
     item_type           = models.CharField(max_length=16, default="maps")
     item_id             = models.IntegerField(default=0)
     unsubscribed        = models.DateTimeField('date of unsubscribe')
-
-
-class Replays(models.Model):
-
-    class Meta:
-        verbose_name_plural = 'Replays'
-
-    def __str__(self):
-        return str(self.id)
-
-    user                = models.ForeignKey(User)
-    info                = models.CharField(max_length=2000, default="")
-    metadata            = models.CharField(max_length=100000, default="")
-
-    game_mod            = models.CharField(max_length=100, default="")
-    map_hash            = models.CharField(max_length=200, default="")
-    version             = models.CharField(max_length=100, default="release-20141029")
-    start_time          = models.CharField(max_length=50, default="")
-    end_time            = models.CharField(max_length=50, default="")
-
-    sha1sum             = models.CharField(max_length=200, default="")
-    parser              = models.CharField(max_length=100, default="release-20141029")
-    posted              = models.DateTimeField('date published', default=datetime.datetime.now)
-    viewed              = models.IntegerField(default=0)
-    downloaded          = models.IntegerField(default=0)
-    rating              = models.FloatField(default=0.0)
-
-
-class ReplayPlayers(models.Model):
-
-    class Meta:
-        verbose_name_plural = "ReplayPlayers"
-
-    def __str__(self):
-        return 'replay_id: ' + str(self.replay_id)
-
-    user                = models.ForeignKey(User)
-    replay_id           = models.IntegerField(default=0)
-
-    client_index        = models.IntegerField(default=0)
-    color               = models.CharField(max_length=30)
-    faction_id          = models.CharField(max_length=50)
-    faction_name        = models.CharField(max_length=50)
-    is_bot              = models.BooleanField(default=False)
-    is_human            = models.BooleanField(default=True)
-    is_random_faction   = models.BooleanField(default=False)
-    is_random_spawn     = models.BooleanField(default=False)
-    name                = models.CharField(max_length=1000)
-    outcome             = models.CharField(max_length=50)
-    outcome_timestamp   = models.CharField(max_length=50)
-    spawn_point         = models.IntegerField(default=0)
-    team                = models.IntegerField(default=0)
-
-    posted              = models.DateTimeField('date published', default=datetime.datetime.now)
 
 
 class Reports(models.Model):

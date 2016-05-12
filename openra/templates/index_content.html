@@ -2,7 +2,7 @@
 	<div id="mainleft">
 		<div class="screenshot hide_block">
 			{% for item in screenshots %}
-			<a href="/{{item.ex_name}}/{{item.ex_id}}/">
+			<a href="/{{item.ex_name}}/{{item.ex_id}}/" title="Show map">
 				<img src="/screenshots/{{item.id}}/mini/" alt="screenshot" />
 			</a>
 			{% endfor %}
@@ -10,14 +10,14 @@
 	</div>
 
 	<div>
-		<h2>Share your Content!</h2>
+		<h2>Share your Maps!</h2>
 	</div>
 
 	<div>
 		<p>OpenRA is a free and open-source RTS game engine that lets you play re-balanced games like C&amp;C: Red Alert, C&amp;C: Tiberian Dawn, Dune 2000...</p>
 		<p>The engine allows players to create new mods, add modified versions of units, buildings etc.
 		It also offers advanced features for creating maps and missions.</p>
-		<p>This website makes distribution of OpenRA related content more comfortable.</p>
+		<p>This website makes distribution of OpenRA maps more comfortable.</p>
 	</div>
 	<div class="clear"></div>
 </div>
@@ -26,10 +26,9 @@
 	<p>If you created a new map and want to play it with other players, you just have to:</p>
 	<ul>
 		<li><a href="/upload/map/">Upload the map here</a>.</li>
-		<li>Create a new game and select your map.</li>
+		<li>Create a new game or join any public server and select your map.</li>
 		<li>Other players joining can download the map in-game directly from this website.</li>
 	</ul>
-	<p><b>Note:</b> Some OpenRA dedicated servers are set up to automatically <a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Sync-maps-over-RSYNC-%28for-dedicated-servers%29" target="_blank">synchronize the map folder</a> with the whole archive of this website.</p>
 </div>
 
 <script>

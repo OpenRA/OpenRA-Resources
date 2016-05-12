@@ -35,17 +35,18 @@ urlpatterns = [
     url(r'^maps/(?P<arg>\d+)/oramap/(?P<sync>\w+)/?$', views.serveOramap, name='serverSyncOramap'),
     url(r'^maps/(?P<arg>\d+)/delete/?$', views.DeleteMap, name='DeleteMap'),
     url(r'^maps/(?P<arg>\d+)/setdownloadingstatus/?$', views.SetDownloadingStatus, name='SetDownloadingStatus'),
-    url(r'^maps/(?P<arg>\d+)/changersyncstatus/?$', views.ChangeRsyncStatus, name='ChangeRsyncStatus'),
     url(r'^maps/(?P<arg>\d+)/add(?P<item>\w+)sc/?$', views.addScreenshot, name='addScreenshot'),
-    url(r'^maps/(?P<arg>\d+)/revisions/?$', views.MapRevisions, name='MapRevisions'),
-    url(r'^maps/(?P<arg>\d+)/revisions/page/(?P<page>\d+)/?$', views.MapRevisions, name='MapRevisions'),
+    url(r'^maps/(?P<arg>\d+)/revisions/?$', views.maps_revisions, name='maps_revisions'),
+    url(r'^maps/(?P<arg>\d+)/revisions/page/(?P<page>\d+)/?$', views.maps_revisions, name='maps_revisions'),
     url(r'^maps/(?P<arg>\d+)/upgrade/?$', views.upgradeMap, name='upgradeMap'),
     url(r'^(?P<item_type>\w+)/(?P<arg>\d+)/unsubscribe/?$', views.unsubscribe_from_comments, name='Unsubscribe from comments to item'),
-    url(r'^maps/author/(?P<author>[^/]+)/?$', views.mapsFromAuthor, name='mapsFromAuthor'),
-    url(r'^maps/author/(?P<author>[^/]+)/page/(?P<page>\d+)/?$', views.mapsFromAuthor, name='mapsFromAuthor'),
+    url(r'^maps/author/(?P<author>[^/]+)/?$', views.maps_author, name='maps_author'),
+    url(r'^maps/author/(?P<author>[^/]+)/page/(?P<page>\d+)/?$', views.maps_author, name='maps_author'),
+    url(r'^maps/uploader/(?P<arg>\d+)/?$', views.maps_uploader, name='maps_uploader'),
+    url(r'^maps/uploader/(?P<arg>\d+)/page/(?P<page>\d+)/?$', views.maps_uploader, name='maps_uploader'),
+    url(r'^maps/duplicates/(?P<maphash>[^/]+)/?$', views.maps_duplicates, name='maps_duplicates'),
+    url(r'^maps/duplicates/(?P<maphash>[^/]+)/page/(?P<page>\d+)/?$', views.maps_duplicates, name='maps_duplicates'),
     url(r'^maps/page/(?P<page>\d+)/?$', views.maps, name='maps_paged'),
-    url(r'^maps/page/(?P<page>\d+)/filter/(?P<filter>\w+)/?$', views.maps, name='maps_paged_filtered'),
-    url(r'^maps/filter/(?P<filter>\w+)/?$', views.maps, name='maps_filtered'),
     url(r'^maps/(?P<arg>\d+)/yaml/?$', views.serveYaml, name='printYaml'),
     url(r'^maps/(?P<arg>\d+)/rules/?$', views.serveYamlRules, name='printYamlRules'),
     url(r'^maps/(?P<arg>\d+)/lua/(?P<name>[^/]+)/?$', views.serveLua, name='printLua'),
@@ -53,10 +54,10 @@ urlpatterns = [
     url(r'^maps/random/?$', views.randomMap, name='randomMap'),
     url(r'^maps/mostCommented/?$', views.mostCommentedMap, name='mostCommentedMap'),
 
+    url(r'^maps/zip/', views.maps_zip, name='maps_zip'),
+
     url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
     url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
-
-    url(r'^upload/replay/?$', views.uploadReplay, name='uploadReplay'),
 
 
     url(r'^screenshots/?$', views.screenshots, name='screenshots'),
@@ -69,11 +70,6 @@ urlpatterns = [
     url(r'^comments/user/(?P<arg>\d+)/?$', views.comments_by_user, name='comments_by_user'),
     url(r'^comments/user/(?P<arg>\d+)/page/(?P<page>\d+)/?$', views.comments_by_user, name='comments_by_user_paged'),
 
-    url(r'^replays/?$', views.replays, name='replays'),
-    url(r'^replays/page/(?P<page>\d+)/?$', views.replays, name='replays_paged'),
-
-    url(r'^replays/(?P<arg>\d+)/?$', views.displayReplay, name='displayReplay'),
-    url(r'^replays/(?P<arg>\d+)/orarep/?$', views.serveReplay, name='serveReplay'),
 
     url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
 
@@ -103,6 +99,7 @@ urlpatterns = [
     url(r'^links/?$', views.links, name='links'),
     url(r'^contacts/?$', views.contacts, name='contacts'),
     url(r'^contacts/sent/?$', views.contacts_sent, name='contacts_sent'),
+
 
     url(r'^map/(?P<arg>\w+)/?$', api.mapAPI, name='mapAPI_download'),
     url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/?$', api.mapAPI, name='mapAPI'),

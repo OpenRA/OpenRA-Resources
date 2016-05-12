@@ -2,11 +2,15 @@ import os
 import shutil
 import datetime
 import time
+import pytz
+import copy
+from functools import reduce
 from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import Count, Q
 from allauth.socialaccount.models import SocialAccount
-from openra.models import Maps, Comments, UnsubscribeComments
+from openra.models import Maps, MapCategories, Comments, UnsubscribeComments
 
 
 def selectLicenceInfo(itemObject):
@@ -289,3 +293,190 @@ def copytree(src, dst, symlinks=False, ignore=None):
         else:
             if not os.path.exists(d) or os.stat(s).st_mtime - os.stat(d).st_mtime > 1:
                 shutil.copy2(s, d)
+
+
+def map_filter(request, mapObject):
+
+    selected_filter = {}
+    filter_prepare = {}
+
+    filter_prepare['mods'] = sorted(Maps.objects.values_list('game_mod', flat=True).distinct())
+    filter_prepare['categories'] = sorted(MapCategories.objects.values_list('category_name', flat=True))
+    filter_prepare['formats'] = sorted(Maps.objects.values_list('mapformat', flat=True).distinct())
+    filter_prepare['formats'] = [str(val) for val in filter_prepare['formats']]
+    filter_prepare['parsers'] = Maps.objects.values_list('parser', flat=True).distinct()
+    filter_prepare['parsers'] = sorted([val for val in filter_prepare['parsers'] if 'git' not in val])
+    filter_prepare['tilesets'] = sorted(Maps.objects.values_list('tileset', flat=True).distinct())
+
+    filter_prepare['sort_by'] = [
+        ['latest', 'latest first'],
+        ['oldest', 'oldest first'],
+        ['title', 'title'],
+        ['title_reversed', 'title in reverse'],
+        ['players', 'players'],
+        ['lately_commented', 'lately commented'],
+        ['rating', 'rating'],
+        ['views', 'views'],
+        ['downloads', 'downloads'],
+        ['revisions', 'upgrade activity']
+    ]
+
+    filter_prepare['with_problems'] = [
+        ['show', 'Show'],
+        ['hide_lint_failed', 'Hide if Lint failed'],
+        ['show_only_lint_failed', 'Show only if Lint failed'],
+        ['api_dl_disabled', 'API downloading disabled'],
+        ['many_reports', 'Too many reports']
+    ]
+
+    selected_filter['mod'] = request.GET.getlist('mod', None)
+    selected_filter['category'] = request.GET.getlist('category', None)
+    selected_filter['format'] = request.GET.getlist('format', None)
+    selected_filter['parser'] = request.GET.getlist('parser', None)
+    selected_filter['tileset'] = request.GET.getlist('tileset', None)
+
+    selected_filter['players'] = request.GET.get('players', None)
+    try:
+        selected_filter['players'] = int(selected_filter['players'])
+        if selected_filter['players'] < 0:
+            selected_filter['players'] = None
+        elif selected_filter['players'] == 0:
+            selected_filter['players'] = str(selected_filter['players'])
+    except:
+        selected_filter['players'] = None
+
+    selected_filter['sort_by'] = request.GET.get('sort_by', None)
+
+    selected_filter['with_problems'] = request.GET.get('with_problems', None)
+
+    selected_filter['show_all_revisions'] = request.GET.get('show_all_revisions', None)
+
+    selected_filter['show_with_reports'] = request.GET.get('show_with_reports', None)
+    selected_filter['only_advanced'] = request.GET.get('only_advanced', None)
+    selected_filter['only_lua'] = request.GET.get('only_lua', None)
+    selected_filter['with_duplicates'] = request.GET.get('with_duplicates', None)
+    selected_filter['outdated'] = request.GET.get('outdated', None)
+
+    ####################
+    ####################
+
+    # Start Filtering/Sorting
+
+    # filter by game mod
+    if selected_filter['mod'] and 'any' not in selected_filter['mod']:
+        mapObject = mapObject.filter(game_mod__in=selected_filter['mod'])
+
+    # filter by map category
+    if selected_filter['category'] and 'any' not in selected_filter['category']:
+        query_category = MapCategories.objects.filter(category_name__in=selected_filter['category'])
+        query_category = ['_'+str(cat.id)+'_' for cat in query_category]
+
+        mapObject = mapObject.filter(reduce(lambda x, y: x | y, [Q(categories__contains=item) for item in query_category]))
+
+    # filter by MapFormat
+    if selected_filter['format'] and 'any' not in selected_filter['format']:
+        mapObject = mapObject.filter(mapformat__in=selected_filter['format'])
+
+    # filter by engine parser
+    if selected_filter['parser'] and 'any' not in selected_filter['parser']:
+        mapObject_copy0 = copy.copy(mapObject)
+        mapObject_copy1 = copy.copy(mapObject)
+
+        mapObject_copy0 = mapObject_copy0.filter(parser__in=selected_filter['parser'])
+
+        if 'bleed' in selected_filter['parser']:
+            mapObject_copy1 = mapObject_copy1.filter(parser__contains='git')
+
+            mapObject = mapObject_copy0 | mapObject_copy1
+        else:
+            mapObject = mapObject_copy0
+
+    # filter by tileset
+    if selected_filter['tileset'] and 'any' not in selected_filter['tileset']:
+        mapObject = mapObject.filter(tileset__in=selected_filter['tileset'])
+
+    # filter by amount of spawn slots
+    if selected_filter['players']:
+        mapObject = mapObject.filter(players=selected_filter['players'])
+
+    # filter: show all revisions or only the latest
+    if selected_filter['show_all_revisions'] != 'on':
+        mapObject = mapObject.filter(next_rev=0)
+
+    # filter: show only maps with reports
+    if selected_filter['show_with_reports'] == 'on':
+        mapObject = mapObject.exclude(amount_reports=0)
+
+    # filter: show only advanced maps
+    if selected_filter['only_advanced'] == 'on':
+        mapObject = mapObject.filter(advanced_map=True)
+
+    # filter: show only maps with Lua scripts
+    if selected_filter['only_lua'] == 'on':
+        mapObject = mapObject.filter(lua=True)
+
+    # filter: show only maps with duplicates (by map_hash)
+    if selected_filter['with_duplicates'] == 'on':
+        dup_Ob = Maps.objects.values_list('map_hash', flat=True).annotate(Count('id')).order_by().filter(id__count__gt=1)
+        mapObject = mapObject.filter(map_hash__in=[dup_it for dup_it in dup_Ob])
+
+    # filter: show only last revisions of maps where parser is not equal to the latest official
+    if selected_filter['outdated'] == 'on':
+        latest_official_parser = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]
+        mapObject = mapObject.filter(next_rev=0).exclude(parser=latest_official_parser)
+
+    # filter options for maps with problems
+    if selected_filter['with_problems'] and selected_filter['with_problems'] != 'show':
+        if selected_filter['with_problems'] == 'hide_lint_failed':
+            mapObject = mapObject.filter(requires_upgrade=False)
+        elif selected_filter['with_problems'] == 'show_only_lint_failed':
+            mapObject = mapObject.filter(requires_upgrade=True)
+        elif selected_filter['with_problems'] == 'api_dl_disabled':
+            mapObject = mapObject.filter(downloading=False)
+        elif selected_filter['with_problems'] == 'many_reports':
+            mapObject = mapObject.filter(amount_reports__gte=3)
+    ####################
+    ####################
+
+    ####################
+    # Sorting
+    ####################
+    mapObject = mapObject.distinct('map_hash').order_by('map_hash')
+
+    if selected_filter['sort_by'] and selected_filter['sort_by'] != 'latest':
+        if selected_filter['sort_by'] == 'oldest':
+            mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=False)
+        elif selected_filter['sort_by'] == 'title':
+            mapObject = sorted(mapObject, key=lambda x: (x.title), reverse=False)
+        elif selected_filter['sort_by'] == 'title_reversed':
+            mapObject = sorted(mapObject, key=lambda x: (x.title), reverse=True)
+        elif selected_filter['sort_by'] == 'players':
+            mapObject = sorted(mapObject, key=lambda x: (x.players), reverse=True)
+        elif selected_filter['sort_by'] == 'lately_commented':
+
+            copy_maps = []
+            copy_comments = {}
+            for mp in mapObject:
+
+                copy_maps.append(mp.id)
+
+                comments_for_map = Comments.objects.filter(is_removed=False, item_type='maps', item_id=mp.id).first()
+                if comments_for_map:
+                    copy_comments[mp.id] = comments_for_map.posted
+                else:
+                    copy_comments[mp.id] = datetime.datetime(2000, 1, 1, 1, 00, 00, tzinfo=pytz.UTC)
+            mapObject = sorted(mapObject, key=lambda x: (copy_comments[x.id]), reverse=True)
+
+        elif selected_filter['sort_by'] == 'rating':
+            mapObject = sorted(mapObject, key=lambda x: (x.rating), reverse=True)
+        elif selected_filter['sort_by'] == 'views':
+            mapObject = sorted(mapObject, key=lambda x: (x.viewed), reverse=True)
+        elif selected_filter['sort_by'] == 'downloads':
+            mapObject = sorted(mapObject, key=lambda x: (x.downloaded), reverse=True)
+        elif selected_filter['sort_by'] == 'revisions':
+            mapObject = sorted(mapObject, key=lambda x: (x.revision), reverse=True)
+    else:
+        mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+    ####################
+
+    return [mapObject, filter_prepare, selected_filter]

@@ -13,146 +13,16 @@ import multiprocessing
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
-from openra.models import Maps, Replays, ReplayPlayers, Lints, Screenshots
+from openra.models import Maps, Lints, Screenshots
 from openra import utility, misc
-
-
-class ReplayHandlers():
-
-    def __init__(self):
-        self.replay_is_uploaded = False
-        self.UID = False
-        self.currentDirectory = os.getcwd() + os.sep    # web root
-
-    def process_uploading(self, user_id, replay_file, post):
-
-        parser_to_db = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]  # default parser = the latest
-        parser = settings.OPENRA_ROOT_PATH + parser_to_db
-
-        if post.get("parser", None) is not None:
-            parser_to_db = post['parser']
-            parser = settings.OPENRA_ROOT_PATH + parser_to_db
-            if 'git' in parser:
-                parser = settings.OPENRA_BLEED_PARSER
-
-        response = {'error': False, 'response': ''}
-        tempname = '/tmp/' + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8)) + '.orarep'
-        with open(tempname, 'wb+') as destination:
-            for chunk in replay_file.chunks():
-                destination.write(chunk)
-
-        command = 'file -b --mime-type %s' % tempname
-        proc = Popen(command.split(), stdout=PIPE).communicate()
-        mimetype = proc[0].decode().strip()
-        if not ((mimetype == 'application/octet-stream' or mimetype == 'application/zip') and os.path.splitext(replay_file.name)[1].lower() == '.orarep'):
-            response['error'] = True
-            response['response'] = 'Failed. Unsupported file type.'
-            return response
-
-        command = 'sha1sum %s' % tempname
-        proc = Popen(command.split(), stdout=PIPE).communicate()
-        sha1_hash = proc[0].decode().split()[0].strip()
-
-        sha1sum_exists = Replays.objects.filter(sha1sum=sha1_hash, user=user_id)
-        if sha1sum_exists:
-            response['error'] = True
-            response['response'] = 'Failed. You have already uploaded this replay.'
-            return response
-
-        replay_metadata = self.get_replay_metadata(tempname, parser)
-
-        if not replay_metadata:
-            response['error'] = True
-            response['response'] = 'Failed to fetch replay metadata.'
-            return response
-
-        userObject = User.objects.get(pk=user_id)
-        transac = Replays(
-            user=userObject,
-            info=post['replay_info'].strip(),
-            metadata=json.dumps(replay_metadata),
-
-            game_mod=replay_metadata['Mod'],
-            map_hash=replay_metadata['MapUid'],
-            version=replay_metadata['Version'],
-            start_time=replay_metadata['StartTimeUtc'],
-            end_time=replay_metadata['EndTimeUtc'],
-
-            sha1sum=sha1_hash,
-            parser=parser_to_db,
-            posted=timezone.now(),
-        )
-        transac.save()
-        self.UID = transac.id
-
-        for pl_key, pl_value in replay_metadata['Players'].items():
-            transac_player = ReplayPlayers(
-                user=userObject,
-                replay_id=transac.id,
-
-                client_index=replay_metadata['Players'][pl_key]['ClientIndex'],
-                color=replay_metadata['Players'][pl_key]['Color'],
-                faction_id=replay_metadata['Players'][pl_key]['FactionId'],
-                faction_name=replay_metadata['Players'][pl_key]['FactionName'],
-                is_bot=replay_metadata['Players'][pl_key]['IsBot'],
-                is_human=replay_metadata['Players'][pl_key]['IsHuman'],
-                is_random_faction=replay_metadata['Players'][pl_key]['IsRandomFaction'],
-                is_random_spawn=replay_metadata['Players'][pl_key]['IsRandomSpawnPoint'],
-                name=replay_metadata['Players'][pl_key]['Name'],
-                outcome=replay_metadata['Players'][pl_key]['Outcome'],
-                outcome_timestamp=replay_metadata['Players'][pl_key]['OutcomeTimestampUtc'],
-                spawn_point=replay_metadata['Players'][pl_key]['SpawnPoint'],
-                team=replay_metadata['Players'][pl_key]['Team'],
-
-                posted=timezone.now(),
-            )
-            transac_player.save()
-
-        replay_directory = self.currentDirectory + __name__.split('.')[0] + '/data/replays/' + str(self.UID) + '/'
-        if not os.path.exists(replay_directory):
-            os.makedirs(replay_directory)
-
-        shutil.move(tempname, replay_directory + str(self.UID) + '.orarep')
-
-        self.replay_is_uploaded = True
-
-        response['error'] = False
-        response['response'] = replay_metadata
-        return response
-
-    def get_replay_metadata(self, fullpath, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
-        os.chdir(parser + "/")
-
-        command = 'mono --debug OpenRA.Utility.exe ra --replay-metadata ' + fullpath
-        proc = Popen(command.split(), stdout=PIPE).communicate()
-
-        replay_metadata = ""
-        for res in proc:
-            if res is None:
-                continue
-            lines = res.decode().split("\n")
-            for line in lines:
-                if '.orarep' in line:
-                    continue
-                else:
-                    if line.strip() != "":
-                        replay_metadata += line + "\n"
-
-        replay_metadata = yaml.load(re.sub('\t', '    ', replay_metadata))
-
-        os.chdir(self.currentDirectory)
-        return replay_metadata
 
 
 class MapHandlers():
 
     def __init__(self, map_full_path_filename="", map_full_path_directory="", preview_filename=""):
-        self.map_is_uploaded = False
         self.minimap_generated = False
         self.maphash = ""
         self.LintPassed = False
-        self.advanced_map = False
-        self.lua_map = False
         self.map_full_path_directory = map_full_path_directory
         self.map_full_path_filename = map_full_path_filename
         self.preview_filename = preview_filename
@@ -236,11 +106,12 @@ class MapHandlers():
         # Read Rules
         base64_rules = {}
         base64_rules['data'] = ''
+        base64_rules['advanced'] = resp_map_data['advanced']
         if int(resp_map_data['mapformat']) >= 10:
-            base64_rules = utility.ReadRules(False, tempname, parser)
+            base64_rules = utility.ReadRules(False, tempname, parser, resp_map_data['game_mod'])
             if (base64_rules['error']):
                 print(base64_rules['response'])
-        if base64_rules['data']:
+        if base64_rules['advanced']:
             resp_map_data['advanced'] = True
 
         # Define license information
@@ -262,6 +133,7 @@ class MapHandlers():
             cc = previous_policy_cc
             commercial = previous_policy_commercial
             adaptations = previous_policy_adaptations
+
 
         # Add record to Database
         transac = Maps(
@@ -311,8 +183,6 @@ class MapHandlers():
         self.preview_filename = os.path.splitext(name)[0] + ".png"
 
         shutil.move(tempname, self.map_full_path_filename)
-
-        self.map_is_uploaded = True
 
         self.UnzipMap()
 

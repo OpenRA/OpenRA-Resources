@@ -6,7 +6,7 @@
 			<div>
 				<div class="title">{{ map.title|strip_tags }}</div>
 				{% if map.author %}
-					<div class="author">by {{ map.author|strip_tags }}</div>
+					<div class="author">by <a href="/maps/author/{{map.author|proper_space}}/" title="Show maps authored by {{map.author|strip_tags}}">{{ map.author|strip_tags }}</a></div>
 				{% endif %}
 			</div>
 		</div>
@@ -14,7 +14,7 @@
 		<div class="map_image_container left">
 			<div class="map_image">
 				{% if map_preview %}
-					<a class="map_full_preview" href="/screenshots/{{map_preview.id}}/" onclick="return hs.expand(this, config_minimap)">
+					<a class="map_full_preview" href="/screenshots/{{map_preview.id}}/" onclick="return hs.expand(this, config_minimap)" title="Full preview">
 						<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} alt="minimap" />
 					</a>
 				{% else %}
@@ -25,7 +25,7 @@
 		<div class="clear"></div>
 
 		<div class="notification_container">
-			{% if map.downloading == False or map.requires_upgrade == True or map.players == 0 or reports|length >= REPORTS_PENALTY_AMOUNT %}
+			{% if map.downloading == False or map.requires_upgrade == True or reports|length >= REPORTS_PENALTY_AMOUNT %}
 			<div class="notification map_attention">
 				<label class="x"></label>
 				<div class="notification_label">Attention!</div>
@@ -38,8 +38,6 @@
 						<p>Reason: Downloading is manually set to False</p>
 					{% elif reports|length >= REPORTS_PENALTY_AMOUNT %}
 						<p>Reason: More then 2 <a class="allReportsShow">active reports</a>!</p>
-					{% elif map.players == 0 %}
-						<p>Reason: Map is unplayable! Max slots: 0</p>
 					{% endif %}
 					</div>
 				</div>
@@ -49,8 +47,16 @@
 			<div class="notification map_advanced">
 				<label class="tick"></label>
 				<div class="notification_label printRulesShow" data-name="Custom Rules">Advanced</div>
-				<div class="notification_tooltip">
-					<div>This map is advanced.<br /><br />Click to see custom Rules.</div>
+				<div class="notification_tooltip printRulesShow" data-name="Custom Rules">
+					<div>This map is advanced:
+						<br />
+						<ul>
+							<li>defines Rules</li>
+							{% if contains_shp %}
+								<li>includes SHP files</li>
+							{% endif %}
+						</ul>
+						Click to see custom Rules.</div>
 				</div>
 			</div>
 			{% endif %}
@@ -73,10 +79,10 @@
 		<div class="map_hash_block cBlockNoPadding">
 			<div class="map_hash_block_element"><a href="/map/hash/{{map.map_hash}}" target='_blank'>API</a></div>
 			<div class="map_hash_block_element"><a href="http://master.openra.net/map_stats?hash={{map.map_hash}}" title='Master Server statistics for this Hash' target="_blank">stats</a></div>
-			<div class="map_hash">{% if duplicates %}<a href="#" title='duplicates'>Ξ</a> {% endif %}<span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span></div>
+			<div class="map_hash">{% if duplicates %}<a href="/maps/duplicates/{{map.map_hash}}/" title='Show duplicates'>Ξ</a> {% endif %}<span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span></div>
 		</div>
 
-		{% if map.description and map.description != "Describe your map here" %}
+		{% if map.description and map.description != "Describe your map here" and map.mapformat < 11 %}
 		<div class="map_description cBlock">
 			<div>
 				<h5>Description:</h5>
@@ -152,17 +158,19 @@
 			</div>
 			{% endfor %}
 
-			<div class="reportMap popup">
-			<div class="popup-content-wrapper">
-				<div class="closePopup"><label class="x"></label></div>                                                      
-				<h3>Report this map</h3>
-				<form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
-					<div><textarea name="reportReason" placeholder="Reason"></textarea></div>
-					<div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
-					<div><button type="submit">Submit</button></div>
-				</form>
-			</div>
-			</div>
+			{% if request.user.is_authenticated %}
+				<div class="reportMap popup">
+				<div class="popup-content-wrapper">
+					<div class="closePopup"><label class="x"></label></div>                                                      
+					<h3>Report this map</h3>
+					<form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+						<div><textarea name="reportReason" placeholder="Reason"></textarea></div>
+						<div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
+						<div><button type="submit">Submit</button></div>
+					</form>
+				</div>
+				</div>
+			{% endif %}
 
 			<div class="printMisc popup" style="width: 580px; left: 10%; margin-top: -100px; font-size: 0.9em;"><div class="popupContainer"></div>
 			</div>
@@ -296,7 +304,7 @@
 		{% if map.categories %}
 			<div class="map_data_label">Categories:</div><div class="map_data_text">{{ map.categories|map_categories }}</div>
 		{% endif %}
-		<div class="map_data_label">Uploader:</div><div class="map_data_text">{{ userid.username }}</div>
+		<div class="map_data_label">Uploader:</div><div class="map_data_text"><a href="/maps/uploader/{{userid.id}}/" title="Show maps uploaded by {{userid.username}}">{{ userid.username }}</a></div>
 		<div class="map_data_label">Players:</div><div class="map_data_text">{{ map.players }}</div>
 		<div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
 		<div class="map_data_label">Size:</div><div class="map_data_text">{{ map.bounds|map_real_size }}</div>
@@ -304,9 +312,11 @@
 		{% if map.shellmap %}
 			<div class="map_data_label">Shellmap:</div><div class="map_data_text">{{ map.shellmap }}</div>
 		{% endif %}
+		{% if map.legacy_map %}
+			<div class="map_data_label">Imported Map:</div><div class="map_data_text">{{ map.legacy_map }}</div>
+		{% endif %}
 		<div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
 		<div class="map_data_label">Downloading:</div><div class="map_data_text" title="ingame"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < REPORTS_PENALTY_AMOUNT and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
-		<div class="map_data_label">Syncing:</div><div class="map_data_text"><a class="syncing_status" title="Synchronization with Dedicated servers">{% if map.rsync_allow and map.downloading and reports|length < REPORTS_PENALTY_AMOUNT and map.requires_upgrade == False and map.players != 0 %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
 		<br />
 		<div class='cBlock'><span class='small-font'>Parsed by: {{map.parser}}</span></div>
 
@@ -314,18 +324,20 @@
 		<div class="cBlock">
 			<span class="small-font bold">Lint check status:</span>
 			{% for lint in lints %}
-				<div class="lint_check_line">
-					<div class="lint_check_line_status">
-						{% if lint.1 %}
-						<span class="small-font green">pass</span>
-						{% else %}
-						<a href="#" class="showLintLog small-font red" data-version="{{lint.0}}">fail</a>
-						{% endif %}
+				{% if not map.requires_upgrade and lint.0 == map.parser  or  map.requires_upgrade  or  not map.requires_upgrade and lint.0 == last_parser %}
+					<div class="lint_check_line">
+						<div class="lint_check_line_status">
+							{% if lint.1 %}
+							<span class="small-font green">pass</span>
+							{% else %}
+							<a href="#" class="showLintLog small-font red" data-version="{{lint.0}}">fail</a>
+							{% endif %}
+						</div>
+						<div class="lint_check_line_version">
+							<span class="small-font">{{lint.0}}</span>
+						</div>
 					</div>
-					<div class="lint_check_line_version">
-						<span class="small-font">{{lint.0}}</span>
-					</div>
-				</div>
+				{% endif %}
 			{% endfor %}
 		</div>
 		{% endif %}
@@ -358,9 +370,6 @@
 		</div>
 		<div class="map_data_link">
 			<a class="change_downloading_status" href="/maps/{{map.id}}/setdownloadingstatus/" title="Only In-Game Downloading">set downloading {% if map.downloading %}false{% else %}true{% endif %}</a>
-		</div>
-		<div class="map_data_link">
-			<a class="change_sync_status" href="/maps/{{map.id}}/changersyncstatus/" title="Synchronization with Dedicated servers">{% if map.rsync_allow %}forbid{% else %}allow{% endif %} syncing</a>
 		</div>
 		<div class="map_data_link">
 			<a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete("map")'>delete {%if map.user_id == request.user.id %}my {% endif %}map</a>

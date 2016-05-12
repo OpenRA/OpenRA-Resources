@@ -28,7 +28,8 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 SITE_ID = 1
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_REQUIRED = False
+SOCIALACCOUNT_AUTO_SIGNUP = False
 
 SESSION_COOKIE_AGE = 7776000  # 90 days for active user session
 
@@ -180,12 +181,6 @@ OPENRA_BLEED_HASH_FILE_PATH = ''
 OPENRA_BLEED_PARSER = ''
 
 
-# Path to directory which will be shared over rsync, with full permissions for website user ( with slash at the end )
-# Must be outside of website's path tree
-# RSYNC_MAP_PATH: Website trigger will dump there 'good' maps for dedicated servers
-RSYNC_MAP_PATH = ''
-
-
 # Email address (FROM) in our custom mail methods
 ADMIN_EMAIL_FROM = ''
 
@@ -194,6 +189,7 @@ ADMIN_EMAIL_TO = ''
 
 # Reply-to email address
 DEFAULT_FROM_EMAIL = ''
+EMAIL_HOST='127.0.0.1'
 
 
 # Determining amount of reports for item, required to forbid in-game downloading, synchronization with servers, etc.
@@ -207,3 +203,5 @@ SITE_MAINTENANCE_OVER = '00:00 GMT'  # when we finish technical works
 
 # Time limit for some execution processes
 UTILITY_TIME_LIMIT = 60
+
+GOOGLE_RECAPTCHA_SECRET_KEY = "YOUR-PRIVATE-KEY"

@@ -2,7 +2,7 @@ import re
 import json
 from django import template
 from openra import misc
-from openra.models import Maps, ReplayPlayers, MapCategories
+from openra.models import Maps, MapCategories
 
 
 register = template.Library()
@@ -84,14 +84,6 @@ def map_title_by_hash(value):
 register.filter('map_title_by_hash', map_title_by_hash)
 
 
-def get_replay_players(value):
-    replay_players = ReplayPlayers.objects.filter(replay_id=value)
-    if replay_players:
-        return replay_players
-    return []
-register.filter('get_replay_players', get_replay_players)
-
-
 def map_id_of_rev(value, arg):
     seek_id_by_rev = misc.get_map_id_of_revision(arg, value)
     if seek_id_by_rev != 0:
@@ -111,10 +103,6 @@ def item_name_by_type_id(value, arg):
         seek = Maps.objects.filter(id=value)
         if seek:
             return seek[0].title
-    elif arg == "replays":
-        seek = Replays.objects.filter(id=value)
-        if seek:
-            return seek[0].game_mod.upper() + ' by ' + seek[0].user.username + ' on ' + seek[0].posted
     return ""
 register.filter('item_name_by_type_id', item_name_by_type_id)
 
