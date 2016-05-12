@@ -146,7 +146,6 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
         try:
             mapObject = Maps.objects.filter(
                 game_mod=mod.lower(),
-                requires_upgrade=False,
                 downloading=True,
                 amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT).distinct('map_hash')
             if arg2 == "players":
@@ -231,7 +230,6 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
                 game_mod=mod.lower(),
                 next_rev=0)
             mapObject = mapObject.filter(
-                requires_upgrade=False,
                 downloading=True,
                 amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT).distinct("map_hash")
             mapObjectCopy = []
@@ -255,7 +253,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
         mod = arg1
         if mod == "":
             raise Http404
-        mapObject = Maps.objects.filter(game_mod=mod.lower(), players__gte=1).distinct("map_hash")
+        mapObject = Maps.objects.filter(game_mod=mod.lower()).distinct("map_hash")
         mapObject = sorted(mapObject, key=lambda x: (x.id))
         if not mapObject:
             raise Http404
@@ -290,8 +288,6 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
         except:
             raise Http404
         if not mapObject.downloading:
-            raise Http404
-        if mapObject.requires_upgrade:
             raise Http404
         if mapObject.amount_reports >= settings.REPORTS_PENALTY_AMOUNT:
             raise Http404
