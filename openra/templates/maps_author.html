@@ -138,7 +138,7 @@
 				<div class="cell-link-container">
 					<div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
 				</div>
-				{% if item.downloading == False or item.requires_upgrade == True or item.players == 0  or item.amount_reports >= 3 %}
+				{% if item.downloading == False or item.amount_reports >= 3 %}
 				<div class="map-custom-status"><img src="/static/images/attention-mini.jpg" /></div>
 				{% endif %}
 				{% if item.advanced_map %}
