@@ -2,6 +2,9 @@ User-agent: *
 Disallow: *shp*
 Disallow: *minimap*
 Disallow: *upgrade*
+Disallow: *addmapsc*
+Disallow: *delete*
+Disallow: *setdownloadingstatus*
 
 User-agent: bingbot
 Disallow: /
