@@ -173,8 +173,6 @@ class MapHandlers():
         )
         transac.save()
         self.UID = str(transac.id)
-        if pre_r != 0:
-            Maps.objects.filter(id=pre_r).update(next_rev=transac.id)
 
         self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID + '/'
 
@@ -183,7 +181,11 @@ class MapHandlers():
                 os.makedirs(self.map_full_path_directory + 'content')
         except Exception as e:
             print("Failed to create directory for new map", self.map_full_path_directory)
+            transac.delete() # Remove failed map from DB before raise
             raise
+
+        if pre_r != 0:
+            Maps.objects.filter(id=pre_r).update(next_rev=transac.id)
 
         self.map_full_path_filename = self.map_full_path_directory + name
         self.preview_filename = os.path.splitext(name)[0] + ".png"
@@ -204,8 +206,8 @@ class MapHandlers():
         if int(resp_map_data['mapformat']) < 10:
             self.GenerateMinimap(resp_map_data['game_mod'], parser)
 
-        shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(resp_map_data['game_mod'], parser,), name='shppreview')
-        shp.start()
+        #shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(resp_map_data['game_mod'], parser,), name='shppreview')
+        #shp.start()
         print("--- New map: %s" % self.UID)
         return False  # no errors
 
@@ -258,7 +260,7 @@ class MapHandlers():
             if fn.endswith('.shp'):
                 os.mkdir(self.map_full_path_directory+'content/png/')
                 os.chdir(self.map_full_path_directory+'content/png/')
-                #command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", game_mod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+                command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", game_mod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
 
                 class TimedOut(Exception):  # Raised if timed out.
                     pass

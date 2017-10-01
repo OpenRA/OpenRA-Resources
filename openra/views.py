@@ -471,7 +471,7 @@ def displayMap(request, arg):
                 contains_shp = True
                 break
     except FileNotFoundError as ex:
-	print(ex)
+        print(ex)
         return HttpResponseRedirect('/')
     try:
         mapObject = Maps.objects.get(id=arg)
@@ -498,12 +498,7 @@ def displayMap(request, arg):
 
     luaNames = []
 
-    listContent = []
-    try:
-        listContent = os.listdir(path + '/content/')
-    except Exception as ex:
-        print('Failed to find ' + path + '/content/', ex.message, ex.args)
-        raise
+    listContent = os.listdir(path + '/content/')
 
     for fn in listContent:
         if fn.endswith('.lua'):
