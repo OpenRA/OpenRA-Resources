@@ -471,7 +471,7 @@ def displayMap(request, arg):
                 contains_shp = True
                 break
     except:
-        pass
+        return HttpResponseRedirect('/')
     try:
         mapObject = Maps.objects.get(id=arg)
     except:
