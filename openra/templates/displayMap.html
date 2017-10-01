@@ -369,7 +369,7 @@
 			<a class="change_downloading_status" href="/maps/{{map.id}}/setdownloadingstatus/" title="Only In-Game Downloading">set downloading {% if map.downloading %}false{% else %}true{% endif %}</a>
 		</div>
 		<div class="map_data_link">
-			<a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete("map")'>delete {%if map.user_id == request.user.id %}my {% endif %}map</a>
+			<a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete("map")'>delete {%if map.user_id == request.user.id %}my {% endif %}map revision</a>
 		</div>
 		{% endif %}
 

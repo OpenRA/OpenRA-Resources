@@ -471,8 +471,8 @@ def displayMap(request, arg):
                 contains_shp = True
                 break
     except FileNotFoundError as ex:
-        print(ex)
-        raise # :: was `pass`
+	print(ex)
+        return HttpResponseRedirect('/')
     try:
         mapObject = Maps.objects.get(id=arg)
     except:
