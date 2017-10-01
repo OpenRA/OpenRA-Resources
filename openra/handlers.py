@@ -177,8 +177,14 @@ class MapHandlers():
             Maps.objects.filter(id=pre_r).update(next_rev=transac.id)
 
         self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID + '/'
-        if not os.path.exists(self.map_full_path_directory):
-            os.makedirs(self.map_full_path_directory + 'content')
+
+        try:
+            if not os.path.exists(self.map_full_path_directory):
+                os.makedirs(self.map_full_path_directory + 'content')
+        except Exception as e:
+            print("Failed to create directory for new map", self.map_full_path_directory)
+            raise
+
         self.map_full_path_filename = self.map_full_path_directory + name
         self.preview_filename = os.path.splitext(name)[0] + ".png"
 
@@ -252,7 +258,7 @@ class MapHandlers():
             if fn.endswith('.shp'):
                 os.mkdir(self.map_full_path_directory+'content/png/')
                 os.chdir(self.map_full_path_directory+'content/png/')
-                command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", game_mod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
+                #command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", game_mod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
 
                 class TimedOut(Exception):  # Raised if timed out.
                     pass

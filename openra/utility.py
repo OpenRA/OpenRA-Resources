@@ -257,8 +257,8 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 LintCheck(transac, "", parser)
 
                 print("\nRunning SHPtoGIF generator, in case there are SHP files\n")
-                shp = multiprocessing.Process(target=GenerateSHPpreview, args=(item, parser,), name='SHPtoGIF')
-                shp.start()
+                #shp = multiprocessing.Process(target=GenerateSHPpreview, args=(item, parser,), name='SHPtoGIF')
+                #shp.start()
 
             if os.path.isdir(ora_temp_dir_name):
                 shutil.rmtree(ora_temp_dir_name)

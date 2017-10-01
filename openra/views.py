@@ -470,8 +470,9 @@ def displayMap(request, arg):
             if filename.endswith(".shp"):
                 contains_shp = True
                 break
-    except:
-        pass
+    except FileNotFoundError as ex:
+        print(ex)
+        raise # :: was `pass`
     try:
         mapObject = Maps.objects.get(id=arg)
     except:
@@ -496,13 +497,19 @@ def displayMap(request, arg):
             reportedByUser = True
 
     luaNames = []
-    listContent = os.listdir(path + '/content/')
+
+    listContent = []
+    try:
+        listContent = os.listdir(path + '/content/')
+    except Exception as ex:
+        print('Failed to find ' + path + '/content/', ex.message, ex.args)
+        raise
+
     for fn in listContent:
         if fn.endswith('.lua'):
             luaNames.append(os.path.splitext(fn)[0])
 
     shpNames = []
-    listContent = os.listdir(path + '/content/')
     for fn in listContent:
         if fn.endswith('.shp.gif'):
             shpNames.append(fn.split('.shp.gif')[0])
