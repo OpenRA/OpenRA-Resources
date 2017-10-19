@@ -217,14 +217,14 @@
 		<button class="maps_page_buttons" type="submit">Most Commented</button>
 	</form>
 </div>
-{% if amount %}
+{% if amount and amount <= 1000 %}
 	<div class="features">
 		<div class='cBlock no-pd-bot no-pd-top'>
 			<p>
 				{% if request.META.QUERY_STRING %}
-					<a href="/maps/zip/?{{request.META.QUERY_STRING}}" title='Downloaded filtered result as zip archive' onClick='return confirmZipDownload("{{amount}}")'>Downloaded filtered result as zip archive ({{amount}} maps)</a>
+					<a href="/maps/zip/?{{request.META.QUERY_STRING}}" title='Download filtered result as zip archive' onClick='return confirmZipDownload("{{amount}}")'>Download filtered result as zip archive ({{amount}} maps)</a>
 				{% else %}
-					<a href="/maps/zip/" title='Downloaded filtered result as zip archive' onClick='return confirmZipDownload("{{amount}}")'>Download filtered result as zip archive ({{amount}} maps)</a>
+					<a href="/maps/zip/" title='Download filtered result as zip archive' onClick='return confirmZipDownload("{{amount}}")'>Download filtered result as zip archive ({{amount}} maps)</a>
 				{% endif %}
 			</p>
 		</div>
