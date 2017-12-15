@@ -1012,6 +1012,7 @@ def cancelReport(request, name, arg):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/')
     Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name=name).delete()
+    Maps.objects.filter(id=arg).update(amount_reports=F('amount_reports')-1) 
     return HttpResponseRedirect('/'+name+'/'+arg)
 
 
