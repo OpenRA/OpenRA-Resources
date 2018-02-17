@@ -18,9 +18,9 @@ from openra import misc
 def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False):
 
     parser_to_db = parser
-    parser = settings.OPENRA_ROOT_PATH + parser
+    parser = os.path.join(settings.OPENRA_ROOT_PATH, parser)
 
-    currentDirectory = settings.BASE_DIR + os.sep
+    currentDirectory = settings.BASE_DIR
 
     upgraded_maps = []
 
@@ -31,7 +31,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
             print("Interrupted map upgrade: %s" % (item.id))
             continue
 
-        path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
+        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
         filename = ""
         Dir = os.listdir(path)
         for fn in Dir:
@@ -44,10 +44,10 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
             continue
 
         # Copy map to temporarily location
-        ora_temp_dir_name = '/tmp/openra_resources/' + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8)) + "/"
+        ora_temp_dir_name = os.path.join('/tmp', 'openra_resources', ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8)))
         os.makedirs(ora_temp_dir_name)
 
-        shutil.copy(path+filename, ora_temp_dir_name)
+        shutil.copy(os.path.join(path, filename), os.path.join(ora_temp_dir_name, filename))
 
         if_new_rev = "WITH creating new revision"
         if not new_rev_on_upgrade:
@@ -63,7 +63,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 if int(engine) > int(parser_eng):
                     engine = parser_eng
 
-        command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe %s --upgrade-map %s %s' % (item.game_mod, ora_temp_dir_name+filename, engine)
+        command = 'mono --debug %s %s --upgrade-map %s %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), item.game_mod, os.path.join(ora_temp_dir_name, filename), engine)
         print(command)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
@@ -85,7 +85,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
 
             continue
 
-        recalculate_hash_response = recalculate_hash(item, ora_temp_dir_name+filename, parser)
+        recalculate_hash_response = recalculate_hash(item, os.path.join(ora_temp_dir_name, filename), parser)
         if recalculate_hash_response['error']:
             print("Interrupted map upgrade: %s" % (item.id))
 
@@ -102,7 +102,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
 
             continue
 
-        lint_check_response = LintCheck(item, ora_temp_dir_name+filename, parser, new_rev_on_upgrade)
+        lint_check_response = LintCheck(item, os.path.join(ora_temp_dir_name, filename), parser, new_rev_on_upgrade)
         if lint_check_response['error'] is True or lint_check_response['response'] != 'pass_for_requested_parser':
             if upgrade_if_lint_fails is False:
                 print("Lint check failed for requested parser: %s" % parser_to_db)
@@ -116,7 +116,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
         if lint_check_response['error'] is False and lint_check_response['response'] == 'pass_for_requested_parser':
             if_map_requires_upgrade = False
 
-        unzipped_map = UnzipMap(item, ora_temp_dir_name+filename)
+        unzipped_map = UnzipMap(item, os.path.join(ora_temp_dir_name, filename))
         if not unzipped_map:
             print("Interrupted map upgrade: %s" % (item.id))
 
@@ -126,7 +126,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
             continue
 
         # Read Yaml
-        read_yaml_response = ReadYaml(item, ora_temp_dir_name+filename)
+        read_yaml_response = ReadYaml(item, os.path.join(ora_temp_dir_name, filename))
 
         resp_map_data = read_yaml_response['response']
         if read_yaml_response['error']:
@@ -143,7 +143,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
         base64_rules['data'] = ''
         base64_rules['advanced'] = resp_map_data['advanced']
         if int(resp_map_data['mapformat']) >= 10:
-            base64_rules = ReadRules(item, ora_temp_dir_name+filename, parser, item.game_mod)
+            base64_rules = ReadRules(item, os.path.join(ora_temp_dir_name, filename), parser, item.game_mod)
             print(base64_rules['response'])
         if base64_rules['advanced']:
             resp_map_data['advanced'] = True
@@ -239,9 +239,9 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                         new_info = item.info
                     Maps.objects.filter(id=transac.id).update(info=new_info)
 
-                new_path = currentDirectory + 'openra/data/maps/' + str(transac.id) + '/'
+                new_path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(transac.id))
                 if not os.path.exists(new_path):
-                    os.makedirs(new_path + 'content')
+                    os.makedirs(os.path.join(new_path, 'content'))
 
                 misc.copytree(path, new_path)
                 misc.copytree(ora_temp_dir_name, new_path)
@@ -262,11 +262,11 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
 
 def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
 
-    currentDirectory = settings.BASE_DIR + os.sep
+    currentDirectory = settings.BASE_DIR
 
     if fullpath == "":
 
-        path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
+        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
         filename = ""
         Dir = os.listdir(path)
         for fn in Dir:
@@ -276,11 +276,11 @@ def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(
         if filename == "":
             print('Failed to recalculate hash for %s: %s' % (item.id, 'can not find map'))
             return {'response': 'can not find map', 'error': True, 'maphash': 'none'}
-        fullpath = path + filename
+        fullpath = os.path.join(path, filename)
 
     os.chmod(fullpath, 0o444)
 
-    command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe %s --map-hash %s' % (item.game_mod, fullpath)
+    command = 'mono --debug %s %s --map-hash %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), item.game_mod, fullpath)
     proc = Popen(command.split(), stdout=PIPE).communicate()
 
     os.chmod(fullpath, 0o644)
@@ -295,12 +295,12 @@ def ReadYaml(item=False, fullpath=""):
     if fullpath == "":
         if item is False:
             return {'response': 'wrong method call', 'error': True}
-        currentDirectory = settings.BASE_DIR + os.sep
-        path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
+        currentDirectory = settings.BASE_DIR
+        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
         Dir = os.listdir(path)
         for fn in Dir:
             if fn.endswith('.oramap'):
-                fullpath = path + fn
+                fullpath = os.path.join(path, fn)
                 break
         if fullpath == "":
             return {'response': 'could not find .oramap', 'error': True}
@@ -421,21 +421,21 @@ def ReadYaml(item=False, fullpath=""):
 
 def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], game_mod="ra"):
 
-    currentDirectory = settings.BASE_DIR + os.sep
+    currentDirectory = settings.BASE_DIR
 
     if fullpath == "":
         if item is False:
             return {'data': '', 'error': True, 'response': 'wrong method call'}
-        path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
+        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
         Dir = os.listdir(path)
         for fn in Dir:
             if fn.endswith('.oramap'):
-                fullpath = path + fn
+                fullpath = os.path.join(path, fn)
                 break
         if fullpath == "":
             return {'data': '', 'error': True, 'response': 'could not find .oramap'}
 
-    command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe %s --map-rules %s' % (game_mod, fullpath)
+    command = 'mono --debug %s %s --map-rules %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), game_mod, fullpath)
     proc = Popen(command.split(), stdout=PIPE).communicate()
     resp = {
         'data': base64.b64encode(proc[0]).decode(),
@@ -450,8 +450,8 @@ def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(r
 
 def UnzipMap(item, fullpath=""):
     if fullpath == "":
-        currentDirectory = settings.BASE_DIR + os.sep
-        path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
+        currentDirectory = settings.BASE_DIR
+        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
         filename = ""
         Dir = os.listdir(path)
         for fn in Dir:
@@ -461,11 +461,11 @@ def UnzipMap(item, fullpath=""):
         if filename == "":
             print("failed to unzip %s" % item.id)
             return False
-        fullpath = path + filename
+        fullpath = os.path.join(path, filename)
 
     z = zipfile.ZipFile(fullpath, mode='a')
     try:
-        z.extractall(os.path.dirname(fullpath) + '/content/')
+        z.extractall(os.path.join(os.path.dirname(fullpath), 'content'))
     except:
         print("failed to unzip %s" % item.id)
         return False
@@ -478,7 +478,7 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
     # this function performs a Lint Check for map
     response = {'error': True, 'response': ''}
 
-    currentDirectory = settings.BASE_DIR + os.sep
+    currentDirectory = settings.BASE_DIR
 
     available_parsers = list(reversed(list(settings.OPENRA_VERSIONS.values())))
 
@@ -492,7 +492,7 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
             if bleed_tag is None:
                 continue
 
-            if not os.path.isfile(settings.OPENRA_BLEED_PARSER + 'OpenRA.Utility.exe'):
+            if not os.path.isfile(os.path.join(settings.OPENRA_BLEED_PARSER, 'OpenRA.Utility.exe')):
                 continue
 
             current_parser_to_db = bleed_tag
@@ -505,7 +505,7 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
             continue
 
         if fullpath == "":
-            path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
+            path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
             filename = ""
             Dir = os.listdir(path)
             for fn in Dir:
@@ -517,11 +517,10 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
                 response['error'] = True
                 response['response'] = 'can not find .oramap'
                 return response
-            fullpath = path + filename
+            fullpath = os.path.join(path, filename)
 
         os.chmod(fullpath, 0o444)
-
-        command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe ' + item.game_mod.lower() + ' --check-yaml ' + fullpath
+        command = 'mono --debug %s %s --check-yaml %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), item.game_mod.lower(), fullpath)
         print(command)
         print('Started Lint check for parser: %s' % current_parser_to_db)
         proc = Popen(command.split(), stdout=PIPE).communicate()

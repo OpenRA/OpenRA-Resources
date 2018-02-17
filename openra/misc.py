@@ -270,9 +270,10 @@ class Revisions():
 
 
 def Log(data, channel="default"):
-    if not os.path.isdir(settings.BASE_DIR + "/logs/"):
-        os.makedirs(settings.BASE_DIR + "/logs/")
-    logfile = open(settings.BASE_DIR + "/logs/" + channel + ".log", "a")
+    log_path = os.path.join(settings.BASE_DIR, "logs")
+    if not os.path.isdir(log_path):
+        os.makedirs(log_path)
+    logfile = open(os.path.join(log_path, channel + ".log"), "a")
     if data:
         today = datetime.datetime.today()
         timestamp = today.strftime('%Y/%m/%d %H:%M:%S') + ' [' + time.tzname[0] + ']:  '

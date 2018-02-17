@@ -247,7 +247,7 @@ def maps_zip(request):
 
     for item in mapObject:
         oramap = ""
-        item_path = settings.BASE_DIR + '/openra/data/maps/' + str(item.id) + '/'
+        item_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
         try:
             mapDir = os.listdir(item_path)
         except:
@@ -259,7 +259,7 @@ def maps_zip(request):
         if not oramap:
             continue
 
-        zip_path = "maps/%s/%s.oramap" % (item.game_mod, item.id)
+        zip_path = os.path.join('maps', item.game_mod, '%d.oramap' % item.id)
 
         zf.write(os.path.join(item_path, oramap), zip_path, zipfile.ZIP_DEFLATED)
     zf.close()
@@ -457,15 +457,15 @@ def displayMap(request, arg):
 
     contains_shp = False
     disk_size = 0
-    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
     try:
         mapDir = os.listdir(path)
         for filename in mapDir:
             if filename.endswith(".oramap"):
-                disk_size = os.path.getsize(path + '/' + filename)
+                disk_size = os.path.getsize(os.path.join(path, filename))
                 disk_size = misc.sizeof_fmt(disk_size)
                 break
-        mapDir = os.listdir(path + '/content/')
+        mapDir = os.listdir(os.path.join(path, 'content'))
         for filename in mapDir:
             if filename.endswith(".shp"):
                 contains_shp = True
@@ -498,7 +498,7 @@ def displayMap(request, arg):
 
     luaNames = []
 
-    listContent = os.listdir(path + '/content/')
+    listContent = os.listdir(os.path.join(path, 'content'))
 
     for fn in listContent:
         if fn.endswith('.lua'):
@@ -661,7 +661,7 @@ def deleteScreenshot(request, itemid):
         arg = str(scObject[0].ex_id)
         name = scObject[0].ex_name
         if request.user.is_superuser or scObject[0].user_id == request.user.id:
-            path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid
+            path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'screenshots', itemid)
             try:
                 shutil.rmtree(path)
             except:
@@ -703,7 +703,7 @@ def unsubscribe_from_comments(request, item_type, arg):
 
 def serveScreenshot(request, itemid, itemname=""):
     image = ""
-    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/screenshots/' + itemid
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'screenshots', itemid)
     try:
         Dir = os.listdir(path)
     except:
@@ -711,12 +711,12 @@ def serveScreenshot(request, itemid, itemname=""):
     for fn in Dir:
         if "-mini." in fn:
             if itemname == "mini":
-                image = path + "/" + fn
+                image = os.path.join(path, fn)
                 mime = fn.split('.')[1]
                 break
         else:
             if itemname == "":
-                image = path + "/" + fn
+                image = os.path.join(path, fn)
                 mime = fn.split('.')[1]
                 break
     if image == "":
@@ -728,26 +728,26 @@ def serveScreenshot(request, itemid, itemname=""):
 
 def serveMinimap(request, arg):
     minimap = ""
-    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
     try:
-        contentDir = os.listdir(path + '/content/')
+        contentDir = os.listdir(os.path.join(path, 'content'))
     except:
         return HttpResponseRedirect("/")
     for filename in contentDir:
         if filename == "map.png":
             minimap = filename
-            serveImage = path + '/content/' + minimap
+            serveImage = os.path.join(path, 'content', minimap)
             break
     if minimap == "":
         mapDir = os.listdir(path)
         for filename in mapDir:
             if filename.endswith("-mini.png"):
                 minimap = filename
-                serveImage = path + os.sep + minimap
+                serveImage = os.path.join(path, minimap)
                 break
     if minimap == "":
         minimap = "nominimap.png"
-        serveImage = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/static/images/nominimap.png'
+        serveImage = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'static', 'images', 'nominimap.png')
     response = StreamingHttpResponse(open(serveImage, 'rb'), content_type='image/png')
     response['Content-Disposition'] = 'attachment; filename = %s' % minimap
     return response
@@ -755,7 +755,7 @@ def serveMinimap(request, arg):
 
 def serveOramap(request, arg, sync=""):
     oramap = ""
-    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
     try:
         mapDir = os.listdir(path)
     except:
@@ -767,7 +767,7 @@ def serveOramap(request, arg, sync=""):
     if oramap == "":
         return HttpResponseRedirect('/maps/'+arg)
     else:
-        serveOramap = path + os.sep + oramap
+        serveOramap = os.path.join(path, oramap)
         if sync == "sync":
                 oramap = arg + ".oramap"
         response = StreamingHttpResponse(open(serveOramap, 'rb'), content_type='application/zip')
@@ -778,7 +778,7 @@ def serveOramap(request, arg, sync=""):
 
 
 def serveYaml(request, arg):
-    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg, 'content', 'map.yaml')
     response = StreamingHttpResponse(cgi.escape(open(path).read(), quote=None), content_type='application/plain')
     response['Content-Disposition'] = 'attachment; filename = map.yaml'
     return response
@@ -791,7 +791,7 @@ def serveYamlRules(request, arg):
     mapObject = Maps.objects.filter(id=arg).first()
     if mapObject:
         if int(mapObject.mapformat) < 10:
-            path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/map.yaml'
+            path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg, 'content', 'map.yaml')
             start = False
             fn = open(path, 'r')
             lines = fn.readlines()
@@ -812,7 +812,7 @@ def serveYamlRules(request, arg):
 
 
 def serveLua(request, arg, name):
-    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + os.sep + '/content/'
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg, 'content')
     fname = ""
     listdir = os.listdir(path)
     for fn in listdir:
@@ -822,13 +822,13 @@ def serveLua(request, arg, name):
                 break
     if fname == "":
         raise Http404
-    response = StreamingHttpResponse(cgi.escape(open(path+fname).read(), quote=None), content_type='application/plain')
+    response = StreamingHttpResponse(cgi.escape(open(os.path.join(path, fname)).read(), quote=None), content_type='application/plain')
     response['Content-Disposition'] = 'attachment; filename = %s' % fname
     return response
 
 
 def serveMapSHP(request, arg, name, request_type='preview'):
-    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + arg + '/content/'
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg, 'content')
     fname = ""
     try:
         listdir = os.listdir(path)
@@ -847,7 +847,7 @@ def serveMapSHP(request, arg, name, request_type='preview'):
                     break
     if fname == "":
         raise Http404
-    response = StreamingHttpResponse(open(path+fname, 'rb'), content_type='image/gif')
+    response = StreamingHttpResponse(open(os.path.join(path, fname), 'rb'), content_type='image/gif')
     response['Content-Disposition'] = 'attachment; filename = %s' % fname
     return response
 
@@ -883,7 +883,7 @@ def uploadMap(request, previous_rev=0):
         bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
         bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
     if 'bleed' in parsers:
-        if not os.path.isfile(settings.OPENRA_BLEED_PARSER + 'OpenRA.Utility.exe'):
+        if not os.path.isfile(os.path.join(settings.OPENRA_BLEED_PARSER, 'OpenRA.Utility.exe')):
             parsers.remove('bleed')
 
     template = loader.get_template('index.html')
@@ -917,7 +917,7 @@ def DeleteMap(request, arg):
     mapTitle = mapObject.title
     mapAuthor = mapObject.author
     if mapObject.user_id == request.user.id or request.user.is_superuser:
-        path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + arg
+        path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
         try:
             shutil.rmtree(path)
         except:

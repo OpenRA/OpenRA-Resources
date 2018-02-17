@@ -26,7 +26,7 @@ class MapHandlers():
         self.map_full_path_directory = map_full_path_directory
         self.map_full_path_filename = map_full_path_filename
         self.preview_filename = preview_filename
-        self.currentDirectory = settings.BASE_DIR + os.sep    # web root
+        self.currentDirectory = settings.BASE_DIR    # web root
         self.UID = False
         self.legacy_name = ""
         self.legacy_map = False
@@ -34,11 +34,11 @@ class MapHandlers():
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
 
         parser_to_db = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]  # default parser = the latest
-        parser = settings.OPENRA_ROOT_PATH + parser_to_db
+        parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
 
         if post.get("parser", None) is not None:
             parser_to_db = post['parser']
-            parser = settings.OPENRA_ROOT_PATH + parser_to_db
+            parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
             if 'git' in parser:
                 parser = settings.OPENRA_BLEED_PARSER
 
@@ -174,11 +174,11 @@ class MapHandlers():
         transac.save()
         self.UID = str(transac.id)
 
-        self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID + '/'
+        self.map_full_path_directory = os.path.join(self.currentDirectory, __name__.split('.')[0], 'data', 'maps', self.UID)
 
         try:
             if not os.path.exists(self.map_full_path_directory):
-                os.makedirs(self.map_full_path_directory + 'content')
+                os.makedirs(os.path.join(self.map_full_path_directory, 'content'))
         except Exception as e:
             print("Failed to create directory for new map", self.map_full_path_directory)
             transac.delete() # Remove failed map from DB before raise
@@ -187,7 +187,7 @@ class MapHandlers():
         if pre_r != 0:
             Maps.objects.filter(id=pre_r).update(next_rev=transac.id)
 
-        self.map_full_path_filename = self.map_full_path_directory + name
+        self.map_full_path_filename = os.path.join(self.map_full_path_directory, name)
         self.preview_filename = os.path.splitext(name)[0] + ".png"
 
         shutil.move(tempname, self.map_full_path_filename)
@@ -212,7 +212,7 @@ class MapHandlers():
     def UnzipMap(self):
         z = zipfile.ZipFile(self.map_full_path_filename, mode='a')
         try:
-            z.extractall(self.map_full_path_directory + 'content/')
+            z.extractall(os.path.join(self.map_full_path_directory, 'content'))
         except:
             pass
         z.close()
@@ -223,7 +223,7 @@ class MapHandlers():
 
         os.chmod(filepath, 0o444)
 
-        command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe ra --map-hash ' + filepath
+        command = 'mono --debug %s ra --map-hash %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), filepath)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         os.chmod(filepath, 0o644)
@@ -233,14 +233,14 @@ class MapHandlers():
     def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
 
         os.chmod(self.map_full_path_filename, 0o444)
-        command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe %s --map-preview %s' % (game_mod, self.map_full_path_filename)
+        command = 'mono --debug %s %s --map-preview %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), game_mod, self.map_full_path_filename)
         proc = Popen(command.split(), stdout=PIPE).communicate()
         os.chmod(self.map_full_path_filename, 0o644)
 
         try:
             shutil.move(
-                misc.addSlash(parser + "/") + self.preview_filename,
-                self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-mini.png")
+                os.path.join(parser, self.preview_filename),
+                os.path.join(self.map_full_path_directory, os.path.splitext(self.preview_filename)[0] + "-mini.png"))
             self.minimap_generated = True
         except:
             pass  # failed to generate minimap
@@ -252,12 +252,12 @@ class MapHandlers():
             if mod == 'cnc':
                 assign_mod = 'td'
 
-            pre_command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe ra'
+            pre_command = 'mono --debug %s ra' % (os.path.join(parser, 'OpenRA.Utility.exe'))
             pre_proc = Popen(pre_command.split(), stdout=PIPE).communicate()
             if '--import-' in pre_proc[0].decode():
-                command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe %s --import-%s-map %s' % (mod, assign_mod, mapPath)
+                command = 'mono --debug %s %s --import-%s-map %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), mod, assign_mod, mapPath)
             else:
-                command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
+                command = 'mono --debug %s %s --map-import %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), mod, mapPath)
 
             proc = Popen(command.split(), stdout=PIPE).communicate()
 
@@ -306,12 +306,12 @@ def addScreenshot(request, arg, item):
         )
     transac.save()
 
-    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/screenshots/' + str(transac.id) + '/'
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'screenshots', str(transac.id))
     if not os.path.exists(path):
         os.makedirs(path)
 
-    sc_full_name = path + arg + "." + mimetype.split('/')[1]
-    sc_mini_name = path + arg + "-mini." + mimetype.split('/')[1]
+    sc_full_name = os.path.join(path, arg + "." + mimetype.split('/')[1])
+    sc_mini_name = os.path.join(path, arg + "-mini." + mimetype.split('/')[1])
 
     shutil.move(tempname, sc_full_name)
 

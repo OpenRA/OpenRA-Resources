@@ -291,7 +291,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
             raise Http404
         if mapObject.amount_reports >= settings.REPORTS_PENALTY_AMOUNT:
             raise Http404
-        path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id)
+        path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', str(mapObject.id))
         try:
             mapDir = os.listdir(path)
         except:
@@ -302,7 +302,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
                 break
         if oramap == "":
             raise Http404
-        serveOramap = path + os.sep + oramap
+        serveOramap = os.path.join(path, oramap)
         oramap = os.path.splitext(oramap)[0] + "-" + str(mapObject.revision) + ".oramap"
         response = StreamingHttpResponse(open(serveOramap, 'rb'), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename = %s' % oramap
@@ -509,10 +509,10 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 
 def get_minimap(mapid, soft=False):
     minimap = ""
-    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapid)
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', str(mapid))
 
     try:
-        contentDir = os.listdir(path + '/content/')
+        contentDir = os.listdir(os.path.join(path, 'content'))
     except:
         if soft:
             return ""
@@ -521,7 +521,7 @@ def get_minimap(mapid, soft=False):
     for filename in contentDir:
         if filename == "map.png":
             minimap = filename
-            serveImage = path + '/content/' + minimap
+            serveImage = os.path.join(path, 'content', minimap)
             break
 
     if minimap == "":
@@ -529,7 +529,7 @@ def get_minimap(mapid, soft=False):
         for filename in mapDir:
             if filename.endswith("-mini.png"):
                 minimap = filename
-                serveImage = path + os.sep + minimap
+                serveImage = os.path.join(path, minimap)
                 break
     if minimap == "":
         if soft:
