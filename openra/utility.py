@@ -20,13 +20,11 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
     parser_to_db = parser
     parser = settings.OPENRA_ROOT_PATH + parser
 
-    currentDirectory = os.getcwd() + os.sep
+    currentDirectory = settings.BASE_DIR + os.sep
 
     upgraded_maps = []
 
     for item in mapObject:
-
-        os.chdir(parser + "/")
 
         if item.next_rev != 0:
             print('Aborting upgrade of map: %s, as it is not the latest revision' % (item.id))
@@ -65,7 +63,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 if int(engine) > int(parser_eng):
                     engine = parser_eng
 
-        command = 'mono --debug OpenRA.Utility.exe %s --upgrade-map %s %s' % (item.game_mod, ora_temp_dir_name+filename, engine)
+        command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe %s --upgrade-map %s %s' % (item.game_mod, ora_temp_dir_name+filename, engine)
         print(command)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
@@ -77,8 +75,6 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 continue
             if line.decode().strip() != "":
                 upgraded = False
-
-        os.chdir(currentDirectory)
 
         if not upgraded:
             print("Problems upgrading map: %s" % (item.id))
@@ -257,20 +253,16 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                 LintCheck(transac, "", parser)
 
                 print("\nRunning SHPtoGIF generator, in case there are SHP files\n")
-                #shp = multiprocessing.Process(target=GenerateSHPpreview, args=(item, parser,), name='SHPtoGIF')
-                #shp.start()
 
             if os.path.isdir(ora_temp_dir_name):
                 shutil.rmtree(ora_temp_dir_name)
 
-    os.chdir(currentDirectory)
     return upgraded_maps
 
 
 def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
 
-    currentDirectory = os.getcwd() + os.sep
-    os.chdir(parser + "/")
+    currentDirectory = settings.BASE_DIR + os.sep
 
     if fullpath == "":
 
@@ -282,20 +274,18 @@ def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(
                 filename = fn
                 break
         if filename == "":
-            os.chdir(currentDirectory)
             print('Failed to recalculate hash for %s: %s' % (item.id, 'can not find map'))
             return {'response': 'can not find map', 'error': True, 'maphash': 'none'}
         fullpath = path + filename
 
     os.chmod(fullpath, 0o444)
 
-    command = 'mono --debug OpenRA.Utility.exe %s --map-hash %s' % (item.game_mod, fullpath)
+    command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe %s --map-hash %s' % (item.game_mod, fullpath)
     proc = Popen(command.split(), stdout=PIPE).communicate()
 
     os.chmod(fullpath, 0o644)
 
     maphash = proc[0].decode().strip()
-    os.chdir(currentDirectory)
     print('Recalculated hash: %s' % item.id)
 
     return {'response': 'success', 'error': False, 'maphash': maphash}
@@ -305,7 +295,7 @@ def ReadYaml(item=False, fullpath=""):
     if fullpath == "":
         if item is False:
             return {'response': 'wrong method call', 'error': True}
-        currentDirectory = os.getcwd() + os.sep
+        currentDirectory = settings.BASE_DIR + os.sep
         path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
         Dir = os.listdir(path)
         for fn in Dir:
@@ -431,8 +421,7 @@ def ReadYaml(item=False, fullpath=""):
 
 def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], game_mod="ra"):
 
-    currentDirectory = os.getcwd() + os.sep
-    os.chdir(parser + "/")
+    currentDirectory = settings.BASE_DIR + os.sep
 
     if fullpath == "":
         if item is False:
@@ -446,7 +435,7 @@ def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(r
         if fullpath == "":
             return {'data': '', 'error': True, 'response': 'could not find .oramap'}
 
-    command = 'mono --debug OpenRA.Utility.exe %s --map-rules %s' % (game_mod, fullpath)
+    command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe %s --map-rules %s' % (game_mod, fullpath)
     proc = Popen(command.split(), stdout=PIPE).communicate()
     resp = {
         'data': base64.b64encode(proc[0]).decode(),
@@ -456,13 +445,12 @@ def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(r
     if len(proc[0].decode().split("\n")) > 8:
         resp['advanced'] = True
 
-    os.chdir(currentDirectory)
     return resp
 
 
 def UnzipMap(item, fullpath=""):
     if fullpath == "":
-        currentDirectory = os.getcwd() + os.sep
+        currentDirectory = settings.BASE_DIR + os.sep
         path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
         filename = ""
         Dir = os.listdir(path)
@@ -490,7 +478,7 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
     # this function performs a Lint Check for map
     response = {'error': True, 'response': ''}
 
-    currentDirectory = os.getcwd() + os.sep
+    currentDirectory = settings.BASE_DIR + os.sep
 
     available_parsers = list(reversed(list(settings.OPENRA_VERSIONS.values())))
 
@@ -516,8 +504,6 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
         if upgrade_with_new_rev and current_parser_path != parser:
             continue
 
-        os.chdir(current_parser_path + "/")
-
         if fullpath == "":
             path = currentDirectory + 'openra/data/maps/' + str(item.id) + '/'
             filename = ""
@@ -535,7 +521,7 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
 
         os.chmod(fullpath, 0o444)
 
-        command = 'mono --debug OpenRA.Utility.exe ' + item.game_mod.lower() + ' --check-yaml ' + fullpath
+        command = 'mono --debug ' + parser + os.sep + 'OpenRA.Utility.exe ' + item.game_mod.lower() + ' --check-yaml ' + fullpath
         print(command)
         print('Started Lint check for parser: %s' % current_parser_to_db)
         proc = Popen(command.split(), stdout=PIPE).communicate()
@@ -589,88 +575,4 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
             else:
                 print('Lint check failed for parser: %s' % current_parser_to_db)
 
-        os.chdir(currentDirectory)
     return response
-
-
-def GenerateSHPpreview(item, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
-    # generates gif preview of shp files for every mapObject in list of objects
-    currentDirectory = os.getcwd()
-
-    path = os.getcwd() + os.sep + 'openra/data/maps/' + str(item.id) + os.sep
-    Dir = os.listdir(path + 'content/')
-    if os.path.isdir(path+'content/png/'):
-        shutil.rmtree(path+'content/png/')
-    for fn in Dir:
-        if fn.endswith('.shp'):
-            os.mkdir(path + 'content/png/')
-            os.chdir(path + 'content/png/')
-            command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", item.game_mod, path+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
-            print(command)
-
-            class TimedOut(Exception):  # Raised if timed out.
-                pass
-
-            def signal_handler(signum, frame):
-                raise TimedOut("Timed out!")
-
-            signal.signal(signal.SIGALRM, signal_handler)
-
-            signal.alarm(settings.UTILITY_TIME_LIMIT)    # Limit command execution time
-
-            try:
-                proc = Popen(command.split(), stdout=PIPE).communicate()
-                signal.alarm(0)
-            except:
-                err = 'Error: failed to generate SHP preview for %s (map: %s)' % (fn, item.id)
-                print(err)
-                misc.send_email_to_admin('ORC: Failed to generate SHP preview', '%s \n\n %s' % (err, command))
-
-                os.chdir(currentDirectory)
-                shutil.rmtree(path+'content/png/')
-
-                continue
-
-            convert_command = 'convert -delay 50 -loop 1 '+path+'content/png/*.png %s' % (path+'content/'+fn+'.gif')
-            convert_proc = Popen(convert_command.split(), stdout=PIPE).communicate()
-
-            os.chdir(currentDirectory)
-            shutil.rmtree(path+'content/png/')
-    return True
-
-
-def GenerateMinimap(item, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
-
-    if int(item.mapformat) >= 10:
-        print('MapFormat 10 and newer does not support generating minimap. Using included map.png instead.')
-        return False
-
-    currentDirectory = os.getcwd() + os.sep
-
-    os.chdir(parser + "/")
-
-    path = currentDirectory + 'openra/data/maps/' + str(item.id) + os.sep
-    filename = ""
-    Dir = os.listdir(path)
-    for fn in Dir:
-        if fn.endswith('.oramap'):
-            filename = fn
-            break
-    if filename == "":
-        os.chdir(currentDirectory)
-        return False
-
-    os.chmod(path + filename, 0o444)
-    command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (item.game_mod, path + filename)
-    print(command)
-    proc = Popen(command.split(), stdout=PIPE).communicate()
-    os.chmod(path + filename, 0o644)
-    try:
-        shutil.move(parser + "/" + os.path.splitext(filename)[0] + ".png", path + os.path.splitext(filename)[0] + "-mini.png")
-        os.chdir(currentDirectory)
-        print('Minimap generated: %s' % item.id)
-        return True
-    except:
-        os.chdir(currentDirectory)
-        print('Failed to generate minimap: %s' % item.id)
-        return False

@@ -291,7 +291,7 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
             raise Http404
         if mapObject.amount_reports >= settings.REPORTS_PENALTY_AMOUNT:
             raise Http404
-        path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id)
+        path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapObject.id)
         try:
             mapDir = os.listdir(path)
         except:
@@ -509,7 +509,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
 
 def get_minimap(mapid, soft=False):
     minimap = ""
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapid)
+    path = settings.BASE_DIR + os.sep + __name__.split('.')[0] + '/data/maps/' + str(mapid)
 
     try:
         contentDir = os.listdir(path + '/content/')
