@@ -20,8 +20,6 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
     parser_to_db = parser
     parser = os.path.join(settings.OPENRA_ROOT_PATH, parser)
 
-    currentDirectory = settings.BASE_DIR
-
     upgraded_maps = []
 
     for item in mapObject:
@@ -31,7 +29,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
             print("Interrupted map upgrade: %s" % (item.id))
             continue
 
-        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
+        path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
         filename = ""
         Dir = os.listdir(path)
         for fn in Dir:
@@ -239,7 +237,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
                         new_info = item.info
                     Maps.objects.filter(id=transac.id).update(info=new_info)
 
-                new_path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(transac.id))
+                new_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(transac.id))
                 if not os.path.exists(new_path):
                     os.makedirs(os.path.join(new_path, 'content'))
 
@@ -262,11 +260,9 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
 
 def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
 
-    currentDirectory = settings.BASE_DIR
-
     if fullpath == "":
 
-        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
+        path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
         filename = ""
         Dir = os.listdir(path)
         for fn in Dir:
@@ -295,8 +291,7 @@ def ReadYaml(item=False, fullpath=""):
     if fullpath == "":
         if item is False:
             return {'response': 'wrong method call', 'error': True}
-        currentDirectory = settings.BASE_DIR
-        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
+        path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
         Dir = os.listdir(path)
         for fn in Dir:
             if fn.endswith('.oramap'):
@@ -421,12 +416,10 @@ def ReadYaml(item=False, fullpath=""):
 
 def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], game_mod="ra"):
 
-    currentDirectory = settings.BASE_DIR
-
     if fullpath == "":
         if item is False:
             return {'data': '', 'error': True, 'response': 'wrong method call'}
-        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
+        path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
         Dir = os.listdir(path)
         for fn in Dir:
             if fn.endswith('.oramap'):
@@ -450,8 +443,7 @@ def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(r
 
 def UnzipMap(item, fullpath=""):
     if fullpath == "":
-        currentDirectory = settings.BASE_DIR
-        path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
+        path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
         filename = ""
         Dir = os.listdir(path)
         for fn in Dir:
@@ -478,8 +470,6 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
     # this function performs a Lint Check for map
     response = {'error': True, 'response': ''}
 
-    currentDirectory = settings.BASE_DIR
-
     available_parsers = list(reversed(list(settings.OPENRA_VERSIONS.values())))
 
     for current_parser in available_parsers:
@@ -505,7 +495,7 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
             continue
 
         if fullpath == "":
-            path = os.path.join(currentDirectory, 'openra', 'data', 'maps', str(item.id))
+            path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
             filename = ""
             Dir = os.listdir(path)
             for fn in Dir:
