@@ -26,7 +26,7 @@ class MapHandlers():
         self.map_full_path_directory = map_full_path_directory
         self.map_full_path_filename = map_full_path_filename
         self.preview_filename = preview_filename
-        self.currentDirectory = os.getcwd() + os.sep    # web root
+        self.currentDirectory = settings.BASE_DIR    # web root
         self.UID = False
         self.legacy_name = ""
         self.legacy_map = False
@@ -34,11 +34,11 @@ class MapHandlers():
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
 
         parser_to_db = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]  # default parser = the latest
-        parser = settings.OPENRA_ROOT_PATH + parser_to_db
+        parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
 
         if post.get("parser", None) is not None:
             parser_to_db = post['parser']
-            parser = settings.OPENRA_ROOT_PATH + parser_to_db
+            parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
             if 'git' in parser:
                 parser = settings.OPENRA_BLEED_PARSER
 
@@ -78,7 +78,7 @@ class MapHandlers():
             if not self.LegacyImport(tempname, parser):
                 misc.send_email_to_admin_OnMapFail(tempname)
                 return 'Failed to import legacy map.'
-            shutil.move(parser + "/" + self.legacy_name, tempname)
+            shutil.move(self.legacy_name, tempname)
             name = os.path.splitext(name)[0] + '.oramap'
             self.legacy_map = True
 
@@ -174,11 +174,11 @@ class MapHandlers():
         transac.save()
         self.UID = str(transac.id)
 
-        self.map_full_path_directory = self.currentDirectory + __name__.split('.')[0] + '/data/maps/' + self.UID + '/'
+        self.map_full_path_directory = os.path.join(self.currentDirectory, __name__.split('.')[0], 'data', 'maps', self.UID)
 
         try:
             if not os.path.exists(self.map_full_path_directory):
-                os.makedirs(self.map_full_path_directory + 'content')
+                os.makedirs(os.path.join(self.map_full_path_directory, 'content'))
         except Exception as e:
             print("Failed to create directory for new map", self.map_full_path_directory)
             transac.delete() # Remove failed map from DB before raise
@@ -187,7 +187,7 @@ class MapHandlers():
         if pre_r != 0:
             Maps.objects.filter(id=pre_r).update(next_rev=transac.id)
 
-        self.map_full_path_filename = self.map_full_path_directory + name
+        self.map_full_path_filename = os.path.join(self.map_full_path_directory, name)
         self.preview_filename = os.path.splitext(name)[0] + ".png"
 
         shutil.move(tempname, self.map_full_path_filename)
@@ -206,15 +206,13 @@ class MapHandlers():
         if int(resp_map_data['mapformat']) < 10:
             self.GenerateMinimap(resp_map_data['game_mod'], parser)
 
-        #shp = multiprocessing.Process(target=self.GenerateSHPpreview, args=(resp_map_data['game_mod'], parser,), name='shppreview')
-        #shp.start()
         print("--- New map: %s" % self.UID)
         return False  # no errors
 
     def UnzipMap(self):
         z = zipfile.ZipFile(self.map_full_path_filename, mode='a')
         try:
-            z.extractall(self.map_full_path_directory + 'content/')
+            z.extractall(os.path.join(self.map_full_path_directory, 'content'))
         except:
             pass
         z.close()
@@ -223,89 +221,43 @@ class MapHandlers():
         if filepath == "":
             filepath = self.map_full_path_filename
 
-        os.chdir(parser + "/")
-
         os.chmod(filepath, 0o444)
 
-        command = 'mono --debug OpenRA.Utility.exe ra --map-hash ' + filepath
+        command = 'mono --debug %s ra --map-hash %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), filepath)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         os.chmod(filepath, 0o644)
 
         self.maphash = proc[0].decode().strip()
 
-        os.chdir(self.currentDirectory)
-
     def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
-        os.chdir(parser + "/")
 
         os.chmod(self.map_full_path_filename, 0o444)
-        command = 'mono --debug OpenRA.Utility.exe %s --map-preview %s' % (game_mod, self.map_full_path_filename)
+        command = 'mono --debug %s %s --map-preview %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), game_mod, self.map_full_path_filename)
         proc = Popen(command.split(), stdout=PIPE).communicate()
         os.chmod(self.map_full_path_filename, 0o644)
 
         try:
             shutil.move(
-                misc.addSlash(parser + "/") + self.preview_filename,
-                self.map_full_path_directory + os.path.splitext(self.preview_filename)[0] + "-mini.png")
+                os.path.join(parser, self.preview_filename),
+                os.path.join(self.map_full_path_directory, os.path.splitext(self.preview_filename)[0] + "-mini.png"))
             self.minimap_generated = True
         except:
             pass  # failed to generate minimap
 
-        os.chdir(self.currentDirectory)
-
-    def GenerateSHPpreview(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
-        Dir = os.listdir(self.map_full_path_directory+'content/')
-        for fn in Dir:
-            if fn.endswith('.shp'):
-                os.mkdir(self.map_full_path_directory+'content/png/')
-                os.chdir(self.map_full_path_directory+'content/png/')
-                command = 'mono --debug %sOpenRA.Utility.exe %s --png %s %s' % (parser + "/", game_mod, self.map_full_path_directory+'content/'+fn, '../../../../palettes/0/RA1/temperat.pal')
-
-                class TimedOut(Exception):  # Raised if timed out.
-                    pass
-
-                def signal_handler(signum, frame):
-                    raise TimedOut("Timed out!")
-
-                signal.signal(signal.SIGALRM, signal_handler)
-
-                signal.alarm(settings.UTILITY_TIME_LIMIT)  # Limit command execution time
-
-                try:
-                    proc = Popen(command.split(), stdout=PIPE).communicate()
-                    signal.alarm(0)
-                except:
-                    err = 'Error: failed to generate SHP preview for %s (map: %s)' % (fn, self.UID)
-                    print(err)
-                    misc.send_email_to_admin('ORC: Failed to generate SHP preview', '%s \n\n %s' % (err, command))
-
-                    os.chdir(self.currentDirectory)
-                    shutil.rmtree(self.map_full_path_directory+'content/png/')
-
-                    continue
-
-                convert_command = 'convert -delay 50 -loop 1 '+self.map_full_path_directory+'content/png/*.png %s' % (self.map_full_path_directory+'content/'+fn+'.gif')
-                convert_proc = Popen(convert_command.split(), stdout=PIPE).communicate()
-
-                os.chdir(self.currentDirectory)
-                shutil.rmtree(self.map_full_path_directory+'content/png/')
-        exit()
-
     def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
-        os.chdir(parser + "/")
         for mod in ['ra', 'cnc']:
 
             assign_mod = mod
             if mod == 'cnc':
                 assign_mod = 'td'
 
-            pre_command = 'mono --debug OpenRA.Utility.exe ra'
+            pre_command = 'mono --debug %s ra' % (os.path.join(parser, 'OpenRA.Utility.exe'))
             pre_proc = Popen(pre_command.split(), stdout=PIPE).communicate()
             if '--import-' in pre_proc[0].decode():
-                command = 'mono --debug OpenRA.Utility.exe %s --import-%s-map %s' % (mod, assign_mod, mapPath)
+                command = 'mono --debug %s %s --import-%s-map %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), mod, assign_mod, mapPath)
             else:
-                command = 'mono --debug OpenRA.Utility.exe %s --map-import %s' % (mod, mapPath)
+                command = 'mono --debug %s %s --map-import %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), mod, mapPath)
 
             proc = Popen(command.split(), stdout=PIPE).communicate()
 
@@ -314,11 +266,9 @@ class MapHandlers():
             else:
                 if "saved" in proc[0].decode():
                     self.legacy_name = proc[0].decode().split("\n")[-2].split(' saved')[0]
-                    os.chdir(self.currentDirectory)
                     return True
                 else:
                     continue
-        os.chdir(self.currentDirectory)
         return False
 
 
@@ -356,12 +306,12 @@ def addScreenshot(request, arg, item):
         )
     transac.save()
 
-    path = os.getcwd() + os.sep + __name__.split('.')[0] + '/data/screenshots/' + str(transac.id) + '/'
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'screenshots', str(transac.id))
     if not os.path.exists(path):
         os.makedirs(path)
 
-    sc_full_name = path + arg + "." + mimetype.split('/')[1]
-    sc_mini_name = path + arg + "-mini." + mimetype.split('/')[1]
+    sc_full_name = os.path.join(path, arg + "." + mimetype.split('/')[1])
+    sc_mini_name = os.path.join(path, arg + "-mini." + mimetype.split('/')[1])
 
     shutil.move(tempname, sc_full_name)
 
