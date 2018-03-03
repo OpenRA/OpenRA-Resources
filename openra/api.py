@@ -14,7 +14,7 @@ from openra import misc
 
 
 # Map API
-def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
+def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4="", arg5=""):
     # get detailed map info by title
     if arg == "title":
         title = arg1.lower()
@@ -206,6 +206,58 @@ def mapAPI(request, arg, arg1="", arg2="", arg3="", arg4=""):
         slice_end = perPage*int(page)
         mapObject = mapObject[slice_start:slice_end]
         if "yaml" in [arg3, arg4]:
+            yaml_response = ""
+            for item in mapObject:
+                yaml_response += serialize_basic_map_info(request, item, "yaml")
+            response = StreamingHttpResponse(yaml_response, content_type="text/plain")
+            response['Access-Control-Allow-Origin'] = '*'
+            return response
+        else:
+            json_response = []
+            for item in mapObject:
+                response_data = serialize_basic_map_info(request, item)
+                json_response.append(response_data)
+            response = StreamingHttpResponse(json.dumps(json_response, indent=4), content_type="application/javascript")
+            response['Access-Control-Allow-Origin'] = '*'
+            return response
+
+    # search for a map
+    elif arg == "search":
+        mod = arg1
+        if mod == "":
+            raise Http404
+        if arg2 not in ["title", "description", "author"]:
+            raise Http404
+        if arg4 not in ["json", "yaml"]:
+            raise Http404
+        try:
+            mapObject = Maps.objects.filter(
+                game_mod=mod.lower(),
+                downloading=True,
+                amount_reports__lt=settings.REPORTS_PENALTY_AMOUNT
+            ).distinct('map_hash')
+            if arg2 == "title":
+                mapObject = mapObject.filter(title__icontains=arg5.lower())
+            if arg2 == "description":
+                mapObject = mapObject.filter(info__icontains=arg5.lower()) | mapObject.filter(description__icontains=arg5.lower())
+            if arg2 == "author":
+                mapObject = mapObject.filter(author__icontains=arg5.lower())
+            if not mapObject:
+                mapObject = []
+            else:
+                mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
+        except:
+            raise Http404
+        page = 1
+        try:
+            page = int(arg3)
+        except:
+            pass
+        perPage = 24
+        slice_start = perPage*int(page)-perPage
+        slice_end = perPage*int(page)
+        mapObject = mapObject[slice_start:slice_end]
+        if arg4 == "yaml":
             yaml_response = ""
             for item in mapObject:
                 yaml_response += serialize_basic_map_info(request, item, "yaml")
