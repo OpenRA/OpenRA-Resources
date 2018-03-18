@@ -40,8 +40,8 @@ urlpatterns = [
     url(r'^maps/(?P<arg>\d+)/revisions/page/(?P<page>\d+)/?$', views.maps_revisions, name='maps_revisions'),
     url(r'^maps/(?P<arg>\d+)/upgrade/?$', views.upgradeMap, name='upgradeMap'),
     url(r'^(?P<item_type>\w+)/(?P<arg>\d+)/unsubscribe/?$', views.unsubscribe_from_comments, name='Unsubscribe from comments to item'),
-    url(r'^maps/author/(?P<author>[^/]+)/?$', views.maps_author, name='maps_author'),
-    url(r'^maps/author/(?P<author>[^/]+)/page/(?P<page>\d+)/?$', views.maps_author, name='maps_author'),
+    url(r'^maps/author/(?P<author>.+?)/page/(?P<page>\d+)/?$', views.maps_author, name='maps_author'),
+    url(r'^maps/author/(?P<author>.+?)/?$', views.maps_author, name='maps_author'),
     url(r'^maps/uploader/(?P<arg>\d+)/?$', views.maps_uploader, name='maps_uploader'),
     url(r'^maps/uploader/(?P<arg>\d+)/page/(?P<page>\d+)/?$', views.maps_uploader, name='maps_uploader'),
     url(r'^maps/duplicates/(?P<maphash>[^/]+)/?$', views.maps_duplicates, name='maps_duplicates'),
@@ -87,7 +87,7 @@ urlpatterns = [
 
     url(r'^news/feed.rss?$', views.feed, name='feed'),
     url(r'^search/?$', views.search, name='search'),
-    url(r'^search/(?P<arg>[^/]+)/?$', views.search, name='search'),
+    url(r'^search/(?P<arg>.+?)/?$', views.search, name='search'),
 
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
     url(r'^panel/mymaps/?$', views.ControlPanel, name='ControlPanel'),
