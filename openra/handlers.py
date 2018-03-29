@@ -103,14 +103,15 @@ class MapHandlers():
             misc.send_email_to_admin_OnMapFail(tempname)
             return resp_map_data
 
+        if int(resp_map_data['mapformat']) < 10:
+            misc.send_email_to_admin_OnMapFail(tempname)
+            return "Unable to import maps older than map format 10."
+
         # Read Rules
-        base64_rules = {}
-        base64_rules['data'] = ''
-        base64_rules['advanced'] = resp_map_data['advanced']
-        if int(resp_map_data['mapformat']) >= 10:
-            base64_rules = utility.ReadRules(False, tempname, parser, resp_map_data['game_mod'])
-            if (base64_rules['error']):
-                print(base64_rules['response'])
+        base64_rules = utility.ReadRules(False, tempname, parser, resp_map_data['game_mod'])
+        if (base64_rules['error']):
+            print(base64_rules['response'])
+
         if base64_rules['advanced']:
             resp_map_data['advanced'] = True
 
@@ -203,8 +204,6 @@ class MapHandlers():
         else:
             Maps.objects.filter(id=transac.id).update(requires_upgrade=True)
 
-        if int(resp_map_data['mapformat']) < 10:
-            self.GenerateMinimap(resp_map_data['game_mod'], parser)
 
         print("--- New map: %s" % self.UID)
         return False  # no errors
