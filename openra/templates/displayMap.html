@@ -105,7 +105,7 @@
 			</div>
 			{% endif %}
 		{% endif %}
-		
+
 		<div>
 			<div class="editMapInfo popup">
 			<div class="popup-content-wrapper">
@@ -117,7 +117,7 @@
 				</form>
 			</div>
 			</div>
-		
+
 			<div class="allReports popup">
 			<div class="popup-content-wrapper">
 				<div class="closePopup"><label class="x"></label></div>
@@ -150,7 +150,7 @@
 			{% if request.user.is_authenticated %}
 				<div class="reportMap popup">
 				<div class="popup-content-wrapper">
-					<div class="closePopup"><label class="x"></label></div>                                                      
+					<div class="closePopup"><label class="x"></label></div>
 					<h3>Report this map</h3>
 					<form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
 						<div><textarea name="reportReason" placeholder="Reason"></textarea></div>
@@ -196,7 +196,7 @@
 				</tr>
 			</table>
 		</div>
-		
+
 		{% if screenshots %}
 		<div class="map_screenshots cBlock highslide-gallery">
 			<h5>Screenshots:</h5>
@@ -212,7 +212,7 @@
 
 		{% if comments %}
 			<a name="comments"></a>
-			
+
 			{% for revision_comments in comments %}
 				{% if revision_comments.1 %}
 					<div class="cBlock">
@@ -352,6 +352,11 @@
 		<div class="map_data_link">
 			<a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete("map")'>delete {%if map.user_id == request.user.id %}my {% endif %}map revision</a>
 		</div>
+		{% endif %}
+		{% if has_upgrade_logs %}
+			<div class="map_data_link">
+				<a href="/maps/{{map.id}}/upgrade_logs/">map upgrade logs</a>
+			</div>
 		{% endif %}
 
 		{% if map.author %}

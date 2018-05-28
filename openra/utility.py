@@ -11,19 +11,16 @@ import multiprocessing
 from subprocess import Popen, PIPE
 from django.conf import settings
 from django.utils import timezone
-from openra.models import Maps, Lints, MapCategories
+from openra.models import Maps, Lints, MapCategories, MapUpgradeLogs
 from openra import misc
 
 
 def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False):
-
     parser_to_db = parser
     parser = os.path.join(settings.OPENRA_ROOT_PATH, parser)
-
     upgraded_maps = []
 
     for item in mapObject:
-
         if item.next_rev != 0:
             print('Aborting upgrade of map: %s, as it is not the latest revision' % (item.id))
             print("Interrupted map upgrade: %s" % (item.id))
@@ -36,6 +33,7 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
             if fn.endswith('.oramap'):
                 filename = fn
                 break
+
         if filename == "":
             print("error, can not find .oramap")
             print("Interrupted map upgrade: %s" % (item.id))
@@ -55,23 +53,17 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
         print('All operations are performed in temporarily location until success: %s' % ora_temp_dir_name)
         ###
 
-        if item.parser != "":
-            parser_eng = item.parser.split('-')[1]
-            if int(engine) > int(parser_eng):
-                engine = parser_eng
-
-        command = 'mono --debug %s %s --upgrade-map %s %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), item.game_mod, os.path.join(ora_temp_dir_name, filename), engine)
+        command = 'mono --debug %s %s --update-map %s %s --apply' % (os.path.join(parser, 'OpenRA.Utility.exe'), item.game_mod, os.path.join(ora_temp_dir_name, filename), item.parser)
         print(command)
-        proc = Popen(command.split(), stdout=PIPE).communicate()
+        popen = Popen(command.split(), stdout=PIPE)
 
-        upgraded = True
-        for line in proc:
-            if line is None:
-                continue
-            if 'Converted' in line.decode() and 'MapFormat' in line.decode():
-                continue
-            if line.decode().strip() != "":
-                upgraded = False
+        upgrade_output = b""
+        for chunk in popen.stdout:
+            upgrade_output += chunk
+
+        upgrade_output = upgrade_output.decode()
+        popen.wait()
+        upgraded = popen.returncode == 0
 
         if not upgraded:
             print("Problems upgrading map: %s" % (item.id))
@@ -85,15 +77,14 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
         recalculate_hash_response = recalculate_hash(item, os.path.join(ora_temp_dir_name, filename), parser)
         if recalculate_hash_response['error']:
             print("Interrupted map upgrade: %s" % (item.id))
-
             if os.path.isdir(ora_temp_dir_name):
                 shutil.rmtree(ora_temp_dir_name)
 
             continue
-        if recalculate_hash_response['maphash'] == item.map_hash and upgrade_if_hash_matches is False:
-            print("Upgrade is not required, map hash after running `--upgrade-map` is idetical to original: %s" % (item.id))
-            print("Interrupted map upgrade: %s" % (item.id))
 
+        if recalculate_hash_response['maphash'] == item.map_hash and upgrade_if_hash_matches is False:
+            print("Upgrade is not required, map hash after running `--upgrade-map` is identical to original: %s" % (item.id))
+            print("Interrupted map upgrade: %s" % (item.id))
             if os.path.isdir(ora_temp_dir_name):
                 shutil.rmtree(ora_temp_dir_name)
 
@@ -104,11 +95,11 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
             if upgrade_if_lint_fails is False:
                 print("Lint check failed for requested parser: %s" % parser_to_db)
                 print("Interrupted map upgrade: %s" % (item.id))
-
                 if os.path.isdir(ora_temp_dir_name):
                     shutil.rmtree(ora_temp_dir_name)
 
                 continue
+
         if_map_requires_upgrade = True
         if lint_check_response['error'] is False and lint_check_response['response'] == 'pass_for_requested_parser':
             if_map_requires_upgrade = False
@@ -116,7 +107,6 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
         unzipped_map = UnzipMap(item, os.path.join(ora_temp_dir_name, filename))
         if not unzipped_map:
             print("Interrupted map upgrade: %s" % (item.id))
-
             if os.path.isdir(ora_temp_dir_name):
                 shutil.rmtree(ora_temp_dir_name)
 
@@ -146,7 +136,6 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
             resp_map_data['advanced'] = True
 
         if upgraded and recalculate_hash_response['error'] is False and unzipped_map and read_yaml_response['error'] is False:
-
             if not new_rev_on_upgrade:
                 # copy directory tree from temporarily location to old location
                 misc.copytree(ora_temp_dir_name, path)
@@ -185,6 +174,15 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
 
                 print('Finished upgrading map %s: %s \n' % (if_new_rev, item.id))
                 upgraded_maps.append(item.id)
+
+                if item.advanced_map:
+                    log_transac = MapUpgradeLogs(
+                        map_id          = item,
+                        from_version    = engine,
+                        to_version      = parser_to_db,
+                        upgrade_output  = upgrade_output
+                    )
+                    log_transac.save()
             else:
                 time.sleep(1)
                 # create new revision after successfully upgrading map in temporarily location
@@ -227,6 +225,16 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
                     parser=parser_to_db,
                 )
                 transac.save()
+
+                if item.advanced_map:
+                    log_transac = MapUpgradeLogs(
+                        map_id          = transac,
+                        from_version    = engine,
+                        to_version      = parser_to_db,
+                        upgrade_output  = upgrade_output
+                    )
+                    log_transac.save()
+
                 Maps.objects.filter(id=item.id).update(next_rev=transac.id)
 
                 if resp_map_data['mapformat'] >= 9:  # Description is gone in MapFormat 9
