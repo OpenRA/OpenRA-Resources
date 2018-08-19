@@ -9,6 +9,7 @@ from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
+from django.utils import timezone
 from allauth.socialaccount.models import SocialAccount
 from openra.models import Maps, MapCategories, Comments, UnsubscribeComments
 
@@ -481,3 +482,10 @@ def map_filter(request, mapObject):
     ####################
 
     return [mapObject, filter_prepare, selected_filter]
+
+def user_account_age(user):
+    """Returns the age of a user account in hours"""
+    if not user or not user.is_authenticated():
+        return 0
+
+    return (timezone.now() - user.date_joined).total_seconds() / 3600
