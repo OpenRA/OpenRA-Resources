@@ -440,7 +440,7 @@ def serialize_basic_map_info(request, mapObject, yaml=""):
         license = "null"
 
     map_grid_type = 'Rectangular'  # ra/cnc/d2k
-    if mapObject.game_mod in ['ts', 'ra2']:
+    if mapObject.game_mod in ['ts', 'ra2', 'sp']:
         map_grid_type = 'RectangularIsometric'
 
     category_lst = []
