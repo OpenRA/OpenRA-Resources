@@ -429,6 +429,17 @@ def displayMap(request, arg):
                 handlers.addScreenshot(request, arg, 'map')
 
         elif request.POST.get('comment', "") != "":
+            account_age = misc.user_account_age(request.user)
+            if account_age < 24:
+                template = loader.get_template('index.html')
+                template_args = {
+                    'content': 'new_user_action_blocked.html',
+                    'hours_remaining': 24 - int(account_age),
+                    'title': ' - Action Blocked',
+                }
+
+                return StreamingHttpResponse(template.render(template_args, request))
+
             transac = Comments(
                 item_type='maps',
                 item_id=int(arg),
@@ -855,6 +866,18 @@ def serveMapSHP(request, arg, name, request_type='preview'):
 def uploadMap(request, previous_rev=0):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
+
+    account_age = misc.user_account_age(request.user)
+    if account_age < 24:
+        template = loader.get_template('index.html')
+        template_args = {
+            'content': 'new_user_action_blocked.html',
+            'hours_remaining': 24 - int(account_age),
+            'title': ' - Action Blocked',
+        }
+
+        return StreamingHttpResponse(template.render(template_args, request))
+
     error_response = False
     uid = False
     rev = 1
