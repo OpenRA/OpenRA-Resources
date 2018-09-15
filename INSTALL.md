@@ -46,8 +46,6 @@ $ pip install -r requirements.txt
 		/home/openra/engines/release-20151224/
 		/home/openra/engines/release-20150919/
 ```
- * Compile OpenRA bleed version (directory name is any)
- * Create text file and put git hash of compiled bleed to it (Compiling bleed should be automated, like in production)
  * Directories with compiled OpenRA versions must have write permissions for web site user
  * Make sure web site user can write into '/tmp/'
  * Copy installed OpenRA Content from your local /home/user/.openra/Content/ to the same directory for web site user
