@@ -227,21 +227,6 @@ class MapHandlers():
 
         self.maphash = proc[0].decode().strip()
 
-    def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
-
-        os.chmod(self.map_full_path_filename, 0o444)
-        command = 'mono --debug %s %s --map-preview %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), game_mod, self.map_full_path_filename)
-        proc = Popen(command.split(), stdout=PIPE).communicate()
-        os.chmod(self.map_full_path_filename, 0o644)
-
-        try:
-            shutil.move(
-                os.path.join(parser, self.preview_filename),
-                os.path.join(self.map_full_path_directory, os.path.splitext(self.preview_filename)[0] + "-mini.png"))
-            self.minimap_generated = True
-        except:
-            pass  # failed to generate minimap
-
     def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
         for mod in ['ra', 'cnc']:
 
