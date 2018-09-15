@@ -46,7 +46,7 @@ class MapsAdmin(admin.ModelAdmin):
     is_latest_revision.boolean = True
 
     list_display = ('map_hash', 'title', 'user', 'posted', 'game_mod', 'amount_reports', 'mapformat', 'parser', 'advanced_map', 'lua', 'downloading', is_latest_revision)
-    list_filter = ('game_mod', 'mapformat', 'advanced_map', 'lua', LatestRevisionListFilter)
+    list_filter = ('game_mod', 'mapformat', 'advanced_map', 'lua', 'parser', LatestRevisionListFilter)
 admin.site.register(Maps, MapsAdmin)
 
 class UnsubscribeCommentsAdmin(admin.ModelAdmin):
