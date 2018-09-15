@@ -83,5 +83,6 @@ admin.site.register(Screenshots, ScreenshotsAdmin)
 
 # Add the registration date to the user list
 UserAdmin.list_display = list(UserAdmin.list_display) + ['date_joined']
+UserAdmin.ordering = ('-date_joined',)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
