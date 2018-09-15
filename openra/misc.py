@@ -306,8 +306,7 @@ def map_filter(request, mapObject):
     filter_prepare['categories'] = sorted(MapCategories.objects.values_list('category_name', flat=True))
     filter_prepare['formats'] = sorted(Maps.objects.values_list('mapformat', flat=True).distinct())
     filter_prepare['formats'] = [str(val) for val in filter_prepare['formats']]
-    filter_prepare['parsers'] = Maps.objects.values_list('parser', flat=True).distinct()
-    filter_prepare['parsers'] = sorted([val for val in filter_prepare['parsers'] if 'git' not in val])
+    filter_prepare['parsers'] = sorted(Maps.objects.values_list('parser', flat=True).distinct())
     filter_prepare['tilesets'] = sorted(Maps.objects.values_list('tileset', flat=True).distinct())
 
     filter_prepare['sort_by'] = [
@@ -381,17 +380,7 @@ def map_filter(request, mapObject):
 
     # filter by engine parser
     if selected_filter['parser'] and 'any' not in selected_filter['parser']:
-        mapObject_copy0 = copy.copy(mapObject)
-        mapObject_copy1 = copy.copy(mapObject)
-
-        mapObject_copy0 = mapObject_copy0.filter(parser__in=selected_filter['parser'])
-
-        if 'bleed' in selected_filter['parser']:
-            mapObject_copy1 = mapObject_copy1.filter(parser__contains='git')
-
-            mapObject = mapObject_copy0 | mapObject_copy1
-        else:
-            mapObject = mapObject_copy0
+        mapObject = mapObject.filter(parser__in=selected_filter['parser'])
 
     # filter by tileset
     if selected_filter['tileset'] and 'any' not in selected_filter['tileset']:

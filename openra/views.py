@@ -555,8 +555,6 @@ def displayMap(request, arg):
     if not (request.user == mapObject.user or request.user.is_superuser):
         show_upgrade_map_button = False
 
-    if 'git' in mapObject.parser:
-        show_upgrade_map_button = False  # can't upgrade maps uploaded with bleed parser
     if mapObject.next_rev != 0:
         show_upgrade_map_button = False  # upgrade only the latest revision
 
@@ -617,17 +615,10 @@ def upgradeMap(request, arg):
     if mapObject[0].user != request.user:
         if not request.user.is_superuser:
             return HttpResponseRedirect('/maps/' + arg + '/')
-
-    if 'git' in mapObject[0].parser:
-        return HttpResponseRedirect('/maps/' + arg + '/')  # can't upgrade maps uploaded with bleed parser
-
     if mapObject[0].next_rev != 0:
         return HttpResponseRedirect('/maps/' + arg + '/')  # upgrade only the latest revision
 
     parsers = list(reversed(list(settings.OPENRA_VERSIONS.values())))
-    if 'bleed' in parsers:
-        parsers.remove('bleed')
-
     if mapObject[0].parser == parsers[0]:
         return HttpResponseRedirect('/maps/' + arg + '/')  # map is up-to-date
 
@@ -901,14 +892,6 @@ def uploadMap(request, previous_rev=0):
 
     parsers = list(reversed(list(settings.OPENRA_VERSIONS.values())))
 
-    bleed_tag = None
-    if (settings.OPENRA_BLEED_HASH_FILE_PATH != '' and os.path.isfile(settings.OPENRA_BLEED_HASH_FILE_PATH)):
-        bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
-        bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
-    if 'bleed' in parsers:
-        if not os.path.isfile(os.path.join(settings.OPENRA_BLEED_PARSER, 'OpenRA.Utility.exe')):
-            parsers.remove('bleed')
-
     template = loader.get_template('index.html')
     template_args = {
         'content': 'uploadMap.html',
@@ -919,7 +902,6 @@ def uploadMap(request, previous_rev=0):
         'previous_rev_title': previous_rev_title,
         'rev': rev,
         'parsers': parsers,
-        'bleed_tag': bleed_tag,
         'error_response': error_response,
     }
 

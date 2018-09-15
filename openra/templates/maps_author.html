@@ -39,7 +39,6 @@
 				<span class="">Parsed by:</span>
 				<select name="parser" multiple class="noscroll">
 					<option value="any" {% if 'any' in selected_filter.parser %}selected{% endif %}>any</option>
-					<option value="bleed" {% if 'bleed' in selected_filter.parser %}selected{% endif %}>bleed (any)</option>
 					{% for parser in filter_prepare.parsers %}
 						<option value="{{parser}}" {% if parser in selected_filter.parser %}selected{% endif %}>{{parser}}</option>
 					{% endfor %}

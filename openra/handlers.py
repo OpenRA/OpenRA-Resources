@@ -34,13 +34,12 @@ class MapHandlers():
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
 
         parser_to_db = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]  # default parser = the latest
-        parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
-
         if post.get("parser", None) is not None:
+            if post['parser'] not in settings.OPENRA_VERSIONS.values():
+                return 'Failed. Invalid parser'
             parser_to_db = post['parser']
-            parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
-            if 'git' in parser:
-                parser = settings.OPENRA_BLEED_PARSER
+
+        parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
 
         if pre_r != 0:
             mapObject = Maps.objects.filter(id=pre_r, user_id=user_id)

@@ -56,10 +56,9 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
         ###
 
         if item.parser != "":
-            if 'git' not in item.parser:
-                parser_eng = item.parser.split('-')[1]
-                if int(engine) > int(parser_eng):
-                    engine = parser_eng
+            parser_eng = item.parser.split('-')[1]
+            if int(engine) > int(parser_eng):
+                engine = parser_eng
 
         command = 'mono --debug %s %s --upgrade-map %s %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), item.game_mod, os.path.join(ora_temp_dir_name, filename), engine)
         print(command)
@@ -473,23 +472,8 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
     available_parsers = list(reversed(list(settings.OPENRA_VERSIONS.values())))
 
     for current_parser in available_parsers:
-        if current_parser == "bleed":
-
-            bleed_tag = None
-            if (settings.OPENRA_BLEED_HASH_FILE_PATH != '' and os.path.isfile(settings.OPENRA_BLEED_HASH_FILE_PATH)):
-                bleed_tag = open(settings.OPENRA_BLEED_HASH_FILE_PATH, 'r')
-                bleed_tag = 'git-' + bleed_tag.readline().strip()[0:7]
-            if bleed_tag is None:
-                continue
-
-            if not os.path.isfile(os.path.join(settings.OPENRA_BLEED_PARSER, 'OpenRA.Utility.exe')):
-                continue
-
-            current_parser_to_db = bleed_tag
-            current_parser_path = settings.OPENRA_BLEED_PARSER
-        else:
-            current_parser_to_db = current_parser
-            current_parser_path = settings.OPENRA_ROOT_PATH + current_parser
+        current_parser_to_db = current_parser
+        current_parser_path = settings.OPENRA_ROOT_PATH + current_parser
 
         if upgrade_with_new_rev and current_parser_path != parser:
             continue
@@ -535,11 +519,8 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reverse
 
         if not upgrade_with_new_rev:
             lintObject = Lints.objects.filter(map_id=item.id, version_tag=current_parser_to_db)
-            lintObjectGit = Lints.objects.filter(map_id=item.id, version_tag__startswith='git')
             if lintObject:
                 Lints.objects.filter(map_id=item.id, version_tag=current_parser_to_db).update(pass_status=passing, lint_output=output_to_db, posted=timezone.now())
-            elif lintObjectGit and current_parser_to_db.startswith('git'):
-                Lints.objects.filter(map_id=item.id, version_tag__startswith='git').update(pass_status=passing, lint_output=output_to_db, posted=timezone.now())
             else:
                 lint_transac = Lints(
                     item_type="maps",

@@ -168,18 +168,10 @@ OPENRA_ROOT_PATH = ''
 
 # OpenRA Versions matching their directory names
 OPENRA_VERSIONS = {
-    3: 'release-20151224',
-    2: 'release-20150919',
-    1: 'release-20150614',
-    0: 'bleed',  # just a name, see OPENRA_BLEED_PARSER setting
+    2: 'release-20151224',
+    1: 'release-20150919',
+    0: 'release-20150614',
 }
-
-# Path to file which stores HASH of the latest `bleed` version
-OPENRA_BLEED_HASH_FILE_PATH = ''
-
-# `bleed` parser  directory is being updated by external script once new commit is pushed and has different structure (full path to directory)
-OPENRA_BLEED_PARSER = ''
-
 
 # Email address (FROM) in our custom mail methods
 ADMIN_EMAIL_FROM = ''
