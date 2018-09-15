@@ -13,10 +13,40 @@ from openra.models import UnsubscribeComments
 
 admin.site.register(MapCategories)
 
+class LatestRevisionListFilter(admin.SimpleListFilter):
+    title = 'Latest Revision'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'latest_revision'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Yes'),
+            ('no', 'No'),
+        )
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+        # Compare the requested value (either '80s' or '90s')
+        # to decide how to filter the queryset.
+        if self.value() == 'yes':
+            return queryset.filter(next_rev=0)
+        if self.value() == 'no':
+            return queryset.exclude(next_rev=0)
+
 class MapsAdmin(admin.ModelAdmin):
     date_hierarchy = 'posted'
-    list_display = ('map_hash', 'title', 'user', 'posted', 'game_mod', 'amount_reports', 'mapformat', 'parser', 'advanced_map', 'lua', 'downloading')
-    list_filter = ('game_mod', 'mapformat', 'advanced_map', 'lua')
+    def is_latest_revision(obj):
+        return obj.next_rev == 0
+    is_latest_revision.short_description = 'Latest Revision'
+    is_latest_revision.boolean = True
+
+    list_display = ('map_hash', 'title', 'user', 'posted', 'game_mod', 'amount_reports', 'mapformat', 'parser', 'advanced_map', 'lua', 'downloading', is_latest_revision)
+    list_filter = ('game_mod', 'mapformat', 'advanced_map', 'lua', LatestRevisionListFilter)
 admin.site.register(Maps, MapsAdmin)
 
 class UnsubscribeCommentsAdmin(admin.ModelAdmin):
