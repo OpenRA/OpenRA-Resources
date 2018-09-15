@@ -413,7 +413,7 @@ def map_filter(request, mapObject):
 
     # filter: show only last revisions of maps where parser is not equal to the latest official
     if selected_filter['outdated'] == 'on':
-        latest_official_parser = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]
+        latest_official_parser = settings.OPENRA_VERSIONS[0]
         mapObject = mapObject.filter(next_rev=0).exclude(parser=latest_official_parser)
 
     # filter options for maps with problems

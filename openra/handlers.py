@@ -32,10 +32,9 @@ class MapHandlers():
         self.legacy_map = False
 
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
-
-        parser_to_db = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]  # default parser = the latest
+        parser_to_db = settings.OPENRA_VERSIONS[0]
         if post.get("parser", None) is not None:
-            if post['parser'] not in settings.OPENRA_VERSIONS.values():
+            if post['parser'] not in settings.OPENRA_VERSIONS:
                 return 'Failed. Invalid parser'
             parser_to_db = post['parser']
 
@@ -215,7 +214,7 @@ class MapHandlers():
             pass
         z.close()
 
-    def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
+    def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
         if filepath == "":
             filepath = self.map_full_path_filename
 
@@ -228,7 +227,7 @@ class MapHandlers():
 
         self.maphash = proc[0].decode().strip()
 
-    def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
+    def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
 
         os.chmod(self.map_full_path_filename, 0o444)
         command = 'mono --debug %s %s --map-preview %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), game_mod, self.map_full_path_filename)
@@ -243,7 +242,7 @@ class MapHandlers():
         except:
             pass  # failed to generate minimap
 
-    def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
+    def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
         for mod in ['ra', 'cnc']:
 
             assign_mod = mod

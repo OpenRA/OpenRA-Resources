@@ -15,7 +15,7 @@ from openra.models import Maps, Lints, MapCategories
 from openra import misc
 
 
-def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False):
+def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False):
 
     parser_to_db = parser
     parser = os.path.join(settings.OPENRA_ROOT_PATH, parser)
@@ -257,7 +257,7 @@ def map_upgrade(mapObject, engine, parser=list(reversed(list(settings.OPENRA_VER
     return upgraded_maps
 
 
-def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
+def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
 
     if fullpath == "":
 
@@ -413,7 +413,7 @@ def ReadYaml(item=False, fullpath=""):
     return {'response': map_data_ordered, 'error': False}
 
 
-def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], game_mod="ra"):
+def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0], game_mod="ra"):
 
     if fullpath == "":
         if item is False:
@@ -465,13 +465,11 @@ def UnzipMap(item, fullpath=""):
     return True
 
 
-def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0], upgrade_with_new_rev=False):
+def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0], upgrade_with_new_rev=False):
     # this function performs a Lint Check for map
     response = {'error': True, 'response': ''}
 
-    available_parsers = list(reversed(list(settings.OPENRA_VERSIONS.values())))
-
-    for current_parser in available_parsers:
+    for current_parser in settings.OPENRA_VERSIONS:
         current_parser_to_db = current_parser
         current_parser_path = settings.OPENRA_ROOT_PATH + current_parser
 

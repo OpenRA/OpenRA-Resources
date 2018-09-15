@@ -558,7 +558,7 @@ def displayMap(request, arg):
     if mapObject.next_rev != 0:
         show_upgrade_map_button = False  # upgrade only the latest revision
 
-    if mapObject.parser == list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]:
+    if mapObject.parser == settings.OPENRA_VERSIONS[0]:
         show_upgrade_map_button = False  # map is up-to-date
     ###
 
@@ -566,8 +566,6 @@ def displayMap(request, arg):
     for sc_item in screenshots:
         if sc_item.map_preview:
             map_preview = sc_item
-
-    last_parser = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]
 
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
@@ -600,7 +598,7 @@ def displayMap(request, arg):
         'show_upgrade_map_button': show_upgrade_map_button,
         'map_preview': map_preview,
         'contains_shp': contains_shp,
-        'last_parser': last_parser,
+        'last_parser': settings.OPENRA_VERSIONS[0],
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
@@ -618,8 +616,7 @@ def upgradeMap(request, arg):
     if mapObject[0].next_rev != 0:
         return HttpResponseRedirect('/maps/' + arg + '/')  # upgrade only the latest revision
 
-    parsers = list(reversed(list(settings.OPENRA_VERSIONS.values())))
-    if mapObject[0].parser == parsers[0]:
+    if mapObject[0].parser == settings.OPENRA_VERSIONS[0]:
         return HttpResponseRedirect('/maps/' + arg + '/')  # map is up-to-date
 
     ##########
@@ -650,7 +647,7 @@ def upgradeMap(request, arg):
         'request': request,
         'title': ' - Upgrade Map - ' + mapObject[0].title,
         'map': mapObject[0],
-        'parsers': parsers,
+        'parsers': settings.OPENRA_VERSIONS,
         'no_effect': no_effect,
         'failed_to_upgrade': failed_to_upgrade,
     }
@@ -890,8 +887,6 @@ def uploadMap(request, previous_rev=0):
                 if error_response is False:
                     return HttpResponseRedirect('/maps/' + uid + "/")
 
-    parsers = list(reversed(list(settings.OPENRA_VERSIONS.values())))
-
     template = loader.get_template('index.html')
     template_args = {
         'content': 'uploadMap.html',
@@ -901,7 +896,7 @@ def uploadMap(request, previous_rev=0):
         'previous_rev': previous_rev,
         'previous_rev_title': previous_rev_title,
         'rev': rev,
-        'parsers': parsers,
+        'parsers': settings.OPENRA_VERSIONS,
         'error_response': error_response,
     }
 
