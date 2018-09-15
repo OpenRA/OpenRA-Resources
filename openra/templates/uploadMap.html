@@ -12,8 +12,6 @@
 			$('.upload-map-form-parser option:first-child').attr("selected", "selected");
 
 			$('.upload-map-form-parser option:first-child').append(' (the latest published)')
-
-			$('.upload-map-form-parser option:contains("bleed")').append( ' (development)')
 		});
 	</script>
 
@@ -50,11 +48,7 @@
 					Parse with OpenRA version<span class="red">**</span>:<br />
 					<select name="parser" size="4">
 						{% for parser in parsers %}
-							{% if parser == 'bleed' %}
-								<option value="{{ bleed_tag }}">bleed ({{ bleed_tag }})</option>
-							{% else %}
-								<option value="{{ parser }}">{{ parser }}</option>
-							{% endif %}
+							<option value="{{ parser }}">{{ parser }}</option>
 						{% endfor %}
 					</select>
 				</div>

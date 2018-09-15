@@ -62,9 +62,6 @@ $ pip install -r requirements.txt
  * Edit Database connection settings
  * Change ```OPENRA_ROOT_PATH```, using example above, it will be ```/home/openra/engines/```
  * Change ```OPENRA_VERSIONS```, it will be just version tag names
- * Change ```OPENRA_BLEED_HASH_FILE_PATH``` to specify path to text file where you store git hash of compiled bleed version
- * Change ```OPENRA_BLEED_PARSER``` to specify directory where bleed version is compiled
-
 
 
 ### Initialize django database (this will create all tables)

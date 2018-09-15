@@ -32,15 +32,13 @@ class MapHandlers():
         self.legacy_map = False
 
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
-
-        parser_to_db = list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]  # default parser = the latest
-        parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
-
+        parser_to_db = settings.OPENRA_VERSIONS[0]
         if post.get("parser", None) is not None:
+            if post['parser'] not in settings.OPENRA_VERSIONS:
+                return 'Failed. Invalid parser'
             parser_to_db = post['parser']
-            parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
-            if 'git' in parser:
-                parser = settings.OPENRA_BLEED_PARSER
+
+        parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
 
         if pre_r != 0:
             mapObject = Maps.objects.filter(id=pre_r, user_id=user_id)
@@ -216,7 +214,7 @@ class MapHandlers():
             pass
         z.close()
 
-    def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
+    def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
         if filepath == "":
             filepath = self.map_full_path_filename
 
@@ -229,22 +227,7 @@ class MapHandlers():
 
         self.maphash = proc[0].decode().strip()
 
-    def GenerateMinimap(self, game_mod, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
-
-        os.chmod(self.map_full_path_filename, 0o444)
-        command = 'mono --debug %s %s --map-preview %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), game_mod, self.map_full_path_filename)
-        proc = Popen(command.split(), stdout=PIPE).communicate()
-        os.chmod(self.map_full_path_filename, 0o644)
-
-        try:
-            shutil.move(
-                os.path.join(parser, self.preview_filename),
-                os.path.join(self.map_full_path_directory, os.path.splitext(self.preview_filename)[0] + "-mini.png"))
-            self.minimap_generated = True
-        except:
-            pass  # failed to generate minimap
-
-    def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + list(reversed(list(settings.OPENRA_VERSIONS.values())))[0]):
+    def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
         for mod in ['ra', 'cnc']:
 
             assign_mod = mod
