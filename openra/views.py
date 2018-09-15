@@ -560,6 +560,10 @@ def displayMap(request, arg):
 
     if mapObject.parser == settings.OPENRA_VERSIONS[0]:
         show_upgrade_map_button = False  # map is up-to-date
+
+    if mapObject.parser not in settings.OPENRA_VERSIONS:
+        show_upgrade_map_button = False  # map was not parsed with a compatible version
+
     ###
 
     map_preview = None
@@ -619,13 +623,15 @@ def upgradeMap(request, arg):
     if mapObject[0].parser == settings.OPENRA_VERSIONS[0]:
         return HttpResponseRedirect('/maps/' + arg + '/')  # map is up-to-date
 
+    if mapObject[0].parser not in settings.OPENRA_VERSIONS:
+        return HttpResponseRedirect('/maps/' + arg + '/')  # map was not parsed with a compatible parser
+
     ##########
     no_effect = False
     failed_to_upgrade = False
     if request.method == 'POST':
         upgrade_to_parser = request.POST.get('upgrade_to_parser', None)
-
-        if upgrade_to_parser:
+        if upgrade_to_parser and upgrade_to_parser in settings.OPENRA_VERSIONS:
 
             if int(mapObject[0].parser.split('-')[1]) >= int(upgrade_to_parser.split('-')[1]):
                 no_effect = True
