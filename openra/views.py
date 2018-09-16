@@ -345,12 +345,6 @@ def maps_duplicates(request, maphash, page=1):
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
-def mostCommentedMap(request):
-    mapObject = Maps.objects.filter(next_rev=0)
-    comments = misc.count_comments_for_many(mapObject, 'maps')
-    mapid = max(comments.items(), key=operator.itemgetter(1))[0]
-    return HttpResponseRedirect('/maps/'+mapid+'/')
-
 
 def displayMap(request, arg):
     if request.method == 'POST':
