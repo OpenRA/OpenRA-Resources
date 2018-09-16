@@ -50,11 +50,6 @@ urlpatterns = [
     url(r'^maps/(?P<arg>\d+)/yaml/?$', views.serveYaml, name='printYaml'),
     url(r'^maps/(?P<arg>\d+)/rules/?$', views.serveYamlRules, name='printYamlRules'),
     url(r'^maps/(?P<arg>\d+)/lua/(?P<name>[^/]+)/?$', views.serveLua, name='printLua'),
-    url(r'^maps/(?P<arg>\d+)/shp/(?P<name>[^/]+)/(?P<request_type>[^/]+)/?$', views.serveMapSHP, name='printMapSHP'),
-    url(r'^maps/random/?$', views.randomMap, name='randomMap'),
-    url(r'^maps/mostCommented/?$', views.mostCommentedMap, name='mostCommentedMap'),
-
-    url(r'^maps/zip/', views.maps_zip, name='maps_zip'),
 
     url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
     url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
@@ -96,7 +91,6 @@ urlpatterns = [
     url(r'^panel/mymaps/filter/(?P<filter>\w+)/?$', views.ControlPanel, name='maps_filtered'),
 
     url(r'^faq/?$', views.faq, name='faq'),
-    url(r'^links/?$', views.links, name='links'),
     url(r'^contacts/?$', views.contacts, name='contacts'),
     url(r'^contacts/sent/?$', views.contacts_sent, name='contacts_sent'),
 

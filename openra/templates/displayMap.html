@@ -45,15 +45,7 @@
 				<label class="tick"></label>
 				<div class="notification_label printRulesShow" data-name="Custom Rules">Advanced</div>
 				<div class="notification_tooltip printRulesShow" data-name="Custom Rules">
-					<div>This map is advanced:
-						<br />
-						<ul>
-							<li>defines Rules</li>
-							{% if contains_shp %}
-								<li>includes SHP files</li>
-							{% endif %}
-						</ul>
-						Click to see custom Rules.</div>
+					<div>Click to see custom Rules.</div>
 				</div>
 			</div>
 			{% endif %}
@@ -217,17 +209,6 @@
 			{% endfor %}
 		</div>
 		{% endif %}
-
-		{% if shpNames %}
-		<div class="map_shp cBlock">
-			<span class="top-bottom-double-arrow" title="show more shp previews">⇳</span>
-			<h5>Preview of embeded SHP files:</h5>
-			{% for item in shpNames %}
-			<div class="cSHP"><a href="/maps/{{arg}}/shp/{{item}}/fetch/" title='Download {{item}}.shp'><img src="/maps/{{arg}}/shp/{{item}}/preview/" alt="shp" /></a></div>
-			{% endfor %}
-		</div>
-		{% endif %}
-
 
 		{% if comments %}
 			<a name="comments"></a>

@@ -85,32 +85,3 @@
 		});
 	});
 /*	code: end */
-
-/*  code: more SHP previews */
-	$(document).ready(function() {
-		map_shp_height = false;
-		if ( $('.cSHP').length > 5 )
-		{
-			map_shp_height = $('.map_shp').height();
-			$('.map_shp').css({ height: '100px' });
-			$('.top-bottom-double-arrow').show();
-		}
-
-		$('.top-bottom-double-arrow').click(function() {
-			if ( map_shp_height )
-			{
-				if ( $('.map_shp').height() == 100)
-				{
-					$('.map_shp').animate({ height: map_shp_height }, 'slow', function() {
-						$('.map_shp').css({ height: '100%' });
-						map_shp_height = $('.map_shp').height();
-					});
-				}
-				else
-				{
-					$('.map_shp').animate({ height: '100' }, 'slow');
-				}
-			}
-		});
-	});
-/*	code: end */

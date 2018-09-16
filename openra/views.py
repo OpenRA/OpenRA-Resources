@@ -9,7 +9,6 @@ import operator
 import json
 import cgi
 import base64
-import zipfile
 from urllib.parse import urlencode
 from io import BytesIO
 from django.conf import settings
@@ -234,42 +233,6 @@ def maps(request, page=1):
 
     return StreamingHttpResponse(template.render(template_args, request))
 
-
-def maps_zip(request):
-
-    mapObject = Maps.objects.filter()
-    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
-
-    s = BytesIO()
-    zf = zipfile.ZipFile(s, "w", zipfile.ZIP_DEFLATED)
-
-    zip_filename = "resource_center_maps.zip"
-
-    for item in mapObject:
-        oramap = ""
-        item_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
-        try:
-            mapDir = os.listdir(item_path)
-        except:
-            continue
-        for filename in mapDir:
-            if filename.endswith(".oramap"):
-                oramap = filename
-                break
-        if not oramap:
-            continue
-
-        zip_path = os.path.join('maps', item.game_mod, '%d.oramap' % item.id)
-
-        zf.write(os.path.join(item_path, oramap), zip_path, zipfile.ZIP_DEFLATED)
-    zf.close()
-
-    response = HttpResponse(s.getvalue(), content_type='application/x-zip-compressed')
-    response['Content-Disposition'] = 'attachment; filename = %s' % zip_filename
-    response['Content-Length'] = s.tell()
-    return response
-
-
 def maps_author(request, author, page=1):
 
     mapObject = Maps.objects.filter(author=author.replace("%20", " "))
@@ -383,19 +346,6 @@ def maps_duplicates(request, maphash, page=1):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def randomMap(request):
-    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
-    mapObject = random.choice(mapObject)
-    return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
-
-
-def mostCommentedMap(request):
-    mapObject = Maps.objects.filter(next_rev=0)
-    comments = misc.count_comments_for_many(mapObject, 'maps')
-    mapid = max(comments.items(), key=operator.itemgetter(1))[0]
-    return HttpResponseRedirect('/maps/'+mapid+'/')
-
-
 def displayMap(request, arg):
     if request.method == 'POST':
         if request.POST.get('reportReason', "").strip() != "":
@@ -466,7 +416,6 @@ def displayMap(request, arg):
 
             return HttpResponseRedirect('/maps/' + arg + '/')
 
-    contains_shp = False
     disk_size = 0
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
     try:
@@ -477,10 +426,6 @@ def displayMap(request, arg):
                 disk_size = misc.sizeof_fmt(disk_size)
                 break
         mapDir = os.listdir(os.path.join(path, 'content'))
-        for filename in mapDir:
-            if filename.endswith(".shp"):
-                contains_shp = True
-                break
     except FileNotFoundError as ex:
         print(ex)
         return HttpResponseRedirect('/')
@@ -514,11 +459,6 @@ def displayMap(request, arg):
     for fn in listContent:
         if fn.endswith('.lua'):
             luaNames.append(os.path.splitext(fn)[0])
-
-    shpNames = []
-    for fn in listContent:
-        if fn.endswith('.shp.gif'):
-            shpNames.append(fn.split('.shp.gif')[0])
 
     mapsFromAuthor = Maps.objects.filter(author=mapObject.author, next_rev=0).exclude(id=mapObject.id).distinct('map_hash').order_by('map_hash', '-posted').exclude(map_hash=mapObject.map_hash)
     if len(mapsFromAuthor) >= 8:
@@ -591,7 +531,6 @@ def displayMap(request, arg):
         'mapsFromAuthor': mapsFromAuthor,
         'similarMaps': similarMaps,
         'screenshots': screenshots,
-        'shpNames': shpNames,
         'disk_size': disk_size,
         'duplicates': duplicates,
         'played_counter': played_counter,
@@ -601,7 +540,6 @@ def displayMap(request, arg):
         'comments': comments,
         'show_upgrade_map_button': show_upgrade_map_button,
         'map_preview': map_preview,
-        'contains_shp': contains_shp,
         'last_parser': settings.OPENRA_VERSIONS[0],
     }
     return StreamingHttpResponse(template.render(template_args, request))
@@ -828,31 +766,6 @@ def serveLua(request, arg, name):
     if fname == "":
         raise Http404
     response = StreamingHttpResponse(cgi.escape(open(os.path.join(path, fname)).read(), quote=None), content_type='application/plain')
-    response['Content-Disposition'] = 'attachment; filename = %s' % fname
-    return response
-
-
-def serveMapSHP(request, arg, name, request_type='preview'):
-    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg, 'content')
-    fname = ""
-    try:
-        listdir = os.listdir(path)
-    except:
-        raise Http404
-    for fn in listdir:
-        if request_type == 'preview':
-            if fn.endswith('.shp.gif'):
-                if fn.split('.shp.gif')[0] == name:
-                    fname = fn
-                    break
-        elif request_type == 'fetch':
-            if fn.endswith('.shp'):
-                if fn.split('.shp')[0] == name:
-                    fname = fn
-                    break
-    if fname == "":
-        raise Http404
-    response = StreamingHttpResponse(open(os.path.join(path, fname), 'rb'), content_type='image/gif')
     response['Content-Disposition'] = 'attachment; filename = %s' % fname
     return response
 
@@ -1133,17 +1046,6 @@ def faq(request):
         'title': ' - FAQ',
     }
     return StreamingHttpResponse(template.render(template_args, request))
-
-
-def links(request):
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'links.html',
-        'request': request,
-        'title': ' - Links',
-    }
-    return StreamingHttpResponse(template.render(template_args, request))
-
 
 def contacts(request):
     message_sent = False
