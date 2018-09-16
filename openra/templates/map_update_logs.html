@@ -1,0 +1,22 @@
+<div class='cBlock no-pd-bot'>
+	<h3 class='center'>Update logs for map: <a href="/maps/{{map.id}}/" title="{{map.title}}" target="_blank">{{map.title}}</a></h3>
+</div>
+
+{% if after_update_notice %}
+<div class='cBlock no-pd-bot'>
+	<p class='center'>Your map has been updated. Check the logs below to see if any manual changes are required.</p>
+</div>
+{% endif %}
+
+{% for log in logs %}
+<div class='cBlock'>
+	<h4>Update from {{log.from_version}} to {{log.to_version}} on {{log.date_run}}:</h4>
+	<p>
+		{{log.upgrade_output|linebreaksbr}}
+	</p>
+</div>
+{% endfor %}
+
+<div class='cBlock' style="text-align:right">
+	<a href="/maps/{{map.id}}">Continue to updated map</a>
+</div>

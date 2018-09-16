@@ -498,11 +498,11 @@ def displayMap(request, arg):
     if mapObject.next_rev != 0:
         show_upgrade_map_button = False  # upgrade only the latest revision
 
-    if mapObject.parser == settings.OPENRA_VERSIONS[0]:
-        show_upgrade_map_button = False  # map is up-to-date
-
     if mapObject.parser not in settings.OPENRA_VERSIONS:
         show_upgrade_map_button = False  # map was not parsed with a compatible version
+
+    if not any([mapObject.parser in v for v in settings.OPENRA_UPDATE_VERSIONS.values()]):
+        show_upgrade_map_button = False  # no compatible update targets
 
     ###
 
@@ -548,75 +548,65 @@ def displayMap(request, arg):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def upgradeMap(request, arg):
+def updateMap(request, arg):
 
     mapObject = Maps.objects.filter(id=arg)
-    if not mapObject:
+    if not mapObject or not mapObject[0]:
         return HttpResponseRedirect('/')
-    if not mapObject[0]:
-        return HttpResponseRedirect('/')
-    if mapObject[0].user != request.user:
-        if not request.user.is_superuser:
-            return HttpResponseRedirect('/maps/' + arg + '/')
-    if mapObject[0].next_rev != 0:
-        return HttpResponseRedirect('/maps/' + arg + '/')  # upgrade only the latest revision
 
-    if mapObject[0].parser == settings.OPENRA_VERSIONS[0]:
-        return HttpResponseRedirect('/maps/' + arg + '/')  # map is up-to-date
+    source_map = mapObject[0]
+    if source_map.user != request.user and not request.user.is_superuser:
+        return HttpResponseRedirect('/maps/' + arg + '/')
 
-    if mapObject[0].parser not in settings.OPENRA_VERSIONS:
+    if source_map.next_rev != 0:
+        return HttpResponseRedirect('/maps/' + arg + '/')  # update only the latest revision
+
+    if source_map.parser not in settings.OPENRA_VERSIONS:
         return HttpResponseRedirect('/maps/' + arg + '/')  # map was not parsed with a compatible parser
 
+    update_parsers = [k for k in settings.OPENRA_UPDATE_VERSIONS if source_map.parser in settings.OPENRA_UPDATE_VERSIONS[k]]
+    if not update_parsers:
+        return HttpResponseRedirect('/maps/' + arg + '/')  # no newer parsers can update from the current parser
+
     ##########
-    no_effect = False
-    failed_to_upgrade = False
+    update_failed = False
     if request.method == 'POST':
-        upgrade_to_parser = request.POST.get('upgrade_to_parser', None)
-        if upgrade_to_parser and upgrade_to_parser in settings.OPENRA_VERSIONS:
+        target_parser = request.POST.get('target_parser', None)
+        if target_parser and target_parser in settings.OPENRA_VERSIONS:
+            updated = utility.map_update(mapObject[0], target_parser)
+            if updated:
+                redirect = '/maps/' + str(updated.id) + '/'
+                if updated.mapupgradelogs_set.count() > 0:
+                    redirect += 'update_logs?updated'
 
-            if int(mapObject[0].parser.split('-')[1]) >= int(upgrade_to_parser.split('-')[1]):
-                no_effect = True
-            else:
+                return HttpResponseRedirect(redirect)
+        update_failed = True
 
-                upgrade_with_creating_new_rev = True
-                upgrade_if_hash_matches = True
-                upgrade_if_lint_fails = True
-                upgrade_res = utility.map_upgrade(mapObject, mapObject[0].parser, upgrade_to_parser, upgrade_with_creating_new_rev, upgrade_if_hash_matches, upgrade_if_lint_fails)
-                if upgrade_res:
-                    if Maps.objects.filter(id=upgrade_res[0])[0].mapupgradelogs_set.count() > 0:
-                        return HttpResponseRedirect('/maps/%s/upgrade_logs?upgraded' % upgrade_res[0])
-                    else:
-                        return HttpResponseRedirect('/maps/%s/' % upgrade_res[0])
-                else:
-                    failed_to_upgrade = True
     ##########
 
     template = loader.get_template('index.html')
     template_args = {
-        'content': 'upgradeMap.html',
+        'content': 'map_update.html',
         'request': request,
-        'title': ' - Upgrade Map - ' + mapObject[0].title,
+        'title': ' - Update Map - ' + mapObject[0].title,
         'map': mapObject[0],
-        'parsers': settings.OPENRA_VERSIONS,
-        'no_effect': no_effect,
-        'failed_to_upgrade': failed_to_upgrade,
+        'parsers': update_parsers,
+        'update_failed': update_failed,
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
-def upgradeMapLogs(request, arg):
+def updateMapLogs(request, arg):
     mapObject = Maps.objects.filter(id=arg)
     item = mapObject[0]
     logs = item.mapupgradelogs_set.all().order_by('-id')
-    print(logs)
-    print('upgraded' in request.GET.keys())
     template = loader.get_template('index.html')
     template_args = {
-        'content': 'upgradeMapLogs.html',
+        'content': 'map_update_logs.html',
         'request': request,
-        'title': ' - Upgrade Map Log - ' + mapObject[0].title,
+        'title': ' - Map Update Log - ' + mapObject[0].title,
         'map': item,
         'logs': logs,
-        'after_upgrade_notice': 'upgraded' in request.GET.keys()
+        'after_update_notice': 'updated' in request.GET.keys()
     }
     return StreamingHttpResponse(template.render(template_args, request))
 

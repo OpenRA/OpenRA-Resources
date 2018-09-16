@@ -271,7 +271,7 @@
 		</div>
 		{% if show_upgrade_map_button %}
 			<div class="map_download">
-				<a href="/maps/{{arg}}/upgrade/" title="Upgrade to the latest OpenRA engine version" class="button">Upgrade Map</a>
+				<a href="/maps/{{arg}}/update/" title="Update to the latest OpenRA engine version" class="button">Update Map</a>
 			</div>
 		{% endif %}
 		<div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
@@ -355,7 +355,7 @@
 		{% endif %}
 		{% if has_upgrade_logs %}
 			<div class="map_data_link">
-				<a href="/maps/{{map.id}}/upgrade_logs/">map upgrade logs</a>
+				<a href="/maps/{{map.id}}/update_logs/">map update logs</a>
 			</div>
 		{% endif %}
 

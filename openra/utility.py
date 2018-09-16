@@ -1,269 +1,214 @@
+import base64
+import json
 import os
 import shutil
+import tempfile
 import zipfile
-import string
-import random
-import signal
-import json
-import base64
-import time
-import multiprocessing
+
 from subprocess import Popen, PIPE
 from django.conf import settings
 from django.utils import timezone
 from openra.models import Maps, Lints, MapCategories, MapUpgradeLogs
 from openra import misc
 
-def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False):
-    upgraded_maps = []
+def __first_oramap_in_directory(path):
+    """Returns the first matching .oramap filename in a given path or None
 
-    for item in mapObject:
-        if item.next_rev != 0:
-            print('Aborting upgrade of map: %s, as it is not the latest revision' % (item.id))
-            print("Interrupted map upgrade: %s" % (item.id))
-            continue
+       The returned string is not prefixed by the directory.
 
-        path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
-        filename = ""
-        Dir = os.listdir(path)
-        for fn in Dir:
-            if fn.endswith('.oramap'):
-                filename = fn
-                break
+       TODO: This helper is a workaround for the filename not being stored in the model
+       This really should be fixed, and then this helper removed!
+    """
+    for filename in os.listdir(path):
+        if filename.endswith('.oramap'):
+            return filename
+    return None
 
-        if filename == "":
-            print("error, can not find .oramap")
-            print("Interrupted map upgrade: %s" % (item.id))
-            continue
+def __run_utility_command(parser, game_mod, args):
+    """Runs an OpenRA.Utility command and returns a tuple of returncode, output text"""
+    # HACK: Work around unknown third-party mods
+    # This can go away once mods are defined as a Django model
+    game_mod = game_mod.lower()
+    if game_mod not in ['ra', 'cnc', 'd2k', 'ts']:
+        game_mod = 'ra'
 
-        # Copy map to temporarily location
-        ora_temp_dir_name = os.path.join('/tmp', 'openra_resources', ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8)))
-        os.makedirs(ora_temp_dir_name)
+    popen = Popen(['mono', '--debug',
+                   os.path.join(settings.OPENRA_ROOT_PATH, parser, 'OpenRA.Utility.exe'),
+                   game_mod] + args, stdout=PIPE)
 
-        shutil.copy(os.path.join(path, filename), os.path.join(ora_temp_dir_name, filename))
+    output = b''
+    for chunk in popen.stdout:
+        output += chunk
 
-        if_new_rev = "WITH creating new revision"
-        if not new_rev_on_upgrade:
-            if_new_rev = "WITHOUT creating new revision"
+    popen.wait()
+    return popen.returncode, output.decode()
 
-        print('\nStarting map upgrade action %s on map: %s. Using parser: %s' % (if_new_rev, item.id, parser))
-        print('All operations are performed in temporarily location until success: %s' % ora_temp_dir_name)
-        ###
+def map_update(item, parser=settings.OPENRA_VERSIONS[0]):
+    """Create a new revision of a map by running the OpenRA.Utility
+       update command using a given parser version
 
-        command = misc.build_utility_command(parser, item.game_mod, [
+       Returns the updated map revision or None on failure
+    """
+    print('Starting map update action on map {}. Using parser: {}'.format(item.id, parser))
+    if item.next_rev != 0:
+        print('Update failed: a newer revision of this map already exists')
+        return None
+
+    # Find the oramap file in the data directory
+    source_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
+    oramap_filename = __first_oramap_in_directory(source_path)
+    if not oramap_filename:
+        print('Update failed: map directory does not contain an .oramap package')
+        return None
+
+    # Create a temporary working directory and copy the oramap to it
+    # Directory is automatically deleted when exiting the context manager
+    with tempfile.TemporaryDirectory() as working_path:
+        print('Temporary working directory: {}'.format(working_path))
+        oramap_path = os.path.join(working_path, oramap_filename)
+        shutil.copy(os.path.join(source_path, oramap_filename), oramap_path)
+
+        # Run OpenRA.Utility to do the actual update
+        print('Running --update-map')
+        update_retcode, update_output = __run_utility_command(parser, item.game_mod, [
             '--update-map',
-            os.path.join(ora_temp_dir_name, filename),
+            oramap_path,
             item.parser,
             '--apply'
         ])
 
-        print(command)
-        popen = Popen(command.split(), stdout=PIPE)
+        # Error code if the command crashed, usage line on invalid arguments
+        if update_retcode != 0 or update_output.startswith('--update-map MAP SOURCE'):
+            print('Update failed: OpenRA.Utility --update-map returned an error')
+            return None
 
-        upgrade_output = b""
-        for chunk in popen.stdout:
-            upgrade_output += chunk
+        if not update_output:
+            print('Update failed: OpenRA.Utility --update-map returned no output')
+            return None
 
-        upgrade_output = upgrade_output.decode()
-        popen.wait()
-        upgraded = popen.returncode == 0
+        if update_output.startswith('No such command'):
+            print('Update failed: OpenRA.Utility --update-map command missing')
+            return None
 
-        if not upgraded:
-            print("Problems upgrading map: %s" % (item.id))
-            print("Interrupted map upgrade: %s" % (item.id))
+        # Recalculate the map UID/hash
+        # TODO: extract this into a rewritten map_hash function so it can be reused by the upload handler
+        print('Running --map-hash')
+        hash_retcode, new_map_uid = __run_utility_command(parser, item.game_mod, [
+            '--map-hash', oramap_path])
 
-            if os.path.isdir(ora_temp_dir_name):
-                shutil.rmtree(ora_temp_dir_name)
+        if hash_retcode != 0 or not new_map_uid:
+            print('Update failed: Hash calculation failed')
+            return None
 
-            continue
-
-        recalculate_hash_response = recalculate_hash(item, os.path.join(ora_temp_dir_name, filename), parser)
-        if recalculate_hash_response['error']:
-            print("Interrupted map upgrade: %s" % (item.id))
-            if os.path.isdir(ora_temp_dir_name):
-                shutil.rmtree(ora_temp_dir_name)
-
-            continue
-
-        if recalculate_hash_response['maphash'] == item.map_hash and upgrade_if_hash_matches is False:
-            print("Upgrade is not required, map hash after running `--upgrade-map` is identical to original: %s" % (item.id))
-            print("Interrupted map upgrade: %s" % (item.id))
-            if os.path.isdir(ora_temp_dir_name):
-                shutil.rmtree(ora_temp_dir_name)
-
-            continue
-
-        lint_check_response = LintCheck(item, os.path.join(ora_temp_dir_name, filename), parser, new_rev_on_upgrade)
-        if lint_check_response['error'] is True or lint_check_response['response'] != 'pass_for_requested_parser':
-            if upgrade_if_lint_fails is False:
-                print("Lint check failed for requested parser: %s" % parser)
-                print("Interrupted map upgrade: %s" % (item.id))
-                if os.path.isdir(ora_temp_dir_name):
-                    shutil.rmtree(ora_temp_dir_name)
-
-                continue
-
-        if_map_requires_upgrade = True
-        if lint_check_response['error'] is False and lint_check_response['response'] == 'pass_for_requested_parser':
-            if_map_requires_upgrade = False
-
-        unzipped_map = UnzipMap(item, os.path.join(ora_temp_dir_name, filename))
+        # Extract the oramap contents (Why?!?)
+        unzipped_map = UnzipMap(item, oramap_path)
         if not unzipped_map:
-            print("Interrupted map upgrade: %s" % (item.id))
-            if os.path.isdir(ora_temp_dir_name):
-                shutil.rmtree(ora_temp_dir_name)
+            print('Update failed: Content extraction failed')
+            return None
 
-            continue
-
-        # Read Yaml
-        read_yaml_response = ReadYaml(item, os.path.join(ora_temp_dir_name, filename))
+        # Parse map metadata
+        # TODO: Rewrite this
+        read_yaml_response = ReadYaml(item, oramap_path)
 
         resp_map_data = read_yaml_response['response']
         if read_yaml_response['error']:
-            print("ReadYaml: " + resp_map_data)
-            print("Interrupted map upgrade: %s" % (item.id))
+            print('Update failed: Metadata parsing failed')
+            return None
 
-            if os.path.isdir(ora_temp_dir_name):
-                shutil.rmtree(ora_temp_dir_name)
-
-            continue
-
-        # Read Rules
+        # Parse custom rules etc
+        # TODO: Rewrite this
         base64_rules = {}
         base64_rules['data'] = ''
         base64_rules['advanced'] = resp_map_data['advanced']
-        if int(resp_map_data['mapformat']) >= 10:
-            base64_rules = ReadRules(item, os.path.join(ora_temp_dir_name, filename), parser, item.game_mod)
-            print(base64_rules['response'])
+        base64_rules = ReadRules(item, oramap_path, parser, item.game_mod)
         if base64_rules['advanced']:
             resp_map_data['advanced'] = True
 
-        if upgraded and recalculate_hash_response['error'] is False and unzipped_map and read_yaml_response['error'] is False:
-            if not new_rev_on_upgrade:
-                # copy directory tree from temporarily location to old location
-                misc.copytree(ora_temp_dir_name, path)
+        updated_item = Maps(
+            user=item.user,
+            title=resp_map_data['title'],
+            description=resp_map_data['description'],
+            info=item.info,
+            author=resp_map_data['author'],
+            map_type=resp_map_data['map_type'],
+            categories=resp_map_data['categories'],
+            players=resp_map_data['players'],
+            game_mod=resp_map_data['game_mod'],
+            map_hash=new_map_uid,
+            width=resp_map_data['width'],
+            height=resp_map_data['height'],
+            bounds=resp_map_data['bounds'],
+            mapformat=resp_map_data['mapformat'],
+            spawnpoints=resp_map_data['spawnpoints'],
+            tileset=resp_map_data['tileset'],
+            shellmap=resp_map_data['shellmap'],
+            base64_rules=base64_rules['data'],
+            base64_players=resp_map_data['base64_players'],
+            legacy_map=False,
+            revision=item.revision + 1,
+            pre_rev=item.id,
+            next_rev=0,
+            downloading=True,
+            requires_upgrade=True,
+            advanced_map=resp_map_data['advanced'],
+            lua=resp_map_data['lua'],
+            posted=item.posted, # keep the original date to avoid reordering the map list
+            viewed=0,
+            policy_cc=item.policy_cc,
+            policy_commercial=item.policy_commercial,
+            policy_adaptations=item.policy_adaptations,
+            parser=parser,
+        )
 
-                Maps.objects.filter(id=item.id).update(map_hash=recalculate_hash_response['maphash'])
-                Maps.objects.filter(id=item.id).update(requires_upgrade=if_map_requires_upgrade)
+        updated_item.save()
 
-                Maps.objects.filter(id=item.id).update(game_mod=resp_map_data['game_mod'])
-                Maps.objects.filter(id=item.id).update(title=resp_map_data['title'])
-                Maps.objects.filter(id=item.id).update(author=resp_map_data['author'])
-                Maps.objects.filter(id=item.id).update(tileset=resp_map_data['tileset'])
-                Maps.objects.filter(id=item.id).update(map_type=resp_map_data['map_type'])
-                Maps.objects.filter(id=item.id).update(categories=resp_map_data['categories'])
-                Maps.objects.filter(id=item.id).update(description=resp_map_data['description'])
-                Maps.objects.filter(id=item.id).update(players=resp_map_data['players'])
-                Maps.objects.filter(id=item.id).update(bounds=resp_map_data['bounds'])
-                Maps.objects.filter(id=item.id).update(mapformat=resp_map_data['mapformat'])
-                Maps.objects.filter(id=item.id).update(spawnpoints=resp_map_data['spawnpoints'])
-                Maps.objects.filter(id=item.id).update(width=resp_map_data['width'])
-                Maps.objects.filter(id=item.id).update(height=resp_map_data['height'])
-                Maps.objects.filter(id=item.id).update(shellmap=resp_map_data['shellmap'])
-                Maps.objects.filter(id=item.id).update(base64_rules=base64_rules['data'])
-                Maps.objects.filter(id=item.id).update(base64_players=resp_map_data['base64_players'])
-                Maps.objects.filter(id=item.id).update(lua=resp_map_data['lua'])
-                Maps.objects.filter(id=item.id).update(advanced_map=resp_map_data['advanced'])
-                Maps.objects.filter(id=item.id).update(parser=parser)
+        # Copy the updated map to its new data location
+        new_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(updated_item.id))
+        if not os.path.exists(new_path):
+            os.makedirs(os.path.join(new_path, 'content'))
 
-                if resp_map_data['mapformat'] >= 9: # Description is gone in MapFormat 9
-                    if item.description:
-                        new_info = item.description+'\n\n'+item.info
-                    else:
-                        new_info = item.info
-                    Maps.objects.filter(id=item.id).update(info=new_info)
+        # Point the original map's next revision to the new map
+        Maps.objects.filter(id=item.id).update(next_rev=updated_item.id)
 
-                print('Updated data, fetched from Yaml: %s' % item.id)
+        # Update logs are only interesting if the map has custom rules
+        if item.advanced_map:
+            log = MapUpgradeLogs(
+                map_id=updated_item,
+                from_version=item.parser,
+                to_version=parser,
+                date_run=timezone.now(),
+                upgrade_output=update_output
+            )
+            log.save()
 
-                print('Finished upgrading map %s: %s \n' % (if_new_rev, item.id))
-                upgraded_maps.append(item.id)
+        # Copy old content to the new revision dir (Why!?!)
+        misc.copytree(source_path, new_path)
 
-                if item.advanced_map:
-                    log_transac = MapUpgradeLogs(
-                        map_id          = item,
-                        from_version    = engine,
-                        to_version      = parser,
-                        upgrade_output  = upgrade_output
-                    )
-                    log_transac.save()
-            else:
-                time.sleep(1)
-                # create new revision after successfully upgrading map in temporarily location
+        # Copy updated content from temp dir to the new revision dir
+        misc.copytree(working_path, new_path)
 
-                rev = item.revision + 1
+        print('Update complete. New ID is {}'.format(updated_item.id))
 
-                transac = Maps(
-                    user=item.user,
-                    title=resp_map_data['title'],
-                    description=resp_map_data['description'],
-                    info=item.info,
-                    author=resp_map_data['author'],
-                    map_type=resp_map_data['map_type'],
-                    categories=resp_map_data['categories'],
-                    players=resp_map_data['players'],
-                    game_mod=resp_map_data['game_mod'],
-                    map_hash=recalculate_hash_response['maphash'],
-                    width=resp_map_data['width'],
-                    height=resp_map_data['height'],
-                    bounds=resp_map_data['bounds'],
-                    mapformat=resp_map_data['mapformat'],
-                    spawnpoints=resp_map_data['spawnpoints'],
-                    tileset=resp_map_data['tileset'],
-                    shellmap=resp_map_data['shellmap'],
-                    base64_rules=base64_rules['data'],
-                    base64_players=resp_map_data['base64_players'],
-                    legacy_map=False,
-                    revision=rev,
-                    pre_rev=item.id,
-                    next_rev=0,
-                    downloading=True,
-                    requires_upgrade=if_map_requires_upgrade,
-                    advanced_map=resp_map_data['advanced'],
-                    lua=resp_map_data['lua'],
-                    posted=item.posted,   # we do not want to break order of maps, so we save old date for new rev
-                    viewed=0,
-                    policy_cc=item.policy_cc,
-                    policy_commercial=item.policy_commercial,
-                    policy_adaptations=item.policy_adaptations,
-                    parser=parser,
-                )
-                transac.save()
+        # Test the updated map
+        # TODO: extract this into a rewritten map_lint function so it can be reused by the upload handler
+        print('Running --check-yaml')
+        lint_retcode, lint_output = __run_utility_command(parser, item.game_mod, [
+            '--check-yaml',
+            oramap_path,
+        ])
 
-                if item.advanced_map:
-                    log_transac = MapUpgradeLogs(
-                        map_id          = transac,
-                        from_version    = engine,
-                        to_version      = parser,
-                        upgrade_output  = upgrade_output
-                    )
-                    log_transac.save()
+        if lint_output:
+            lint = Lints(
+                item_type='maps',
+                map_id=updated_item.id,
+                version_tag=parser,
+                pass_status=lint_retcode == 0,
+                lint_output=lint_output,
+                posted=timezone.now(),
+            )
+            lint.save()
 
-                Maps.objects.filter(id=item.id).update(next_rev=transac.id)
-
-                if resp_map_data['mapformat'] >= 9:  # Description is gone in MapFormat 9
-                    if item.description:
-                        new_info = item.description+'\n\n'+item.info
-                    else:
-                        new_info = item.info
-                    Maps.objects.filter(id=transac.id).update(info=new_info)
-
-                new_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(transac.id))
-                if not os.path.exists(new_path):
-                    os.makedirs(os.path.join(new_path, 'content'))
-
-                misc.copytree(path, new_path)
-                misc.copytree(ora_temp_dir_name, new_path)
-
-                print('Finished upgrading map %s %s. New ID: %s \n' % (item.id, if_new_rev, transac.id))
-                upgraded_maps.append(transac.id)
-
-                print("\nRunning Lint checks for successfully upgraded map\n")
-                LintCheck(transac, "", parser)
-
-            if os.path.isdir(ora_temp_dir_name):
-                shutil.rmtree(ora_temp_dir_name)
-
-    return upgraded_maps
+        return updated_item
 
 def recalculate_hash(item, fullpath="", parser=settings.OPENRA_VERSIONS[0]):
 
