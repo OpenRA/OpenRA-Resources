@@ -54,8 +54,6 @@ urlpatterns = [
     url(r'^maps/random/?$', views.randomMap, name='randomMap'),
     url(r'^maps/mostCommented/?$', views.mostCommentedMap, name='mostCommentedMap'),
 
-    url(r'^maps/zip/', views.maps_zip, name='maps_zip'),
-
     url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
     url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
 

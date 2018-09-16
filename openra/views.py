@@ -9,7 +9,6 @@ import operator
 import json
 import cgi
 import base64
-import zipfile
 from urllib.parse import urlencode
 from io import BytesIO
 from django.conf import settings
@@ -233,42 +232,6 @@ def maps(request, page=1):
         template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
 
     return StreamingHttpResponse(template.render(template_args, request))
-
-
-def maps_zip(request):
-
-    mapObject = Maps.objects.filter()
-    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
-
-    s = BytesIO()
-    zf = zipfile.ZipFile(s, "w", zipfile.ZIP_DEFLATED)
-
-    zip_filename = "resource_center_maps.zip"
-
-    for item in mapObject:
-        oramap = ""
-        item_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
-        try:
-            mapDir = os.listdir(item_path)
-        except:
-            continue
-        for filename in mapDir:
-            if filename.endswith(".oramap"):
-                oramap = filename
-                break
-        if not oramap:
-            continue
-
-        zip_path = os.path.join('maps', item.game_mod, '%d.oramap' % item.id)
-
-        zf.write(os.path.join(item_path, oramap), zip_path, zipfile.ZIP_DEFLATED)
-    zf.close()
-
-    response = HttpResponse(s.getvalue(), content_type='application/x-zip-compressed')
-    response['Content-Disposition'] = 'attachment; filename = %s' % zip_filename
-    response['Content-Length'] = s.tell()
-    return response
-
 
 def maps_author(request, author, page=1):
 
