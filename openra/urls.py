@@ -51,7 +51,6 @@ urlpatterns = [
     url(r'^maps/(?P<arg>\d+)/rules/?$', views.serveYamlRules, name='printYamlRules'),
     url(r'^maps/(?P<arg>\d+)/lua/(?P<name>[^/]+)/?$', views.serveLua, name='printLua'),
     url(r'^maps/(?P<arg>\d+)/shp/(?P<name>[^/]+)/(?P<request_type>[^/]+)/?$', views.serveMapSHP, name='printMapSHP'),
-    url(r'^maps/random/?$', views.randomMap, name='randomMap'),
     url(r'^maps/mostCommented/?$', views.mostCommentedMap, name='mostCommentedMap'),
 
     url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),

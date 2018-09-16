@@ -345,13 +345,6 @@ def maps_duplicates(request, maphash, page=1):
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
-
-def randomMap(request):
-    mapObject = Maps.objects.filter(next_rev=0).distinct('map_hash')
-    mapObject = random.choice(mapObject)
-    return HttpResponseRedirect('/maps/'+str(mapObject.id)+'/')
-
-
 def mostCommentedMap(request):
     mapObject = Maps.objects.filter(next_rev=0)
     comments = misc.count_comments_for_many(mapObject, 'maps')
