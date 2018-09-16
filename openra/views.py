@@ -22,7 +22,7 @@ from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openra import handlers, misc, utility
-from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments, MapCategories
+from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments, MapCategories, MapUpgradeLogs
 
 
 def index(request):
@@ -515,6 +515,8 @@ def displayMap(request, arg):
     userObject = User.objects.get(pk=mapObject.user_id)
     Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
 
+    has_upgrade_logs = mapObject.mapupgradelogs_set.count() > 0
+
     template = loader.get_template('index.html')
     template_args = {
         'content': 'displayMap.html',
@@ -541,6 +543,7 @@ def displayMap(request, arg):
         'show_upgrade_map_button': show_upgrade_map_button,
         'map_preview': map_preview,
         'last_parser': settings.OPENRA_VERSIONS[0],
+        'has_upgrade_logs': has_upgrade_logs
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
@@ -578,9 +581,12 @@ def upgradeMap(request, arg):
                 upgrade_with_creating_new_rev = True
                 upgrade_if_hash_matches = True
                 upgrade_if_lint_fails = True
-                upgrade_res = utility.map_upgrade(mapObject, mapObject[0].parser.split('-')[1], upgrade_to_parser, upgrade_with_creating_new_rev, upgrade_if_hash_matches, upgrade_if_lint_fails)
+                upgrade_res = utility.map_upgrade(mapObject, mapObject[0].parser, upgrade_to_parser, upgrade_with_creating_new_rev, upgrade_if_hash_matches, upgrade_if_lint_fails)
                 if upgrade_res:
-                    return HttpResponseRedirect('/maps/%s/' % upgrade_res[0])
+                    if Maps.objects.filter(id=upgrade_res[0])[0].mapupgradelogs_set.count() > 0:
+                        return HttpResponseRedirect('/maps/%s/upgrade_logs?upgraded' % upgrade_res[0])
+                    else:
+                        return HttpResponseRedirect('/maps/%s/' % upgrade_res[0])
                 else:
                     failed_to_upgrade = True
     ##########
@@ -597,6 +603,22 @@ def upgradeMap(request, arg):
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
+def upgradeMapLogs(request, arg):
+    mapObject = Maps.objects.filter(id=arg)
+    item = mapObject[0]
+    logs = item.mapupgradelogs_set.all().order_by('-id')
+    print(logs)
+    print('upgraded' in request.GET.keys())
+    template = loader.get_template('index.html')
+    template_args = {
+        'content': 'upgradeMapLogs.html',
+        'request': request,
+        'title': ' - Upgrade Map Log - ' + mapObject[0].title,
+        'map': item,
+        'logs': logs,
+        'after_upgrade_notice': 'upgraded' in request.GET.keys()
+    }
+    return StreamingHttpResponse(template.render(template_args, request))
 
 def deleteScreenshot(request, itemid):
     scObject = Screenshots.objects.filter(id=itemid)
@@ -931,7 +953,7 @@ def cancelReport(request, name, arg):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/')
     Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name=name).delete()
-    Maps.objects.filter(id=arg).update(amount_reports=F('amount_reports')-1) 
+    Maps.objects.filter(id=arg).update(amount_reports=F('amount_reports')-1)
     return HttpResponseRedirect('/'+name+'/'+arg)
 
 

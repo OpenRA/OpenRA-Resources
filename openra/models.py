@@ -60,6 +60,18 @@ class MapCategories(models.Model):
     category_name       = models.CharField(max_length=100)
     posted              = models.DateTimeField('dated added', default=datetime.datetime.now)
 
+class MapUpgradeLogs(models.Model):
+    class Meta:
+        verbose_name_plural = 'MapUpgradeLogs'
+
+    def __str__(self):
+        return str(self.id)
+
+    map_id                = models.ForeignKey(Maps)
+    date_run              = models.DateTimeField(default=datetime.datetime.now)
+    from_version          = models.CharField(max_length=100, default="")
+    to_version            = models.CharField(max_length=100, default="")
+    upgrade_output        = models.CharField(max_length=10000000, default="")
 
 class Lints(models.Model):
 

@@ -4,14 +4,13 @@ from django.contrib.auth.models import User, Group
 
 from openra.models import Maps
 from openra.models import MapCategories
+from openra.models import MapUpgradeLogs
 from openra.models import Lints
 from openra.models import Screenshots
 from openra.models import Reports
 from openra.models import Rating
 from openra.models import Comments
 from openra.models import UnsubscribeComments
-
-admin.site.register(MapCategories)
 
 class LatestRevisionListFilter(admin.SimpleListFilter):
     title = 'Latest Revision'
@@ -48,6 +47,14 @@ class MapsAdmin(admin.ModelAdmin):
     list_display = ('map_hash', 'title', 'user', 'posted', 'game_mod', 'amount_reports', 'mapformat', 'parser', 'advanced_map', 'lua', 'downloading', is_latest_revision)
     list_filter = ('game_mod', 'mapformat', 'advanced_map', 'lua', 'parser', LatestRevisionListFilter)
 admin.site.register(Maps, MapsAdmin)
+
+admin.site.register(MapCategories)
+
+class MapUpgradeLogsAdmin(admin.ModelAdmin):
+    ordering = ('-date_run',)
+    list_display = ('map_id', 'date_run', 'from_version', 'to_version')
+    list_filter = ('from_version', 'to_version')
+admin.site.register(MapUpgradeLogs, MapUpgradeLogsAdmin)
 
 class UnsubscribeCommentsAdmin(admin.ModelAdmin):
     date_hierarchy = 'unsubscribed'
