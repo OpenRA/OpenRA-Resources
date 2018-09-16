@@ -1134,17 +1134,6 @@ def faq(request):
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
-
-def links(request):
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'links.html',
-        'request': request,
-        'title': ' - Links',
-    }
-    return StreamingHttpResponse(template.render(template_args, request))
-
-
 def contacts(request):
     message_sent = False
     if request.method == 'POST':

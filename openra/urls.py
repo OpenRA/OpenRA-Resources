@@ -96,7 +96,6 @@ urlpatterns = [
     url(r'^panel/mymaps/filter/(?P<filter>\w+)/?$', views.ControlPanel, name='maps_filtered'),
 
     url(r'^faq/?$', views.faq, name='faq'),
-    url(r'^links/?$', views.links, name='links'),
     url(r'^contacts/?$', views.contacts, name='contacts'),
     url(r'^contacts/sent/?$', views.contacts_sent, name='contacts_sent'),
 
