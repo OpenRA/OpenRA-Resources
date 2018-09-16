@@ -1244,24 +1244,6 @@ p.registerInfo {
 					max-width: 96px;
 					max-height: 96px;
 				}
-		.map_shp {
-			min-height: 84px;
-			overflow: hidden;
-		}
-			.map_shp .cSHP {
-				display: inline-block;
-				margin: 10px;
-				border: 1px solid #74c2e7;
-				width: 60px;
-				height: 60px;
-				text-align: center;
-				line-height: 57px;
-			}
-				.map_shp img {
-					max-width: 60px;
-					max-height: 60px;
-					vertical-align: middle;
-				}
 
 	.right_map_content {
 		float: right;

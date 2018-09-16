@@ -249,8 +249,6 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
                 print("\nRunning Lint checks for successfully upgraded map\n")
                 LintCheck(transac, "", parser)
 
-                print("\nRunning SHPtoGIF generator, in case there are SHP files\n")
-
             if os.path.isdir(ora_temp_dir_name):
                 shutil.rmtree(ora_temp_dir_name)
 
