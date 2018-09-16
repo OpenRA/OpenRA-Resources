@@ -14,10 +14,7 @@ from django.utils import timezone
 from openra.models import Maps, Lints, MapCategories, MapUpgradeLogs
 from openra import misc
 
-
 def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_on_upgrade=True, upgrade_if_hash_matches=False, upgrade_if_lint_fails=False):
-    parser_to_db = parser
-    parser = os.path.join(settings.OPENRA_ROOT_PATH, parser)
     upgraded_maps = []
 
     for item in mapObject:
@@ -49,11 +46,17 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
         if not new_rev_on_upgrade:
             if_new_rev = "WITHOUT creating new revision"
 
-        print('\nStarting map upgrade action %s on map: %s. Using parser: %s' % (if_new_rev, item.id, parser_to_db))
+        print('\nStarting map upgrade action %s on map: %s. Using parser: %s' % (if_new_rev, item.id, parser))
         print('All operations are performed in temporarily location until success: %s' % ora_temp_dir_name)
         ###
 
-        command = 'mono --debug %s %s --update-map %s %s --apply' % (os.path.join(parser, 'OpenRA.Utility.exe'), item.game_mod, os.path.join(ora_temp_dir_name, filename), item.parser)
+        command = misc.build_utility_command(parser, item.game_mod, [
+            '--update-map',
+            os.path.join(ora_temp_dir_name, filename),
+            item.parser,
+            '--apply'
+        ])
+
         print(command)
         popen = Popen(command.split(), stdout=PIPE)
 
@@ -93,7 +96,7 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
         lint_check_response = LintCheck(item, os.path.join(ora_temp_dir_name, filename), parser, new_rev_on_upgrade)
         if lint_check_response['error'] is True or lint_check_response['response'] != 'pass_for_requested_parser':
             if upgrade_if_lint_fails is False:
-                print("Lint check failed for requested parser: %s" % parser_to_db)
+                print("Lint check failed for requested parser: %s" % parser)
                 print("Interrupted map upgrade: %s" % (item.id))
                 if os.path.isdir(ora_temp_dir_name):
                     shutil.rmtree(ora_temp_dir_name)
@@ -161,7 +164,7 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
                 Maps.objects.filter(id=item.id).update(base64_players=resp_map_data['base64_players'])
                 Maps.objects.filter(id=item.id).update(lua=resp_map_data['lua'])
                 Maps.objects.filter(id=item.id).update(advanced_map=resp_map_data['advanced'])
-                Maps.objects.filter(id=item.id).update(parser=parser_to_db)
+                Maps.objects.filter(id=item.id).update(parser=parser)
 
                 if resp_map_data['mapformat'] >= 9: # Description is gone in MapFormat 9
                     if item.description:
@@ -179,7 +182,7 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
                     log_transac = MapUpgradeLogs(
                         map_id          = item,
                         from_version    = engine,
-                        to_version      = parser_to_db,
+                        to_version      = parser,
                         upgrade_output  = upgrade_output
                     )
                     log_transac.save()
@@ -222,7 +225,7 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
                     policy_cc=item.policy_cc,
                     policy_commercial=item.policy_commercial,
                     policy_adaptations=item.policy_adaptations,
-                    parser=parser_to_db,
+                    parser=parser,
                 )
                 transac.save()
 
@@ -230,7 +233,7 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
                     log_transac = MapUpgradeLogs(
                         map_id          = transac,
                         from_version    = engine,
-                        to_version      = parser_to_db,
+                        to_version      = parser,
                         upgrade_output  = upgrade_output
                     )
                     log_transac.save()
@@ -262,11 +265,9 @@ def map_upgrade(mapObject, engine, parser=settings.OPENRA_VERSIONS[0], new_rev_o
 
     return upgraded_maps
 
-
-def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
+def recalculate_hash(item, fullpath="", parser=settings.OPENRA_VERSIONS[0]):
 
     if fullpath == "":
-
         path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
         filename = ""
         Dir = os.listdir(path)
@@ -281,7 +282,7 @@ def recalculate_hash(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + setti
 
     os.chmod(fullpath, 0o444)
 
-    command = 'mono --debug %s %s --map-hash %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), item.game_mod, fullpath)
+    command = misc.build_utility_command(parser, item.game_mod, ['--map-hash', fullpath])
     proc = Popen(command.split(), stdout=PIPE).communicate()
 
     os.chmod(fullpath, 0o644)
@@ -419,8 +420,7 @@ def ReadYaml(item=False, fullpath=""):
     return {'response': map_data_ordered, 'error': False}
 
 
-def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0], game_mod="ra"):
-
+def ReadRules(item=False, fullpath="", parser=settings.OPENRA_VERSIONS[0], game_mod="ra"):
     if fullpath == "":
         if item is False:
             return {'data': '', 'error': True, 'response': 'wrong method call'}
@@ -433,7 +433,7 @@ def ReadRules(item=False, fullpath="", parser=settings.OPENRA_ROOT_PATH + settin
         if fullpath == "":
             return {'data': '', 'error': True, 'response': 'could not find .oramap'}
 
-    command = 'mono --debug %s %s --map-rules %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), game_mod, fullpath)
+    command = misc.build_utility_command(parser, game_mod, ['--map-rules', fullpath])
     proc = Popen(command.split(), stdout=PIPE).communicate()
     resp = {
         'data': base64.b64encode(proc[0]).decode(),
@@ -471,15 +471,12 @@ def UnzipMap(item, fullpath=""):
     return True
 
 
-def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0], upgrade_with_new_rev=False):
+def LintCheck(item, fullpath="", parser=settings.OPENRA_VERSIONS[0], upgrade_with_new_rev=False):
     # this function performs a Lint Check for map
     response = {'error': True, 'response': ''}
 
     for current_parser in settings.OPENRA_VERSIONS:
-        current_parser_to_db = current_parser
-        current_parser_path = settings.OPENRA_ROOT_PATH + current_parser
-
-        if upgrade_with_new_rev and current_parser_path != parser:
+        if upgrade_with_new_rev and current_parser != parser:
             continue
 
         if fullpath == "":
@@ -498,9 +495,9 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPE
             fullpath = os.path.join(path, filename)
 
         os.chmod(fullpath, 0o444)
-        command = 'mono --debug %s %s --check-yaml %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), item.game_mod.lower(), fullpath)
+        command = misc.build_utility_command(parser, item.game_mod, ['--check-yaml', fullpath])
         print(command)
-        print('Started Lint check for parser: %s' % current_parser_to_db)
+        print('Started Lint check for parser: %s' % current_parser)
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         os.chmod(fullpath, 0o644)
@@ -522,31 +519,31 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_ROOT_PATH + settings.OPE
                         passing = False
 
         if not upgrade_with_new_rev:
-            lintObject = Lints.objects.filter(map_id=item.id, version_tag=current_parser_to_db)
+            lintObject = Lints.objects.filter(map_id=item.id, version_tag=current_parser)
             if lintObject:
-                Lints.objects.filter(map_id=item.id, version_tag=current_parser_to_db).update(pass_status=passing, lint_output=output_to_db, posted=timezone.now())
+                Lints.objects.filter(map_id=item.id, version_tag=current_parser).update(pass_status=passing, lint_output=output_to_db, posted=timezone.now())
             else:
                 lint_transac = Lints(
                     item_type="maps",
                     map_id=item.id,
-                    version_tag=current_parser_to_db,
+                    version_tag=current_parser,
                     pass_status=passing,
                     lint_output=output_to_db,
                     posted=timezone.now(),
                 )
                 lint_transac.save()
 
-        if parser == current_parser_path:
+        if parser == current_parser:
             if passing:
                 response['error'] = False
                 response['response'] = 'pass_for_requested_parser'
-                print('Lint check passed for requested parser: %s' % current_parser_to_db)
+                print('Lint check passed for requested parser: %s' % current_parser)
             else:
-                print('Lint check failed for requested parser: %s' % current_parser_to_db)
+                print('Lint check failed for requested parser: %s' % current_parser)
         else:
             if passing:
-                print('Lint check passed for parser: %s' % current_parser_to_db)
+                print('Lint check passed for parser: %s' % current_parser)
             else:
-                print('Lint check failed for parser: %s' % current_parser_to_db)
+                print('Lint check failed for parser: %s' % current_parser)
 
     return response

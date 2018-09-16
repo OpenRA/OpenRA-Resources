@@ -16,7 +16,6 @@ from django.contrib.auth.models import User
 from openra.models import Maps, Lints, Screenshots
 from openra import utility, misc
 
-
 class MapHandlers():
 
     def __init__(self, map_full_path_filename="", map_full_path_directory="", preview_filename=""):
@@ -32,13 +31,11 @@ class MapHandlers():
         self.legacy_map = False
 
     def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
-        parser_to_db = settings.OPENRA_VERSIONS[0]
+        parser = settings.OPENRA_VERSIONS[0]
         if post.get("parser", None) is not None:
             if post['parser'] not in settings.OPENRA_VERSIONS:
                 return 'Failed. Invalid parser'
-            parser_to_db = post['parser']
-
-        parser = os.path.join(settings.OPENRA_ROOT_PATH, parser_to_db)
+            parser = post['parser']
 
         if pre_r != 0:
             mapObject = Maps.objects.filter(id=pre_r, user_id=user_id)
@@ -168,7 +165,7 @@ class MapHandlers():
             policy_cc=cc,
             policy_commercial=commercial,
             policy_adaptations=adaptations,
-            parser=parser_to_db,
+            parser=parser,
         )
         transac.save()
         self.UID = str(transac.id)
@@ -214,33 +211,27 @@ class MapHandlers():
             pass
         z.close()
 
-    def GetHash(self, filepath="", parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
+    def GetHash(self, filepath="", parser=settings.OPENRA_VERSIONS[0]):
         if filepath == "":
             filepath = self.map_full_path_filename
 
         os.chmod(filepath, 0o444)
 
-        command = 'mono --debug %s ra --map-hash %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), filepath)
+        command = misc.build_utility_command(parser, 'ra', ['--map-hash', filepath])
         proc = Popen(command.split(), stdout=PIPE).communicate()
 
         os.chmod(filepath, 0o644)
 
         self.maphash = proc[0].decode().strip()
 
-    def LegacyImport(self, mapPath, parser=settings.OPENRA_ROOT_PATH + settings.OPENRA_VERSIONS[0]):
+    def LegacyImport(self, mapPath, parser=settings.OPENRA_VERSIONS[0]):
         for mod in ['ra', 'cnc']:
 
             assign_mod = mod
             if mod == 'cnc':
                 assign_mod = 'td'
 
-            pre_command = 'mono --debug %s ra' % (os.path.join(parser, 'OpenRA.Utility.exe'))
-            pre_proc = Popen(pre_command.split(), stdout=PIPE).communicate()
-            if '--import-' in pre_proc[0].decode():
-                command = 'mono --debug %s %s --import-%s-map %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), mod, assign_mod, mapPath)
-            else:
-                command = 'mono --debug %s %s --map-import %s' % (os.path.join(parser, 'OpenRA.Utility.exe'), mod, mapPath)
-
+            command = misc.build_utility_command(parser, mod, ['--import-{0}-map'.format(assign_mod), mapPath])
             proc = Popen(command.split(), stdout=PIPE).communicate()
 
             if "Error" in proc[0].decode():
