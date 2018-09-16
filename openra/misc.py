@@ -478,3 +478,11 @@ def user_account_age(user):
         return 0
 
     return (timezone.now() - user.date_joined).total_seconds() / 3600
+
+def build_utility_command(parser, game_mod, args):
+    game_mod = game_mod.lower()
+    if game_mod not in ['ra', 'cnc', 'd2k', 'ts']:
+        game_mod = 'ra'
+
+    return 'mono --debug %s %s %s' % (os.path.join(settings.OPENRA_ROOT_PATH, parser, 'OpenRA.Utility.exe'), game_mod, ' '.join(args))
+
