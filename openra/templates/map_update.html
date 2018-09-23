@@ -1,0 +1,34 @@
+<div class='cBlock no-pd-bot'>
+	<h3 class='center'>Update map: <a href="/maps/{{map.id}}/" title="{{map.title}}" target="_blank">{{map.title}}</a></h3>
+</div>
+
+{% if update_failed %}
+<div class='cBlock no-pd-bot'>
+	<p class='center'>Update failed. <a href="https://github.com/OpenRA/OpenRA-Resources/issues/" target="_blank">Report</a> this if you can't find the reason.</p>
+</div>
+{% endif %}
+
+<form action="/maps/{{map.id}}/update/" method="POST">{% csrf_token %}
+	<div class='cBlock'>
+		<div class='upgrade_map_col'>
+			<h4>Parsed with: {{map.parser}}</h4>
+			<p>Here you can update your map to a newer OpenRA version.</p>
+			<p>The update feature is available if:</p>
+			<ul>
+				<li>this is the latest revision of the map</li>
+				<li>a compatible updated engine version is available</li>
+			</ul>
+		</div>
+		<div class='upgrade_map_col'>
+			<p>Select OpenRA version:</p>
+			<select class="parser" name="target_parser" size="1">
+			{% for parser in parsers %}
+				<option value="{{ parser }}">{{ parser }}</option>
+			{% endfor %}
+			</select>
+			<p></p>
+			<button type="submit">Update Map</button>
+			<p>The updated map will be saved as a new revision.</p>
+		</div>
+	</div>
+</form>
