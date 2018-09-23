@@ -495,7 +495,7 @@ def LintCheck(item, fullpath="", parser=settings.OPENRA_VERSIONS[0], upgrade_wit
             fullpath = os.path.join(path, filename)
 
         os.chmod(fullpath, 0o444)
-        command = misc.build_utility_command(parser, item.game_mod, ['--check-yaml', fullpath])
+        command = misc.build_utility_command(current_parser, item.game_mod, ['--check-yaml', fullpath])
         print(command)
         print('Started Lint check for parser: %s' % current_parser)
         proc = Popen(command.split(), stdout=PIPE).communicate()
