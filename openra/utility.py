@@ -43,6 +43,123 @@ def __run_utility_command(parser, game_mod, args):
     popen.wait()
     return popen.returncode, output.decode()
 
+def parse_map_metadata(oramap_path):
+
+    # TODO: Replace this DIY parsing with a utility command that returns JSON
+    metadata = {
+        'lua': False,
+        'players': 0,
+        'title': '',
+        'author': '',
+        'description': '',
+        'map_type': '',
+        'categories': '',
+        'shellmap': False,
+        'base64_players': ''
+    }
+
+    yaml_data = ""
+    with zipfile.ZipFile(oramap_path, mode='a') as z:
+        for name in z.namelist():
+            if name == "map.yaml":
+                yaml_data = z.read(name).decode("utf-8")
+            if name.endswith('.lua'):
+                metadata['lua'] = True
+
+    if not yaml_data:
+        return None
+
+    in_players_node = False
+    in_actors_node = False
+    in_spawn_node = False
+
+    spawn_locations = []
+    players_nodes = ''
+
+    for line in yaml_data.split('\n'):
+        # Count starting indent
+        space_indent = 0
+        tab_indent = 0
+        for c in line:
+            if c not in [' ', '\t']:
+                break
+            if c == '\t':
+                tab_indent += 1
+            else:
+                space_indent += 1
+        indent = int(tab_indent + space_indent // 4)
+
+        if in_players_node and indent == 0:
+            in_players_node = False
+        if in_actors_node and indent == 0:
+            in_actors_node = False
+        if in_spawn_node and indent < 2:
+            in_spawn_node = False
+
+        if in_players_node:
+            players_nodes += '\t' * indent + line.strip() + '\n'
+
+        split_index = line.find(':')
+        if split_index < 0:
+            continue
+
+        key = line[:split_index].strip()
+        value = line[split_index + 1:].strip()
+        if key == 'Title':
+            metadata['title'] = value.replace("'", "''")
+        elif key == 'RequiresMod':
+            metadata['game_mod'] = value.lower()
+        elif key == 'Author':
+            metadata['author'] = value.replace("'", "''")
+        elif key == 'Tileset':
+            metadata['tileset'] = value
+        elif key == 'Categories':
+            # TODO: Migrate this to something sensible!
+            category_ids = []
+            for c in value.split(','):
+                category = MapCategories.objects.filter(category_name=c.strip()).first()
+                if not category:
+                    category_transac = MapCategories(
+                        category_name=category_item.strip(),
+                        posted=timezone.now(),
+                    )
+                    category_transac.save()
+                    category_ids.append('_'+str(category_transac.id)+'_')
+                else:
+                    category_ids.append('_'+str(category.id)+'_')
+            metadata['categories'] = json.dumps(category_ids)
+        elif key == 'MapSize':
+            size = value.split(',')
+            metadata['width'] = size[0]
+            metadata['height'] = size[1]
+        elif key == 'Bounds':
+            metadata['bounds'] = value
+        elif key == 'MapFormat':
+            metadata['mapformat'] = int(value)
+        elif key == 'Visibility' and 'Shellmap' in value.split(','):
+            metadata['shellmap'] = True
+
+        elif key == 'Actors':
+            in_actors_node = True
+        elif in_actors_node and value.lower() == 'mpspawn':
+            in_spawn_node = True
+        elif in_spawn_node and key == "Location":
+            spawn_locations.append(value)
+
+        elif key == 'Players':
+            in_players_node = True
+        elif in_players_node and key == 'Playable':
+            if value.lower() in ['true', 'on', 'yes', 'y']:
+                metadata['players'] += 1
+
+    metadata['spawnpoints'] = ', '.join(spawn_locations)
+
+    if players_nodes:
+        metadata['base64_players'] = base64.b64encode(players_nodes.encode()).decode()
+
+    return metadata
+
+
 def map_update(item, parser=settings.OPENRA_VERSIONS[0]):
     """Create a new revision of a map by running the OpenRA.Utility
        update command using a given parser version
@@ -107,51 +224,51 @@ def map_update(item, parser=settings.OPENRA_VERSIONS[0]):
             return None
 
         # Parse map metadata
-        # TODO: Rewrite this
-        read_yaml_response = ReadYaml(item, oramap_path)
-
-        resp_map_data = read_yaml_response['response']
-        if read_yaml_response['error']:
+        metadata = parse_map_metadata(oramap_path)
+        if not metadata:
             print('Update failed: Metadata parsing failed')
             return None
 
-        # Parse custom rules etc
-        # TODO: Rewrite this
-        base64_rules = {}
-        base64_rules['data'] = ''
-        base64_rules['advanced'] = resp_map_data['advanced']
-        base64_rules = ReadRules(item, oramap_path, parser, item.game_mod)
-        if base64_rules['advanced']:
-            resp_map_data['advanced'] = True
+        # Parse custom rules
+        rules_retcode, custom_rules = __run_utility_command(parser, item.game_mod, [
+            '--map-rules', oramap_path])
+
+        if rules_retcode != 0:
+            print('Update failed: Rule extraction failed')
+            return None
+
+        # TODO: Check against the game's Ruleset.DefinesUnsafeCustomRules code instead of line count
+        advanced = len(custom_rules.split("\n")) > 8
+        base64_rules = base64.b64encode(custom_rules.encode()).decode()
 
         updated_item = Maps(
             user=item.user,
-            title=resp_map_data['title'],
-            description=resp_map_data['description'],
+            title=metadata['title'],
+            description=metadata['description'],
             info=item.info,
-            author=resp_map_data['author'],
-            map_type=resp_map_data['map_type'],
-            categories=resp_map_data['categories'],
-            players=resp_map_data['players'],
-            game_mod=resp_map_data['game_mod'],
+            author=metadata['author'],
+            map_type=metadata['map_type'],
+            categories=metadata['categories'],
+            players=metadata['players'],
+            game_mod=metadata['game_mod'],
             map_hash=new_map_uid,
-            width=resp_map_data['width'],
-            height=resp_map_data['height'],
-            bounds=resp_map_data['bounds'],
-            mapformat=resp_map_data['mapformat'],
-            spawnpoints=resp_map_data['spawnpoints'],
-            tileset=resp_map_data['tileset'],
-            shellmap=resp_map_data['shellmap'],
-            base64_rules=base64_rules['data'],
-            base64_players=resp_map_data['base64_players'],
+            width=metadata['width'],
+            height=metadata['height'],
+            bounds=metadata['bounds'],
+            mapformat=metadata['mapformat'],
+            spawnpoints=metadata['spawnpoints'],
+            tileset=metadata['tileset'],
+            shellmap=metadata['shellmap'],
+            base64_rules=base64_rules,
+            base64_players=metadata['base64_players'],
             legacy_map=False,
             revision=item.revision + 1,
             pre_rev=item.id,
             next_rev=0,
             downloading=True,
             requires_upgrade=True,
-            advanced_map=resp_map_data['advanced'],
-            lua=resp_map_data['lua'],
+            advanced_map=advanced,
+            lua=metadata['lua'],
             posted=item.posted, # keep the original date to avoid reordering the map list
             viewed=0,
             policy_cc=item.policy_cc,
