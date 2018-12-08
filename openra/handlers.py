@@ -1,248 +1,303 @@
+import base64
+import tempfile
 import shutil
 import os
 import zipfile
-import string
-import re
-import signal
-import random
-import yaml
-import json
 from subprocess import Popen, PIPE
-import multiprocessing
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.text import get_valid_filename
 from django.contrib.auth.models import User
 from openra.models import Maps, Lints, Screenshots
 from openra import utility, misc
 
-class MapHandlers():
+# pylint: disable=too-many-return-statements
+# pylint: disable=too-many-locals
+# pylint: disable=broad-except
 
-    def __init__(self, map_full_path_filename="", map_full_path_directory="", preview_filename=""):
-        self.minimap_generated = False
-        self.maphash = ""
-        self.LintPassed = False
-        self.map_full_path_directory = map_full_path_directory
-        self.map_full_path_filename = map_full_path_filename
-        self.preview_filename = preview_filename
-        self.currentDirectory = settings.BASE_DIR    # web root
-        self.UID = False
-        self.legacy_name = ""
-        self.legacy_map = False
+class InvalidMapException(Exception):
+    """Failed to parse or process an OpenRA map file"""
+    def __init__(self, message):
+        self.message = message
 
-    def ProcessUploading(self, user_id, f, post, rev=1, pre_r=0):
-        parser = settings.OPENRA_VERSIONS[0]
-        if post.get("parser", None) is not None:
-            if post['parser'] not in settings.OPENRA_VERSIONS:
-                return 'Failed. Invalid parser'
-            parser = post['parser']
+def __first_oramap_in_directory(path):
+    """Returns the first matching .oramap filename in a given path or None
 
-        if pre_r != 0:
-            mapObject = Maps.objects.filter(id=pre_r, user_id=user_id)
-            if not mapObject:
-                return 'Failed. You do not own map for which you want to upload a new revision.'
-            if mapObject[0].next_rev != 0:
-                return 'Failed. Unable to upload a new revision for map which already has one.'
-            previous_policy_cc = mapObject[0].policy_cc
-            previous_policy_commercial = mapObject[0].policy_commercial
-            previous_policy_adaptations = mapObject[0].policy_adaptations
-        tempname = '/tmp/openramap.oramap'
-        with open(tempname, 'wb+') as destination:
-            for chunk in f.chunks():
+       The returned string is not prefixed by the directory.
+
+       TODO: This helper is a workaround for the filename not being stored in the model
+       This really should be fixed, and then this helper removed!
+    """
+    for filename in os.listdir(path):
+        if filename.endswith('.oramap'):
+            return filename
+    return None
+
+
+def add_map_revision(oramap_path, user,
+                     parser, game_mod,
+                     info, policy_options, posted_date,
+                     revision=1, previous_revision_id=0):
+    """ Parse and save a given oramap into the database.
+        The input file is not modified, and must be cleaned up afterwards by the caller.
+        Returns a Maps model or raises an InvalidMapException on error
+    """
+    print('Running --map-hash')
+    hash_retcode, map_hash = utility.run_utility_command(parser, game_mod, [
+        '--map-hash', oramap_path])
+
+    if hash_retcode != 0 or not map_hash:
+        raise InvalidMapException('Hash calculation failed')
+
+    # Check if user has already uploaded the same map
+    # TODO: Why do we prevent this for the same user, but not others?
+    if Maps.objects.filter(user_id=user.id, map_hash=map_hash).exists():
+        raise InvalidMapException("You've already uploaded this map.")
+
+    # Parse metadata
+    print('Parsing map.yaml metadata')
+    metadata = utility.parse_map_metadata(oramap_path)
+    if not metadata:
+        misc.send_email_to_admin_OnMapFail(oramap_path)
+        raise InvalidMapException('Unable to parse map metadata.')
+
+    if int(metadata['mapformat']) < 10:
+        raise InvalidMapException('Unable to import maps older than map format 10.')
+
+    # Parse custom rules
+    rules_retcode, custom_rules = utility.run_utility_command(parser, game_mod, [
+        '--map-rules', oramap_path])
+
+    if rules_retcode != 0:
+        misc.send_email_to_admin_OnMapFail(oramap_path)
+        raise InvalidMapException('Failed to parse custom rules.')
+
+    # TODO: Check against the game's Ruleset.DefinesUnsafeCustomRules code instead of line count
+    advanced = len(custom_rules.split("\n")) > 8
+    base64_rules = base64.b64encode(custom_rules.encode()).decode()
+
+    expect_metadata_keys = [
+        'title', 'author', 'categories', 'players', 'game_mod',
+        'width', 'height', 'bounds', 'mapformat', 'spawnpoints',
+        'tileset', 'base64_players', 'lua'
+    ]
+
+    keyargs = {}
+    for key in expect_metadata_keys:
+        if key not in metadata:
+            raise InvalidMapException('Map metadata missing required key: ' + key + '.')
+        keyargs[key] = metadata[key]
+
+    # Add record to Database
+    item = Maps(
+        map_hash=map_hash,
+        revision=revision,
+        pre_rev=previous_revision_id,
+        next_rev=0,
+        posted=posted_date,
+        viewed=0,
+        base64_rules=base64_rules,
+        parser=parser,
+        user=user,
+        info=info,
+        downloading=True,
+        requires_upgrade=True,
+        advanced_map=advanced,
+        policy_cc=policy_options['cc'],
+        policy_commercial=policy_options['commercial'],
+        policy_adaptations=policy_options['adaptations'],
+        description='', # Obsolete field
+        map_type='', # Obsolete field
+        shellmap=False, # Obsolete field
+        legacy_map=False, # Obsolete field
+        **keyargs
+    )
+    item.save()
+
+    # Copy the updated map to its new data location
+    item_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
+    item_content_path = os.path.join(item_path, 'content')
+    if not os.path.exists(item_content_path):
+        os.makedirs(item_content_path)
+
+    item_map_path = os.path.join(item_path, os.path.basename(oramap_path))
+    shutil.copy(oramap_path, item_map_path)
+
+    if previous_revision_id:
+        previous_item = Maps.objects.get(id=previous_revision_id)
+        previous_item.next_rev = item.id
+        previous_item.save()
+
+    # Extract the oramap contents
+    # TODO: Why do we need this?
+    with zipfile.ZipFile(item_map_path, mode='a') as oramap:
+        try:
+            oramap.extractall(item_content_path)
+        except Exception:
+            pass
+
+    # Run lint tests
+    print('Running --check-yaml')
+    lint_retcode, lint_output = utility.run_utility_command(parser, item.game_mod, [
+        '--check-yaml',
+        item_map_path
+    ])
+
+    if lint_output:
+        Lints(
+            item_type='maps',
+            map_id=item.id,
+            version_tag=parser,
+            pass_status=lint_retcode == 0,
+            lint_output=lint_output,
+            posted=timezone.now(),
+        ).save()
+
+    if lint_retcode == 0:
+        item.requires_upgrade = False
+        item.save()
+
+    print("--- New revision: %s" % item.id)
+    return item
+
+
+def process_upload(user_id, file, post, revision=1, previous_revision=0):
+    """Upload a new revision of a map
+       Returns the updated map revision or raises an InvalidMapException on error
+    """
+    parser = settings.OPENRA_VERSIONS[0]
+    if post.get("parser", None) is not None:
+        if post['parser'] not in settings.OPENRA_VERSIONS:
+            raise InvalidMapException('Invalid parser.')
+        parser = post['parser']
+
+    user = User.objects.get(pk=user_id)
+
+    # Check whether we can upload a new revision
+    # and propagate the license info
+    policy = {
+        'cc': False,
+        'commercial': False,
+        'adaptations': ''
+    }
+
+    if previous_revision:
+        query = Maps.objects.filter(id=previous_revision, user_id=user.id)
+        if not query:
+            raise InvalidMapException('Map is owned by another user.')
+
+        previous_item = query[0]
+        if previous_item.next_rev != 0:
+            raise InvalidMapException('Map already has a later revision.')
+
+        policy['cc'] = previous_item.policy_cc
+        policy['commercial'] = previous_item.policy_commercial
+        policy['adaptations'] = previous_item.policy_adaptations
+    else:
+        if post['policy_cc'] == 'cc_yes':
+            policy['cc'] = True
+            if post['commercial'] == "com_yes":
+                policy['commercial'] = True
+            if post['adaptations'] == "adapt_yes":
+                policy['adaptations'] = "yes"
+            elif post['adaptations'] == "adapt_no":
+                policy['adaptations'] = "no"
+            else:
+                policy['adaptations'] = "yes and shared alike"
+
+    # Create a temporary working directory and copy the oramap to it
+    # Directory is automatically deleted when exiting the context manager
+    with tempfile.TemporaryDirectory() as working_path:
+        print('Temporary working directory: {}'.format(working_path))
+
+        # Django's get_valid_filename makes the name safe
+        upload_path = os.path.join(working_path, get_valid_filename(file.name))
+        upload_ext = os.path.splitext(upload_path)[1].lower()
+        with open(upload_path, 'wb+') as destination:
+            for chunk in file.chunks():
                 destination.write(chunk)
 
-        command = 'file -b --mime-type %s' % tempname
-        proc = Popen(command.split(), stdout=PIPE).communicate()
-        mimetype = proc[0].decode().strip()
-        if not (mimetype == 'application/zip' and os.path.splitext(f.name)[1].lower() == '.oramap'):
-            if not (mimetype == 'text/plain' and os.path.splitext(f.name)[1].lower() in ['.mpr', '.ini']):
-                return 'Failed. Unsupported file type.'
+        mime_retcode, mime_type = utility.detect_mimetype(upload_path)
+        if mime_retcode != 0 or not (
+                (mime_type == 'application/zip' and upload_ext == '.oramap') or
+                (mime_type == 'text/plain' and upload_ext in ['.mpr', '.ini'])):
+            raise InvalidMapException('Unsupported file type: ' + mime_type)
 
-        name = f.name
-        badChars = ": ; < > @ $ # & ( ) % '".split()
-        for badchar in badChars:
-            name = name.replace(badchar, "_")
-        name = name.replace(" ", "_")
-        # There can be weird chars still, if so: stop uploading
-        findBadChars = re.findall(r'(\W+)', name)
-        for bc in findBadChars:
-            if bc not in ['.', '-']:
-                return 'Failed. Your filename is bogus; rename and try again.'
+        # TODO: Support importing from cnc/d2k/ts.
+        # Note that cnc maps contain *two* files which must both be present
+        if mime_type == 'text/plain':
+            import_path = os.path.splitext(upload_path)[0] + '.oramap'
 
-        if mimetype == 'text/plain':
-            if not self.LegacyImport(tempname, parser):
-                misc.send_email_to_admin_OnMapFail(tempname)
-                return 'Failed to import legacy map.'
-            shutil.move(self.legacy_name, tempname)
-            name = os.path.splitext(name)[0] + '.oramap'
-            self.legacy_map = True
+            # Ignore command output and retcode, we know it worked if an oramap is saved
+            utility.run_utility_command(parser, 'ra', [
+                '--import-ra-map', upload_path], cwd=working_path)
 
-        # Check if user has already uploaded the same map
-        self.GetHash(tempname, parser)
-        if 'Converted' in self.maphash and 'to MapFormat' in self.maphash:
-            misc.send_email_to_admin_OnMapFail(tempname)
-            return 'Failed to upload with this parser. MapFormat does not match. Try to upgrade your map or use different parser.'
-
-        userObject = User.objects.get(pk=user_id)
-        try:
-            hashExists = Maps.objects.get(user_id=userObject.id, map_hash=self.maphash)
-            self.UID = str(hashExists.id)
-            return "Failed. You've already uploaded this map."
-        except:
-            pass   # all good
-
-        # Read Yaml
-        read_yaml_response = utility.ReadYaml(False, tempname)
-        resp_map_data = read_yaml_response['response']
-        if read_yaml_response['error']:
-            misc.send_email_to_admin_OnMapFail(tempname)
-            return resp_map_data
-
-        if int(resp_map_data['mapformat']) < 10:
-            misc.send_email_to_admin_OnMapFail(tempname)
-            return "Unable to import maps older than map format 10."
-
-        # Read Rules
-        base64_rules = utility.ReadRules(False, tempname, parser, resp_map_data['game_mod'])
-        if (base64_rules['error']):
-            print(base64_rules['response'])
-
-        if base64_rules['advanced']:
-            resp_map_data['advanced'] = True
-
-        # Define license information
-        cc = False
-        commercial = False
-        adaptations = ""
-        if pre_r == 0:
-            if post['policy_cc'] == 'cc_yes':
-                cc = True
-                if post['commercial'] == "com_yes":
-                    commercial = True
-                if post['adaptations'] == "adapt_yes":
-                    adaptations = "yes"
-                elif post['adaptations'] == "adapt_no":
-                    adaptations = "no"
-                else:
-                    adaptations = "yes and shared alike"
-        else:
-            cc = previous_policy_cc
-            commercial = previous_policy_commercial
-            adaptations = previous_policy_adaptations
-
-
-        # Add record to Database
-        transac = Maps(
-            user=userObject,
-            title=resp_map_data['title'],
-            description=resp_map_data['description'],
-            info=post['info'].strip(),
-            author=resp_map_data['author'],
-            map_type=resp_map_data['map_type'],
-            categories=resp_map_data['categories'],
-            players=resp_map_data['players'],
-            game_mod=resp_map_data['game_mod'],
-            map_hash=self.maphash.strip(),
-            width=resp_map_data['width'],
-            height=resp_map_data['height'],
-            bounds=resp_map_data['bounds'],
-            mapformat=resp_map_data['mapformat'],
-            spawnpoints=resp_map_data['spawnpoints'],
-            tileset=resp_map_data['tileset'],
-            shellmap=resp_map_data['shellmap'],
-            base64_rules=base64_rules['data'],
-            base64_players=resp_map_data['base64_players'],
-            legacy_map=self.legacy_map,
-            revision=rev,
-            pre_rev=pre_r,
-            next_rev=0,
-            downloading=True,
-            requires_upgrade=True,
-            advanced_map=resp_map_data['advanced'],
-            lua=resp_map_data['lua'],
-            posted=timezone.now(),
-            viewed=0,
-            policy_cc=cc,
-            policy_commercial=commercial,
-            policy_adaptations=adaptations,
-            parser=parser,
-        )
-        transac.save()
-        self.UID = str(transac.id)
-
-        self.map_full_path_directory = os.path.join(self.currentDirectory, __name__.split('.')[0], 'data', 'maps', self.UID)
-
-        try:
-            if not os.path.exists(self.map_full_path_directory):
-                os.makedirs(os.path.join(self.map_full_path_directory, 'content'))
-        except Exception as e:
-            print("Failed to create directory for new map", self.map_full_path_directory)
-            transac.delete() # Remove failed map from DB before raise
-            raise
-
-        if pre_r != 0:
-            Maps.objects.filter(id=pre_r).update(next_rev=transac.id)
-
-        self.map_full_path_filename = os.path.join(self.map_full_path_directory, name)
-        self.preview_filename = os.path.splitext(name)[0] + ".png"
-
-        shutil.move(tempname, self.map_full_path_filename)
-
-        self.UnzipMap()
-
-        lint_check_response = utility.LintCheck(transac, self.map_full_path_filename, parser)
-        if lint_check_response['error'] is False and lint_check_response['response'] == 'pass_for_requested_parser':
-            self.LintPassed = True
-
-        if self.LintPassed:
-            Maps.objects.filter(id=transac.id).update(requires_upgrade=False)
-        else:
-            Maps.objects.filter(id=transac.id).update(requires_upgrade=True)
-
-
-        print("--- New map: %s" % self.UID)
-        return False  # no errors
-
-    def UnzipMap(self):
-        z = zipfile.ZipFile(self.map_full_path_filename, mode='a')
-        try:
-            z.extractall(os.path.join(self.map_full_path_directory, 'content'))
-        except:
-            pass
-        z.close()
-
-    def GetHash(self, filepath="", parser=settings.OPENRA_VERSIONS[0]):
-        if filepath == "":
-            filepath = self.map_full_path_filename
-
-        os.chmod(filepath, 0o444)
-
-        command = misc.build_utility_command(parser, 'ra', ['--map-hash', filepath])
-        proc = Popen(command.split(), stdout=PIPE).communicate()
-
-        os.chmod(filepath, 0o644)
-
-        self.maphash = proc[0].decode().strip()
-
-    def LegacyImport(self, mapPath, parser=settings.OPENRA_VERSIONS[0]):
-        for mod in ['ra', 'cnc']:
-
-            assign_mod = mod
-            if mod == 'cnc':
-                assign_mod = 'td'
-
-            command = misc.build_utility_command(parser, mod, ['--import-{0}-map'.format(assign_mod), mapPath])
-            proc = Popen(command.split(), stdout=PIPE).communicate()
-
-            if "Error" in proc[0].decode():
-                continue
+            if os.path.exists(import_path):
+                upload_path = import_path
             else:
-                if "saved" in proc[0].decode():
-                    self.legacy_name = proc[0].decode().split("\n")[-2].split(' saved')[0]
-                    return True
-                else:
-                    continue
-        return False
+                misc.send_email_to_admin_OnMapFail(upload_path)
+                raise InvalidMapException('Failed to import legacy map.')
+
+        # TODO: Replace hardcoded RA with the parser mod when that rewrite happens
+        return add_map_revision(upload_path, user, parser, 'ra',
+                                post['info'].strip(), policy, timezone.now(),
+                                revision, previous_revision)
+
+
+def process_update(item, parser=settings.OPENRA_VERSIONS[0]):
+    """Create a new revision of a map by running the OpenRA.Utility
+       update command using a given parser version
+
+       Returns the updated map revision or raises an InvalidMapException on error
+    """
+    print('Starting map update action on map {}. Using parser: {}'.format(item.id, parser))
+    if item.next_rev != 0:
+        raise InvalidMapException('A newer revision of this map already exists')
+
+    # Find the oramap file in the data directory
+    source_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
+    oramap_filename = __first_oramap_in_directory(source_path)
+    if not oramap_filename:
+        raise InvalidMapException('Map directory does not contain an .oramap package')
+
+    # Create a temporary working directory and copy the oramap to it
+    # Directory is automatically deleted when exiting the context manager
+    with tempfile.TemporaryDirectory() as working_path:
+        print('Temporary working directory: {}'.format(working_path))
+        oramap_path = os.path.join(working_path, oramap_filename)
+        shutil.copy(os.path.join(source_path, oramap_filename), oramap_path)
+
+        # Run OpenRA.Utility to do the actual update
+        print('Running --update-map')
+        update_retcode, update_output = utility.run_utility_command(parser, item.game_mod, [
+            '--update-map',
+            oramap_path,
+            item.parser,
+            '--apply'
+        ])
+
+        # Error code if the command crashed, usage line on invalid arguments
+        if update_retcode != 0 or update_output.startswith('--update-map MAP SOURCE'):
+            raise InvalidMapException('OpenRA.Utility --update-map returned an error')
+
+        if not update_output:
+            raise InvalidMapException('OpenRA.Utility --update-map returned no output')
+
+        if update_output.startswith('No such command'):
+            raise InvalidMapException('OpenRA.Utility --update-map command missing')
+
+        policy = {
+            'cc': item.policy_cc,
+            'commercial': item.policy_commercial,
+            'adaptations': item.policy_adaptations
+        }
+
+        return add_map_revision(oramap_path, item.user,
+                                parser, item.game_mod,
+                                item.info, policy,
+                                item.posted, # preserve original date to avoid reordering map list
+                                item.revision + 1, item.id)
 
 
 def addScreenshot(request, arg, item):
@@ -279,7 +334,8 @@ def addScreenshot(request, arg, item):
         )
     transac.save()
 
-    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'screenshots', str(transac.id))
+    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data',
+                        'screenshots', str(transac.id))
     if not os.path.exists(path):
         os.makedirs(path)
 
