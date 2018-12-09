@@ -180,7 +180,7 @@ def ControlPanel(request, page=1, filter=""):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/panel/")
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -214,7 +214,7 @@ def maps(request, page=1):
             return HttpResponseRedirect("/maps/?" + request.META['QUERY_STRING'])
         return HttpResponseRedirect("/maps/")
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -254,7 +254,7 @@ def maps_author(request, author, page=1):
             return HttpResponseRedirect("/maps/author/%s/?%s" % (author, request.META['QUERY_STRING']))
         return HttpResponseRedirect("/maps/author/%s/" % author)
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -294,7 +294,7 @@ def maps_uploader(request, arg, page=1):
             return HttpResponseRedirect("/maps/uploader/%s/?%s" % (arg, request.META['QUERY_STRING']))
         return HttpResponseRedirect("/maps/uploader/%s/" % arg)
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -333,7 +333,7 @@ def maps_duplicates(request, maphash, page=1):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/duplicates/%s/" % maphash)
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -916,8 +916,7 @@ def maps_revisions(request, arg, page=1):
     except:
         return HttpResponseRedirect('/')
 
-    revs = misc.Revisions('maps')
-    revisions = revs.GetRevisions(arg)
+    revisions = misc.all_revisions_for_map(arg)
     mapObject = Maps.objects.filter(id__in=revisions).order_by('-revision', '-posted')
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
@@ -925,7 +924,7 @@ def maps_revisions(request, arg, page=1):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/%s/revisions/" % arg)
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
