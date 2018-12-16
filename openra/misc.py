@@ -6,6 +6,7 @@ import pytz
 import copy
 from functools import reduce
 from django.core import mail
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
@@ -181,20 +182,18 @@ def sizeof_fmt(disk_size):
         disk_size /= 1024.0
 
 
-def count_comments_for_many(mapObject, item_type):
+def count_comments_for_many(mapObject):
     comments = {}
     for item in mapObject:
         comments[str(item.id)] = 0
-        revs = Revisions(item_type)
-        revisions = revs.GetRevisions(item.id)
+        revisions = all_revisions_for_map(item.id)
         for rev in revisions:
-            comments[str(item.id)] += len(Comments.objects.filter(item_type=item_type.lower(), item_id=rev, is_removed=False))
+            comments[str(item.id)] += len(Comments.objects.filter(item_type='maps', item_id=rev, is_removed=False))
     return comments
 
 
 def get_map_id_of_revision(item, seek_rev):
-    revs = Revisions('maps')
-    revisions = revs.GetRevisions(item.id)
+    revisions = all_revisions_for_map(item.id)
     for rev in revisions:
         mapObj = Maps.objects.get(id=rev)
         if mapObj.revision == seek_rev:
@@ -203,8 +202,7 @@ def get_map_id_of_revision(item, seek_rev):
 
 
 def get_map_title_of_revision(item, seek_rev):
-    revs = Revisions('maps')
-    revisions = revs.GetRevisions(item.id)
+    revisions = all_revisions_for_map(item.id)
     for rev in revisions:
         mapObj = Maps.objects.get(id=rev)
         if mapObj.revision == seek_rev:
@@ -215,10 +213,8 @@ def get_map_title_of_revision(item, seek_rev):
 def get_comments_for_all_revisions(request, item_type, item_id):
     comments = []
 
-    revs = Revisions(item_type)
-    revisions = revs.GetRevisions(item_id)
+    revisions = all_revisions_for_map(item_id)
     for rev in revisions:
-
         current_user_commented = False
         current_rev = Maps.objects.get(id=rev)
         commentsObj = Comments.objects.filter(item_type=item_type, item_id=rev, is_removed=False).order_by('posted')
@@ -237,37 +233,30 @@ def get_comments_for_all_revisions(request, item_type, item_id):
     return list(reversed(comments))
 
 
-# Revisions
-class Revisions():
+def all_revisions_for_map(item_id):
+    # Seek back to root revision
+    try:
+        while True:
+            item = Maps.objects.get(id=item_id)
+            if item.pre_rev == 0:
+                break
+            item_id = item.pre_rev
+    # Don't crash on broken references
+    # TODO: Fix the models so this won't happen!
+    except ObjectDoesNotExist:
+        pass
 
-    def __init__(self, modelName):
-        self.revisions = []
-        self.modelName = modelName
+    # Seek forwards yielding revisions
+    try:
+        while True:
+            item = Maps.objects.get(id=item_id)
+            yield item_id
 
-    def GetRevisions(self, itemid, seek_next=False):
-        if seek_next:
-            if self.modelName.lower() == "maps":
-                itemObject = Maps.objects.get(id=itemid)
-            if itemObject.next_rev == 0:
-                return
-            self.revisions.append(itemObject.next_rev)
-            self.GetRevisions(itemObject.next_rev, True)
-            return
-        self.revisions.insert(0, itemid)
-        if self.modelName.lower() == "maps":
-            itemObject = Maps.objects.get(id=itemid)
-        if itemObject.pre_rev == 0:
-            self.GetRevisions(self.revisions[-1], True)
-            return self.revisions
-        self.GetRevisions(itemObject.pre_rev)
-        return self.revisions
-
-    def GetLatestRevisionID(self, itemid):
-        if self.modelName.lower() == "maps":
-            itemObject = Maps.objects.get(id=itemid)
-        if itemObject.next_rev == 0:
-            return itemObject.id
-        return self.GetLatestRevisionID(itemObject.next_rev)
+            item_id = item.next_rev
+            if item_id == 0:
+                break
+    except ObjectDoesNotExist:
+        pass
 
 
 def Log(data, channel="default"):

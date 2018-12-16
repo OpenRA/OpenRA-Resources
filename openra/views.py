@@ -1,19 +1,17 @@
 import os
 import math
-import re
-import urllib.request
 import datetime
 import shutil
 import random
-import operator
 import json
 import cgi
 import base64
 from urllib.parse import urlencode
-from io import BytesIO
+import urllib.request
+
 from django.conf import settings
-from django.http import StreamingHttpResponse, HttpResponse
-from django.template import RequestContext, loader
+from django.http import StreamingHttpResponse
+from django.template import loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, Http404
 from django.utils import timezone
@@ -21,8 +19,14 @@ from django.utils import timezone
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from openra import handlers, misc, utility
-from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments, MapCategories, MapUpgradeLogs
+from openra import handlers, misc
+from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments
+
+# TODO: Fix the code and reenable some of these warnings
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=missing-docstring
+# pylint: disable=bare-except
 
 
 def index(request):
@@ -176,7 +180,7 @@ def ControlPanel(request, page=1, filter=""):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/panel/")
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -210,7 +214,7 @@ def maps(request, page=1):
             return HttpResponseRedirect("/maps/?" + request.META['QUERY_STRING'])
         return HttpResponseRedirect("/maps/")
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -250,7 +254,7 @@ def maps_author(request, author, page=1):
             return HttpResponseRedirect("/maps/author/%s/?%s" % (author, request.META['QUERY_STRING']))
         return HttpResponseRedirect("/maps/author/%s/" % author)
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -290,7 +294,7 @@ def maps_uploader(request, arg, page=1):
             return HttpResponseRedirect("/maps/uploader/%s/?%s" % (arg, request.META['QUERY_STRING']))
         return HttpResponseRedirect("/maps/uploader/%s/" % arg)
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -329,7 +333,7 @@ def maps_duplicates(request, maphash, page=1):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/duplicates/%s/" % maphash)
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
@@ -573,14 +577,16 @@ def updateMap(request, arg):
     if request.method == 'POST':
         target_parser = request.POST.get('target_parser', None)
         if target_parser and target_parser in settings.OPENRA_VERSIONS:
-            updated = utility.map_update(mapObject[0], target_parser)
-            if updated:
-                redirect = '/maps/' + str(updated.id) + '/'
-                if updated.mapupgradelogs_set.count() > 0:
+            try:
+                updated_item = handlers.process_update(mapObject[0], target_parser)
+                redirect = '/maps/' + str(updated_item.id) + '/'
+                if updated_item.mapupgradelogs_set.count() > 0:
                     redirect += 'update_logs?updated'
 
                 return HttpResponseRedirect(redirect)
-        update_failed = True
+            except handlers.InvalidMapException as exception:
+                update_failed = True
+                print('Update Failed: ' + exception.message)
 
     ##########
 
@@ -797,8 +803,7 @@ def uploadMap(request, previous_rev=0):
 
         return StreamingHttpResponse(template.render(template_args, request))
 
-    error_response = False
-    uid = False
+    error_message = None
     rev = 1
     previous_rev_title = ""
     user_id = request.user.id
@@ -809,26 +814,24 @@ def uploadMap(request, previous_rev=0):
             previous_rev_title = mapObject[0].title
             if request.user.is_superuser:
                 user_id = mapObject[0].user_id
-    if request.method == 'POST':
-        if request.FILES.get('file', None) is not None:
-            uploadingMap = handlers.MapHandlers()
-            error_response = uploadingMap.ProcessUploading(user_id, request.FILES['file'], request.POST, rev, previous_rev)
-            if uploadingMap.UID:
-                uid = str(uploadingMap.UID)
-                if error_response is False:
-                    return HttpResponseRedirect('/maps/' + uid + "/")
+
+    if request.method == 'POST' and request.FILES.get('file', None) is not None:
+        try:
+            item = handlers.process_upload(user_id, request.FILES['file'], request.POST, rev, previous_rev)
+            return HttpResponseRedirect('/maps/' + str(item.id) + "/")
+        except handlers.InvalidMapException as exception:
+            error_message = exception.message
 
     template = loader.get_template('index.html')
     template_args = {
         'content': 'uploadMap.html',
         'request': request,
         'title': ' - Uploading Map',
-        'uid': uid,
         'previous_rev': previous_rev,
         'previous_rev_title': previous_rev_title,
         'rev': rev,
         'parsers': settings.OPENRA_VERSIONS,
-        'error_response': error_response,
+        'error_response': error_message,
     }
 
     if settings.SITE_MAINTENANCE:
@@ -913,8 +916,7 @@ def maps_revisions(request, arg, page=1):
     except:
         return HttpResponseRedirect('/')
 
-    revs = misc.Revisions('maps')
-    revisions = revs.GetRevisions(arg)
+    revisions = misc.all_revisions_for_map(arg)
     mapObject = Maps.objects.filter(id__in=revisions).order_by('-revision', '-posted')
     amount = len(mapObject)
     rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
@@ -922,7 +924,7 @@ def maps_revisions(request, arg, page=1):
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/%s/revisions/" % arg)
 
-    comments = misc.count_comments_for_many(mapObject, 'maps')
+    comments = misc.count_comments_for_many(mapObject)
 
     template = loader.get_template('index.html')
     template_args = {
