@@ -42,6 +42,7 @@ def run_utility_command(parser, game_mod, args, cwd=None):
 
 def parse_map_metadata(oramap_path):
     # TODO: Replace this DIY parsing with a utility command that returns JSON
+    # TODO: Will need a migration to remove the quote-doubling from title and author
     metadata = {
         'mapformat': 0,
         'lua': False,
