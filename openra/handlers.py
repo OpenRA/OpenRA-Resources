@@ -12,6 +12,9 @@ from django.contrib.auth.models import User
 from openra.models import Maps, Lints, Screenshots
 from openra import utility, misc
 
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-statements
 # pylint: disable=too-many-return-statements
 # pylint: disable=too-many-locals
 # pylint: disable=broad-except
@@ -19,6 +22,7 @@ from openra import utility, misc
 class InvalidMapException(Exception):
     """Failed to parse or process an OpenRA map file"""
     def __init__(self, message):
+        super().__init__()
         self.message = message
 
 
