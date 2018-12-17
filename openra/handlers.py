@@ -21,19 +21,6 @@ class InvalidMapException(Exception):
     def __init__(self, message):
         self.message = message
 
-def __first_oramap_in_directory(path):
-    """Returns the first matching .oramap filename in a given path or None
-
-       The returned string is not prefixed by the directory.
-
-       TODO: This helper is a workaround for the filename not being stored in the model
-       This really should be fixed, and then this helper removed!
-    """
-    for filename in os.listdir(path):
-        if filename.endswith('.oramap'):
-            return filename
-    return None
-
 
 def add_map_revision(oramap_path, user,
                      parser, game_mod,
@@ -257,7 +244,7 @@ def process_update(item, parser=settings.OPENRA_VERSIONS[0]):
 
     # Find the oramap file in the data directory
     source_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
-    oramap_filename = __first_oramap_in_directory(source_path)
+    oramap_filename = misc.first_oramap_in_directory(source_path)
     if not oramap_filename:
         raise InvalidMapException('Map directory does not contain an .oramap package')
 

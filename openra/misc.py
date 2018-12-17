@@ -475,3 +475,15 @@ def build_utility_command(parser, game_mod, args):
 
     return 'mono --debug %s %s %s' % (os.path.join(settings.OPENRA_ROOT_PATH, parser, 'OpenRA.Utility.exe'), game_mod, ' '.join(args))
 
+def first_oramap_in_directory(path):
+    """Returns the first matching .oramap filename in a given path or None
+
+       The returned string is not prefixed by the directory.
+
+       TODO: This helper is a workaround for the filename not being stored in the model
+       This really should be fixed, and then this helper removed!
+    """
+    for filename in os.listdir(path):
+        if filename.endswith('.oramap'):
+            return filename
+    return None
