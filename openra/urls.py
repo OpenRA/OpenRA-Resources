@@ -95,10 +95,17 @@ urlpatterns = [
     url(r'^contacts/?$', views.contacts, name='contacts'),
     url(r'^contacts/sent/?$', views.contacts_sent, name='contacts_sent'),
 
-
-    url(r'^map/(?P<arg>\w+)/?$', api.mapAPI, name='mapAPI_download'),
-    url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/?$', api.mapAPI, name='mapAPI'),
-    url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/(?P<arg2>\-?\w+)/?$', api.mapAPI, name='mapAPI_list'),
+    url(r'^map/', include([
+        url(r'^hash/(?P<map_hashes>[^/]+)/yaml/?$', api.map_info_from_hashes, {'yaml': True}, name='mapAPI'),
+        url(r'^hash/(?P<map_hashes>[^/]+)/?$', api.map_info_from_hashes, name='mapAPI'),
+        url(r'^id/(?P<map_ids>[^/]+)/yaml/?$', api.map_info_from_ids, {'yaml': True}, name='mapAPI'),
+        url(r'^id/(?P<map_ids>[^/]+)/?$', api.map_info_from_ids, name='mapAPI'),
+        url(r'^url/(?P<map_hashes>[^/]+)/yaml/?$', api.map_urlinfo_from_hashes, {'yaml': True}, name='mapAPI'),
+        url(r'^url/(?P<map_hashes>[^/]+)/?$', api.map_urlinfo_from_hashes, name='mapAPI'),
+        url(r'^lastmap/yaml/?$', api.latest_map_info, {'yaml': True}, name='mapAPI'),
+        url(r'^lastmap/?$', api.latest_map_info, name='mapAPI'),
+        url(r'^(?P<map_hash>\w+)/?$', api.download_map, name='mapAPI_download'),
+    ])),
 
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
     url(r'^robots.txt$', views.robots, name='robots.txt'),
