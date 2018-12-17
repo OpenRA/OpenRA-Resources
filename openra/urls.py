@@ -99,10 +99,6 @@ urlpatterns = [
     url(r'^map/(?P<arg>\w+)/?$', api.mapAPI, name='mapAPI_download'),
     url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/?$', api.mapAPI, name='mapAPI'),
     url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/(?P<arg2>\-?\w+)/?$', api.mapAPI, name='mapAPI_list'),
-    url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/(?P<arg2>\-?\w+)/(?P<arg3>[^/]+)/?$', api.mapAPI, name='mapAPI_list_strict'),
-    url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/(?P<arg2>\-?\w+)/(?P<arg3>[^/]+)/(?P<arg4>\w+)/?$', api.mapAPI, name='mapAPI_list_strict'),
-    url(r'^map/(?P<arg>\w+)/(?P<arg1>[^/]+)/(?P<arg2>\-?\w+)/(?P<arg3>[^/]+)/(?P<arg4>\w+)/?/(?P<arg5>\w+)/?$', api.mapAPI, name='mapAPI_search'),
-
 
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
     url(r'^robots.txt$', views.robots, name='robots.txt'),
