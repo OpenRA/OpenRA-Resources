@@ -39,12 +39,12 @@ def add_map_revision(oramap_path, user,
         '--map-hash', oramap_path])
 
     if hash_retcode != 0 or not map_hash:
-        raise InvalidMapException('Hash calculation failed')
+        raise InvalidMapException('Hash calculation failed.')
 
-    # Check if user has already uploaded the same map
-    # TODO: Why do we prevent this for the same user, but not others?
-    if Maps.objects.filter(user_id=user.id, map_hash=map_hash).exists():
-        raise InvalidMapException("You've already uploaded this map.")
+    # Require unique map hashes - allowing maps to have multiple RC entries
+    # makes it difficult to return consistent data through the map API
+    if Maps.objects.filter(map_hash=map_hash).exists():
+        raise InvalidMapException("Map has already been uploaded.")
 
     # Parse metadata
     print('Parsing map.yaml metadata')

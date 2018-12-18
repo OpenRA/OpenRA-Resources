@@ -96,7 +96,7 @@ def parse_map_metadata(oramap_path):
             in_spawn_node = False
 
         if in_players_node:
-            players_nodes += '\t' * indent + line.strip() + '\n'
+            players_nodes += '\t' * (indent - 1) + line.strip() + '\n'
 
         split_index = line.find(':')
         if split_index < 0:
