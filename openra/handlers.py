@@ -12,6 +12,9 @@ from django.contrib.auth.models import User
 from openra.models import Maps, Lints, Screenshots
 from openra import utility, misc
 
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-statements
 # pylint: disable=too-many-return-statements
 # pylint: disable=too-many-locals
 # pylint: disable=broad-except
@@ -19,6 +22,7 @@ from openra import utility, misc
 class InvalidMapException(Exception):
     """Failed to parse or process an OpenRA map file"""
     def __init__(self, message):
+        super().__init__()
         self.message = message
 
 
@@ -52,17 +56,24 @@ def add_map_revision(oramap_path, user,
     if int(metadata['mapformat']) < 10:
         raise InvalidMapException('Unable to import maps older than map format 10.')
 
-    # Parse custom rules
-    rules_retcode, custom_rules = utility.run_utility_command(parser, game_mod, [
-        '--map-rules', oramap_path])
+    # Only attempt to parse rules for the default mods
+    # This will be fixed properly once we move to mod-based parsing
+    is_known_mod = metadata['game_mod'] in ['ra', 'cnc', 'd2k', 'ts']
 
-    if rules_retcode != 0:
-        misc.send_email_to_admin_OnMapFail(oramap_path)
-        raise InvalidMapException('Failed to parse custom rules.')
+    if is_known_mod:
+        rules_retcode, custom_rules = utility.run_utility_command(parser, metadata['game_mod'], [
+            '--map-rules', oramap_path])
 
-    # TODO: Check against the game's Ruleset.DefinesUnsafeCustomRules code instead of line count
-    advanced = len(custom_rules.split("\n")) > 8
-    base64_rules = base64.b64encode(custom_rules.encode()).decode()
+        if rules_retcode != 0:
+            misc.send_email_to_admin_OnMapFail(oramap_path)
+            raise InvalidMapException('Failed to parse custom rules.')
+
+        # TODO: Check against the game's Ruleset.DefinesUnsafeCustomRules code instead of line count
+        advanced = len(custom_rules.split("\n")) > 8
+        base64_rules = base64.b64encode(custom_rules.encode()).decode()
+    else:
+        base64_rules = ''
+        advanced = False
 
     expect_metadata_keys = [
         'title', 'author', 'categories', 'players', 'game_mod',
@@ -89,7 +100,7 @@ def add_map_revision(oramap_path, user,
         user=user,
         info=info,
         downloading=True,
-        requires_upgrade=True,
+        requires_upgrade=not is_known_mod,
         advanced_map=advanced,
         policy_cc=policy_options['cc'],
         policy_commercial=policy_options['commercial'],
@@ -124,26 +135,26 @@ def add_map_revision(oramap_path, user,
         except Exception:
             pass
 
-    # Run lint tests
-    print('Running --check-yaml')
-    lint_retcode, lint_output = utility.run_utility_command(parser, item.game_mod, [
-        '--check-yaml',
-        item_map_path
-    ])
+    if is_known_mod:
+        print('Running --check-yaml')
+        lint_retcode, lint_output = utility.run_utility_command(parser, item.game_mod, [
+            '--check-yaml',
+            item_map_path
+        ])
 
-    if lint_output:
-        Lints(
-            item_type='maps',
-            map_id=item.id,
-            version_tag=parser,
-            pass_status=lint_retcode == 0,
-            lint_output=lint_output,
-            posted=timezone.now(),
-        ).save()
+        if lint_output:
+            Lints(
+                item_type='maps',
+                map_id=item.id,
+                version_tag=parser,
+                pass_status=lint_retcode == 0,
+                lint_output=lint_output,
+                posted=timezone.now(),
+            ).save()
 
-    if lint_retcode == 0:
-        item.requires_upgrade = False
-        item.save()
+        if lint_retcode == 0:
+            item.requires_upgrade = False
+            item.save()
 
     print("--- New revision: %s" % item.id)
     return item

@@ -1,5 +1,4 @@
 import base64
-import html
 import json
 import os
 
@@ -27,7 +26,7 @@ def __generate_response(maps_data, yaml):
                     value = ', '.join(map_value)
 
                 # Escape bad yaml values
-                value = value.replace('\n', '\\n').replace('\t', '\\t')
+                value = value.replace('\r', '\\r').replace('\n', '\\n').replace('\t', '\\t')
                 yaml_response += '\t{0}: {1}\n'.format(map_key, value)
         response = StreamingHttpResponse(yaml_response, content_type="text/plain")
     else:
@@ -63,7 +62,7 @@ def __map_info_from_objects(request, map_objects, yaml):
             categories = json.loads(map_object.categories)
             category_ids = [cat_id.strip('_') for cat_id in categories]
             category_objects = MapCategories.objects.filter(id__in=category_ids)
-            category_list = [html.escape(c.category_name) for c in category_objects]
+            category_list = [c.category_name for c in category_objects]
 
         minimap_path = os.path.join(
             settings.BASE_DIR, 'openra', 'data', 'maps',
@@ -78,21 +77,22 @@ def __map_info_from_objects(request, map_objects, yaml):
         download_url = 'http://' + request.META['HTTP_HOST'] + \
                        '/maps/' + str(map_object.id) + '/oramap'
 
+        # TODO: Title and author have ' replaced with '' before insertion into the database. Work out why and fix it
         results[map_object.map_hash] = {
             'id': map_object.id,
-            'title': html.escape(map_object.title),
-            'description': html.escape(map_object.description),
-            'info': html.escape(map_object.info),
-            'author': html.escape(map_object.author),
-            'map_type': html.escape(map_object.map_type),
+            'title': map_object.title.replace("''", "'"),
+            'description': map_object.description,
+            'info': map_object.info,
+            'author': map_object.author.replace("''", "'"),
+            'map_type': map_object.map_type,
             'players': map_object.players,
-            'game_mod': html.escape(map_object.game_mod),
+            'game_mod': map_object.game_mod,
             'map_hash': map_object.map_hash,
             'width': map_object.width,
             'height': map_object.height,
             'bounds': map_object.bounds,
             'spawnpoints': map_object.spawnpoints,
-            'tileset': html.escape(map_object.tileset),
+            'tileset': map_object.tileset,
             'revision': map_object.revision,
             'last_revision': last_revision,
             'requires_upgrade': map_object.requires_upgrade,
