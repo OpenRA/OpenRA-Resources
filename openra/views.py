@@ -497,9 +497,6 @@ def displayMap(request, arg):
     if mapObject.next_rev != 0:
         show_upgrade_map_button = False  # upgrade only the latest revision
 
-    if mapObject.parser not in settings.OPENRA_VERSIONS:
-        show_upgrade_map_button = False  # map was not parsed with a compatible version
-
     if not any([mapObject.parser in v for v in settings.OPENRA_UPDATE_VERSIONS.values()]):
         show_upgrade_map_button = False  # no compatible update targets
 
@@ -559,9 +556,6 @@ def updateMap(request, arg):
 
     if source_map.next_rev != 0:
         return HttpResponseRedirect('/maps/' + arg + '/')  # update only the latest revision
-
-    if source_map.parser not in settings.OPENRA_VERSIONS:
-        return HttpResponseRedirect('/maps/' + arg + '/')  # map was not parsed with a compatible parser
 
     update_parsers = [k for k in settings.OPENRA_UPDATE_VERSIONS if source_map.parser in settings.OPENRA_UPDATE_VERSIONS[k]]
     if not update_parsers:
