@@ -420,23 +420,18 @@ def displayMap(request, arg):
 
             return HttpResponseRedirect('/maps/' + arg + '/')
 
-    disk_size = 0
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
-    try:
-        mapDir = os.listdir(path)
-        for filename in mapDir:
-            if filename.endswith(".oramap"):
-                disk_size = os.path.getsize(os.path.join(path, filename))
-                disk_size = misc.sizeof_fmt(disk_size)
-                break
-        mapDir = os.listdir(os.path.join(path, 'content'))
-    except FileNotFoundError as ex:
-        print(ex)
+    oramap_filename = misc.first_oramap_in_directory(path)
+    if not oramap_filename:
         return HttpResponseRedirect('/')
+
     try:
         mapObject = Maps.objects.get(id=arg)
     except:
         return HttpResponseRedirect('/')
+
+    disk_size = os.path.getsize(os.path.join(path, oramap_filename))
+    disk_size = misc.sizeof_fmt(disk_size)
 
     lints = []
     lintObject = Lints.objects.filter(map_id=mapObject.id, item_type='maps')
