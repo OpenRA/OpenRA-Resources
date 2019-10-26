@@ -1,9 +1,6 @@
 import os
-import shutil
 import datetime
-import time
 import pytz
-import copy
 from functools import reduce
 from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist
@@ -43,12 +40,6 @@ def selectLicenceInfo(itemObject):
         name = "Attribution-NonCommercial-ShareAlike 4.0 International"
         icons = 'by-nc-sa'
     return name, icons
-
-
-def addSlash(path):
-    if not path.endswith('/'):
-        path += '/'
-    return path
 
 
 def send_email_contacts_form(name, email, message):
@@ -259,33 +250,6 @@ def all_revisions_for_map(item_id):
         pass
 
 
-def Log(data, channel="default"):
-    log_path = os.path.join(settings.BASE_DIR, "logs")
-    if not os.path.isdir(log_path):
-        os.makedirs(log_path)
-    logfile = open(os.path.join(log_path, channel + ".log"), "a")
-    if data:
-        today = datetime.datetime.today()
-        timestamp = today.strftime('%Y/%m/%d %H:%M:%S') + ' [' + time.tzname[0] + ']:  '
-
-        logfile.write(timestamp + data.strip() + "\n")
-    logfile.close()
-    return True
-
-
-def copytree(src, dst, symlinks=False, ignore=None):
-    if not os.path.exists(dst):
-        os.makedirs(dst)
-    for item in os.listdir(src):
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        if os.path.isdir(s):
-            copytree(s, d, symlinks, ignore)
-        else:
-            if not os.path.exists(d) or os.stat(s).st_mtime - os.stat(d).st_mtime > 1:
-                shutil.copy2(s, d)
-
-
 def map_filter(request, mapObject):
 
     selected_filter = {}
@@ -467,13 +431,6 @@ def user_account_age(user):
         return 0
 
     return (timezone.now() - user.date_joined).total_seconds() / 3600
-
-def build_utility_command(parser, game_mod, args):
-    game_mod = game_mod.lower()
-    if game_mod not in ['ra', 'cnc', 'd2k', 'ts']:
-        game_mod = 'ra'
-
-    return 'mono --debug %s %s %s' % (os.path.join(settings.OPENRA_ROOT_PATH, parser, 'OpenRA.Utility.exe'), game_mod, ' '.join(args))
 
 def first_oramap_in_directory(path):
     """Returns the first matching .oramap filename in a given path or None
