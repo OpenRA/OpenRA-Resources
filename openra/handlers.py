@@ -9,7 +9,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.text import get_valid_filename
 from django.contrib.auth.models import User
-from openra.models import Maps, Lints, Screenshots
+from openra.models import Maps, MapUpgradeLogs, Lints, Screenshots
 from openra import utility, misc
 
 # pylint: disable=too-many-arguments
@@ -291,12 +291,23 @@ def process_update(item, parser=settings.OPENRA_VERSIONS[0]):
             'adaptations': item.policy_adaptations
         }
 
-        return add_map_revision(oramap_path, item.user,
+        updated_item = add_map_revision(oramap_path, item.user,
                                 parser, item.game_mod,
                                 item.info, policy,
                                 item.posted, # preserve original date to avoid reordering map list
                                 item.revision + 1, item.id)
 
+        # Update logs are only interesting if the map has custom rules
+        if item.advanced_map:
+            MapUpgradeLogs(
+                map_id=updated_item,
+                from_version=item.parser,
+                to_version=parser,
+                date_run=timezone.now(),
+                upgrade_output=update_output
+            ).save()
+
+        return updated_item
 
 def addScreenshot(request, arg, item):
     if item == 'map':
