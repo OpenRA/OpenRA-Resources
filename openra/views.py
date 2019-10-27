@@ -420,23 +420,18 @@ def displayMap(request, arg):
 
             return HttpResponseRedirect('/maps/' + arg + '/')
 
-    disk_size = 0
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
-    try:
-        mapDir = os.listdir(path)
-        for filename in mapDir:
-            if filename.endswith(".oramap"):
-                disk_size = os.path.getsize(os.path.join(path, filename))
-                disk_size = misc.sizeof_fmt(disk_size)
-                break
-        mapDir = os.listdir(os.path.join(path, 'content'))
-    except FileNotFoundError as ex:
-        print(ex)
+    oramap_filename = misc.first_oramap_in_directory(path)
+    if not oramap_filename:
         return HttpResponseRedirect('/')
+
     try:
         mapObject = Maps.objects.get(id=arg)
     except:
         return HttpResponseRedirect('/')
+
+    disk_size = os.path.getsize(os.path.join(path, oramap_filename))
+    disk_size = misc.sizeof_fmt(disk_size)
 
     lints = []
     lintObject = Lints.objects.filter(map_id=mapObject.id, item_type='maps')
@@ -502,9 +497,6 @@ def displayMap(request, arg):
     if mapObject.next_rev != 0:
         show_upgrade_map_button = False  # upgrade only the latest revision
 
-    if mapObject.parser not in settings.OPENRA_VERSIONS:
-        show_upgrade_map_button = False  # map was not parsed with a compatible version
-
     if not any([mapObject.parser in v for v in settings.OPENRA_UPDATE_VERSIONS.values()]):
         show_upgrade_map_button = False  # no compatible update targets
 
@@ -564,9 +556,6 @@ def updateMap(request, arg):
 
     if source_map.next_rev != 0:
         return HttpResponseRedirect('/maps/' + arg + '/')  # update only the latest revision
-
-    if source_map.parser not in settings.OPENRA_VERSIONS:
-        return HttpResponseRedirect('/maps/' + arg + '/')  # map was not parsed with a compatible parser
 
     update_parsers = [k for k in settings.OPENRA_UPDATE_VERSIONS if source_map.parser in settings.OPENRA_UPDATE_VERSIONS[k]]
     if not update_parsers:
