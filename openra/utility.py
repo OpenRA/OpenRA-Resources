@@ -28,8 +28,11 @@ def run_utility_command(parser, game_mod, args, cwd=None):
     if game_mod not in ['ra', 'cnc', 'd2k', 'ts']:
         game_mod = 'ra'
 
-    popen = Popen([os.path.join(settings.OPENRA_ROOT_PATH, parser, game_mod + '.AppImage'), '--utility'] + args,
-                  stdout=PIPE, cwd=cwd)
+    utility_args = [os.path.join(settings.OPENRA_ROOT_PATH, parser, game_mod, 'AppRun'), '--utility']
+    if parser in settings.OPENRA_LEGACY_VERSIONS:
+        utility_args = ['mono', '--debug', os.path.join(settings.OPENRA_ROOT_PATH, parser, 'OpenRA.Utility.exe'), game_mod]
+
+    popen = Popen(utility_args + args, stdout=PIPE, cwd=cwd)
 
     output = b''
     for chunk in popen.stdout:
