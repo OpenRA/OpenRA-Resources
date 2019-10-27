@@ -166,9 +166,23 @@ ACCOUNT_ACTIVATION_DAYS = 7
 # Path to directory where OpenRA versions are stored
 OPENRA_ROOT_PATH = ''
 
-# OpenRA versions matching their directory names
+# OpenRA Versions matching their directory names
 # Reverse chronological order - newer versions must be listed first!
 OPENRA_VERSIONS = [
+    'playtest-20191021',
+    'release-20190314',
+    'release-20180923',
+    'release-20180307',
+    'release-20180218',
+    'release-20171014',
+]
+
+# Versions that should be run using the legacy mono environment
+# Versions not in this list will be treated as an extracted AppImage bundle
+OPENRA_LEGACY_VERSIONS = [
+    'release-20190314',
+    'playtest-20190106',
+    'release-20180923',
     'release-20180307',
     'release-20180218',
     'release-20171014',
@@ -176,7 +190,8 @@ OPENRA_VERSIONS = [
 
 # List of versions that each version can update from
 OPENRA_UPDATE_VERSIONS = {
-    'playtest-20180825': ['release-20180307', 'release-20171014']
+    'playtest-20191021': ['release-20190314', 'release-20181215', 'release-20180923', 'release-20180307', 'release-20171014'],
+    'release-20190314': ['playtest-20190106', 'release-20180923', 'release-20180307', 'release-20180218', 'release-20171014'],
 }
 
 # Email address (FROM) in our custom mail methods
