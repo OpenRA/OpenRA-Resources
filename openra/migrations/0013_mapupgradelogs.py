@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('from_version', models.CharField(default='', max_length=100)),
                 ('to_version', models.CharField(default='', max_length=100)),
                 ('upgrade_output', models.CharField(default='', max_length=10000000)),
-                ('map_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='openra.Maps')),
+                ('map_id', models.ForeignKey(on_delete=models.CASCADE, to='openra.Maps')),
             ],
             options={
                 'verbose_name_plural': 'MapUpgradeLogs',

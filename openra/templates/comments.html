@@ -6,44 +6,49 @@
 
 {% if amount != 0 %}
 
-	<div class="cBlock_comments">
-		{% for comment in comments %}
+<div class="cBlock_comments">
+	{% for comment in comments %}
 
-			{% autoescape off %}
-			<div class="commentUser">{{comment.user.username|account_link:comment.user.id}} commented <a href="/{{comment.item_type}}/{{comment.item_id}}/" title="{{comment.item_id|item_name_by_type_id:comment.item_type}}">{{comment.item_type|slice:":-1"}} {{comment.item_id}}</a> on {{comment.posted}}</div>
-			<div class="commentMsg">{% if last_comment_id_seen and last_comment_id_seen < comment.id and request.user.id != comment.user.id %}<span class='new_comment'>(New)</span>{% endif %}{{comment.content|strip_tags|convert_links|linebreaks}}</div>
-			{% endautoescape %}
+	{% autoescape off %}
+	<div class="commentUser">{{comment.user.username|account_link:comment.user.id}} commented <a
+			href="/{{comment.item_type}}/{{comment.item_id}}/"
+			title="{{comment.item_id|item_name_by_type_id:comment.item_type}}">{{comment.item_type|slice:":-1"}}
+			{{comment.item_id}}</a> on {{comment.posted}}</div>
+	<div class="commentMsg">
+		{% if last_comment_id_seen and last_comment_id_seen < comment.id and request.user.id != comment.user.id %}<span
+			class='new_comment'>(New)</span>{% endif %}{{comment.content|strip_tags|convert_links|linebreaks}}</div>
+	{% endautoescape %}
 
-		{% endfor %}
+	{% endfor %}
+</div>
+
+{% if 2 in range %}
+<div id="paging">
+	{% for i in range %}
+	<div class="paging_cell">
+		{% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
+		{% if page == i %}
+		<span>{{ i }}</span>
+		{% else %}
+		<a href="/comments/page/{{i}}">{{ i }}</a>
+		{% endif %}
+		{% else %}
+		{% if i < page %}
+		<span class='no-page-before hide_block'>...</span>
+		{% else %}
+		<span class='no-page-after hide_block'>...</span>
+		{% endif %}
+		{% endif %}
 	</div>
-
-	{% if 2 in range %}
-	<div id="paging">
-		{% for i in range %}
-			<div class="paging_cell">
-			{% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
-				{% if page == i %}
-					<span>{{ i }}</span>
-				{% else %}
-					<a href="/comments/page/{{i}}">{{ i }}</a>
-				{% endif %}
-			{% else %}
-				{% if i < page %}
-					<span class='no-page-before hide_block'>...</span>
-				{% else %}
-					<span class='no-page-after hide_block'>...</span>
-				{% endif %}
-			{% endif %}
-			</div>
-		{% endfor %}
-	</div>
-	{% endif %}
-	<div class="clear"></div>
+	{% endfor %}
+</div>
+{% endif %}
+<div class="clear"></div>
 
 {% else %}
 
-	<div class="cBlock_comments">
-		<p>No comments from {{comments_by_user.username}}</p>
-	</div>
+<div class="cBlock_comments">
+	<p>No comments from {{comments_by_user.username}}</p>
+</div>
 
 {% endif %}

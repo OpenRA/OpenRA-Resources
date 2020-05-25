@@ -961,9 +961,10 @@ def comments(request, page=1):
 
     if amount_this_page == 0 and int(page) != 1:
         return HttpResponseRedirect("/comments/")
-
-    last_comment_id_seen = request.COOKIES.get('last_comment_id_seen', comments[0].id)
-
+    if len(comments) > 1:    
+        last_comment_id_seen = request.COOKIES.get('last_comment_id_seen', comments[0].id)
+    else:
+        last_comment_id_seen = 0
     template = loader.get_template('index.html')
     template_args = {
         'content': 'comments.html',
@@ -977,8 +978,10 @@ def comments(request, page=1):
         'last_comment_id_seen': int(last_comment_id_seen),
     }
     response = StreamingHttpResponse(template.render(template_args, request))
-    if int(page) == 1:
+    if int(page) == 1 and  len(comments) > 1:
         response.set_cookie('last_comment_id_seen', comments[0].id, max_age=4320000)
+    else:
+        response.set_cookie('last_comment_id_seen', 0, max_age=4320000)
     return response
 
 
