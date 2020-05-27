@@ -782,15 +782,15 @@ def uploadMap(request, previous_rev=0):
         return HttpResponseRedirect('/maps/')
 
     account_age = misc.user_account_age(request.user)
-    # if account_age < 24:
-    #     template = loader.get_template('index.html')
-    #     template_args = {
-    #         'content': 'new_user_action_blocked.html',
-    #         'hours_remaining': 24 - int(account_age),
-    #         'title': ' - Action Blocked',
-    #     }
+    if account_age < 24:
+        template = loader.get_template('index.html')
+        template_args = {
+            'content': 'new_user_action_blocked.html',
+            'hours_remaining': 24 - int(account_age),
+            'title': ' - Action Blocked',
+        }
 
-    #     return StreamingHttpResponse(template.render(template_args, request))
+        return StreamingHttpResponse(template.render(template_args, request))
 
     error_message = None
     rev = 1
