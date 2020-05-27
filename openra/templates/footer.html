@@ -1,10 +1,20 @@
-<div id="footer">
-	<div class="copyright">Copyright © 2013-{% now "Y" %} The OpenRA Content Site Developers</div>
-	<div class="footer-links">
-		<div class="Contacts"><a href="/contacts/">Contacts</a></div>
-		<div class="FAQ"><a href="/faq/">FAQ</a></div>
-		<div class="Issues"><a target="_blank" href='https://github.com/OpenRA/OpenRA-Resources/issues/'>Issues</a>
-		</div>
-		<div class="API"><a target="_blank" href='https://github.com/OpenRA/OpenRA-Resources/wiki/MapAPI'>API</a></div>
-	</div>
-</div>
+<footer id="footer" class="footer">
+	<ul class="nav">
+		<li class="nav-item">
+		  <a class="nav-link active" href="/contacts">Contact</a>
+		</li>
+		<li class="nav-item">
+		  <a class="nav-link" href="/faq/">FAQ</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="https://github.com/OpenRA/OpenRA-Resources/issues/">Bug Report/Issues</a>
+		  </li>
+		<li class="nav-item">
+		  <a class="nav-link" href="https://github.com/OpenRA/OpenRA-Resources/wiki/MapAPI">Map API</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="/news/feed.rss"><i class="fas fa-rss-square"></i> RSS Feed</a>
+		</li>
+	  </ul>
+	  <div class="copyright">Copyright © 2013-{% now "Y" %} The OpenRA Content Site Developers</div>
+</footer>

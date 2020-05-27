@@ -1,43 +1,39 @@
-<div id="profile_container">
-	<nav class="side_nav">
-		<ul>
-			<li><a href="/accounts/profile/" {% if '/accounts/profile/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Summary</a></li>
-			<li><a href="/comments/user/{{request.user.id}}/">My comments</a></li>
-		</ul>
-	</nav>
+<section id="profile_container" class="p-4">
+	<div class="row">
+		<div class="col-4">
+			<nav class="side_nav">
+				<ul>
+					<li><a href="/accounts/profile/" {% if '/accounts/profile/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Summary</a></li>
+					<li><a href="/comments/user/{{request.user.id}}/">My comments</a></li>
+				</ul>
+			</nav>
+		</div>
+		<div class="col-8">
+			{% if '/accounts/profile/' in request.path %}
+				<div class="profile_row m-2">
+					<i class="fas fa-user"></i> Username: {% if user.is_authenticated %} {{ user }} {% endif %}
+				</div>
 
-	<div class="side_nav_content">
-		{% if '/accounts/profile/' in request.path %}
-		<div>
-			<div class="profile_row">
-				<div class="label">Username:</div>
-				<div>{% if user.is_authenticated %} {{ user }} {% endif %}</div>
-			</div>
+				<div class="profile_row m-2">
+					<i class="fas fa-envelope"></i> Email:
+					{% if user.email %}
+						 {{ user.email }} 
+					{% else %}
+						<a href="/accounts/email/">Add Email</a> (recommended)
+					{% endif %}
+				</div>
 
-			<div class="profile_row">
-				<div class="label">Email:</div>
-
-				{% if user.email %}
-					<div> {{ user.email }} </div>
-				{% else %}
-					<div><a href="/accounts/email/">Add Email</a> (recommended)</div>
+				{% if ifsocial == False %}
+				<div class="profile_row m-2">
+					<div class="label"><i class="fas fa-key"></i> Password:**************** <a href="/accounts/password/reset/">(change)</a></div>
+				</div>
 				{% endif %}
-			</div>
 
-			{% if ifsocial == False %}
-			<div class="profile_row">
-				<div class="label">Password:</div>
-				<div>**************** <a href="/accounts/password/reset/">(change)</a></div>
+			<div class="content_row m-2">
+				<p>Account created on {% if user.is_authenticated %} {{ user.date_joined }} {% endif %}</p>
+				<section>{% if user.is_authenticated %} You have uploaded {{ amountMaps }} maps {% endif %}</section>
 			</div>
 			{% endif %}
 		</div>
-
-		<div class="content_row">
-			<p>Account created on {% if user.is_authenticated %} {{ user.date_joined }} {% endif %}</p>
-			<section>{% if user.is_authenticated %} You have uploaded {{ amountMaps }} maps {% endif %}</section>
-		</div>
-
-		{% endif %}
 	</div>
-	<div class="clear"></div>
-</div>
+</section>
