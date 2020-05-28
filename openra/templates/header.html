@@ -84,7 +84,7 @@
 		  </li>
 	  </ul>
 
-	  <form class="form-inline my-2 my-lg-0 justify-content-center" id="quick-search" method="POST" action="/search/">{% csrf_token %}
+	  <form class="form-inline my-2 my-lg-0 justify-content-end" id="quick-search" method="POST" action="/search/">{% csrf_token %}
 		<input class="form-control mr-sm-2 w-50 " type="search" placeholder="Search" aria-label="Search" id="qsearch" type="text" title="Search maps by title, hash, description..." value="Search..."
 		onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';"
 		name="qsearch">

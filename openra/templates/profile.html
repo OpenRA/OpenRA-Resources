@@ -31,7 +31,7 @@
 
 			<div class="content_row m-2">
 				<p>Account created on {% if user.is_authenticated %} {{ user.date_joined }} {% endif %}</p>
-				<section>{% if user.is_authenticated %} You have uploaded {{ amountMaps }} maps {% endif %}</section>
+				<section>{% if user.is_authenticated %} You have uploaded <i class="far fa-map"></i>  {{ amountMaps }} maps {% endif %}</section>
 			</div>
 			{% endif %}
 		</div>

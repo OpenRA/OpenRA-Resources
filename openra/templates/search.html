@@ -1,85 +1,94 @@
 <div class='cBlock'>
 {% if global_search_request.maps.amount == 0 %}
-<span>Nothing found</span>
+<h4 class="m-4">Nothing found</h4>
 {% else %}
 	{% if global_search_request.maps.hash %}
 		
-		<h3><i class="far fa-map"></i> Matches in Map HASH:</h3>
+		<h3 class="p-4 mb-0"><i class="far fa-map"></i> Matches in Map HASH:</h3>
+		<article class="row">
 		{% for item in global_search_request.maps.hash %}
-			<div class="map-left">
-				<h4>Map name: {{item.title}}</h4>
-				<p><i class="far fa-user"></i>  author: <span class="map-left-author">{{item.author}}</span></p>
+			<div class="col-sm-6 col-md-4">
+				<div class="card bg-transparent border border-primary m-4">
+					<img src="/maps/{{item.id}}/minimap" class="card-img-top">
+					<div class="card-body  bg-dark">
+						<h5 class="card-title">Map name: {{item.title}}</h5>
+						<p class="card-text ">author: <span class="map-left-author">{{item.author}}</p>
+						<a href="/maps/{{item.id}}/" class="btn btn-primary">View map</a>
+					</div>
+				</div>
 			</div>
-			<div class="map-right">
-				<p>Map preview</p>
-				<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
-			</div>
-		</article>
 		{% endfor %}
-		
+		</article>
 	{% endif %}
 
 	{% if global_search_request.maps.title %}
-		<h3><i class="far fa-map"></i> Matches in Map Title:</h3>
+		<h3 class="p-4 mb-0"><i class="far fa-map"></i> Matches in Map Title:</h3>
+		<article class="row">
 		{% for item in global_search_request.maps.title %}
-		<article class="map">
-			<div class="map-left">
-				<h4>Map name: {{item.title}}</h4>
-				<p><i class="far fa-user"></i>  author: <span class="map-left-author">{{item.author}}</span></p>
+			<div class="col-sm-6 col-md-4">
+				<div class="card bg-transparent border border-primary m-4">
+					<img src="/maps/{{item.id}}/minimap" class="card-img-top">
+					<div class="card-body  bg-dark">
+						<h5 class="card-title">Map name: {{item.title}}</h5>
+						<p class="card-text ">author: <span class="map-left-author">{{item.author}}</p>
+						<a href="/maps/{{item.id}}/" class="btn btn-primary">View map</a>
+					</div>
+				</div>
 			</div>
-			<div class="map-right">
-				<p>Map preview</p>
-				<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
-			</div>
-		</article>
 		{% endfor %}
+		</article>
 	{% endif %}
 
 	{% if global_search_request.maps.info.0 or global_search_request.maps.info.1 %}
-		<h3><i class="far fa-map"></i> Matches in Map Info:</h3>
+		<h3 class="p-4 mb-0"><i class="far fa-map"></i> Matches in Map Info:</h3>
+		<article class="row"></article>
 		{% for item in global_search_request.maps.info.0 %}
-		<article class="map">
-			<div class="map-left">
-				<h4>Map name: {{item.title}}</h4>
-				<p><i class="far fa-user"></i>  author: <span class="map-left-author">{{item.author}}</span></p>
+			<div class="col-sm-6 col-md-4">
+				<div class="card bg-transparent border border-primary m-4">
+					<img src="/maps/{{item.id}}/minimap" class="card-img-top">
+					<div class="card-body  bg-dark">
+						<h5 class="card-title">Map name: {{item.title}}</h5>
+						<p class="card-text ">author: <span class="map-left-author">{{item.author}}</p>
+						<a href="/maps/{{item.id}}/" class="btn btn-primary">View map</a>
+					</div>
+				</div>
 			</div>
-			<div class="map-right">
-				<p>Map preview</p>
-				<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
-			</div>
-		</article>
 		{% endfor %}
+		</article>
+		<article class="row">
 		{% for item in global_search_request.maps.info.1 %}
-		<article class="map">
-			<div class="map-left">
-				<h4>Map name: {{item.title}}</h4>
-				<p><i class="far fa-user"></i>  author: <span class="map-left-author">{{item.author}}</span></p>
+
+			<div class="col-sm-6 col-md-4">
+				<div class="card bg-transparent border border-primary m-4">
+					<img src="/maps/{{item.id}}/minimap" class="card-img-top">
+					<div class="card-body  bg-dark">
+						<h5 class="card-title">Map name: {{item.title}}</h5>
+						<p class="card-text ">author: <span class="map-left-author">{{item.author}}</p>
+						<a href="/maps/{{item.id}}/" class="btn btn-primary">View map</a>
+					</div>
+				</div>
 			</div>
-			<div class="map-right">
-				<p>Map preview</p>
-				<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
-			</div>
-		</article>
 		{% endfor %}
+		</article>
+
 	{% endif %}
 
 	{% if global_search_request.maps.author %}
-		<h3><i class="far fa-map"></i> Matches in Map Author:</h3>
-		<article class="map">
-
-		{% for item in global_search_request.maps.author %}
-		<div class="map-content">
-			<div class="map-left">
-				<h4>Map name: {{item.title}}</h4>
-				<p><i class="far fa-user"></i>  author: <span class="map-left-author">{{item.author}}</span></p>
+		<h3 class="p-4 mb-0"><i class="far fa-map"></i> Matches in Map Author:</h3>
+			<article class="row">
+			{% for item in global_search_request.maps.author %}
+			<div class="col-sm-6 col-md-4">
+				<div class="card bg-transparent border border-primary m-4">
+					<img src="/maps/{{item.id}}/minimap" class="card-img-top">
+					<div class="card-body  bg-dark">
+						<h5 class="card-title">Map name: {{item.title}}</h5>
+						<p class="card-text ">author: <span class="map-left-author">{{item.author}}</p>
+						<a href="/maps/{{item.id}}/" class="btn btn-primary">View map</a>
+					</div>
+				</div>
 			</div>
-			<div class="map-right">
-				<p>Map preview</p>
-				<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
-			</div>
-		</div>
 		{% endfor %}
-	</article>
+		</article>
 	{% endif %}
 
 {% endif %}

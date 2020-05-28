@@ -2,6 +2,16 @@ body{
     background-image:url('/static/images/bg.svg');
     color:#fff !important;
 }
+body:after{
+    z-index:-1;
+    position:absolute;
+    top:0;
+    left:0;
+    content:"";
+    width:100%;
+    height:100%;
+    background-color: rgba(0,0,0,0.1);
+}
 .container{
     margin:1rem;
     border:3px solid #74c2e7;
@@ -79,6 +89,12 @@ body{
     margin:0 0 0.2rem;
 }
 
+/* comments */
+.comment p {
+    margin:0;
+    padding:0;
+}
+
 /* footer */
 .footer{
     background:rgba(0,0,0,0.4);
@@ -89,4 +105,12 @@ body{
     align-items: center;
     justify-content: center;
     padding:0.2rem;
+}
+
+/* overwrite/addition bootstrap */
+.bg-transparent{
+    background:transparent !important;
+}
+.shadow-dark{
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,0.9) !important
 }
