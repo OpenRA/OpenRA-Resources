@@ -1,23 +1,30 @@
-<div class="cBlock">
+<section class="m-4">
 	{% if message_sent %}
 		<h3>Your message has been sent!</h3>
 	{% else %}
-		<h3>Contacts</h3>
+		<h2>Contacts</h2>
 		<p>
 
-		If you need admin/maintainer of this site, contact <b>ihptru</b> at <a target="_blank" href="http://webchat.freenode.net/?channels=openra">#openra</a> IRC channel on Freenode.
+		If you need admin/maintainer of this site, contact <b>ihptru</b> on:</p>
+		<ul>
+			<li>
+				<a target="_blank" href="http://discord.openra.net"><i class="fab fa-discord"></i> Discord server</a>
+			</li>
+			<li>
+				<a target="_blank" href="http://webchat.freenode.net/?channels=openra"><i class="fas fa-hashtag"></i>#openra IRC channel</a>  on Freenode.
+			</li>
+		</ul>
 
-		</p>
 		<p>Or use this contact form:</p>
 
 		<div class="contacts">
 			<form action="/contacts/" method="POST">{% csrf_token %}
-				<label>Name:</label> <input type="text" value="" name="name" required><br /><br />
-				<label>E-mail:</label> <input type="email" value="" name="email" required><br /><br />
-				<textarea placeholder="Your message" title="Your message" name="message" required></textarea><br />
-				<div class="g-recaptcha" data-sitekey="6LdnnB4TAAAAABcVD33avSRlCMsFRSj_TP38xH_T"></div><br />
-				<input type="submit" value="Send" name="contacts_submit" class="button">
+				<label for="name">Name:</label> <input id="name" type="text" class="mb-2 form-control col-md-5" value="" name="name" required>
+				<label for="email">E-mail:</label> <input id="email" class="mb-4 form-control col-md-5 p-0 m-0" type="email" value="" name="email" required>
+				<textarea placeholder="Your message" title="Your message" name="message" class="form-control col-md-5" required></textarea>
+				<div class="m-4 g-recaptcha" data-sitekey="6LdnnB4TAAAAABcVD33avSRlCMsFRSj_TP38xH_T"></div>
+				<input type="submit" value="Send" name="contacts_submit" class="btn btn-primary">
 			</form>
 		</div>
 	{% endif %}
-</div>
+	</section>

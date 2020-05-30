@@ -1,0 +1,72 @@
+{% load customTags %}
+
+<div class="col-md-4 col-sm-12">
+    <div class="card map">
+        <div class="map-status">
+            <img src="/maps/{{item.id}}/minimap" class="card-img-top" alt="/maps/{{item.name}}/">
+            {% if item.downloading == False or item.amount_reports >= 3 %}
+                <img src="/static/images/attention-mini.jpg" alt="attention" class="map-custom-status"/>
+            {% endif %}
+            {% if item.advanced_map %}
+                <img src="/static/images/advanced-mini.jpg" alt="advanced" class="map-custom-status"/>
+            {% endif %}
+            {% if item.lua %}
+                <img src="/static/images/lua-mini.jpg" alt="lua" class="map-custom-status"/>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">
+                {{ item.title }}
+            </h5>
+            <ul class="list-group list-group-horizontal text-center justify-self-center  align-items-center border-0">
+                <li class="list-group-item border-0 p-1 m-auto text-center bg-transparent">
+                    <i class="fas fa-star-half-alt"></i>
+                    <span title="rating">
+                        {{ item.rating }}
+                    </span>
+                </li>
+                <li class="list-group-item border-0 p-1 m-auto text-center bg-transparent">
+                <i class="fas fa-comment-dots"></i>
+                    <span title="comments">
+                    {{ comments|amount_comments:item.id }}
+                    </span>
+                </li>
+                <li class="list-group-item border-0 p-1 m-auto text-center bg-transparent">
+                    <i class="fas fa-users"></i>
+                    <span title="players">
+                    {{ item.players }}
+                    </span>
+                </li>
+                <li class="list-group-item border-0 p-1 m-auto text-center bg-transparent">
+                    <i class="fas fa-check-double"></i>
+                    <span title="revision">
+                    {{ item.revision }}
+                    </span>
+                </li>
+            </ul>
+                <div class="card-text">
+                    <ul class="map-stats bg-transparent list-group list-group-horizontal">
+                        <li class="list-group-item">
+                            <p class="map-header-stats p-0 m-0">Game mode: </p>
+                            <p class="m-0">{{ item.game_mod|upper }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            {% if item.author %}
+                            <p  class="map-header-stats p-0 m-0">Author: </p>
+                            <p class="p-0 m-0">
+                                <a href="/maps/author/{{item.author|proper_space}}/" title="Show maps authored by {{item.author|strip_tags}}">{{ item.author|strip_tags }}</a>
+                            </p>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item">
+                            <p class="map-header-stats p-0 m-0">Uploader: </p>
+                            <p class="m-0">
+                                <a href="/maps/uploader/{{item.user.id}}/" title="Show maps uploaded by {{item.user.username}}">{{ item.user.username }}</a>
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+            <a href="/maps/{{item.id}}/" class="btn btn-primary">View map</a>
+        </div>
+    </div>
+</div>

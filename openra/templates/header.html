@@ -1,7 +1,7 @@
 {% load header_tags %}
 
-<!-- <div id="overlay"></div> -->
 <nav class="navbar navbar-expand-lg navbar-dark ">
+	<div class="ribbon d-none d-md-block d-lg-block"><span><a href="https://openra.net" class="text-light">OpenRA.net</a></span></div>
 
 		<a class="navbar-brand" href="#">
 		  <img src="/static/images/soviet-logo.svg" class="img-fluid"
@@ -84,13 +84,13 @@
 		  </li>
 	  </ul>
 
-	  <form class="form-inline my-2 my-lg-0 justify-content-end" id="quick-search" method="POST" action="/search/">{% csrf_token %}
+	  <form class="form-inline my-2 my-lg-0 justify-content-center" id="quick-search" method="POST" action="/search/">{% csrf_token %}
 		<input class="form-control mr-sm-2 w-50 " type="search" placeholder="Search" aria-label="Search" id="qsearch" type="text" title="Search maps by title, hash, description..." value="Search..."
 		onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';"
 		name="qsearch">
 		<button class="btn btn-outline-primary" type="submit" 
 		onerror='this.onerror = null; this.src="/static/images/search-fallback.png"' title="Search" name="searchsubmit"
-		alt="Search"><i class="fas fa-search"></i></button>
+		alt="Search"><i class="fas fa-search text-light"></i></button>
 	  </form>
 	</div>
   </nav>

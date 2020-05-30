@@ -961,7 +961,7 @@ def comments(request, page=1):
 
     if amount_this_page == 0 and int(page) != 1:
         return HttpResponseRedirect("/comments/")
-    if len(comments) > 1:    
+    if len(comments) > 0:    
         last_comment_id_seen = request.COOKIES.get('last_comment_id_seen', comments[0].id)
     else:
         last_comment_id_seen = 0
