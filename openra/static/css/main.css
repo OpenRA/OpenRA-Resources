@@ -84,6 +84,7 @@ code {
     margin:auto;
     position:absolute;
 }
+
 /* comments */
 .comment p {
     margin:0;
@@ -126,8 +127,9 @@ code {
 .text-orange{
     color:orange;
 }
-
-
+small{
+    font-size:60% !important;
+}
 /* ribbon */
   .ribbon {
     position: absolute;
@@ -172,3 +174,4 @@ code {
     border-bottom: 3px solid transparent;
     border-top: 3px solid #087F8F;
   }
+

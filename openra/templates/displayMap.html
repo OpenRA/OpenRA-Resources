@@ -1,512 +1,538 @@
 {% load customTags %}
-<div id="map_data_container">
-	<div class="left_map_content">
 
-		<div class="map_title left">
-			<div>
-				<div class="title">{{ map.title|strip_tags }}</div>
-				{% if map.author %}
-					<div class="author">by <a href="/maps/author/{{map.author|proper_space}}/" title="Show maps authored by {{map.author|strip_tags}}">{{ map.author|strip_tags }}</a></div>
-				{% endif %}
-			</div>
-		</div>
+<section class="m-4">
+	<div class="row">
+		<div class="col-sm-12 col-md-8">
+			<div class="row p-1 border border-primary bg-transparent-dark">
+				<div class="col-sm-12 col-md-9">
+					<h2>{{ map.title|strip_tags }}</h2>
+					{% if map.author %}
+					<h4>
+							by <a href="/maps/author/{{map.author|proper_space}}/" title="Show maps authored by {{map.author|strip_tags}}">{{ map.author|strip_tags }}</a>
+					</h4>
+					{% endif %}
+					<p class="mb-0">Rating: 
+						<span class="rating">
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star-half-alt"></i>	
+							<i class="far fa-star"></i>
+						</span></p>
+						<ul class="list-group list-group-horizontal justify-self-flex-start  align-items-flex-start border-0">
+							<li class="list-group-item border-0 p-0 m-0 pr-4 text-left bg-transparent align-items-center d-inline-flex">
+								{% if map.game_mod == 'ra' %}
+								<img src="/static/images/{{map.game_mod}}_64x64.png" class="pr-1" width="24" height="24">
+								{% else %}
+								<img src="/static/images/{{map.game_mod}}_64x64.png" class="pr-1" width="24" height="24">
+								 {% endif %}
+								<span title="rating">
+									{{ map.game_mod|upper }}
+								</span>
+							</li>
+							<li class="list-group-item border-0 p-0 pr-4 text-left bg-transparent align-items-center d-inline-flex">
+								<i class="fas fa-hdd pr-1"></i>
+								<span title="rating">
+									{{disk_size}}
+								</span>
+							</li>
+							<li class="list-group-item border-0 pl-0 pr-4 text-left bg-transparent">
+								<i class="far fa-eye pr-1"></i>
+								<span title="rating">
+									{{ map.viewed }}
+								</span>
+							</li>
+							<li class="list-group-item border-0 p-0 m-0 pr-4 text-left bg-transparent align-items-center d-inline-flex">
+								<i class="fas fa-download pr-1"></i>
+								<span title="rating">
+									{{ map.downloaded }}
+								</span>
+							</li>
+							<li class="list-group-item border-0 p-0 pr-4 text-left bg-transparent align-items-center d-inline-flex">
+								<i class="fas fa-gamepad pr-1"></i>
+								<span title="rating">
+									{% if map.played_counter > 0 %}{{ map.played_counter }}{% else %} 0 {% endif %}
+								</span>
+							</li>
+						</ul>
+						<p>
+							<span class="border border-top-0 border-left-0 border-bottom-0 border-primary pr-2">
+								<a href="/map/hash/{{map.map_hash}}" target='_blank'>View API</a>
+							</span>
+							<span class="pl-2" title="click to copy">Stats:
+							{% if duplicates %}<a href="/maps/duplicates/{{map.map_hash}}/" title='Show duplicates'>Ξ</a> {% endif %}<span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span>
+							</span>
+						</p>
+						<div class="row">
+							<div class="col-4 text-center">									<a href="/maps/{{arg}}/oramap" title="{{disk_size}}" class="btn btn-primary"><i class="fas fa-file-download"></i> Download</a>
+							</div>
+							<div class="col-4 text-center">								{% if request.user.is_authenticated %}
+									{% if reported == False %}
+									<!-- Button trigger modal -->
+									<button type="button" class="btn btn btn-danger" data-toggle="modal" data-target="#reportmap">
+										<i class="fas fa-flag"></i> report map</a>
+									</button>
+									
+									{% if request.user.is_authenticated %}
+									<!-- Modal -->
+									<div class="modal fade" id="reportmap" tabindex="-1" role="dialog" aria-labelledby="reportmap" aria-hidden="true">
+										<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+											<h5 class="modal-title text-dark">Report this map</h5>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+											</div>
+											<div class="modal-body">
+												<form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+													<div><textarea name="reportReason" placeholder="Reason"></textarea></div>
+													<div class="checkboxRow text-danger"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
+													<div><button class="btn btn-primary" type="submit">Submit</button></div>
+												</form>
+											</div>
+											<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+										</div>
+										</div>
+									</div>
+									</div>
 
-		<div class="map_image_container left">
-			<div class="map_image">
-				{% if map_preview %}
-					<a class="map_full_preview" href="/screenshots/{{map_preview.id}}/" onclick="return hs.expand(this, config_minimap)" title="Full preview">
+									{% endif %}
+					
+									{% endif %}
+									{% if reports %}
+											<div class="map_data_link"><a class="allReportsShow">show reports ({{reports|length}})</a></div>
+										{% endif %}
+									{% else %}
+									{% if reports %}
+										<a class="allReportsShow">show reports ({{reports|length}})</a>
+										{% endif %}
+									{% endif %}
+							</div>
+							<div class="col-4 text-center">
+								<a class="printYamlShow btn btn-info">show yaml</a>
+							</div>
+						</div>
+						<div class="row align-items-center mt-2">
+							{% if show_upgrade_map_button %}
+							<div class="col-4 text-center">
+								<div class="map_download">
+									<a href="/maps/{{arg}}/update/" title="Update to the latest OpenRA engine version" class="button">Update Map</a>
+								</div>
+								
+							</div>
+							{% endif %}
+							{% if request.user.is_superuser or map.user_id == request.user.id %}
+							<div class="col-4 text-center">
+								<!-- Button trigger modal -->
+								<div class="btn btn-info" data-toggle="modal" data-target="#editmapinfo">
+									Edit map info
+								</div>
+								<!-- Modal -->
+								<div class="modal fade" id="editmapinfo" tabindex="-1" role="dialog" aria-labelledby="editmapinfo" aria-hidden="true">
+									<div class="modal-dialog">
+									  <div class="modal-content">
+										<div class="modal-header">
+										  <h5 class="modal-title text-dark">						Edit map info
+										  </h5>
+										  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										  </button>
+										</div>
+										<div class="modal-body">
+											<form method="POST" class="form" action="/maps/{{map.id}}">{% csrf_token %}
+												<div class="w-100"><textarea name="mapInfo" placeholder="Map info">{{map.info}}</textarea></div>
+												<div><button type="submit" class="btn btn-primary m-1">Submit</button></div>
+											</form>
+										</div>
+										<div class="modal-footer">
+										  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+										</div>
+									  </div>
+									</div>
+								  </div>
+							</div>
+							<div class="col-4 text-center">
+								<div class="btn btn-info">
+									Add screenshot
+								</div>
+							</div>
+							<div class="col-4 text-center">
+									<a class="change_downloading_status btn-sm btn btn-dark" href="/maps/{{map.id}}/setdownloadingstatus/" title="Only In-Game Downloading">set downloading {% if map.downloading %}false{% else %}true{% endif %}</a>
+							</div>
+							<div class="col-4 mt-2 text-center">
+								<a class="btn btn-danger btn-sm"  href="/maps/{{map.id}}/delete/" onClick='return confirmDelete("map")'>delete {%if map.user_id == request.user.id %}my {% endif %}map revision</a>
+							</div>
+							{% endif %}
+							{% if has_upgrade_logs %}
+							<div class="col-4">
+								<a class="btn btn-info" href="/maps/{{map.id}}/update_logs/">map update logs</a>
+							</div>
+							{% endif %}
+						</div>
+				</div>
+				<div class="col-sm-12 col-md-3 text-center text-md-right">
+					<p>Published on {{ map.posted|date:"M/d/Y" }}</p>
+					{% if map_preview %}
+					<a class="img-fluid map-preview" href="/screenshots/{{map_preview.id}}/" onclick="return hs.expand(this, config_minimap)" title="Full preview">
 						<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} alt="minimap" />
 					</a>
-				{% else %}
-					<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} alt="minimap" />
-				{% endif %}
-			</div>
-		</div>
-		<div class="clear"></div>
-
-		<div class="notification_container">
-			{% if map.downloading == False or reports|length >= REPORTS_PENALTY_AMOUNT %}
-			<div class="notification map_attention">
-				<label class="x"></label>
-				<div class="notification_label">Attention!</div>
-				<div class="notification_tooltip">
-					<div>This map can't be automatically downloaded by OpenRA game!
-					{% if map.downloading == False %}
-						<p>Reason: Downloading is manually set to False</p>
-					{% elif reports|length >= REPORTS_PENALTY_AMOUNT %}
-						<p>Reason: More then 2 <a class="allReportsShow">active reports</a>!</p>
+					{% else %}
+						<img src={{ '/maps/' }}{{ arg }}{{ '/minimap' }} class="img-fluid map-preview" alt="minimap" />
 					{% endif %}
-					</div>
 				</div>
 			</div>
-			{% endif %}
-			{% if map.advanced_map %}
-			<div class="notification map_advanced">
-				<label class="tick"></label>
-				<div class="notification_label printRulesShow" data-name="Custom Rules">Advanced</div>
-				<div class="notification_tooltip printRulesShow" data-name="Custom Rules">
-					<div>Click to see custom Rules.</div>
+			<div class="row">
+				<div class="col-12 ">
+						<table class="table mt-2 border align-items-center border-primary bg-transparent-dark">
+							<thead>
+								<tr>
+									<th class="text-white">Previous revision</th>
+								<th class="text-white"><a href="/maps/{{map.id}}/revisions/" title="Show all revisions">Revision</a></th>
+								<th class="text-white">Next revision</th>
+							</tr>
+							</thead>
+							<tr>
+								<td class="text-white">{% if map.pre_rev == 0 %}
+									Nothing found
+									{% else %}
+										<a href="/maps/{{map.pre_rev}}/"><img src="/maps/{{map.pre_rev}}/minimap" alt="minimap" /></a>
+									{% endif %}
+								</td>
+								<td class="text-white"><h3>{{ map.revision }}</h3></td>
+								<td>{% if map.next_rev == 0 %}
+										{% if map.user_id == request.user.id or request.user.is_superuser %}
+										<a href="/upload/map/{{map.id}}/">Upload new revision</a>
+										{% else %}
+										<span class="text-white">It's the latest</span>
+										{% endif %}
+									{% else %}
+										<a href="/maps/{{map.next_rev}}/"><img src="/maps/{{map.next_rev}}/minimap" alt="minimap" /></a>
+									{% endif %}
+								</td>
+							</tr>
+						</table>			
 				</div>
 			</div>
-			{% endif %}
-			{% if map.lua %}
-			<div class="notification map_lua">
-				<label class="tick"></label>
-				<div class="notification_label">Lua map</div>
-				<div class="notification_tooltip">
-					<div>This map includes Lua scripting logic.
-						{% for item in luaNames %}
-						<p><a class="printLua" data-name="{{item}}.lua" title="{{item}}">Display</a> {{item}}.lua or <a href="/maps/{{map.id}}/lua/{{item}}/">download</a> file.</p>
-						{% endfor %}
-						<p>Checkout <a href="http://wiki.openra.net/Map-scripting" target="_blank">documentation</a>
-					</div>
-				</div>
-			</div>
-			{% endif %}
-		</div>
-
-		<div class="map_hash_block cBlockNoPadding">
-			<div class="map_hash_block_element"><a href="/map/hash/{{map.map_hash}}" target='_blank'>API</a></div>
-			<div class="map_hash_block_element"><a href="http://master.openra.net/map_stats?hash={{map.map_hash}}" title='Master Server statistics for this Hash' target="_blank">stats</a></div>
-			<div class="map_hash">{% if duplicates %}<a href="/maps/duplicates/{{map.map_hash}}/" title='Show duplicates'>Ξ</a> {% endif %}<span id="selectHash" onclick="selectText('selectHash')">{{ map.map_hash }}</span></div>
-		</div>
-
-		{% if map.description and map.description != "Describe your map here" and map.mapformat < 11 %}
-		<div class="map_description cBlock">
-			<div>
-				<h5>Description:</h5>
-				<p>
-				{% autoescape off %}
-				{{ map.description|strip_tags|convert_links|nl_to_br }}
-				{% endautoescape %}
-				</p>
-			</div>
-			{% if map.info %}
-			<div class="map_info">
-				<p>
-				{% autoescape off %}
-				{{ map.info|strip_tags|convert_links|linebreaks }}
-				{% endautoescape %}
-				</p>
-			</div>
-			{% endif %}
-		</div>
-		{% else %}
-			{% if map.info %}
-			<div class="map_description cBlock">
-				<div>
-					<h5>Description:</h5>
-					<p>
-					{% autoescape off %}
-					{{ map.info|strip_tags|convert_links|linebreaks }}
-					{% endautoescape %}
-					</p>
-				</div>
-			</div>
-			{% endif %}
-		{% endif %}
-
-		<div>
-			<div class="editMapInfo popup">
-			<div class="popup-content-wrapper">
-				<div class="closePopup"><label class="x"></label></div>
-				<h3>Edit map info</h3>
-				<form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
-					<div><textarea name="mapInfo" placeholder="Map info">{{map.info}}</textarea></div>
-					<div><button type="submit">Submit</button></div>
-				</form>
-			</div>
-			</div>
-
-			<div class="allReports popup">
-			<div class="popup-content-wrapper">
-				<div class="closePopup"><label class="x"></label></div>
-				<h3>Reports of {{ map.title }}</h3>
-				{% for item in reports %}
-				<div class="reportRow">
-					<div class="reportUser">{{item.0}} reported on {{item.3}} {% if item.2 == True %} ( &copy; ){% endif %}{% if reported and item.0 == request.user.username %} (<a href="/maps/{{map.id}}/cancelreport/" onClick='return confirmDelete("report")'>cancel</a>){% endif %}</div>
-					{% autoescape off %}
-					<div class="reportMsg">{{item.1|strip_tags|convert_links}}</div>
-					{% endautoescape %}
-				</div>
-				{% endfor %}
-			</div>
-			</div>
-
-			{% for lint in lints %}
-			<div class="Lints popup" data-version="{{lint.0}}">
-				<div class="lint_check_h3">
-					<h3>Lint check for {{ lint.0 }}</h3>
-				</div>
-				<div class="lint_check">
-					{% autoescape off %}
-					{{ lint.2|nl_to_br }}
-					{% endautoescape %}
-					<div class="closePopup"><label class="x"></label></div>
-				</div>
-			</div>
-			{% endfor %}
-
-			{% if request.user.is_authenticated %}
-				<div class="reportMap popup">
-				<div class="popup-content-wrapper">
-					<div class="closePopup"><label class="x"></label></div>
-					<h3>Report this map</h3>
-					<form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
-						<div><textarea name="reportReason" placeholder="Reason"></textarea></div>
-						<div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
-						<div><button type="submit">Submit</button></div>
-					</form>
-				</div>
-				</div>
-			{% endif %}
-
-			<div class="printMisc popup" style="width: 580px; left: 10%; margin-top: -100px; font-size: 0.9em;"><div class="popupContainer"></div>
-			</div>
-
-			<div class="addScreenshotForm popup"></div>
-
-		</div>
-
-		<div class="map_revisions cBlock">
-			<table>
-				<tr>
-					<th>Previous revision</th>
-					<th><a href="/maps/{{map.id}}/revisions/" title="Show all revisions">Revision</a></th>
-					<th>Next revision</th>
-				</tr>
-				<tr>
-					<td>{% if map.pre_rev == 0 %}
-						Nothing found
-						{% else %}
-							<a href="/maps/{{map.pre_rev}}/"><img src="/maps/{{map.pre_rev}}/minimap" alt="minimap" /></a>
-						{% endif %}
-					</td>
-					<td><h3>{{ map.revision }}</h3></td>
-					<td>{% if map.next_rev == 0 %}
-							{% if map.user_id == request.user.id or request.user.is_superuser %}
-							<a href="/upload/map/{{map.id}}/">Upload new revision</a>
-							{% else %}
-							It's the latest
+			{% if screenshots %}
+			<div class="row">
+				<div class="col-12">
+					<div class="border border-primary m-1 p-2 bg-transparent-dark cBlock highslide-gallery">
+						<h5>Screenshots:</h5>
+						{% for item in screenshots %}
+						<div class="cScreenshot"><a class="highslide" href="/screenshots/{{item.id}}/" onclick="return hs.expand(this, config1)"><img src="/screenshots/{{item.id}}/mini/" alt="screenshot" /></a>
+							{% if request.user.id == item.user_id or request.user.is_superuser %}
+								<br /><span style="font-size: 0.8em; text-align: justify;"><a href="/screenshots/{{item.id}}/delete/" onClick='return confirmDelete("screenshot")'>delete</a></span>
 							{% endif %}
-						{% else %}
-							<a href="/maps/{{map.next_rev}}/"><img src="/maps/{{map.next_rev}}/minimap" alt="minimap" /></a>
-						{% endif %}
-					</td>
-				</tr>
-			</table>
-		</div>
-
-		{% if screenshots %}
-		<div class="map_screenshots cBlock highslide-gallery">
-			<h5>Screenshots:</h5>
-			{% for item in screenshots %}
-			<div class="cScreenshot"><a class="highslide" href="/screenshots/{{item.id}}/" onclick="return hs.expand(this, config1)"><img src="/screenshots/{{item.id}}/mini/" alt="screenshot" /></a>
-				{% if request.user.id == item.user_id or request.user.is_superuser %}
-					<br /><span style="font-size: 0.8em; text-align: justify;"><a href="/screenshots/{{item.id}}/delete/" onClick='return confirmDelete("screenshot")'>delete</a></span>
-				{% endif %}
-			</div>
-			{% endfor %}
-		</div>
-		{% endif %}
-
-		{% if comments %}
-			<a name="comments"></a>
-
-			{% for revision_comments in comments %}
-				{% if revision_comments.1 %}
-					<div class="cBlock">
-						<h5>Comments for <a href="{{revision_comments.0.revision|map_id_of_rev:map}}" title="{{revision_comments.0.revision|map_title_of_rev:map}}">revision {{revision_comments.0.revision}}</a>{% if map.revision == revision_comments.0.revision %} (current){% endif %}{% if request.user.is_authenticated and revision_comments.2 and request.user != map.user and revision_comments.3 != True %} (<a href="{{revision_comments.0.revision|map_id_of_rev:map}}/unsubscribe/" title="Unsubscribe from comments to this revision">unsubscribe</a>){% elif request.user.is_authenticated and revision_comments.2 and request.user != map.user and revision_comments.3 == True%} (<a href="{{revision_comments.0.revision|map_id_of_rev:map}}/unsubscribe/" title="Subscribe back to comments to this revision">subscribe</a>){% endif %}:</h5>
+						</div>
+						{% endfor %}
 					</div>
-
-					<div class="cBlock_comments">
-						{% for comment in revision_comments.1 %}
-
+				</div>
+			</div>
+			{% endif %}
+			<div class="row">
+				<div class="col">
+					{% if map.description and map.description != "Describe your map here" and map.mapformat < 11 %}
+					<section class="map_description cBlock">
+						<div>
+							<h5>Description:</h5>
+							<p>
 							{% autoescape off %}
-							<div class="commentUser">{{comment.user.username|account_link:comment.user.id}} commented on {{comment.posted}}{% if request.user.id == comment.user.id %} (<a href="/deletecomment/{{comment.id}}/maps/{{map.id}}/" onClick='return confirmDelete("comment")' title='delete comment'>メ</a>){% endif %}</div>
-							<div class="commentMsg">{{comment.content|strip_tags|convert_links|linebreaks}}</div>
+							{{ map.description|strip_tags|convert_links|nl_to_br }}
 							{% endautoescape %}
+							</p>
+						</div>
+						{% if map.info %}
+						<div class="map_info">
+							<p>
+							{% autoescape off %}
+							{{ map.info|strip_tags|convert_links|linebreaks }}
+							{% endautoescape %}
+							</p>
+						</div>
+						{% endif %}
+					</section>
+					{% else %}
+						{% if map.info %}
+						<section class="map_description cBlock">
+								<h5>Description:</h5>
+								<p>
+								{% autoescape off %}
+								{{ map.info|strip_tags|convert_links|linebreaks }}
+								{% endautoescape %}
+								</p>
+						</section>
+						{% endif %}
+					{% endif %}
 
-						{% endfor %}
-					</div>
-				{% endif %}
-			{% endfor %}
 
-		{% endif %}
-
-
-		{% if request.user.is_authenticated %}
-			<div class='cBlock'>
-				<form class='post_comment' method='POST' action='{{request.path}}#comments'>{% csrf_token %}
-					<textarea name='comment'></textarea>
-					<input type='submit' value="Comment" class='button'>
-				</form>
-			</div>
-		{% endif %}
-
-
-		{% if license %}
-		<div class="map_license cBlock">
-			<div>
-				<div class="license_img left">
-					<a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">
-						<img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/{{icons}}/4.0/88x31.png" />
-					</a>
 				</div>
-				<div class="license_text left">Some rights reserved: <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US" title="External graphics and sounds are not covered by the license">Creative Commons {{license}}</a>. External graphics and sounds are not covered by the license.</div>
-				<div class="clear"></div>
-			{% if request.user.is_authenticated %}
-				{% if reported == False %}
-				<a class="reportCopyright">Report copyright infringement</a>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					{% if comments %}
+					<a name="comments"></a>
+		
+					{% for revision_comments in comments %}
+						{% if revision_comments.1 %}
+							<div class="cBlock">
+								<h5>Comments for <a href="{{revision_comments.0.revision|map_id_of_rev:map}}" title="{{revision_comments.0.revision|map_title_of_rev:map}}">revision {{revision_comments.0.revision}}</a>{% if map.revision == revision_comments.0.revision %} (current){% endif %}{% if request.user.is_authenticated and revision_comments.2 and request.user != map.user and revision_comments.3 != True %} (<a href="{{revision_comments.0.revision|map_id_of_rev:map}}/unsubscribe/" title="Unsubscribe from comments to this revision">unsubscribe</a>){% elif request.user.is_authenticated and revision_comments.2 and request.user != map.user and revision_comments.3 == True%} (<a href="{{revision_comments.0.revision|map_id_of_rev:map}}/unsubscribe/" title="Subscribe back to comments to this revision">subscribe</a>){% endif %}:</h5>
+							</div>
+		
+							<div class="cBlock_comments">
+								{% for comment in revision_comments.1 %}
+		
+									{% autoescape off %}
+									<details class="commentUser" open>
+										<summary><b>{{comment.user.username|account_link:comment.user.id}}</b> commented on {{comment.posted}}{% if request.user.id == comment.user.id %} (<a href="/deletecomment/{{comment.id}}/maps/{{map.id}}/" onClick='return confirmDelete("comment")' title='delete comment'>メ</a>){% endif %}
+										</summary>
+									
+									<div class="commentMsg">{{comment.content|strip_tags|convert_links|linebreaks}}</div>
+									{% endautoescape %}
+								</details>
+		
+								{% endfor %}
+							</div>
+						{% endif %}
+					{% endfor %}
+		
 				{% endif %}
-			{% endif %}
+		
+		
+				{% if request.user.is_authenticated %}
+				<form class='post_comment' method='POST' action='{{request.path}}#comments'>{% csrf_token %}
+					<label for="comment">Post comment</label>
+					<textarea name='comment' class="form-control" id="comment" rows="3"></textarea>
+					<input type='submit' value="Comment" class='mt-2 btn btn-primary'>
+				</form>
+				{% endif %}
+				</div>
 			</div>
-		</div>
-		{% endif %}
-	</div>
-
-	<div class="right_map_content">
-		<div class="map_download">
-			<a href="/maps/{{arg}}/oramap" title="{{disk_size}}" class="button">Download</a>
-		</div>
-		{% if show_upgrade_map_button %}
-			<div class="map_download">
-				<a href="/maps/{{arg}}/update/" title="Update to the latest OpenRA engine version" class="button">Update Map</a>
-			</div>
-		{% endif %}
-		<div class="map_data_label">Mod:</div><div class="map_data_text"><span class="mod_{{ map.game_mod }}">{{ map.game_mod|upper }}</span></div>
-		<div class="map_data_label">File Size:</div><div class="map_data_text">{{disk_size}}</div>
-		{% if map.map_type %}
-			<div class="map_data_label">Type:</div><div class="map_data_text">{{ map.map_type|upper }}</div>
-		{% endif %}
-		{% if map.categories %}
-			<div class="map_data_label">Categories:</div><div class="map_data_text">{{ map.categories|map_categories }}</div>
-		{% endif %}
-		<div class="map_data_label">Uploader:</div><div class="map_data_text"><a href="/maps/uploader/{{userid.id}}/" title="Show maps uploaded by {{userid.username}}">{{ userid.username }}</a></div>
-		<div class="map_data_label">Players:</div><div class="map_data_text">{{ map.players }}</div>
-		<div class="map_data_label">Tileset:</div><div class="map_data_text">{{ map.tileset|capfirst }}</div>
-		<div class="map_data_label">Size:</div><div class="map_data_text">{{ map.bounds|map_real_size }}</div>
-		<div class="map_data_label">MapFormat:</div><div class="map_data_text">{{ map.mapformat }}</div>
-		{% if map.shellmap %}
-			<div class="map_data_label">Shellmap:</div><div class="map_data_text">{{ map.shellmap }}</div>
-		{% endif %}
-		{% if map.legacy_map %}
-			<div class="map_data_label">Imported Map:</div><div class="map_data_text">{{ map.legacy_map }}</div>
-		{% endif %}
-		<div class="map_data_label">Published:</div><div class="map_data_text">{{ map.posted|date:"M. d - Y" }}</div>
-		<div class="map_data_label">Downloading:</div><div class="map_data_text" title="ingame"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < REPORTS_PENALTY_AMOUNT %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></div>
-		<br />
-		<div class='cBlock'><span class='small-font'>Parsed by: {{map.parser}}</span></div>
-
-		{% if lints %}
-		<div class="cBlock">
-			<span class="small-font bold">Lint check status:</span>
-			{% for lint in lints %}
-				{% if not map.requires_upgrade and lint.0 == map.parser  or  map.requires_upgrade  or  not map.requires_upgrade and lint.0 == last_parser %}
-					<div class="lint_check_line">
-						<div class="lint_check_line_status">
-							{% if lint.1 %}
-							<span class="small-font green">pass</span>
-							{% else %}
-							<a href="#" class="showLintLog small-font red" data-version="{{lint.0}}">fail</a>
+			<div class="row">
+				<div class="col-12">
+					{% if license %}
+					<section class="mt-2 map_license border border-primary">
+						<div>
+							<div class="license_img left">
+								<a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US">
+									<img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/{{icons}}/4.0/88x31.png" />
+								</a>
+							</div>
+							<div class="license_text left">Some rights reserved: <a target="_blank" rel="license" href="http://creativecommons.org/licenses/{{icons}}/4.0/deed.en_US" title="External graphics and sounds are not covered by the license">Creative Commons {{license}}</a>. External graphics and sounds are not covered by the license.</div>
+							<div class="clear"></div>
+						{% if request.user.is_authenticated %}
+							{% if reported == False %}
+							<a class="reportCopyright">Report copyright infringement</a>
 							{% endif %}
+						{% endif %}
 						</div>
-						<div class="lint_check_line_version">
-							<span class="small-font">{{lint.0}}</span>
-						</div>
-					</div>
-				{% endif %}
-			{% endfor %}
-		</div>
-		{% endif %}
-
-		<br />
-		<div class="map_data_label">Rating:</div><div class="map_data_text">{% if request.user.is_authenticated %}<div class="five-star-rating" data-average="{{map.rating}}" data-id="{{map.id}}" data-type="map" title="{{ratesAmount}} users rated, average: {{map.rating}}"></div>{% else %}<span title="Authenticate to rate map">{{ map.rating }}</span>{% endif %}</div>
-		<div class="map_data_label">Viewed:</div><div class="map_data_text">{{ map.viewed }}</div>
-		<div class="map_data_label">Downloaded:</div><div class="map_data_text">{{ map.downloaded }}</div>
-		<div class="map_data_label">Played:</div><div class="map_data_text">{{ played_counter }}</div><br /><br />
-		<div class="map_data_link"><a class="printYamlShow">show yaml</a></div>
-		<!--<div class="map_data_link"><a class="printMapContent">show archive content</a></div>-->
-		{% if request.user.is_authenticated %}
-			{% if reported == False %}
-			<div class="map_data_link"><a class="report">report map</a></div>
-			{% endif %}
-			{% if reports %}
-				<div class="map_data_link"><a class="allReportsShow">show reports ({{reports|length}})</a></div>
-			{% endif %}
-		{% else %}
-			{% if reports %}
-				<div class="map_data_link"><a class="allReportsShow">show reports ({{reports|length}})</a></div>
-			{% endif %}
-		{% endif %}
-		{% if request.user.is_superuser or map.user_id == request.user.id %}
-		<div class="map_data_link">
-			<a class="editMapInfoShow" title="additional map info">edit map info</a>
-		</div>
-		<div class="map_data_link">
-			<a class="addScreenshot">add screenshot</a>
-		</div>
-		<div class="map_data_link">
-			<a class="change_downloading_status" href="/maps/{{map.id}}/setdownloadingstatus/" title="Only In-Game Downloading">set downloading {% if map.downloading %}false{% else %}true{% endif %}</a>
-		</div>
-		<div class="map_data_link">
-			<a href="/maps/{{map.id}}/delete/" onClick='return confirmDelete("map")'>delete {%if map.user_id == request.user.id %}my {% endif %}map revision</a>
-		</div>
-		{% endif %}
-		{% if has_upgrade_logs %}
-			<div class="map_data_link">
-				<a href="/maps/{{map.id}}/update_logs/">map update logs</a>
+					</section>
+					{% endif %}
+				</div>
 			</div>
-		{% endif %}
-
-		{% if map.author %}
-		<div class="side_img_links">
-			{% if mapsFromAuthor %}
-			<div>More from <a href="/maps/author/{{map.author|proper_space}}/" title="Author">{{ map.author|strip_tags }}</a>:</div>
-			{% for item in mapsFromAuthor %}
-				<div class="side_img_link"><a title="{{item.title}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" alt="minimap" /></a></div>
-			{% endfor %}
-			{% endif %}
 		</div>
-		{% endif %}
+		<div class="col-sm-12 col-md-4">
+			<div class="row  ml-1 mr-1 p-2 border align-items-center border-primary bg-transparent-dark">
+				<div class="col-12">
+					<details class="border border-dark bg-transparent-dark ml-1 mr-1 mt-2 mb-2" open>
+						<summary class="p-2  border-dark"><h5 class="d-inline-flex">Map Details</h5></summary>
+						{% if map.map_type %}
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Type: </span><span class="map_data_text">{{ map.map_type|upper }}</span>
+						</p>
+						{% endif %}
+						{% if map.categories %}
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Categories: </span><span class="map_data_text">{{ map.categories|map_categories }}</span>
+						</p>
+						{% endif %}
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Players: </span><span class="map_data_text">{{ map.players }}</span>
+						</p>
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Tileset: </span><span class="map_data_text">{{ map.tileset|capfirst }}</span>
+						</p>
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Size: </span><span class="map_data_text">{{ map.bounds|map_real_size }}</span>
+						</p>
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Map Format: </span><span class="map_data_text">{{ map.mapformat }}</span>
+						</p>
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Uploader: </span><span class="map_data_text"><a href="/maps/uploader/{{userid.id}}/" title="Show maps uploaded by {{userid.username}}">{{ userid.username }}</a></span>
+						</p>
+						{% if map.shellmap %}
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Shellmap: </span><span class="map_data_text">{{ map.shellmap }}</span>
+						</p>
+						{% endif %}
+						{% if map.legacy_map %}
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Imported Map: </span><span class="map_data_text">{{ map.legacy_map }}</span>
+						</p>
+						{% endif %}
+						<p class="m-0 p-0 pl-2 pr-2">
+							<span class="map_data_label">Downloading: </span><span class="map_data_text"><a href="https://github.com/OpenRA/OpenRA-Resources/wiki/Downloading-Status-FAQ" title="In-Game Downloading" target="_blank">{% if map.downloading and reports|length < REPORTS_PENALTY_AMOUNT %}allowed{% else %}<span class="integration">!</span>forbidden<span class="integration">!</span>{% endif %}</a></span>
+						</p>
+					</details> 
+				</div>
+				<div class="col-12">
+						{% if map.downloading == False or reports|length >= REPORTS_PENALTY_AMOUNT %}
+						<details class="border border-dark bg-transparent-dark ml-1 mr-1 mt-2 mb-2">
+							<summary class="p-2">
+								Attention
+							</summary>
+							<p class="p-2">
+								This map can't be automatically downloaded by OpenRA game!
+							</p>
+							{% if map.downloading == False %}
+								<p>Reason: Downloading is manually set to False</p>
+							{% elif reports|length >= REPORTS_PENALTY_AMOUNT %}
+								<p>Reason: More then 2 <a class="allReportsShow">active reports</a>!</p>
+							{% endif %}
+						</details>
+						{% endif %}
+						{% if map.advanced_map %}
+						<details class="border border-dark bg-transparent-dark ml-1 mr-1 mt-2 mb-2">
+							<summary class="p-2">
+								Advanced rules
+							</summary>
+							<p class="p-2">
+								Click to see custom <a class="primary" data-toggle="modal" data-target="#advancerules">Rules</a>.
+							</p>
+						</details>
 
-		{% if similarMaps %}
-		<div class="side_img_links">
-			<div>Similar maps:</div>
-			{% for item in similarMaps %}
-			<div class="side_img_link"><a title="{{item.title}} by {{item.author}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" alt="minimap" /></a></div>
-			{% endfor %}
+						<!-- Modal -->
+						<div class="modal fade" id="advancerules" tabindex="-1" role="dialog" aria-labelledby="advancerules" aria-hidden="true">
+							<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+								<h5 class="modal-title text-dark">Report this map</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+								</div>
+								<div class="modal-body">
+									<form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+										<div><textarea name="reportReason" placeholder="Reason"></textarea></div>
+										<div class="checkboxRow text-danger"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
+										<div><button class="btn btn-primary" type="submit">Submit</button></div>
+									</form>
+								</div>
+								<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+							</div>
+							</div>
+						</div>
+						</div>
+						<!-- // TODO See advance rules -->
+						<!-- $.ajax({
+							url : "/maps/{{map.id}}/rules/",
+							dataType: "text",
+							success : function (data) {
+								$(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
+								$(".closePopup").on("click", function() {
+									$("#overlay").hide()
+									$(".popup").hide()
+								});
+								noScroll("popupContainer");
+							}
+						}); -->
+						{% endif %}
+						<!-- // TODO LUA script download -->
+						{% if map.lua %}
+						<details class="border border-dark bg-transparent-dark ml-1 mr-1 mt-2 mb-2">
+							<summary class="p-2">
+								Lua map
+							</summary>
+							<p class="p-2">
+								This map includes Lua scripting logic.
+									{% for item in luaNames %}
+									<a class="printLua" data-name="{{item}}.lua" title="{{item}}">Display</a> <code>{{item}}.lua</code> or <a href="/maps/{{map.id}}/lua/{{item}}/">dow	nload</a> file.
+									{% endfor %}
+								<p class="p-2">Checkout <a href="http://wiki.openra.net/Map-scripting" target="_blank">documentation</a>
+							</p>
+							<!-- // 		$.ajax({
+								// 			url : "/maps/{{map.id}}/lua/" + this.title,
+								// 			dataType: "text",
+								// 			success : function (data) {
+								// 				$(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
+								// 				$(".closePopup").on("click", function() {
+								// 					$("#overlay").hide()
+								// 					$(".popup").hide()
+								// 				});
+								// 				noScroll("popupContainer");
+								// 			}
+								// 		}); -->
+						</details>
+						{% endif %}					
+				</div>
+				<div class="col-12">
+					<section class="border p-2 ml-1 mr-1 mt-2 mb-2 border-dark bg-transparent-dark">
+
+						{% if lints %}
+							<p class="small-font bold">Lint check status:</p>
+							{% for lint in lints %}
+								{% if not map.requires_upgrade and lint.0 == map.parser  or  map.requires_upgrade  or  not map.requires_upgrade and lint.0 == last_parser %}
+										{% if lint.1 %}
+										<span class="text-success"><i class="fas fa-check"></i> pass</span>
+										{% else %}
+										<a href="#" class="showLintLog text-danger" data-version="{{lint.0}}"><i class="fas fa-times"></i> fail</a>
+										{% endif %}
+
+										<span class="small-font">{{lint.0}}</span>
+								{% endif %}
+							{% endfor %}
+						{% endif %}
+					</section>
+				</div>
+				<div class="col-12 ">
+					<section class="p-2 ml-1 mr-1 mt-2 mb-2 border border-dark bg-transparent-dark">
+						Parsed by: {{map.parser}}
+					</section>
+				</div>
+					{% if map.author %}
+					<div class="col-12">
+						{% if mapsFromAuthor %}
+
+						<section class="side_img_links border border-dark bg-transparent-dark ml-1 mr-1 mt-2 mb-2 p-2">
+							<details open>
+								<summary>	<h5 class="d-inline-flex">More from <a href="/maps/author/{{map.author|proper_space}}/" title="Author">{{ map.author|strip_tags }}</a>:</h5></summary>
+								{% for item in mapsFromAuthor %}
+									<a title="{{item.title}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" alt="minimap" class="img-fluid"/></a>
+								{% endfor %}
+							</details>
+						</section>
+						{% endif %}
+					</div>
+					{% endif %}
+			
+					{% if similarMaps %}
+					<div class="col-12">
+
+						<section class="side_img_links border border-dark bg-transparent-dark ml-1 mr-1 mt-2 mb-2 p-2">
+							<details>
+								<summary>
+									<h5 class="d-inline-flex">Similar maps:</h5>
+								</summary>
+								{% for item in similarMaps %}
+								<a title="{{item.title}} by {{item.author}}" href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" alt="minimap" class="img-fluid"/></a>
+								{% endfor %}
+							</details>
+							
+						</section>
+					</div>
+					{% endif %}
+			</div>
 		</div>
-		{% endif %}
 	</div>
-	<div class="clear"></div>
-</div>
+</section>
 
 <script>
-	function confirmDelete(what)
-	{
-		var agree = confirm('Are you sure you want to delete this '+what+'?')
+	function confirmDelete(what){
+		var agree = confirm('Are you sure you want to delete this '+what+'?');
 		if (agree) return true
 		else return false
 	}
-	$(function() {
-		$("#overlay").on("click", function() {
-			$(this).hide()
-			$(".popup").hide()
-		})
-
-		$(".closePopup").on("click", function() {
-			$("#overlay").hide()
-			$(".popup").hide()
-		})
-
-		$(".report").on("click", function() {
-			$(".reportMap input[type='checkbox']").prop('checked', false)
-			$(".reportMap").show().children().children().children('textarea').focus()
-			$("#overlay").show()
-		})
-
-		$(".reportCopyright").on("click", function() {
-			$(".reportMap input[type='checkbox']").prop('checked', true)
-			$(".reportMap").show().children().children().children('textarea').focus()
-			$("#overlay").show()
-		})
-
-		$(".editMapInfoShow").on("click", function() {
-			$(".editMapInfo").show().children().children().children('textarea').focus()
-			$("#overlay").show()
-		})
-
-		$(".allReportsShow").on("click", function() {
-			$(".allReports").show()
-			$("#overlay").show()
-		})
-
-		$(".printYamlShow").on("click", function() {
-			$(".popupContainer").empty()
-			$(".printMisc").empty()
-			$(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
-			$(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>map.yaml</h3></div>'));
-			$.ajax({
-				url : "/maps/{{map.id}}/yaml/",
-				dataType: "text",
-				success : function (data) {
-					$(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
-					$(".closePopup").on("click", function() {
-						$("#overlay").hide()
-						$(".popup").hide()
-					});
-					noScroll("popupContainer");
-				}
-			});
-			$(".printMisc").show()
-			$("#overlay").show()
-		})
-
-		$(".printRulesShow").on("click", function() {
-			$(".popupContainer").empty()
-			$(".printMisc").empty()
-			$(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
-			$(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>'+$(this).data("name")+'</h3></div>'));
-			$.ajax({
-				url : "/maps/{{map.id}}/rules/",
-				dataType: "text",
-				success : function (data) {
-					$(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
-					$(".closePopup").on("click", function() {
-						$("#overlay").hide()
-						$(".popup").hide()
-					});
-					noScroll("popupContainer");
-				}
-			});
-			$(".printMisc").show()
-			$("#overlay").show()
-		})
-
-		$(".showLintLog").on("click", function() {
-			$('.Lints[data-version="'+$(this).attr("data-version")+'"]').show()
-			$("#overlay").show()
-			noScroll('lint_check')
-		})
-
-		$(".printLua").on("click", function() {
-			$(".popupContainer").empty()
-			$(".printMisc").empty()
-			$(".printMisc").append($('<div class="popupContainer"><div class="ajax-loader"></div></div>'))
-			$(".printMisc").append($('<div style="position:absolute; margin-left: 240px; margin-top: -365px;"><h3>'+$(this).data("name")+'</h3></div>'));
-			$.ajax({
-				url : "/maps/{{map.id}}/lua/" + this.title,
-				dataType: "text",
-				success : function (data) {
-					$(".popupContainer").html(data.replace(/\n/g, '<br />').replace(/\t/g, '<span style="padding-left: 20px;"></span>')).append($('<div class="closePopup"><label class="x"></label></div>'));
-					$(".closePopup").on("click", function() {
-						$("#overlay").hide()
-						$(".popup").hide()
-					});
-					noScroll("popupContainer");
-				}
-			});
-			$(".printMisc").show()
-			$("#overlay").show()
-		})
-
-		$(".addScreenshot").on("click", function() {
-			$(".addScreenshotForm").empty();
-			$.ajax({
-				url : "/maps/{{map.id}}/addmapsc/" + this.title,
-				dataType: "text",
-				success : function (data) {
-					$(".addScreenshotForm").html(data);
-					$(".closePopup").on("click", function() {
-						$("#overlay").hide()
-						$(".popup").hide()
-					});
-					noScroll("addScreenshotForm");
-				}
-			});
-			$(".addScreenshotForm").show()
-			$("#overlay").show()
-		})
-	})
 </script>
