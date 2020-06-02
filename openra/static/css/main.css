@@ -47,15 +47,15 @@ body:after{
 
 }
 
-  
+
 code {
     padding:2px;
-    background:rgba(0,0,0,0.3);
+    background-color: #f1f1f1;
     border-radius:2px;
 }
 
 /* maps */
-.map{ 
+.map{
     background:rgba(0,0,0,0.5) !important;
 }
 .map img {
@@ -89,6 +89,7 @@ code {
 .comment p {
     margin:0;
     padding:0;
+    font-size:95%;
 }
 
 /* footer */
@@ -174,4 +175,3 @@ small{
     border-bottom: 3px solid transparent;
     border-top: 3px solid #087F8F;
   }
-

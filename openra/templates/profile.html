@@ -1,12 +1,7 @@
 <section id="profile_container" class="p-4">
 	<div class="row">
 		<div class="col-4">
-			<nav class="side_nav">
-				<ul>
-					<li><a href="/accounts/profile/" {% if '/accounts/profile/' in request.path %}{{'class="nav-selected"'}}{% endif %}>Summary</a></li>
-					<li><a href="/comments/user/{{request.user.id}}/">My comments</a></li>
-				</ul>
-			</nav>
+			{% include 'profile_side_nav.html' %}
 		</div>
 		<div class="col-8">
 			{% if '/accounts/profile/' in request.path %}
@@ -17,7 +12,7 @@
 				<div class="profile_row m-2">
 					<i class="fas fa-envelope"></i> Email:
 					{% if user.email %}
-						 {{ user.email }} 
+						 {{ user.email }}
 					{% else %}
 						<a href="/accounts/email/">Add Email</a> (recommended)
 					{% endif %}

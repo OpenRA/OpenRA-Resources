@@ -1,7 +1,7 @@
 {% load customTags %}
 
 <div class="col-md-4 col-sm-12">
-    <div class="card map">
+    <div class="card map m-1">
         <div class="map-status">
             <img src="/maps/{{item.id}}/minimap" class="card-img-top" alt="/maps/{{item.name}}/">
             {% if item.downloading == False or item.amount_reports >= 3 %}
