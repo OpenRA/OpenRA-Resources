@@ -1,86 +1,96 @@
 {% load header_tags %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=1024" />
-	<title>OpenRA Resource Center{{ title }}</title>
-	<link href="/static/style003.css" rel="stylesheet" type="text/css">
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
 
-	{% if map %}
-		<script type="text/javascript" src="/static/js/highslide/highslide-with-gallery.packed.js" ></script>
-		<script type="text/javascript" src="/static/js/highslide/highslide.config.js" charset="utf-8" ></script>
-		<link href="/static/js/highslide/highslide.css" rel="stylesheet">
-	{% endif %}
-	<script type="text/javascript" src="/static/js/jRating/jRating.jquery.js"></script>
-	<link rel="stylesheet" type="text/css" href="/static/js/jRating/jRating.jquery.css" media="screen" />
+<nav class="navbar navbar-expand-lg navbar-dark ">
+	<div class="ribbon d-none d-md-block d-lg-block"><span><a href="https://openra.net" class="text-light">OpenRA.net</a></span></div>
 
-	<script type="text/javascript" src="/static/js/script.js"></script>
-	<!--[if lt IE 9]>
-	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link href="/static/favicon.ico" rel="shortcut icon" type="image/x-icon">
-	<link href="/news/feed/" rel="alternate" type="application/atom+xml">
-
-	{% if '/contacts' in request.path %}
-		<script src='https://www.google.com/recaptcha/api.js'></script>
-	{% endif %}
-
-</head>
-<body>
-	<div id="overlay"></div>
-
-	<div id="rssfeed">
-		<a class="feed" href="/news/feed.rss" title="The latest maps">RSS Feed</a>
-	{% if user.is_authenticated %}
-		<a class="userManageTop" style="text-decoration: underline;" href="/logout/" title="Sign out">Sign out</a>
-		<a class="userManageTop" style="text-decoration: underline; padding-right: 30px;" href="/accounts/profile/" title="Show profile">Profile ({{ user.username}})</a>
-		<a class="userManageTop" style="text-decoration: none; padding-right: 30px;" href="/comments/" title="All comments">{{request.COOKIES.last_comment_id_seen|new_comments:request.user.id}}<span style="text-decoration: underline;">Comments</span></a>
-	{% endif %}
-	</div>
-
-
-	<div id="container">
-		<div id="header">
-			<h1>
-				<img src="/static/images/soviet-logo.svg" onerror='this.onerror = null; this.src="/static/images/soviet-logo-fallback.png"' alt="logo">OpenRA Resource Center
-			</h1>
-		</div>
-
-		<a id="ghbanner" href="http://openra.net" target="_blank" title="Go to the official OpenRA Website">
-			<img alt="Go to the official OpenRA Website" src="/static/images/openra-net.svg" onerror='this.onerror = null; this.src="/static/images/openra-net-fallback.png"'>
+		<a class="navbar-brand" href="#">
+		  <img src="/static/images/soviet-logo.svg" class="img-fluid"
+		  onerror='this.onerror = null; this.src="/static/images/soviet-logo-fallback.png"' alt="logo"/>
+		  <span class="navbar-brand-text">OpenRA
+			Resource Center</span>
 		</a>
 
-		<form id="quick-search" method="POST" action="/search/">{% csrf_token %}
-			<input id="qsearch"
-				type="text"
-				title="Search maps by title, hash, description..."
-				value="Search..."
-				onblur="this.value=!this.value?'Search...':this.value;"
-				onfocus="this.select()"
-				onclick="this.value='';"
-				name="qsearch">
-
-			<input class="btn"
-				type="image"
-				src="/static/images/search.svg"
-				onerror='this.onerror = null; this.src="/static/images/search-fallback.png"'
-				title="Search"
-				name="searchsubmit"
-				alt="Search">
-		</form>
-
-		<ul id="nav">
-			<li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></a></li>
-			<li><a href="/maps/"><span {% if '/maps' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
-		{% if user.is_authenticated %}
-			<li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
-			<li><a href="/upload/map/"><span {% if '/upload/map' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload Map</span></a></li>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	  <span class="navbar-toggler-icon"></span>
+	</button>
+  
+	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+	  <ul class="navbar-nav mr-auto ml-auto">
+		<li {% if request.path == '/' %}
+			{{ 'class="nav-item active"' }} 
+			{% else %}
+			{{ 'class="nav-item"' }} 
+			{% endif %}>
+			<a href="/" class="nav-link">
+				<span>Home</span>
+			</a>
+		</li>
+		<li {% if request.path == '/maps/' %}
+		{{ 'class="nav-item active"' }} 
 		{% else %}
-			<li><a href="/login/"><span {% if request.path == '/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>
+		{{ 'class="nav-item"' }} 
+		{% endif %}>
+			<a href="/maps/" class="nav-link">
+				<span>Maps</span>
+			</a>
+		</li>
+		{% if user.is_authenticated %}
+			<li {% if request.path == '/panel/' %}
+			{{ 'class="nav-item active"' }} 
+			{% else %}
+			{{ 'class="nav-item"' }} 
+			{% endif %}>
+				<a href="/panel/" class="nav-link">
+					<span>My Content</span>
+				</a>
+			</li>
+			<li {% if request.path == '/upload/map/' %}
+			{{ 'class="nav-item active"' }} 
+			{% else %}
+			{{ 'class="nav-item"' }} 
+			{% endif %}>
+				<a href="/upload/map/" class="nav-link">
+					<span>Upload Map</span>
+				</a>
+			</li>
 		{% endif %}
-		</ul>
+		<li class="nav-item dropdown">
+			<a  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  {% if request.path == '/accounts/profile/' %}
+			{{ 'class="nav-link dropdown-toggle active"' }} 
+			{% elif request.path == '/comments/' %}
+			{{ 'class="nav-link dropdown-toggle active"' }} 
+			{% else %}
+			{{ 'class="nav-link dropdown-toggle"' }} 
+			{% endif %}>
+			  User
+			</a>
+			<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+			  {% if user.is_authenticated %}
+			  <a class="dropdown-item"  href="/accounts/profile/">
+				  Profile ({{ user.username}})
+			  </a>
+			  {% if comments %}
+			  <a class="dropdown-item"   href="/comments/"
+				  title="All comments">{{request.COOKIES.last_comment_id_seen|new_comments:request.user.id}}Comments</a>
+			  {% else %}
+			  <a class="dropdown-item"   href="/comments/"
+				  title="All comments">Comments</a>
+			  {% endif %}
+			  <a class="dropdown-item" href="/logout/" title="Sign out">Sign out</a>
+			  {% else %}
+				  <a href="/login/" class="dropdown-item">Sign In</a>
+			  {% endif %}
+			</div>
+		  </li>
+	  </ul>
 
-		<div id="content">
+	  <form class="form-inline my-2 my-lg-0 justify-content-center" id="quick-search" method="POST" action="/search/">{% csrf_token %}
+		<input class="form-control mr-sm-2 w-50 " type="search" placeholder="Search" aria-label="Search" id="qsearch" type="text" title="Search maps by title, hash, description..." value="Search..."
+		onblur="this.value=!this.value?'Search...':this.value;" onfocus="this.select()" onclick="this.value='';"
+		name="qsearch">
+		<button class="btn btn-outline-primary" type="submit" 
+		onerror='this.onerror = null; this.src="/static/images/search-fallback.png"' title="Search" name="searchsubmit"
+		alt="Search"><i class="fas fa-search text-light"></i></button>
+	  </form>
+	</div>
+  </nav>

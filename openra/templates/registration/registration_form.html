@@ -1,68 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+	{% include 'head.html' %}
+</head>
+<body>
+<div class="container">
 {% include 'header.html' %}
 
 {% if not user.is_authenticated %}
 
-	{% block main_content %}
+<div id="outer" class="row">
+	<div class="col-12">
 
-	<h2>Sign Up</h2>
+		{% block main_content %}
+		<section class="m-4">
+			<h2>Sign Up</h2>
+			<p> Please fill in the form below to</p>
+				{% if form.errors %}
+					<h3 class="error">Please correct the errors below:</h3>
+				{% endif %}
+				
+				<form method="post" action="">{% csrf_token %}
+					<div>
+							<div id="innerCellLeft">
+								<i class="fas fa-user pr-1"></i>
+								<label for="id_username">Username:</label>{% if form.username.errors %}<br />
+								<span style="color: #B7FF0A; font-weight: bold;" class="error">{{ form.username.errors|join:", " }}</span>{% endif %}
+							</div>
+							<div id="innerCellLeft">{{ form.username }}</div>
+						</div>
+					<div >
+						<div id="innerCellLeft">
+							<i class="far fa-envelope pr-1"></i>
+							<label for="id_email">Email address:</label>{% if form.email.errors %}<br />
+							<span style="color: #B7FF0A; font-weight: bold;" class="error">{{ form.email.errors|join:", " }}</span>{% endif %}
+						</div>
+						<div id="innerCellRight">{{ form.email }}</div>
+					</div>
 
-	<div id="outer">
+					<div >
+						<div id="innerCellLeft">
+							<i class="fas fa-key pr-1"></i>
+							<label for="id_password1">Password:</label>{% if form.password1.errors %}<br />
+							<span style="color: #B7FF0A; font-weight: bold;" class="error">{{ form.password1.errors|join:", " }}</span>{% endif %}
+						</div>
+						<div id="innerCellRight">{{ form.password1 }}</div>
+					</div>
 
-		{% if form.errors %}
-			<p></p>
-			<h3 class="error">Please correct the errors below:</h3>
-		{% endif %}
+					<div >
+						<div id="innerCellLeft">
+							<i class="fas fa-key pr-1"></i>
+							<label for="id_password2">Password (type again):</label>{% if form.password2.errors %}<br />
+							<span style="color: #B7FF0A; font-weight: bold;" class="error">{{ form.password2.errors|join:", " }}</span>{% endif %}
+						</div>
+						<div id="innerCellRight">{{ form.password2 }}</div>
+					</div><br />
 
-		<form method="post" action="">{% csrf_token %}
+					<div>
+						<div colspan="2">
+							<button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Register</button>
+						</div>
+					</div>
 
-			<div id="row">
-				<div id="innerCellLeft">
-					<label for="id_username">Username:</label>{% if form.username.errors %}<br />
-					<span style="color: #B7FF0A; font-weight: bold;" class="error">{{ form.username.errors|join:", " }}</span>{% endif %}
-				</div>
-				<div id="innerCellRight">{{ form.username }}</div>
+				</form>
+			{% endblock %}
+
+			<div class="mt-4">
+				<p class="registerInfo">Fill out the form (all fields are required), and your account will be created; you'll be sent an email with instructions on how to finish your registration. We'll only use your email to send you signup instructions and notifications related to content you upload. We hate spam as much as you do.</p>
+				<p class="registerInfo">This account will let you log into the OpenRA Resource Center, upload &amp; manage your content, participate in discussions.</p>
+				<p class="registerInfo">Your username can only consist of alphanumeric characters and underscores and may be up to 20 characters long.</p>
 			</div>
-
-			<div id="row">
-				<div id="innerCellLeft">
-					<label for="id_email">Email address:</label>{% if form.email.errors %}<br />
-					<span style="color: #B7FF0A; font-weight: bold;" class="error">{{ form.email.errors|join:", " }}</span>{% endif %}
-				</div>
-				<div id="innerCellRight">{{ form.email }}</div>
-			</div>
-
-			<div id="row">
-				<div id="innerCellLeft">
-					<label for="id_password1">Password:</label>{% if form.password1.errors %}<br />
-					<span style="color: #B7FF0A; font-weight: bold;" class="error">{{ form.password1.errors|join:", " }}</span>{% endif %}
-				</div>
-				<div id="innerCellRight">{{ form.password1 }}</div>
-			</div>
-
-			<div id="row">
-				<div id="innerCellLeft">
-					<label for="id_password2">Password (type again):</label>{% if form.password2.errors %}<br />
-					<span style="color: #B7FF0A; font-weight: bold;" class="error">{{ form.password2.errors|join:", " }}</span>{% endif %}
-				</div>
-				<div id="innerCellRight">{{ form.password2 }}</div>
-			</div><br />
-
-			<div>
-				<div colspan="2">
-					<button type="submit">Register &rarr;</button>
-				</div>
-			</div>
-
-		</form>
+		</section>
 	</div>
-	{% endblock %}
-
-	<div class="cBlock">
-		<p class="registerInfo">Fill out the form (all fields are required), and your account will be created; you'll be sent an email with instructions on how to finish your registration. We'll only use your email to send you signup instructions and notifications related to content you upload. We hate spam as much as you do.</p>
-		<p class="registerInfo">This account will let you log into the OpenRA Resource Center, upload &amp; manage your content, participate in discussions.</p>
-		<p class="registerInfo">Your username can only consist of alphanumeric characters and underscores and may be up to 20 characters long.</p>
-	</div>
+</div>
 
 {% endif %}
-
 {% include 'footer.html' %}
+</div>
+</body>
+</html>

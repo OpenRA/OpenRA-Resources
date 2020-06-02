@@ -1,0 +1,6 @@
+<nav class="nav flex-column">
+  <a class="nav-link" href="/accounts/profile/" {% if '/accounts/profile/' in request.path %}{{'class="active"'}}{% endif %}>Summary</a>
+  <a  class="nav-link" href="/comments/user/{{request.user.id}}/" {% if '/comments/user/' in request.path %}{{'class="active"'}}{% endif %}>My comments</a>
+  <a  class="nav-link" href="/panel/myscreenshots/" {% if '/panel/myscreenshots/' in request.path %}{{'class="active"'}}{% endif %}>My screenshots</a>
+
+</nav>

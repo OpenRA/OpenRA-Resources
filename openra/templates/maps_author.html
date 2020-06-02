@@ -1,183 +1,31 @@
 {% load customTags %}
+<section class="m-4">
+	<h3>Maps authored by <u>{{author|strip_tags}}</u>{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
 
-<div class='cBlock'>
-	<form name='filter_maps' class='filter_maps' action='{{request.path}}' method='GET'>
-		<div class='filter_container'>
+	<div class='form m-4'>
+		{% include 'map_filters.html' %}
+	</div>
 
-
-			<div class='filter_section'>
-				<span class="">Mod:</span>
-				<select name="mod" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.mod %}selected{% endif %}>any</option>
-					{% for mod in filter_prepare.mods %}
-						<option value="{{mod}}" {% if mod in selected_filter.mod %}selected{% endif %}>{{mod|upper}}</option>
-					{% endfor %}
-				</select>
-			</div>
-
-			<div class='filter_section'>
-				<span class="">Category:</span>
-				<select name="category" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.category %}selected{% endif %}>any</option>
-					{% for category in filter_prepare.categories %}
-						<option value="{{category}}" {% if category in selected_filter.category %}selected{% endif %}>{{category}}</option>
-					{% endfor %}
-				</select>
-			</div>
-
-			<div class='filter_section'>
-				<span class="">Format:</span>
-				<select name="format" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.format %}selected{% endif %}>any</option>
-					{% for format in filter_prepare.formats %}
-						<option value="{{format}}" {% if format in selected_filter.format %}selected{% endif %}>{{format}}
-					{% endfor %}
-				</select>
-			</div>
-
-			<div class='filter_section'>
-				<span class="">Parsed by:</span>
-				<select name="parser" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.parser %}selected{% endif %}>any</option>
-					{% for parser in filter_prepare.parsers %}
-						<option value="{{parser}}" {% if parser in selected_filter.parser %}selected{% endif %}>{{parser}}</option>
-					{% endfor %}
-				</select>
-			</div>
-
-			<div class='filter_section'>
-				<span class="">Tileset:</span>
-				<select name="tileset" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.tileset %}selected{% endif %}>any</option>
-					{% for tileset in filter_prepare.tilesets %}
-						<option value="{{tileset}}" {% if tileset in selected_filter.tileset %}selected{% endif %}>{{tileset}}</option>
-					{% endfor %}
-				</select>
-			</div>
-
-
-			<div class='clear'></div>
-
-
-			<div class='filter_end'>
-
-				<div class='filter_section'>
-					<div class='filter_sort_by'>
-						<span class="">Sort by:</span>
-						<select name="sort_by">
-							{% for sorting in filter_prepare.sort_by %}
-								<option value="{{sorting.0}}" {% if sorting.0 in selected_filter.sort_by %}selected{% endif %}>{{sorting.1}}</option>
-							{% endfor %}
-						</select>
-					</div>
-
-					<div class="filter_apply">
-						<button type="submit">Apply Filter/Sorting</button>
-					</div>
-				</div>
-
-				<div class='filter_section filter_checks'>
-
-					<div class='filter_section_checks'>
-						<input type='checkbox' {% if selected_filter.show_all_revisions == 'on' %}checked{% endif %} name='show_all_revisions'>
-						<span class="">Show all revisions</span>
-						<br />
-						<input type='checkbox' name='show_with_reports' {% if selected_filter.show_with_reports == 'on' %}checked{% endif %}>
-						<span class="">Show only with reports</span>
-						<br />
-						<input type='checkbox' name='with_duplicates' {% if selected_filter.with_duplicates == 'on' %}checked{% endif %}>
-						<span class="">With duplicates</span>
-					</div>
-
-					<div class='filter_section_checks'>
-						<input type='checkbox' name='only_advanced' {% if selected_filter.only_advanced == 'on' %}checked{% endif %}>
-						<span class="">Only Advanced</span>
-						<br />
-						<input type='checkbox' name='only_lua' {% if selected_filter.only_lua == 'on' %}checked{% endif %}>
-						<span class="">Only Lua</span>
-						<br />
-						<input type='checkbox' name='outdated' {% if selected_filter.outdated == 'on' %}checked{% endif %}>
-						<span class="">Outdated</span>
-					</div>
-
-				</div>
-
-				<div class='filter_section'>
-					<span class="">Maps with problems:</span>
-					<select name="with_problems">
-						{% for problem in filter_prepare.with_problems %}
-							<option value="{{problem.0}}" {% if problem.0 in selected_filter.with_problems %}selected{% endif %}>{{problem.1}}</option>
-						{% endfor %}
-					</select>
-
-					<br />
-
-					<span class="">Players:</span>
-					<input type='text' placeholder='any' name='players' {% if selected_filter.players %}value="{{selected_filter.players}}"{% endif %}>
-				</div>
-
-			</div>
-
-		</div>
-	</form>
-</div>
-
-
-
-
-
-<div class='cBlock no-pd-bot map-grid-header-info'>
-	<h3>Found {{ amount }} maps authored by <u>{{author|strip_tags}}</u>{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
-</div>
 {% if amount != 0 %}
-<div id="map_grid">
-	{% for item in maps %}
-		<div class="map_grid_cell">
-			<a href="/maps/{{item.id}}/">
-				<div class="cell-link-container">
-					<div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
-				</div>
-				{% if item.downloading == False or item.amount_reports >= 3 %}
-				<div class="map-custom-status"><img src="/static/images/attention-mini.jpg" /></div>
-				{% endif %}
-				{% if item.advanced_map %}
-				<div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" /></div>
-				{% endif %}
-				{% if item.lua %}
-				<div class="map-custom-status"><img src="/static/images/lua-mini.jpg" /></div>
-				{% endif %}
-			</a>
-			<div class="map_tooltip">
-				<div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
-				<table>
-					<tr>
-						<td class="tooltip_title">Author: </td>
-						<td class="tooltip_value"><a href="/maps/author/{{item.author|proper_space}}/" title="Show maps authored by {{item.author|strip_tags}}">{{ item.author|strip_tags }}</a></td>
-					</tr>
-					<tr>
-						<td class="tooltip_title">Uploader: </td>
-						<td class="tooltip_value"><a href="/maps/uploader/{{item.user.id}}/" title="Show maps uploaded by {{item.user.username}}">{{ item.user.username }}</a></td>
-					</tr>
-				</table>
-				<table>
-					<tr>
-						<td class="tooltip_title_misc">Revision: </td>
-						<td class="tooltip_value_misc">{{ item.revision }}</td>
-						<td class="tooltip_title_misc">Players: </td>
-						<td class="tooltip_value_misc">{{ item.players }}</td>
-					</tr>
-					<tr>
-						<td class="tooltip_title_misc">Comments: </td>
-						<td class="tooltip_value_misc">{{ comments|amount_comments:item.id }}</td>
-						<td class="tooltip_title_misc">Rating: </td>
-						<td class="tooltip_value_misc">{{ item.rating }}</td>
-					</tr>
-				</table>
-			</div>
-		</div>
-	{% endfor %}
-	<div class="clear"></div>
+
+	<div class='m-4'>
+		<h3>Found {{ amount }} maps{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
+	</div>
+	{% if amount != 0 %}
+	<div class="m-4 row">
+		{% for item in maps %}
+			{% include 'maps_card.html' %}
+		{% endfor %}
+	</div>
+
+{% endif %}
+
+{% else %}
+<div class="m-4 row">
+	<div class="col-12">Nothing found.</div>
 </div>
+
+
 {% if 2 in range %}
 <div id="paging">
 	{% for i in range %}
@@ -203,5 +51,6 @@
 	{% endfor %}
 </div>
 {% endif %}
-<div class="clear"></div>
+
+</section>
 {% endif %}

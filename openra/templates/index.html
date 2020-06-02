@@ -1,3 +1,18 @@
-{% include 'header.html' %}
-{% include content %}
-{% include 'footer.html' %}
+<!doctype html>
+<html lang="en">
+
+<head>
+{% include 'head.html' %}
+</head>
+
+<body>
+    <div id="container" class="container  shadow-dark">
+
+        {% include 'header.html' %}
+
+            {% include content %}
+
+        {% include 'footer.html' %}
+    </div>
+</body>
+</html>

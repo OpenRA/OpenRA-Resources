@@ -1,49 +1,86 @@
 {% load customTags %}
+<section class="m-4">
+<h3 class="d-inline-block border border-white border-top-0 border-left-0 border-right-0 mb-4 pb-2"> 
+	<i class="fas fa-comments"></i> 
+	Comments {% if comments_by_user %}by {{comments_by_user.username}} {% endif %}( page {{page}} ):
+</h3>
 
-<div class="cBlock">
-	<h5>Comments {% if comments_by_user %}by {{comments_by_user.username}} {% endif %}( page {{page}} ):</h5>
-</div>
 
 {% if amount != 0 %}
 
-	<div class="cBlock_comments">
-		{% for comment in comments %}
+{% if 2 in range %}
+<div class="paging text-center p-1">
+	Page: 
+	{% for i in range %}
+	<span class="paging_cell">
+		{% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
+		{% if page == i %}
+		<span>{{ i }}</span>
+		{% else %}
+		<a href="/comments/page/{{i}}">{{ i }}</a>
+		{% endif %}
+		{% else %}
+		{% if i < page %}
+		<span class='no-page-before hide_block'>...</span>
+		{% else %}
+		<span class='no-page-after hide_block'>...</span>
+		{% endif %}
+		{% endif %}
+	</span>
+	{% endfor %}
+</div>
+{% endif %}
 
-			{% autoescape off %}
-			<div class="commentUser">{{comment.user.username|account_link:comment.user.id}} commented <a href="/{{comment.item_type}}/{{comment.item_id}}/" title="{{comment.item_id|item_name_by_type_id:comment.item_type}}">{{comment.item_type|slice:":-1"}} {{comment.item_id}}</a> on {{comment.posted}}</div>
-			<div class="commentMsg">{% if last_comment_id_seen and last_comment_id_seen < comment.id and request.user.id != comment.user.id %}<span class='new_comment'>(New)</span>{% endif %}{{comment.content|strip_tags|convert_links|linebreaks}}</div>
-			{% endautoescape %}
+<div class="comments ">
+	{% for comment in comments %}
 
-		{% endfor %}
+	{% autoescape off %}
+	
+	<div class="card comment m-2 border-0 p-0 bg-transparent">
+		<div class="card-body  ">
+		<h5 class="card-title">
+			<a
+			href="/{{comment.item_type}}/{{comment.item_id}}/"
+			title="{{comment.item_id|item_name_by_type_id:comment.item_type}}">
+			{{comment.user.username|account_link:comment.user.id}} commented 
+		</a></h5>
+		<h6 class="card-subtitle mb-2 text-muted"><i class="fas fa-clock"></i> on {{comment.posted}}</h6>
+		<p class="card-text">
+			{% if last_comment_id_seen and last_comment_id_seen < comment.id and request.user.id != comment.user.id %}<span
+			class='new_comment'>(New)</span>{% endif %}{{comment.content|strip_tags|convert_links|linebreaks}}
+		</p>
+		</div>
 	</div>
+	{% endautoescape %}
 
-	{% if 2 in range %}
-	<div id="paging">
-		{% for i in range %}
-			<div class="paging_cell">
-			{% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
-				{% if page == i %}
-					<span>{{ i }}</span>
-				{% else %}
-					<a href="/comments/page/{{i}}">{{ i }}</a>
-				{% endif %}
-			{% else %}
-				{% if i < page %}
-					<span class='no-page-before hide_block'>...</span>
-				{% else %}
-					<span class='no-page-after hide_block'>...</span>
-				{% endif %}
-			{% endif %}
-			</div>
-		{% endfor %}
-	</div>
-	{% endif %}
-	<div class="clear"></div>
+	{% endfor %}
+</div>
+
+
+{% if 2 in range %}
+<div class="paging text-center p-1">
+	Page: 
+	{% for i in range %}
+	<span class="paging_cell">
+		{% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
+		{% if page == i %}
+		<span>{{ i }}</span>
+		{% else %}
+		<a href="/comments/page/{{i}}">{{ i }}</a>
+		{% endif %}
+		{% else %}
+		{% if i < page %}
+		<span class='no-page-before hide_block'>...</span>
+		{% else %}
+		<span class='no-page-after hide_block'>...</span>
+		{% endif %}
+		{% endif %}
+	</span>
+	{% endfor %}
+</div>
+{% endif %}
 
 {% else %}
-
-	<div class="cBlock_comments">
-		<p>No comments from {{comments_by_user.username}}</p>
-	</div>
-
+<p>No comments from {{comments_by_user.username}}</p>
 {% endif %}
+</section>

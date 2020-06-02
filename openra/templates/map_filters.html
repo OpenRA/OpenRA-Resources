@@ -1,0 +1,119 @@
+<form name='filter_maps' class="p-4 form-settings" action='{{request.path}}' method='GET'>
+    <div class='row align-items-center justify-content-center'>
+
+
+        <div class='col-sm-6 col-md-2'>
+            <label for="mod">Mod select:</label>
+            <select name="mod"  class="form-control" id="mod" multiple class="noscroll">
+                <option value="any" {% if 'any' in selected_filter.mod %}selected{% endif %}>any</option>
+                {% for mod in filter_prepare.mods %}
+                    <option value="{{mod}}" {% if mod in selected_filter.mod %}selected{% endif %}>{{mod|upper}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class='col-sm-6 col-md-2'>
+            <label for="category">Categry select:</label>
+            <select id="category" name="category" multiple  class="form-control">
+                <option value="any" {% if 'any' in selected_filter.category %}selected{% endif %}>any</option>
+                {% for category in filter_prepare.categories %}
+                    <option value="{{category}}" {% if category in selected_filter.category %}selected{% endif %}>{{category}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class='col-sm-6 col-md-2'>
+            <label for="format">Format select:</label>
+            <select name="format" id="format" multiple class="form-control">
+                <option value="any" {% if 'any' in selected_filter.format %}selected{% endif %}>any</option>
+                {% for format in filter_prepare.formats %}
+                    <option value="{{format}}" {% if format in selected_filter.format %}selected{% endif %}>{{format}}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class='col-sm-6 col-md-2'>
+            <label for="parser">Parsed select:</label>
+            <select name="parser" id="parser" multiple class="form-control">
+                <option value="any" {% if 'any' in selected_filter.parser %}selected{% endif %}>any</option>
+                {% for parser in filter_prepare.parsers %}
+                    <option value="{{parser}}" {% if parser in selected_filter.parser %}selected{% endif %}>{{parser}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class='col-sm-6 col-md-2'>
+            <label for="tileset">Tileset select:</label>
+            <select name="tileset" id="tileset" multiple class="form-control">
+                <option value="any" {% if 'any' in selected_filter.tileset %}selected{% endif %}>any</option>
+                {% for tileset in filter_prepare.tilesets %}
+                    <option value="{{tileset}}" {% if tileset in selected_filter.tileset %}selected{% endif %}>{{tileset}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class='row align-items-center justify-content-center'>
+
+            <div class='col-sm-4 col-md-4'>
+                <div class="row no-gutters">
+                    <p class="col-12">Filters:</p>
+                    <div class='col-sm-12 col-md-6'>
+                        <input type='checkbox' {% if selected_filter.show_all_revisions == 'on' %}checked{% endif %} name='show_all_revisions'>
+                        <span class="">Show all revisions</span>
+                        <br />
+                        <input type='checkbox' name='show_with_reports' {% if selected_filter.show_with_reports == 'on' %}checked{% endif %}>
+                        <span class="">Show only with reports</span>
+                        <br />
+                        <input type='checkbox' name='with_duplicates' {% if selected_filter.with_duplicates == 'on' %}checked{% endif %}>
+                        <span class="">With duplicates</span>
+                    </div>
+
+                    <div class='col-sm-12 col-md-6'>
+                        <input type='checkbox' name='only_advanced' {% if selected_filter.only_advanced == 'on' %}checked{% endif %}>
+                        <span class="">Only Advanced</span>
+                        <br />
+                        <input type='checkbox' name='only_lua' {% if selected_filter.only_lua == 'on' %}checked{% endif %}>
+                        <span class="">Only Lua</span>
+                        <br />
+                        <input type='checkbox' name='outdated' {% if selected_filter.outdated == 'on' %}checked{% endif %}>
+                        <span class="">Outdated</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class='col-sm-4 col-md-3'>
+                <div class="row no-gutters">
+                    <p class="mt-0 mb-1 col-12">Maps with problems:</p>
+                    <div class="col-12">
+                        <select class="form-control" name="with_problems">
+                            {% for problem in filter_prepare.with_problems %}
+                                <option value="{{problem.0}}" {% if problem.0 in selected_filter.with_problems %}selected{% endif %}>{{problem.1}}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="players" >Players:</label>
+                        <input type='text' class="form-control" placeholder='any' name='players' {% if selected_filter.players %}value="{{selected_filter.players}}"{% endif %}>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class='col-sm-4 col-md-3'>
+                <div class='row no-gutters'>
+                    <div class="col-12">
+                        <label for="sort_by"><p class="mt-3 mb-0">Sort by:</p></label>
+                        <select name="sort_by" id="sort_by" class="form-control">
+                            {% for sorting in filter_prepare.sort_by %}
+                                <option value="{{sorting.0}}" {% if sorting.0 in selected_filter.sort_by %}selected{% endif %}>{{sorting.1}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-primary m-4" type="submit">Apply Filter/Sorting</button>
+                </div>
+            </div>
+
+    </div>
+</form>

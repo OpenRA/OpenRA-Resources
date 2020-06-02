@@ -1,64 +1,43 @@
-<div class="top_content">
-	<div id="mainleft">
-		<div class="screenshot hide_block">
-			{% for item in screenshots %}
-			<a href="/{{item.ex_name}}/{{item.ex_id}}/" title="Show map">
-				<img src="/screenshots/{{item.id}}/mini/" alt="screenshot" />
-			</a>
-			{% endfor %}
+<div class="col-12">
+	<div class="row align-items-center">
+		<div class="col-sm-12 col-md-5">
+
+			<div id="carouselScreenshot" class="carousel slide p-4" data-ride="carousel">
+				<div class="carousel-inner">
+					{% for item in screenshots %}
+					<div class="carousel-item active">
+						<a href="/{{item.ex_name}}/{{item.ex_id}}/" title="Show map">
+							<img src="/screenshots/{{item.id}}/mini/" class="d-block w-100" alt="screenshot" />
+						</a>
+					</div>
+					{% endfor %}
+					<a class="carousel-control-prev" href="#carouselScreenshot" role="button" data-slide="prev">
+						<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+						<span class="sr-only">Previous</span>
+					</a>
+					<a class="carousel-control-next" href="#carouselScreenshot" role="button" data-slide="next">
+						<span class="carousel-control-next-icon" aria-hidden="true"></span>
+						<span class="sr-only">Next</span>
+					</a>
+				</div>
+			</div>
+			
+		</div>
+		<div class="col-sm-12 col-md-7">
+			<section class="p-4">
+				<h2 class="pb-2 d-inline-flex border border-white border-top-0 border-left-0 border-right-0"><b>Share your Maps!</b></h2>
+				<p>Welcome to the <a href="http://www.openra.net/">OpenRA</a> map database platform.</p>
+				<p><a href="http://www.openra.net/">OpenRA</a> is a free and open-source RTS game engine that lets you play re-balanced games like C&amp;C: Red Alert, C&amp;C: Tiberian Dawn, Dune 2000...</p>
+				<p>The engine allows players to create new mods, add modified versions of units, buildings etc.
+				It also offers advanced features for creating maps and missions.</p>
+				<p>This website makes distribution of OpenRA maps more comfortable.</p>
+				<p>If you created a new map and want to play it with other players, you just have to:</p>
+				<ul>
+					<li><a href="/upload/map/">Upload the map here</a>.</li>
+					<li>Create a new game or join any public server and select your map.</li>
+					<li>Other players joining can download the map in-game directly from this website.</li>
+				</ul>
+			</section>
 		</div>
 	</div>
-
-	<div>
-		<h2>Share your Maps!</h2>
-	</div>
-
-	<div>
-		<p>OpenRA is a free and open-source RTS game engine that lets you play re-balanced games like C&amp;C: Red Alert, C&amp;C: Tiberian Dawn, Dune 2000...</p>
-		<p>The engine allows players to create new mods, add modified versions of units, buildings etc.
-		It also offers advanced features for creating maps and missions.</p>
-		<p>This website makes distribution of OpenRA maps more comfortable.</p>
-	</div>
-	<div class="clear"></div>
 </div>
-
-<div>
-	<p>If you created a new map and want to play it with other players, you just have to:</p>
-	<ul>
-		<li><a href="/upload/map/">Upload the map here</a>.</li>
-		<li>Create a new game or join any public server and select your map.</li>
-		<li>Other players joining can download the map in-game directly from this website.</li>
-	</ul>
-</div>
-
-<script>
-$(document).ready(function(){
-	var image_fader = function(user_options) {
-		var container = $(".screenshot");
-		var links = container.find("a");
-		var linkI = -1;
-		var default_options = {
-			path: "",
-			duration: 10000
-		};
-		var options = $.extend(default_options, user_options);
-		var show = function(){
-			linkI ++;
-			if( linkI >= links.size()) linkI = 0;
-			links.eq(linkI).fadeIn(500, delay);
-		};
-		var delay = function(){
-			links.eq(linkI).animate({opacity:100}, options.duration , hide);
-		};
-		var hide = function(){
-			links.eq(linkI).hide(500, function(){
-				show();
-			});
-		};
-		$(links).hide();
-		show();
-	}
-	$(".screenshot").removeClass("hide_block");
-	image_fader();
-});
-</script>

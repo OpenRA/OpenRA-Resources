@@ -1,87 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+	{% include 'head.html' %}
+</head>
+<body>
+<div class="container">
+
 {% include 'header.html' %}
 
 {% if not user.is_authenticated %}
+<div class="row">
+	<div class="col-12">
+		<div class="signin m-4" >
+			<h2>Sign In</h2>
 
-	<h2>Sign In</h2>
+			<div class="accountsmain">
 
-	<div class="accountsmain">
+				<div class="localaccount">
+					<p>Please sign in with your local account.</p>
 
-		<div class="localaccount">
-			<p>Please sign in with your local account.</p>
 
-			<div class="frame">
+						{% if errors %}
+							{% for error in errors %}
+								<div class="login_errors">{{ error }}</div>
+							{% endfor %}
+						{% endif %}
 
-				{% if errors %}
-					{% for error in errors %}
-						<div class="login_errors">{{ error }}</div>
-					{% endfor %}
-				{% endif %}
+						<form id="login" method="POST" action="/login/">{% csrf_token %}
 
-				<form id="login" method="POST" action="/login/">{% csrf_token %}
+							<input type="hidden" name="referer" value="{{referer}}">
 
-					<input type="hidden" name="referer" value="{{referer}}">
+								<div class="innerCellLeft">
+									<label for="id_login"><i class="fas fa-user"></i> Username:</label>
+								</div>
+								<div class="innerCellRight"><input type="text" name="ora_username"></div>
 
-					<div class="row">
-						<div class="innerCellLeft">
-							<label for="id_login">Username:</label>
-						</div>
-						<div class="innerCellRight"><input type="text" name="ora_username"></div>
+								<div class="innerCellLeft mt-2">
+									<label for="id_password"><i class="fas fa-key"></i> Password:</label>
+								</div>
+								<div class="innerCellRight"><input type="password" name="ora_password"></div>
+
+								<div class="innerCellLeft mt-2">
+									<label for="id_remember">Remember Me:  </label>
+									<input type="checkbox" name="ora_remember" checked=checked>
+								</div>
+
+								<div class="innerCellLeft mt-2"><br/>
+									<a href='/accounts/password/reset/'>Forgot Password?</a>
+								</div>
+								<div class="innerCellRight mt-2">
+									<button class="btn btn-primary" type="submit"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+								</div>
+
+						</form>
+
+					<p></p>
+
+					<div class="cBlock">
+						Don't have an account? <a href="/auth/register/">Create one now</a>.
 					</div>
 
-					<div class="row">
-						<div class="innerCellLeft">
-							<label for="id_password">Password:</label>
-						</div>
-						<div class="innerCellRight"><input type="password" name="ora_password"></div>
-					</div>
+				</div>
 
-					<div class="row">
-						<div class="innerCellLeft">
-							<label for="id_remember">Remember Me:  </label>
-							<input type="checkbox" name="ora_remember" checked=checked>
-						</div>
-					</div>
 
-					<div class="row">
-						<div class="innerCellLeft"><br/>
-							<a href='/accounts/password/reset/'>Forgot Password?</a>
-						</div>
-						<div class="innerCellRight">
-							<button class="primaryAction" type="submit">Sign In</button>
-						</div>
-					</div>
 
-				</form>
+				{% load socialaccount %}
+				{% get_providers as socialaccount_providers %}
+				<div id="socialaccounts">
+					<p>Or just log in with one of these social accounts:</p>
+
+					<div class="frame">
+						<ul id="socialaccounts_providers">
+							{% for provider in socialaccount_providers %}
+								<li><a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}" 
+									href="{% provider_login_url provider.id process=process %}">
+									<i class="fab fa-{{provider.name|lower}}-square"></i> {{provider.name}}
+								</a>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+					<p>You'll just be asked to authorize this website to use your login.</p>
+				</div>
 			</div>
-
-			<p></p>
-
-			<div class="cBlock">
-				Don't have an account? <a href="/auth/register/">Create one now</a>.
-			</div>
-
-		</div>
-
-
-
-		{% load socialaccount %}
-		{% get_providers as socialaccount_providers %}
-		<div id="socialaccounts">
-			<p>Or just log in with one of these social accounts:</p>
-
-			<div class="frame">
-				<ul id="socialaccounts_providers">
-					 {% for provider in socialaccount_providers %}
-						<li><a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}" 
-							 href="{% provider_login_url provider.id process=process %}"><img src="/static/images/{{provider.id}}.svg" alt="{{provider.name}}"></a>
-						</li>
-					{% endfor %}
-				</ul>
-			</div>
-			<p>You'll just be asked to authorize this website to use your login.</p>
 		</div>
 	</div>
-
+</div>
 {% endif %}
 
 {% include 'footer.html' %}
+</div>
+</body>
+</html>

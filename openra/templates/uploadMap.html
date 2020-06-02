@@ -1,100 +1,131 @@
 {% if user.is_authenticated %}
-
-	<script>
-		$(document).ready(function() {
-			$("input[value=cc_yes]").click(function() {
-				$(".license_options").show();
-			});
-			$("input[value=cc_no]").click(function() {
-				$(".license_options").hide();
-			});
-
-			$('.upload-map-form-parser option:first-child').attr("selected", "selected");
-
-			$('.upload-map-form-parser option:first-child').append(' (latest version)')
-		});
-	</script>
-
-	<div class='cBlock no-pd-bot'>
-		<div class="upload_container">
-			{% if previous_rev == 0 %}
-				<h3>Upload your ORAMAP or MPR(INI)<span class='red'>*</span> file</h3>
-			{% else %}
-				<h3>Upload revision {{rev}} of <a href="/maps/{{previous_rev}}/" title="{{previous_rev_title}}">map {{previous_rev}}</a>
-			{% endif %}
-		</div>
-	</div>
+<section class="upload m-4">
+	{% if previous_rev == 0 %}
+		<h3>Upload your ORAMAP or MPR(INI)<span class='text-danger'>*</span> file</h3>
+	{% else %}
+		<h3>Upload revision {{rev}} of <a href="/maps/{{previous_rev}}/" title="{{previous_rev_title}}">map {{previous_rev}}</a></h3>
+	{% endif %}
 
 
 	<form action={{ '/upload/map/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
-		<div class='cBlock'>
+		<div class='form-group pb-2'>
 
-			<div class='upload-map-form-left'>
-
-				<div class='upload-map-form-info'>
-					<textarea class="id_info" name="info" placeholder="Description" title="Description"></textarea>
+				<div class="row">
+					<div class="col">
+						<label for="description">Map description</label>
+						<textarea class="form-control id_info" id="description" rows="3" name="info" placeholder="Description" title="Description"> </textarea>
+						<div class="row align-items-center">
+							<div class="col">
+								<label for="exampleFormControlFile1">Select map</label>
+								<input type="file" name="file" class="form-control-file id_file" id="exampleFormControlFile1">
+							</div>
+							<div class="col align-self-center text-right">
+								<button class="btn btn-primary" type="submit">
+									<i class="fas fa-upload"></i> Upload
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="col text-center ">
+						<div class='upload-map-form-parser w-50 mr-auto ml-auto'>
+							<label for="parser">Parse with OpenRA version<span class="text-danger">**</span>:</label><br />
+							<select name="parser" class="form-control" size="4">
+								{% for parser in parsers %}
+									<option value="{{ parser }}">{{ parser }}</option>
+								{% endfor %}
+							</select>
+						</div>		
+					</div>
 				</div>
-
-				<div class='upload-map-form-file'>
-					<input class="id_file" name="file" type="file">
-					<button type="submit">Upload</button>
-				</div>
-
-			</div>
-
-			<div class='upload-map-form-right'>
-
-				<div class='upload-map-form-parser'>
-					Parse with OpenRA version<span class="red">**</span>:<br />
-					<select name="parser" size="4">
-						{% for parser in parsers %}
-							<option value="{{ parser }}">{{ parser }}</option>
-						{% endfor %}
-					</select>
-				</div>
-
-			</div>
 
 		</div>
 
 		{% if previous_rev == 0 %}
-		<div class='cBlock'>
-			<div class="license_cc">
-				Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
-				<label><input name="policy_cc" type="radio" value="cc_yes"> Yes</label>
-				<label><input name="policy_cc" checked="checked" type="radio" value="cc_no"> No</label>
+		<div class="form-group pb-2">
+			<p class="m-0">	Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?</p>
+			<div class="form-check form-check-inline license_cc">
+				<input class="form-check-input" name="policy_cc" type="radio" value="cc_yes" !checked>
+				<label class="form-check-label">Yes</label>
 			</div>
-			<div class="license_options"><br>
-				Allow commercial uses of your work?<br>
-				<label><input name="commercial" type="radio" value="com_yes"> Yes</label>
-				<label><input checked="checked" name="commercial" type="radio" value="com_no"> No</label>
-				<br /><br />
-				Allow modifications of your work?<br>
-				<label><input name="adaptations" type="radio" value="adapt_yes"> Yes</label>
-				<label><input name="adaptations" type="radio" value="adapt_no"> No</label>
-				<label><input checked="checked" name="adaptations" type="radio" value="adapt_alike"> Yes, as long as others share alike</label>
+			<div class="form-check  form-check-inline license_cc">
+				<input class="form-check-input" name="policy_cc" checked="checked" type="radio" value="cc_no" checked> 
+				<label class="form-check-label">No</label>
+			</div>
+		</div>
+		<div class="form-group pb-2 license_options" >
+			<p class="m-0">Allow commercial uses of your work?</p>
+			<div class="form-check form-check-inline license_com">
+				<input class="form-check-input" name="commercial" type="radio" value="com_yes">
+				<label class="form-check-label">Yes</label>
+			</div>
+			<div class="form-check  form-check-inline license_com">
+				<input class="form-check-input" name="commercial" checked="checked" type="radio" value="com_no"> 
+				<label class="form-check-label">No</label>
+			</div>
+		</div>
+		<div class="form-group pb-2 license_options" >
+			<p class="m-0">	Allow modifications of your work?</p>
+			<div class="form-check form-check-inline license_adaptations">
+				<input class="form-check-input" name="adaptations" type="radio" value="adapt_no">
+				<label class="form-check-label">Yes</label>
+			</div>
+			<div class="form-check form-check-inline license_adaptations">
+				<input class="form-check-input" name="adaptations" type="radio" value="adapt_alike">
+				<label class="form-check-label">Yes, as long as others share alike</label>
+			</div>
+			<div class="form-check  form-check-inline license_adaptations">
+				<input class="form-check-input" name="adaptations" checked="checked" type="radio" value="adapt_no"> 
+				<label class="form-check-label">No</label>
 			</div>
 		</div>
 		{% endif %}
 	</form>
-
 	{% if error_response %}
-	<div class='cBlock'>
+	<div class="alert alert-danger" role="alert">
 		<p>Error:</p>
 		<p>{{error_response}}</p>
 		{% if uid %}
 			<p><a href={{ '/maps/' }}{{ uid }}{{'/'}}>
 			<img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>
 		{% endif %}
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		  </button>
 	</div>
 	{% endif %}
 
 	{% if previous_rev == 0 %}
-	<div class='cBlock'>
-		<div class='upload-map-form-stars'>
-			<span class='red'>*</span>&nbsp;&nbsp;&nbsp;<span>Format of original Red Alert maps (MPR, INI); will automatically import it during uploading</span><br />
-			<span class='red'>**</span>&nbsp;&nbsp;<span>Choose version the map was created for. If a newer version of OpenRA is available, you will be able to update the map after uploading using the <b>Upgrade Map</b> button.</span>
-		</div>
+	<div class='upload-map-form-stars'>
+		<span class='red'>*</span>&nbsp;&nbsp;&nbsp;<span>Format of original Red Alert maps (MPR, INI); will automatically import it during uploading</span><br />
+		<span class='red'>**</span>&nbsp;&nbsp;<span>Choose version the map was created for. If a newer version of OpenRA is available, you will be able to update the map after uploading using the <b>Upgrade Map</b> button.</span>
 	</div>
 	{% endif %}
+</section>
+	
+<script>
+	window.addEventListener('load',function(){
+		const inputYes = document.querySelector("input[value='cc_yes'");
+		const licenseOptions = document.getElementsByClassName("license_options");
+		Array.from(licenseOptions).forEach((option)=>{
+			option.classList.add('d-none');
+		})
+		inputYes.addEventListener('click',function(){
+			Array.from(licenseOptions).forEach((option)=>{
+				if(option.classList.contains('d-none')){
+					option.classList.remove('d-none');
+					option.classList.add('d-block');
+				}
+			})
+		})
+		const inputNo = document.querySelector("input[value='cc_no'");
+		inputNo.addEventListener('click',function(){
+			Array.from(licenseOptions).forEach((option)=>{
+				if(option.classList.contains('d-block')){
+					option.classList.remove('d-block');
+					option.classList.add('d-none');
+				}
+			})
+		})
+	})
+</script>
 {% endif %}

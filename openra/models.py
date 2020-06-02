@@ -67,7 +67,7 @@ class MapUpgradeLogs(models.Model):
     def __str__(self):
         return str(self.id)
 
-    map_id                = models.ForeignKey(Maps)
+    map_id                = models.ForeignKey(Maps,on_delete=models.CASCADE)
     date_run              = models.DateTimeField(default=datetime.datetime.now)
     from_version          = models.CharField(max_length=100, default="")
     to_version            = models.CharField(max_length=100, default="")
@@ -94,7 +94,7 @@ class Comments(models.Model):
     def __str__(self):
         return self.item_type + ' ' + str(self.item_id) + ' by ' + self.user.username
 
-    user                = models.ForeignKey(User)
+    user                = models.ForeignKey(User,on_delete=models.CASCADE)
     content             = models.CharField(max_length=10000)
     item_type           = models.CharField(max_length=16, default="maps")
     item_id             = models.IntegerField(default=0)
@@ -110,7 +110,7 @@ class UnsubscribeComments(models.Model):
     def __str__(self):
         return str(self.id)
 
-    user                = models.ForeignKey(User)
+    user                = models.ForeignKey(User,on_delete=models.CASCADE)
     item_type           = models.CharField(max_length=16, default="maps")
     item_id             = models.IntegerField(default=0)
     unsubscribed        = models.DateTimeField('date of unsubscribe')
@@ -121,7 +121,7 @@ class Reports(models.Model):
     class Meta:
         verbose_name_plural = 'Reports'
 
-    user                = models.ForeignKey(User)
+    user                = models.ForeignKey(User,on_delete=models.CASCADE)
     reason              = models.CharField(max_length=400)
     ex_id               = models.IntegerField(default=0)
     ex_name             = models.CharField(max_length=16)
@@ -134,7 +134,7 @@ class Screenshots(models.Model):
     class Meta:
         verbose_name_plural = 'Screenshots'
 
-    user                = models.ForeignKey(User)
+    user                = models.ForeignKey(User,on_delete=models.CASCADE)
     ex_id               = models.IntegerField(default=0)
     ex_name             = models.CharField(max_length=16)
     posted              = models.DateTimeField('date published')
@@ -146,7 +146,7 @@ class Rating(models.Model):
     class Meta:
         verbose_name_plural = 'Ratings'
 
-    user                = models.ForeignKey(User)
+    user                = models.ForeignKey(User,on_delete=models.CASCADE)
     ex_id               = models.IntegerField(default=0)
     ex_name             = models.CharField(max_length=16)
     rating              = models.FloatField(default=0.0)

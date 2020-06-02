@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('item_id', models.IntegerField(default=0)),
                 ('posted', models.DateTimeField(verbose_name='date of comment')),
                 ('is_removed', models.BooleanField(default=False)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Comment',
@@ -97,7 +97,7 @@ class Migration(migrations.Migration):
                 ('policy_cc', models.BooleanField(default=False)),
                 ('policy_adaptations', models.CharField(max_length=30)),
                 ('policy_commercial', models.BooleanField(default=False)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Map',
@@ -119,7 +119,7 @@ class Migration(migrations.Migration):
                 ('policy_cc', models.BooleanField(default=False)),
                 ('policy_adaptations', models.CharField(max_length=30)),
                 ('policy_commercial', models.BooleanField(default=False)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Mod',
@@ -134,7 +134,7 @@ class Migration(migrations.Migration):
                 ('used', models.IntegerField(default=0)),
                 ('posted', models.DateTimeField(verbose_name='date published')),
                 ('rating', models.FloatField(default=0.0)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Palette',
@@ -148,7 +148,7 @@ class Migration(migrations.Migration):
                 ('ex_name', models.CharField(max_length=16)),
                 ('rating', models.FloatField(default=0.0)),
                 ('posted', models.DateTimeField(verbose_name='date rated')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Rating',
@@ -173,7 +173,7 @@ class Migration(migrations.Migration):
                 ('spawn_point', models.IntegerField(default=0)),
                 ('team', models.IntegerField(default=0)),
                 ('posted', models.DateTimeField(default=datetime.datetime.now, verbose_name='date published')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'ReplayPlayer',
@@ -196,7 +196,7 @@ class Migration(migrations.Migration):
                 ('viewed', models.IntegerField(default=0)),
                 ('downloaded', models.IntegerField(default=0)),
                 ('rating', models.FloatField(default=0.0)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Replay',
@@ -211,7 +211,7 @@ class Migration(migrations.Migration):
                 ('ex_name', models.CharField(max_length=16)),
                 ('infringement', models.BooleanField(default=False)),
                 ('posted', models.DateTimeField(verbose_name='date published')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Report',
@@ -225,7 +225,7 @@ class Migration(migrations.Migration):
                 ('ex_name', models.CharField(max_length=16)),
                 ('posted', models.DateTimeField(verbose_name='date published')),
                 ('map_preview', models.BooleanField(default=False)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Screenshot',
@@ -250,7 +250,7 @@ class Migration(migrations.Migration):
                 ('policy_cc', models.BooleanField(default=False)),
                 ('policy_adaptations', models.CharField(max_length=30)),
                 ('policy_commercial', models.BooleanField(default=False)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Unit',
@@ -263,7 +263,7 @@ class Migration(migrations.Migration):
                 ('item_type', models.CharField(default='maps', max_length=16)),
                 ('item_id', models.IntegerField(default=0)),
                 ('unsubscribed', models.DateTimeField(verbose_name='date of unsubscribe')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'UnsubscribeComment',
