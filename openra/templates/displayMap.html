@@ -11,14 +11,10 @@
 									by <a href="/maps/author/{{map.author|proper_space}}/" title="Show maps authored by {{map.author|strip_tags}}">{{ map.author|strip_tags }}</a>
 							</h4>
 							{% endif %}
-							<p class="mb-0">Rating:
-								<span class="rating">
-									<i class="fas fa-star"></i>
-									<i class="fas fa-star"></i>
-									<i class="fas fa-star"></i>
-									<i class="fas fa-star-half-alt"></i>
-									<i class="far fa-star"></i>
-								</span></p>
+							<p class="mb-0 d-inline-flex align-items-center" title="Rating of the map">
+								<span>Rating:</span>
+										<div class="d-inline-flex align-items-center">{% if request.user.is_authenticated %}<div class="d-inline-block five-star-rating" data-average="{{map.rating}}" data-id="{{map.id}}" data-type="map" title="{{ratesAmount}} users rated, average: {{map.rating}}"></div>{% else %}<span title="Authenticate to rate map">{{ map.rating }}</span>{% endif %}</div>
+							</p>
 								<ul class="list-group list-group-horizontal justify-self-flex-start  align-items-flex-start border-0">
 									<li class="list-group-item border-0 p-0 m-0 pr-4 text-left bg-transparent align-items-center d-inline-flex">
 										{% if map.game_mod == 'ra' %}
@@ -447,7 +443,7 @@
 						<div class="col-12">
 							<details class="border border-dark bg-transparent-dark p-3">
 								<summary class="text-warning">
-									Attention
+									<h5 class="d-inline-flex"><i class="pr-2 fas fa-exclamation-triangle"></i>Attention</h5>
 								</summary>
 								<p class="">
 									This map can't be automatically downloaded by OpenRA game!
@@ -465,10 +461,10 @@
 						<div class="col-12">
 							<details class="border border-dark bg-transparent-dark p-3 mt-2 mb-2" open>
 								<summary class="">
-									Advanced rules
+									<h5 class="d-inline-flex"><i class="pr-2 far fa-question-circle"></i> Advanced rules</h5>
 								</summary>
 								<p class="p-2">
-									<a class="primary" data-toggle="modal" id="advancerulesbtn">Click</a> to see custom <a class="primary" data-toggle="modal" id="advancerulesbtn"><b>Rules</b></a> or <a href="/maps/{{map.id}}/rules/">download </a> file.
+									Click to see custom <a class="primary advancerulesbtn" data-toggle="modal" id="advancerulesbtn" data-target="#advancerules"><b>Rules</b></a> or <a href="/maps/{{map.id}}/rules/">download </a> file.
 								</p>
 							</details>
 						<!-- Modal -->
@@ -492,12 +488,12 @@
 							</div>
 						</div>
 						{% endif %}
-						<!-- // TODO LUA script download -->
 						{% if map.lua %}
+
 						<div class="col-12">
 							<details class="border border-dark bg-transparent-dark p-3 mt-2 mb-2" open>
 								<summary class="">
-									Lua map
+									<h5 class="d-inline-flex"><i class="pr-2 fas fa-code"></i> Lua map</h5>
 								</summary>
 								<p class="p-2">
 									This map includes Lua scripting logic.
@@ -508,6 +504,7 @@
 								</p>
 							</details>
 						</div>
+
 						{% endif %}
 						<div class="col-12">
 
@@ -571,29 +568,3 @@
 			</section>
 		</div>
 	</div>
-
-<script>
-	function confirmDelete(what){
-		var agree = confirm('Are you sure you want to delete this '+what+'?')
-		if (agree) return true
-		else return false
-	}
-	const btnModalRules = document.getElementById('advancerulesbtn');
-	btnModalRules.addEventListener('click',function(){
-		// fetch rules
-		fetch('/maps/{{map.id}}/rules/').then(result => {
-			return	result.text()
-		}).then((json)=>{
-			const luafile = document.getElementById('luafile');
-			// append rules
-			luafile.append(`${json}`);
-			// toggle Bootstrap modal
-			$('#advancerules').modal('toggle');
-		}).catch((error)=>{
-			// toggle Bootstrap modal
-			$('#advancerules').modal('toggle');
-			console.log(error)
-		})
-	})
-
-</script>
