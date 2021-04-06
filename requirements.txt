@@ -3,7 +3,7 @@ defusedxml==0.4.1
 Django==1.9.4
 django-allauth==0.24.1
 django-cors-headers==1.1.0
-django-registration==2.0.4
+django-registration==3.1.2
 gunicorn==19.4.5
 ipython==4.1.2
 ipython-genutils==0.1.0
