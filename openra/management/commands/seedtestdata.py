@@ -36,5 +36,15 @@ class Command(BaseCommand):
             }
         )
 
+        process_upload(
+            user.id,
+            File(open('openra/resources/sample-maps/sample-yaml-map.oramap', 'rb')),
+            {
+                'policy_cc': 'yes',
+                'name': 'Sample YAML Map',
+                'info': 'Info about sample YAML map'
+            }
+        )
+
         self.stdout.write('Database seeded')
 
