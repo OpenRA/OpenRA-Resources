@@ -40,18 +40,12 @@ class TestCommandSeedTestData(TestCase):
 
         self.assertTrue(user.is_superuser)
 
-    def test_the_user_account_is_set_to_at_least_five_days_old(self):
-        self.runSeeder()
-
-        user = self.getSeededUser()
-
         self.assertLess(
             user.date_joined,
             timezone.now()-timezone.timedelta(days=5)
         )
 
-    def test_it_imports_the_standard_map(self):
-
+    def test_it_imports_the_sample_maps(self):
         self.runSeeder()
 
         standardMap = Maps.objects.first()
@@ -63,10 +57,6 @@ class TestCommandSeedTestData(TestCase):
             standardMap.author
         )
 
-    def test_it_imports_the_yaml_map(self):
-
-        self.runSeeder()
-
         yamlMap = Maps.objects.get(id=2)
 
         self.assertIsNotNone(yamlMap)
@@ -74,6 +64,15 @@ class TestCommandSeedTestData(TestCase):
         self.assertEquals(
             'Sample YAML Map',
             yamlMap.author
+        )
+
+        luaMap = Maps.objects.get(id=3)
+
+        self.assertIsNotNone(luaMap)
+
+        self.assertEquals(
+            'Sample Lua Author',
+            luaMap.author
         )
 
 

@@ -46,5 +46,15 @@ class Command(BaseCommand):
             }
         )
 
+        process_upload(
+            user.id,
+            File(open('openra/resources/sample-maps/sample-lua-map.oramap', 'rb')),
+            {
+                'policy_cc': 'no',
+                'name': 'Sample Lua Map',
+                'info': 'Info about sample Lua map'
+            }
+        )
+
         self.stdout.write('Database seeded')
 
