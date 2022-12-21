@@ -32,8 +32,8 @@ class TestCommandSeedTestData(TestCase):
         )
 
         authed = authenticate(
-                username='sampleuser',
-                password='pass123'
+            username='sampleuser',
+            password='pass123'
         )
 
         self.assertEqual(authed, user)
@@ -50,12 +50,17 @@ class TestCommandSeedTestData(TestCase):
             timezone.now()-timezone.timedelta(days=5)
         )
 
-    def test_it_creates_the_standard_map(self):
+    def test_it_imports_the_standard_map(self):
 
         self.runSeeder()
 
         standardMap = Maps.objects.first()
 
         self.assertIsNotNone(standardMap)
+
+        self.assertEquals(
+            'Sample Author',
+            standardMap.author
+        )
 
 
