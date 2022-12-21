@@ -63,4 +63,17 @@ class TestCommandSeedTestData(TestCase):
             standardMap.author
         )
 
+    def test_it_imports_the_yaml_map(self):
+
+        self.runSeeder()
+
+        yamlMap = Maps.objects.get(id=2)
+
+        self.assertIsNotNone(yamlMap)
+
+        self.assertEquals(
+            'Sample YAML Map',
+            yamlMap.author
+        )
+
 
