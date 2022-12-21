@@ -48,7 +48,9 @@ class TestCommandSeedTestData(TestCase):
     def test_it_imports_the_sample_maps(self):
         self.runSeeder()
 
-        standardMap = Maps.objects.first()
+        maps = Maps.objects.filter()
+
+        standardMap = maps[0]
 
         self.assertIsNotNone(standardMap)
 
@@ -57,7 +59,7 @@ class TestCommandSeedTestData(TestCase):
             standardMap.author
         )
 
-        yamlMap = Maps.objects.get(id=2)
+        yamlMap = maps[1]
 
         self.assertIsNotNone(yamlMap)
 
@@ -66,7 +68,7 @@ class TestCommandSeedTestData(TestCase):
             yamlMap.author
         )
 
-        luaMap = Maps.objects.get(id=3)
+        luaMap = maps[2]
 
         self.assertIsNotNone(luaMap)
 
