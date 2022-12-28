@@ -1,6 +1,6 @@
 decorator==4.0.9
 defusedxml==0.4.1
-Django==1.9.4
+Django==2.2.28
 django-allauth==0.24.1
 django-cors-headers==1.1.0
 django-registration==2.0.4
