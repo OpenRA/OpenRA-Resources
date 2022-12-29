@@ -129,7 +129,10 @@ def add_map_revision(oramap_path, user,
 
     # Extract the oramap contents
     # TODO: Why do we need this?
-    fs.copy.copy_dir(ZipFS(oramap_path), '/', data_fs, item_content_path)
+    try:
+        fs.copy.copy_dir(ZipFS(oramap_path), '/', data_fs, item_content_path)
+    except:
+        pass
 
     if previous_revision_id:
         previous_item = Maps.objects.get(id=previous_revision_id)
