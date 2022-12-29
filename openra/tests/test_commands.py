@@ -10,6 +10,7 @@ from openra.models import User, Maps
 from dependency_injector import providers
 from openra import container
 from fs.memoryfs import MemoryFS
+from os import path
 
 class TestCommandSeedTestData(TestCase):
 
@@ -20,6 +21,18 @@ class TestCommandSeedTestData(TestCase):
         container.fs = providers.Singleton(
             MemoryFS
         )
+
+    def oramapFileExistsForMapId(self, mapId):
+        fs = container.fs()
+        filePath = path.join('maps', str(mapId))
+        if not fs.exists(filePath):
+            return False
+
+        for file in fs.scandir(filePath):
+            if file.suffix == '.oramap':
+                return True
+
+        return False
 
     def test_it_creates_a_super_user_with_the_details_provided(self):
         self.mockFileSystem()
@@ -53,6 +66,8 @@ class TestCommandSeedTestData(TestCase):
 
     def test_it_imports_the_sample_maps(self):
         self.mockFileSystem()
+
+        self.assertFalse(self.oramapFileExistsForMapId(1))
         self.runSeeder()
 
         maps = Maps.objects.filter()
@@ -66,6 +81,8 @@ class TestCommandSeedTestData(TestCase):
             standardMap.author
         )
 
+        self.assertTrue(self.oramapFileExistsForMapId(standardMap.id))
+
         yamlMap = maps[1]
 
         self.assertIsNotNone(yamlMap)
@@ -74,6 +91,8 @@ class TestCommandSeedTestData(TestCase):
             'Sample YAML Map',
             yamlMap.author
         )
+
+        self.assertTrue(self.oramapFileExistsForMapId(yamlMap.id))
 
         luaMap = maps[2]
 
@@ -84,4 +103,4 @@ class TestCommandSeedTestData(TestCase):
             luaMap.author
         )
 
-
+        self.assertTrue(self.oramapFileExistsForMapId(luaMap.id))
