@@ -2,15 +2,16 @@ import base64
 import tempfile
 import shutil
 import os
-import zipfile
+import fs
 from subprocess import Popen, PIPE
+from fs.zipfs import ZipFS
 
 from django.conf import settings
 from django.utils import timezone
 from django.utils.text import get_valid_filename
 from django.contrib.auth.models import User
 from openra.models import Maps, MapUpgradeLogs, Lints, Screenshots
-from openra import utility, misc
+from openra import utility, misc, container
 
 # pylint: disable=too-many-arguments
 # pylint: disable=too-many-branches
@@ -114,26 +115,26 @@ def add_map_revision(oramap_path, user,
     item.save()
 
     # Copy the updated map to its new data location
-    item_path = os.path.join(settings.BASE_DIR, 'openra', 'data', 'maps', str(item.id))
+    item_path = os.path.join('maps', str(item.id))
     item_content_path = os.path.join(item_path, 'content')
-    if not os.path.exists(item_content_path):
-        os.makedirs(item_content_path)
 
     item_map_path = os.path.join(item_path, os.path.basename(oramap_path))
-    shutil.copy(oramap_path, item_map_path)
+
+    data_fs = container.fs()
+
+    if not data_fs.exists(item_content_path):
+        data_fs.makedirs(item_content_path)
+
+    fs.copy.copy_file('/', oramap_path, data_fs, item_map_path)
+
+    # Extract the oramap contents
+    # TODO: Why do we need this?
+    fs.copy.copy_dir(ZipFS(oramap_path), '/', data_fs, item_content_path)
 
     if previous_revision_id:
         previous_item = Maps.objects.get(id=previous_revision_id)
         previous_item.next_rev = item.id
         previous_item.save()
-
-    # Extract the oramap contents
-    # TODO: Why do we need this?
-    with zipfile.ZipFile(item_map_path, mode='a') as oramap:
-        try:
-            oramap.extractall(item_content_path)
-        except Exception:
-            pass
 
     if is_known_mod:
         print('Running --check-yaml')

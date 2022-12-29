@@ -7,19 +7,25 @@ from django.utils.six import StringIO
 from django.contrib.auth import authenticate
 
 from openra.models import User, Maps
+from dependency_injector import providers
+from openra import container
+from fs.memoryfs import MemoryFS
 
 class TestCommandSeedTestData(TestCase):
 
     def runSeeder(self):
         call_command('seedtestdata', 'sampleuser@example.com', 'sampleuser', 'pass123')
 
-    def getSeededUser(self):
-        return User.objects.first()
+    def mockFileSystem(self):
+        container.fs = providers.Singleton(
+            MemoryFS
+        )
 
     def test_it_creates_a_super_user_with_the_details_provided(self):
+        self.mockFileSystem()
         self.runSeeder()
 
-        user = self.getSeededUser()
+        user = User.objects.first()
 
         self.assertEqual(
             'sampleuser@example.com',
@@ -46,6 +52,7 @@ class TestCommandSeedTestData(TestCase):
         )
 
     def test_it_imports_the_sample_maps(self):
+        self.mockFileSystem()
         self.runSeeder()
 
         maps = Maps.objects.filter()

@@ -21,3 +21,5 @@ requests-oauthlib==0.6.1
 simplegeneric==0.8.1
 traitlets==4.1.0
 factory_boy==2.9.0
+dependency-injector==4.41.0
+fs==2.4.16
