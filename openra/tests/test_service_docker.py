@@ -4,6 +4,8 @@ from django.utils import timezone
 from unittest import TestCase
 from unittest.mock import  Mock, MagicMock
 from openra.services.docker import Docker
+from os import path
+from django.conf import settings
 
 class TestServiceDocker(TestCase):
 
@@ -114,7 +116,9 @@ class TestServiceDocker(TestCase):
 
         clientMock.images.get.assert_called_once_with('rc-ubuntu')
 
-        clientMock.images.build.assert_called_once_with(path='/src/openra/resources/docker', tag='rc-ubuntu')
+        imagePath = path.join(settings.BASE_DIR, 'openra', 'resources', 'docker')
+
+        clientMock.images.build.assert_called_once_with(path=imagePath, tag='rc-ubuntu')
 
         clientMock.containers.run.assert_called_once_with(
             'fake_image',
