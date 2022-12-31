@@ -1,6 +1,7 @@
 import docker
 
 from os import path
+from django.conf import settings
 
 
 class Docker:
@@ -12,7 +13,6 @@ class Docker:
 
     def extractAppImage(self, appImagePath, toDir):
         appImage = path.basename(appImagePath)
-
         return self._dockerRun(
             'bash -c "cp /in/{0} . && '
                     './{0} --appimage-extract && '
@@ -49,7 +49,7 @@ class Docker:
 
 
     def _getDockerImage(self, client):
-        imagePath = '/src/openra/resources/docker'
+        imagePath = path.join(settings.BASE_DIR, 'openra', 'resources', 'docker')
 
         try:
             return client.images.get('rc-ubuntu')
