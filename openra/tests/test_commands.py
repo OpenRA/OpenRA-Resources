@@ -107,3 +107,10 @@ class TestCommandSeedTestData(TestCase):
         )
 
         self.assertTrue(self.oramap_file_exists_for_map_id(lua_map.id))
+
+class TestTestDocker(TestCase):
+
+    def test_it_runs_the_test_docker_command(self):
+        # Currently untestable but will be
+        # once service injection gets merged
+        pass
