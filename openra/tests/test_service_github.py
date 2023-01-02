@@ -1,9 +1,7 @@
 import datetime
 
-from django.utils import timezone
 from unittest import TestCase
-from unittest.mock import  Mock, MagicMock, PropertyMock
-from os import path
+from unittest.mock import  Mock, MagicMock
 from django.conf import settings
 from openra.services.github import Github
 
@@ -39,6 +37,13 @@ class TestServiceGithub(TestCase):
                 "published":publishedDate,
             }],
             github.listReleases()
+        )
+
+        repoMock.get_releases.assert_called_once_with()
+
+        clientMock.get_repo.assert_called_once_with(
+            settings.GITHUB_OPENRA_REPO,
+            lazy=True
         )
 
     def test_will_return_assets_for_a_release(self):
@@ -80,4 +85,15 @@ class TestServiceGithub(TestCase):
                 "url":"url2",
             }],
             github.getReleaseAssets('release_tag')
+        )
+
+        releaseMock.get_assets.assert_called_once_with()
+
+        repoMock.get_release.assert_called_once_with(
+            'release_tag'
+        )
+
+        clientMock.get_repo.assert_called_once_with(
+            settings.GITHUB_OPENRA_REPO,
+            lazy=True
         )
