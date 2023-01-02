@@ -221,3 +221,9 @@ GOOGLE_RECAPTCHA_SECRET_KEY = "YOUR-PRIVATE-KEY"
 
 # This will appear on the image created by the resource center when you run "docker image list"
 DOCKER_IMAGE_TAG = 'resource-center'
+
+# Not likely to ever change
+GITHUB_OPENRA_REPO = "OpenRA/OpenRA"
+
+# Not necessarily required but reduces rate limiting
+GITHUB_API_KEY = None
