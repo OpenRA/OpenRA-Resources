@@ -97,3 +97,34 @@ class TestServiceGithub(TestCase):
             settings.GITHUB_OPENRA_REPO,
             lazy=True
         )
+
+    def test_will_only_get_the_repo_once_over_multiple_calls(self):
+        releaseMock = Mock()
+        releaseMock.get_assets = MagicMock(
+            return_value = []
+        )
+        repoMock = Mock()
+        repoMock.get_releases = MagicMock(
+            return_value = []
+        )
+        repoMock.get_release = MagicMock(
+            return_value = releaseMock
+        )
+        clientMock = Mock()
+        clientMock.get_repo = MagicMock(
+            return_value = repoMock
+        )
+
+        github = Github()
+
+        github._getClient = MagicMock(
+            return_value = clientMock
+        )
+
+        github.listReleases()
+        github.getReleaseAssets('sample')
+
+        clientMock.get_repo.assert_called_once()
+        repoMock.get_releases.assert_called_once()
+        repoMock.get_release.assert_called_once()
+        releaseMock.get_assets.assert_called_once()
