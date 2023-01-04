@@ -218,3 +218,6 @@ SITE_MAINTENANCE_OVER = '00:00 GMT'  # when we finish technical works
 UTILITY_TIME_LIMIT = 60
 
 GOOGLE_RECAPTCHA_SECRET_KEY = "YOUR-PRIVATE-KEY"
+
+# This will appear on the image created by the resource center when you run "docker image list"
+DOCKER_IMAGE_TAG = 'resource-center'
