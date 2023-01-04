@@ -15,8 +15,8 @@ psycopg2==2.8
 ptyprocess==0.5.1
 python3-openid==3.0.9
 pytz==2016.1
-PyYAML==3.11
-requests==2.9.1
+PyYAML==3.13
+requests==2.14.2
 requests-oauthlib==0.6.1
 simplegeneric==0.8.1
 traitlets==4.1.0

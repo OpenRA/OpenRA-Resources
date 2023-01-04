@@ -5,13 +5,16 @@ import os
 import fs
 from subprocess import Popen, PIPE
 from fs.zipfs import ZipFS
+from fs.base import FS
 
 from django.conf import settings
 from django.utils import timezone
 from django.utils.text import get_valid_filename
 from django.contrib.auth.models import User
 from openra.models import Maps, MapUpgradeLogs, Lints, Screenshots
-from openra import utility, misc, container
+from openra import utility, misc
+from dependency_injector.wiring import inject, Provide
+from openra.containers import Container
 
 # pylint: disable=too-many-arguments
 # pylint: disable=too-many-branches
@@ -27,10 +30,12 @@ class InvalidMapException(Exception):
         self.message = message
 
 
+@inject
 def add_map_revision(oramap_path, user,
                      parser, game_mod,
                      info, policy_options, posted_date,
-                     revision=1, previous_revision_id=0):
+                     revision=1, previous_revision_id=0,
+                     data_fs:FS=Provide[Container.dataFs]):
     """ Parse and save a given oramap into the database.
         The input file is not modified, and must be cleaned up afterwards by the caller.
         Returns a Maps model or raises an InvalidMapException on error
@@ -120,8 +125,6 @@ def add_map_revision(oramap_path, user,
 
     item_map_path = os.path.join(item_path, os.path.basename(oramap_path))
 
-    data_fs = container.fs()
-
     if not data_fs.exists(item_content_path):
         data_fs.makedirs(item_content_path)
 
@@ -162,7 +165,6 @@ def add_map_revision(oramap_path, user,
 
     print("--- New revision: %s" % item.id)
     return item
-
 
 def process_upload(user_id, file, post, revision=1, previous_revision=0):
     """Upload a new revision of a map
