@@ -17,29 +17,29 @@ from os import path
 
 class TestCommandSeedTestData(TestCase):
 
-    def runSeeder(self):
+    def run_seeder(self):
         call_command('seedtestdata', 'sampleuser@example.com', 'sampleuser', 'pass123')
 
-    def mockFileSystem(self):
-        container.dataFs.override(providers.Singleton(
+    def mock_file_system(self):
+        container.data_fs.override(providers.Singleton(
             MemoryFS
         ))
 
     @inject
-    def oramapFileExistsForMapId(self, mapId, dataFs:FS=Provide[Container.dataFs]):
-        filePath = path.join('maps', str(mapId))
-        if not dataFs.exists(filePath):
+    def oramap_file_exists_for_map_id(self, map_id, data_fs:FS=Provide[Container.data_fs]):
+        file_path = path.join('maps', str(map_id))
+        if not data_fs.exists(file_path):
             return False
 
-        for file in dataFs.scandir(filePath):
+        for file in data_fs.scandir(file_path):
             if file.suffix == '.oramap':
                 return True
 
         return False
 
     def test_it_creates_a_super_user_with_the_details_provided(self):
-        self.mockFileSystem()
-        self.runSeeder()
+        self.mock_file_system()
+        self.run_seeder()
 
         user = User.objects.first()
 
@@ -68,42 +68,42 @@ class TestCommandSeedTestData(TestCase):
         )
 
     def test_it_imports_the_sample_maps(self):
-        self.mockFileSystem()
+        self.mock_file_system()
 
-        self.assertFalse(self.oramapFileExistsForMapId(1))
-        self.runSeeder()
+        self.assertFalse(self.oramap_file_exists_for_map_id(1))
+        self.run_seeder()
 
         maps = Maps.objects.filter()
 
-        standardMap = maps[0]
+        standard_map = maps[0]
 
-        self.assertIsNotNone(standardMap)
+        self.assertIsNotNone(standard_map)
 
         self.assertEquals(
             'Sample Author',
-            standardMap.author
+            standard_map.author
         )
 
-        self.assertTrue(self.oramapFileExistsForMapId(standardMap.id))
+        self.assertTrue(self.oramap_file_exists_for_map_id(standard_map.id))
 
-        yamlMap = maps[1]
+        yaml_map = maps[1]
 
-        self.assertIsNotNone(yamlMap)
+        self.assertIsNotNone(yaml_map)
 
         self.assertEquals(
             'Sample YAML Map',
-            yamlMap.author
+            yaml_map.author
         )
 
-        self.assertTrue(self.oramapFileExistsForMapId(yamlMap.id))
+        self.assertTrue(self.oramap_file_exists_for_map_id(yaml_map.id))
 
-        luaMap = maps[2]
+        lua_map = maps[2]
 
-        self.assertIsNotNone(luaMap)
+        self.assertIsNotNone(lua_map)
 
         self.assertEquals(
             'Sample Lua Author',
-            luaMap.author
+            lua_map.author
         )
 
-        self.assertTrue(self.oramapFileExistsForMapId(luaMap.id))
+        self.assertTrue(self.oramap_file_exists_for_map_id(lua_map.id))

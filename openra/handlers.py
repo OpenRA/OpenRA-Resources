@@ -2,10 +2,11 @@ import base64
 import tempfile
 import shutil
 import os
-import fs
 from subprocess import Popen, PIPE
 from fs.zipfs import ZipFS
 from fs.base import FS
+from fs import copy
+
 
 from django.conf import settings
 from django.utils import timezone
@@ -35,7 +36,7 @@ def add_map_revision(oramap_path, user,
                      parser, game_mod,
                      info, policy_options, posted_date,
                      revision=1, previous_revision_id=0,
-                     data_fs:FS=Provide[Container.dataFs]):
+                     data_fs:FS=Provide[Container.data_fs]):
     """ Parse and save a given oramap into the database.
         The input file is not modified, and must be cleaned up afterwards by the caller.
         Returns a Maps model or raises an InvalidMapException on error
@@ -128,12 +129,12 @@ def add_map_revision(oramap_path, user,
     if not data_fs.exists(item_content_path):
         data_fs.makedirs(item_content_path)
 
-    fs.copy.copy_file('/', oramap_path, data_fs, item_map_path)
+    copy.copy_file('/', oramap_path, data_fs, item_map_path)
 
     # Extract the oramap contents
     # TODO: Why do we need this?
     try:
-        fs.copy.copy_dir(ZipFS(oramap_path), '/', data_fs, item_content_path)
+        copy.copy_dir(ZipFS(oramap_path), '/', data_fs, item_content_path)
     except:
         pass
 
