@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import MagicMock, Mock, patch
 
 from django.utils import timezone
 from django.test import TestCase
@@ -14,6 +15,8 @@ from openra.containers import Container
 from fs.memoryfs import MemoryFS
 from fs.base import FS
 from os import path
+
+from openra.services.docker import Docker
 
 class TestCommandSeedTestData(TestCase):
 
@@ -110,7 +113,15 @@ class TestCommandSeedTestData(TestCase):
 
 class TestTestDocker(TestCase):
 
-    def test_it_runs_the_test_docker_command(self):
-        # Currently untestable but will be
-        # once service injection gets merged
-        pass
+    @patch('builtins.print')
+    def test_it_runs_the_test_docker_command_and_prints_the_result(self, print_mock):
+        docker_mock = Mock(spec=Docker)
+        docker_mock.test_docker = MagicMock(
+            return_value = 'sample'
+        )
+        container.docker.override(docker_mock)
+
+        call_command('testdocker')
+
+        docker_mock.test_docker.assert_called_once_with()
+        print_mock.assert_called_once_with('sample')

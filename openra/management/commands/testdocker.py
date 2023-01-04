@@ -10,8 +10,8 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        self.test_docker()
+        self._test_docker()
 
     @inject
-    def test_docker(self, docker:Docker=Provide[Container.docker]):
+    def _test_docker(self, docker:Docker=Provide[Container.docker]):
         print(docker.test_docker())
