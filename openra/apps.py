@@ -11,4 +11,5 @@ class OpenraConfig(AppConfig):
         container.wire(modules=[
             ".handlers",
             ".tests.test_commands",
+            ".management.commands.testdocker",
         ])

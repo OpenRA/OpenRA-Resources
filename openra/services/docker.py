@@ -3,9 +3,15 @@ import docker
 from os import path
 from django.conf import settings
 import re
+from docker.client import DockerClient
 
 
 class Docker:
+
+    _client: DockerClient
+
+    def __init__(self, client:DockerClient):
+        self._client = client
 
     def test_docker(self):
         return self._docker_run(
@@ -38,7 +44,7 @@ class Docker:
         )
 
     def _get_client(self):
-        return docker.from_env()
+        return self._client
 
     def _docker_run(self, command, volumes=[], working_dir='/'):
         client = self._get_client()

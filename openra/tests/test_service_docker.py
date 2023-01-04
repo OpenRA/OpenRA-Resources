@@ -20,11 +20,7 @@ class TestServiceDocker(TestCase):
             return_value = b'mock_return'
         )
 
-        docker = Docker()
-
-        docker._get_client = MagicMock(
-            return_value = client_mock
-        )
+        docker = Docker(client_mock)
 
         self.assertEquals(
             'mock_return',
@@ -41,7 +37,6 @@ class TestServiceDocker(TestCase):
         )
 
     def test_extract_app_image_will_pass_the_correct_parameters(self):
-
         client_mock = Mock()
         client_mock.containers = Mock()
         client_mock.images = Mock()
@@ -52,11 +47,7 @@ class TestServiceDocker(TestCase):
             return_value = b'mock_return'
         )
 
-        docker = Docker()
-
-        docker._get_client = MagicMock(
-            return_value = client_mock
-        )
+        docker = Docker(client_mock)
 
         self.assertEquals(
             'mock_return',
@@ -84,11 +75,7 @@ class TestServiceDocker(TestCase):
     def test_extract_app_image_will_throw_exception_if_an_incompatible_filename_is_used(self):
         client_mock = Mock()
 
-        docker = Docker()
-
-        docker._get_client = MagicMock(
-            return_value = client_mock
-        )
+        docker = Docker(client_mock)
 
         self.assertRaises(
             IncompatibleAppImagePathException,
@@ -98,7 +85,6 @@ class TestServiceDocker(TestCase):
         )
 
     def test_run_utility_command_will_pass_the_correct_parameters(self):
-
         client_mock = Mock()
         client_mock.containers = Mock()
         client_mock.images = Mock()
@@ -112,11 +98,7 @@ class TestServiceDocker(TestCase):
             return_value=b'mock_return'
         )
 
-        docker = Docker()
-
-        docker._get_client = MagicMock(
-            return_value = client_mock
-        )
+        docker = Docker(client_mock)
 
         self.assertEquals(
             'mock_return',

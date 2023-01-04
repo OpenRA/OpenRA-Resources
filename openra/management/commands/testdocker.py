@@ -1,4 +1,6 @@
+from dependency_injector.wiring import Provide, inject
 from django.core.management.base import BaseCommand, CommandError
+from openra.containers import Container
 from openra.services.docker import Docker
 
 class Command(BaseCommand):
@@ -8,4 +10,8 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        print(Docker().test_docker())
+        self.test_docker()
+
+    @inject
+    def test_docker(self, docker:Docker=Provide[Container.docker]):
+        print(docker.test_docker())
