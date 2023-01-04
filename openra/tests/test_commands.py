@@ -8,8 +8,11 @@ from django.contrib.auth import authenticate
 
 from openra.models import User, Maps
 from dependency_injector import providers
+from dependency_injector.wiring import inject, Provide
 from openra import container
+from openra.containers import Container
 from fs.memoryfs import MemoryFS
+from fs.base import FS
 from os import path
 
 class TestCommandSeedTestData(TestCase):
@@ -18,17 +21,17 @@ class TestCommandSeedTestData(TestCase):
         call_command('seedtestdata', 'sampleuser@example.com', 'sampleuser', 'pass123')
 
     def mockFileSystem(self):
-        container.fs = providers.Singleton(
+        container.dataFs.override(providers.Singleton(
             MemoryFS
-        )
+        ))
 
-    def oramapFileExistsForMapId(self, mapId):
-        fs = container.fs()
+    @inject
+    def oramapFileExistsForMapId(self, mapId, dataFs:FS=Provide[Container.dataFs]):
         filePath = path.join('maps', str(mapId))
-        if not fs.exists(filePath):
+        if not dataFs.exists(filePath):
             return False
 
-        for file in fs.scandir(filePath):
+        for file in dataFs.scandir(filePath):
             if file.suffix == '.oramap':
                 return True
 
