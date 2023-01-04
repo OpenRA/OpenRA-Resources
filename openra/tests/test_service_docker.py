@@ -10,29 +10,29 @@ from django.conf import settings
 class TestServiceDocker(TestCase):
 
     def test_test_docker_will_pass_the_correct_parameters(self):
-        clientMock = Mock()
-        clientMock.containers = Mock()
-        clientMock.images = Mock()
-        clientMock.images.get = MagicMock(
+        client_mock = Mock()
+        client_mock.containers = Mock()
+        client_mock.images = Mock()
+        client_mock.images.get = MagicMock(
             return_value ='fake_image'
         )
-        clientMock.containers.run = MagicMock(
+        client_mock.containers.run = MagicMock(
             return_value = b'mock_return'
         )
 
         docker = Docker()
 
-        docker._getClient = MagicMock(
-            return_value = clientMock
+        docker._get_client = MagicMock(
+            return_value = client_mock
         )
 
         self.assertEquals(
             'mock_return',
-            docker.testDocker()
+            docker.test_docker()
         )
 
-        clientMock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
-        clientMock.containers.run.assert_called_once_with(
+        client_mock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
+        client_mock.containers.run.assert_called_once_with(
             'fake_image',
             'echo "Docker appears to be running ok"',
             remove=True,
@@ -42,33 +42,33 @@ class TestServiceDocker(TestCase):
 
     def test_extract_app_image_will_pass_the_correct_parameters(self):
 
-        clientMock = Mock()
-        clientMock.containers = Mock()
-        clientMock.images = Mock()
-        clientMock.images.get = MagicMock(
+        client_mock = Mock()
+        client_mock.containers = Mock()
+        client_mock.images = Mock()
+        client_mock.images.get = MagicMock(
             return_value ='fake_image'
         )
-        clientMock.containers.run = MagicMock(
+        client_mock.containers.run = MagicMock(
             return_value = b'mock_return'
         )
 
         docker = Docker()
 
-        docker._getClient = MagicMock(
-            return_value = clientMock
+        docker._get_client = MagicMock(
+            return_value = client_mock
         )
 
         self.assertEquals(
             'mock_return',
-            docker.extractAppImage(
+            docker.extract_app_image(
                 '/sample/image.AppImage',
                 '/extract/to/location',
             )
         )
 
-        clientMock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
+        client_mock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
 
-        clientMock.containers.run.assert_called_once_with(
+        client_mock.containers.run.assert_called_once_with(
             'fake_image',
             'bash -c "cp /in/AppImage . && '
                     './AppImage --appimage-extract && '
@@ -82,45 +82,45 @@ class TestServiceDocker(TestCase):
         )
 
     def test_extract_app_image_will_throw_exception_if_an_incompatible_filename_is_used(self):
-        clientMock = Mock()
+        client_mock = Mock()
 
         docker = Docker()
 
-        docker._getClient = MagicMock(
-            return_value = clientMock
+        docker._get_client = MagicMock(
+            return_value = client_mock
         )
 
         self.assertRaises(
             IncompatibleAppImagePathException,
-            docker.extractAppImage,
-            '/sample/im age.AppImage',
+            docker.extract_app_image,
+            '/sample/im age.App_image',
             '/extract/to/location'
         )
 
     def test_run_utility_command_will_pass_the_correct_parameters(self):
 
-        clientMock = Mock()
-        clientMock.containers = Mock()
-        clientMock.images = Mock()
-        clientMock.images.get = MagicMock(
+        client_mock = Mock()
+        client_mock.containers = Mock()
+        client_mock.images = Mock()
+        client_mock.images.get = MagicMock(
             side_effect = Exception()
         )
-        clientMock.images.build = MagicMock(
+        client_mock.images.build = MagicMock(
             return_value=('fake_image', 'something_else')
         )
-        clientMock.containers.run = MagicMock(
+        client_mock.containers.run = MagicMock(
             return_value=b'mock_return'
         )
 
         docker = Docker()
 
-        docker._getClient = MagicMock(
-            return_value = clientMock
+        docker._get_client = MagicMock(
+            return_value = client_mock
         )
 
         self.assertEquals(
             'mock_return',
-            docker.runUtilityCommand(
+            docker.run_utility_command(
                 '/engine/path',
                 'sample_command',
                 [
@@ -129,13 +129,13 @@ class TestServiceDocker(TestCase):
             )
         )
 
-        clientMock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
+        client_mock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
 
-        imagePath = path.join(settings.BASE_DIR, 'openra', 'resources', 'docker')
+        image_path = path.join(settings.BASE_DIR, 'openra', 'resources', 'docker')
 
-        clientMock.images.build.assert_called_once_with(path=imagePath, tag=settings.DOCKER_IMAGE_TAG)
+        client_mock.images.build.assert_called_once_with(path=image_path, tag=settings.DOCKER_IMAGE_TAG)
 
-        clientMock.containers.run.assert_called_once_with(
+        client_mock.containers.run.assert_called_once_with(
             'fake_image',
             '/engine/AppRun --utility sample_command',
             remove=True,
