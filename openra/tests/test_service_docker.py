@@ -9,7 +9,7 @@ from django.conf import settings
 
 class TestServiceDocker(TestCase):
 
-    def test_test_docker_will_pass_the_correct_parameters(self):
+    def test_that_test_docker_will_pass_the_correct_parameters(self):
         client_mock = Mock()
         client_mock.containers = Mock()
         client_mock.images = Mock()
