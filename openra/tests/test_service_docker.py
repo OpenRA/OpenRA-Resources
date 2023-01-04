@@ -3,13 +3,13 @@ import datetime
 from django.utils import timezone
 from unittest import TestCase
 from unittest.mock import  Mock, MagicMock
-from openra.services.docker import Docker
+from openra.services.docker import Docker, IncompatibleAppImagePathException
 from os import path
 from django.conf import settings
 
 class TestServiceDocker(TestCase):
 
-    def test_test_docker_will_pass_the_correct_parameters_to_docker_run(self):
+    def test_test_docker_will_pass_the_correct_parameters(self):
         clientMock = Mock()
         clientMock.containers = Mock()
         clientMock.images = Mock()
@@ -31,7 +31,7 @@ class TestServiceDocker(TestCase):
             docker.testDocker()
         )
 
-        clientMock.images.get.assert_called_once_with('rc-ubuntu')
+        clientMock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
         clientMock.containers.run.assert_called_once_with(
             'fake_image',
             'echo "Docker appears to be running ok"',
@@ -40,8 +40,7 @@ class TestServiceDocker(TestCase):
             working_dir='/',
         )
 
-
-    def test_extract_app_image_will_pass_the_correct_parameters_to_docker_run(self):
+    def test_extract_app_image_will_pass_the_correct_parameters(self):
 
         clientMock = Mock()
         clientMock.containers = Mock()
@@ -67,22 +66,38 @@ class TestServiceDocker(TestCase):
             )
         )
 
-        clientMock.images.get.assert_called_once_with('rc-ubuntu')
+        clientMock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
 
         clientMock.containers.run.assert_called_once_with(
             'fake_image',
-            'bash -c "cp /in/image.AppImage . && '
-                    './image.AppImage --appimage-extract && '
-                    'rm image.AppImage"',
+            'bash -c "cp /in/AppImage . && '
+                    './AppImage --appimage-extract && '
+                    'rm AppImage"',
             remove=True,
             volumes=[
-                '/sample/image.AppImage:/in/image.AppImage',
+                '/sample/image.AppImage:/in/AppImage',
                 '/extract/to/location:/out/squashfs-root'
             ],
             working_dir="/out",
         )
 
-    def test_run_utility_command_will_pass_the_correct_parameters_to_docker_run(self):
+    def test_extract_app_image_will_throw_exception_if_an_incompatible_filename_is_used(self):
+        clientMock = Mock()
+
+        docker = Docker()
+
+        docker._getClient = MagicMock(
+            return_value = clientMock
+        )
+
+        self.assertRaises(
+            IncompatibleAppImagePathException,
+            docker.extractAppImage,
+            '/sample/im age.AppImage',
+            '/extract/to/location'
+        )
+
+    def test_run_utility_command_will_pass_the_correct_parameters(self):
 
         clientMock = Mock()
         clientMock.containers = Mock()
@@ -114,11 +129,11 @@ class TestServiceDocker(TestCase):
             )
         )
 
-        clientMock.images.get.assert_called_once_with('rc-ubuntu')
+        clientMock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
 
         imagePath = path.join(settings.BASE_DIR, 'openra', 'resources', 'docker')
 
-        clientMock.images.build.assert_called_once_with(path=imagePath, tag='rc-ubuntu')
+        clientMock.images.build.assert_called_once_with(path=imagePath, tag=settings.DOCKER_IMAGE_TAG)
 
         clientMock.containers.run.assert_called_once_with(
             'fake_image',

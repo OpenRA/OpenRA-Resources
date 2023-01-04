@@ -2,6 +2,7 @@ import docker
 
 from os import path
 from django.conf import settings
+import re
 
 
 class Docker:
@@ -12,13 +13,17 @@ class Docker:
         )
 
     def extractAppImage(self, appImagePath, toDir):
+        pattern = re.compile("^[A-z0-9\-\/\.]+$")
+        if not pattern.match(appImagePath):
+            raise IncompatibleAppImagePathException('Incompatible character used in appimage path: ' + appImagePath)
+
         appImage = path.basename(appImagePath)
         return self._dockerRun(
-            'bash -c "cp /in/{0} . && '
-                    './{0} --appimage-extract && '
-                    'rm {0}"'.format(appImage),
+            'bash -c "cp /in/AppImage . && '
+                    './AppImage --appimage-extract && '
+                    'rm AppImage"',
             volumes=[
-                appImagePath+':/in/'+appImage,
+                appImagePath+':/in/AppImage',
                 toDir+':/out/squashfs-root'
             ],
             workingDir="/out",
@@ -52,8 +57,10 @@ class Docker:
         imagePath = path.join(settings.BASE_DIR, 'openra', 'resources', 'docker')
 
         try:
-            return client.images.get('rc-ubuntu')
+            return client.images.get(settings.DOCKER_IMAGE_TAG)
         except:
-            return client.images.build(path=imagePath, tag="rc-ubuntu")[0]
+            return client.images.build(path=imagePath, tag=settings.DOCKER_IMAGE_TAG)[0]
 
-
+class IncompatibleAppImagePathException(Exception):
+    "Docker library only accepts basic characters, rename before extracting"
+    pass
