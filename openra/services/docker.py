@@ -43,14 +43,9 @@ class Docker:
             working_dir='/build',
         )
 
-    def _get_client(self):
-        return self._client
-
     def _docker_run(self, command, volumes=[], working_dir='/'):
-        client = self._get_client()
-
-        return client.containers.run(
-            self._get_docker_image(client),
+        return self._client.containers.run(
+            self._get_docker_image(self._client),
             command,
             remove=True,
             volumes=volumes,
