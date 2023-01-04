@@ -7,60 +7,59 @@ import re
 
 class Docker:
 
-    def testDocker(self):
-        return self._dockerRun(
+    def test_docker(self):
+        return self._docker_run(
             'echo "Docker appears to be running ok"',
         )
 
-    def extractAppImage(self, appImagePath, toDir):
-        pattern = re.compile("^[A-z0-9\-\/\.]+$")
-        if not pattern.match(appImagePath):
-            raise IncompatibleAppImagePathException('Incompatible character used in appimage path: ' + appImagePath)
+    def extract_app_image(self, app_image_path, to_dir):
+        pattern = re.compile('^[A-z0-9\-\/\.]+$')
+        if not pattern.match(app_image_path):
+            raise IncompatibleAppImagePathException('Incompatible character used in appimage path: ' + app_image_path)
 
-        appImage = path.basename(appImagePath)
-        return self._dockerRun(
+        return self._docker_run(
             'bash -c "cp /in/AppImage . && '
                     './AppImage --appimage-extract && '
                     'rm AppImage"',
             volumes=[
-                appImagePath+':/in/AppImage',
-                toDir+':/out/squashfs-root'
+                app_image_path+':/in/AppImage',
+                to_dir+':/out/squashfs-root'
             ],
-            workingDir="/out",
+            working_dir='/out',
         )
 
-    def runUtilityCommand(self, enginePath, command, additionalVolumes=[]):
-        return self._dockerRun(
+    def run_utility_command(self, engine_path, command, additional_volumes=[]):
+        return self._docker_run(
             '/engine/AppRun --utility ' + command,
             volumes=[
-                enginePath+':/engine',
-            ]+additionalVolumes,
-            workingDir="/build",
+                engine_path+':/engine',
+            ]+additional_volumes,
+            working_dir='/build',
         )
 
-    def _getClient(self):
+    def _get_client(self):
         return docker.from_env()
 
-    def _dockerRun(self, command, volumes=[], workingDir="/"):
-        client = self._getClient()
+    def _docker_run(self, command, volumes=[], working_dir='/'):
+        client = self._get_client()
 
         return client.containers.run(
-            self._getDockerImage(client),
+            self._get_docker_image(client),
             command,
             remove=True,
             volumes=volumes,
-            working_dir=workingDir
+            working_dir=working_dir
         ).decode('UTF-8')
 
 
-    def _getDockerImage(self, client):
-        imagePath = path.join(settings.BASE_DIR, 'openra', 'resources', 'docker')
+    def _get_docker_image(self, client):
+        image_path = path.join(settings.BASE_DIR, 'openra', 'resources', 'docker')
 
         try:
             return client.images.get(settings.DOCKER_IMAGE_TAG)
         except:
-            return client.images.build(path=imagePath, tag=settings.DOCKER_IMAGE_TAG)[0]
+            return client.images.build(path=image_path, tag=settings.DOCKER_IMAGE_TAG)[0]
 
 class IncompatibleAppImagePathException(Exception):
-    "Docker library only accepts basic characters, rename before extracting"
+    'Docker library only accepts basic characters, rename before extracting'
     pass

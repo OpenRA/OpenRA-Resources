@@ -8,4 +8,4 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        print(Docker().testDocker())
+        print(Docker().test_docker())
