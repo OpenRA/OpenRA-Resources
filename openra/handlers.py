@@ -147,7 +147,7 @@ def add_map_revision(oramap_path, user,
         print('Running --check-yaml')
         lint_retcode, lint_output = utility.run_utility_command(parser, item.game_mod, [
             '--check-yaml',
-            item_map_path
+            oramap_path
         ])
 
         if lint_output:
