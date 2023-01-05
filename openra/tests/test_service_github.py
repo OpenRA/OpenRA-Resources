@@ -23,18 +23,14 @@ class TestServiceGithub(TestCase):
             return_value = repo_mock
         )
 
-        github = Github()
-
-        github._get_client = MagicMock(
-            return_value = client_mock
-        )
+        github = Github(client_mock)
 
         self.assertEquals([{
-                "tag":"sample1",
-                "published":published_date,
+                "tag": "sample1",
+                "published": published_date,
             },{
-                "tag":"sample2",
-                "published":published_date,
+                "tag": "sample2",
+                "published": published_date,
             }],
             github.list_releases()
         )
@@ -71,18 +67,14 @@ class TestServiceGithub(TestCase):
             return_value = repo_mock
         )
 
-        github = Github()
-
-        github._get_client = MagicMock(
-            return_value = client_mock
-        )
+        github = Github(client_mock)
 
         self.assertEquals([{
-                "name":"asset1",
-                "url":"url1",
+                "name": "asset1",
+                "url": "url1",
             },{
-                "name":"asset2",
-                "url":"url2",
+                "name": "asset2",
+                "url": "url2",
             }],
             github.get_release_assets('release_tag')
         )
@@ -115,11 +107,7 @@ class TestServiceGithub(TestCase):
             return_value = repo_mock
         )
 
-        github = Github()
-
-        github._get_client = MagicMock(
-            return_value = client_mock
-        )
+        github = Github(client_mock)
 
         github.list_releases()
         github.get_release_assets('sample')
