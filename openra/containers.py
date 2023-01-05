@@ -3,8 +3,9 @@ from fs.osfs import OSFS
 from openra import settings
 from os import path
 import docker
-
 from openra.services.docker import Docker
+from github import Github as GithubClient
+from openra.services.github import Github
 
 class Container(containers.DeclarativeContainer):
     config = providers.Configuration()
@@ -21,3 +22,10 @@ class Container(containers.DeclarativeContainer):
         )
     )
 
+    github = providers.Singleton(
+        Github,
+        providers.Callable(
+            GithubClient,
+            settings.GITHUB_API_KEY
+        )
+    )
