@@ -4,7 +4,7 @@ from dependency_injector.wiring import Provide, inject
 from github import Github as GithubClient
 from result import Err, Ok
 from openra import settings
-from openra.errors import ErrorBase
+from openra.classes.errors import ErrorBase
 
 class Github():
 

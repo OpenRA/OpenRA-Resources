@@ -1,15 +1,14 @@
-from platform import mac_ver
 from unittest import TestCase
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock
 from fs.memoryfs import MemoryFS
-import urllib.request
 
 from fs.tempfs import TempFS
+from result import Err, Ok
+from openra.classes.errors import ErrorBase
+from openra.classes.file_location import FileLocation
 from openra.services.docker import Docker
-from openra.services.github import Github
 
-from openra.services.engine_provider import EngineProvider
-from openra.structs import FileLocation
+from openra.services.engine_provider import EngineProvider, ErrorEngineProviderGetPath
 
 class TestServiceEngineProvider(TestCase):
 
@@ -22,7 +21,7 @@ class TestServiceEngineProvider(TestCase):
             data_fs=fs,
         )
 
-        location = engine_provider.get_path('ra', 'release123')
+        location = engine_provider.get_path('ra', 'release123').unwrap()
 
         self.assertIsInstance(
             location,
@@ -46,16 +45,34 @@ class TestServiceEngineProvider(TestCase):
             data_fs=fs
         )
 
-        location = engine_provider.get_path('ra', 'release123')
+        location = engine_provider.get_path('ra', 'release123').unwrap()
 
         self.assertIsNone(
             location
         )
 
+    def test_it_will_return_an_error_if_an_exception_is_caught(self):
+        fs = Mock(spec=TempFS)
+
+        fs.exists = MagicMock(
+            side_effect = Exception()
+        )
+
+        engine_provider = EngineProvider(
+            data_fs=fs
+        )
+
+        result = engine_provider.get_path('ra', 'release123').unwrap_err()
+
+        self.assertIsInstance(
+            result,
+            ErrorEngineProviderGetPath
+        )
+
     def test_it_can_import_an_appimage_file(self):
         docker_mock = Mock(spec=Docker)
         docker_mock.extract_appimage = MagicMock(
-            return_value = 'sample_output'
+            return_value = Ok('sample_output')
         )
 
         fs=TempFS()
@@ -74,21 +91,21 @@ class TestServiceEngineProvider(TestCase):
         )
         appimage_file.fs.touch('file')
 
-        temp_fs_location = appimage_file.copy_to_tempfs('appImageName')
+        temp_fs_location = appimage_file.copy_to_tempfs('appImageName').unwrap()
 
         appimage_file.copy_to_tempfs = MagicMock(
-            return_value=temp_fs_location
+            return_value=Ok(temp_fs_location)
         )
 
         location = engine_provider.import_appimage(
             'ra',
             'version1',
             appimage_file
-        )
+        ).unwrap()
 
         docker_mock.extract_appimage.assert_called_once_with(
-            temp_fs_location.get_os_path(),
-            fs.getospath('engines/ra/version1')
+            temp_fs_location.get_os_path().unwrap(),
+            fs.getospath('engines/ra/version1').decode('utf-8')
         )
 
         self.assertIsInstance(
@@ -106,10 +123,10 @@ class TestServiceEngineProvider(TestCase):
             'engines/ra/version1',
         )
 
-    def test_import_appimage_will_return_none_if_docker_returns_none(self):
+    def test_import_appimage_will_return_an_error_if_docker_returns_an_error(self):
         docker_mock = Mock(spec=Docker)
         docker_mock.extract_appimage = MagicMock(
-            return_value = None
+            return_value = Err(ErrorBase())
         )
 
         fs=TempFS()
@@ -126,31 +143,32 @@ class TestServiceEngineProvider(TestCase):
         )
         appimage_file.fs.touch('file')
 
-        temp_fs_location = appimage_file.copy_to_tempfs('appImageName')
+        temp_fs_location = appimage_file.copy_to_tempfs('appImageName').unwrap()
 
         appimage_file.copy_to_tempfs = MagicMock(
-            return_value=temp_fs_location
+            return_value=Ok(temp_fs_location)
         )
 
-        location = engine_provider.import_appimage(
+        result = engine_provider.import_appimage(
             'ra',
             'version1',
             appimage_file
         )
 
         docker_mock.extract_appimage.assert_called_once_with(
-            temp_fs_location.get_os_path(),
-            fs.getospath('engines/ra/version1')
+            temp_fs_location.get_os_path().unwrap(),
+            fs.getospath('engines/ra/version1').decode('utf-8')
         )
 
-        self.assertIsNone(
-            location,
+        self.assertIsInstance(
+            result.unwrap_err(),
+            ErrorBase
         )
 
     def test_import_appimage_will_return_none_if_get_path_returns_none(self):
         docker_mock = Mock(spec=Docker)
         docker_mock.extract_appimage = MagicMock(
-            return_value = 'sample_output'
+            return_value = Ok('sample_output')
         )
 
         fs=TempFS()
@@ -167,10 +185,10 @@ class TestServiceEngineProvider(TestCase):
         )
         appimage_file.fs.touch('file')
 
-        temp_fs_location = appimage_file.copy_to_tempfs('appImageName')
+        temp_fs_location = appimage_file.copy_to_tempfs('appImageName').unwrap()
 
         appimage_file.copy_to_tempfs = MagicMock(
-            return_value=temp_fs_location
+            return_value=Ok(temp_fs_location)
         )
 
         location = engine_provider.import_appimage(
@@ -180,12 +198,12 @@ class TestServiceEngineProvider(TestCase):
         )
 
         docker_mock.extract_appimage.assert_called_once_with(
-            temp_fs_location.get_os_path(),
-            fs.getospath('engines/ra/version1')
+            temp_fs_location.get_os_path().unwrap(),
+            fs.getospath('engines/ra/version1').decode('utf-8')
         )
 
         self.assertIsNone(
-            location,
+            location.unwrap(),
         )
 
     def test_an_appimage_can_be_downloaded_before_importing(self):

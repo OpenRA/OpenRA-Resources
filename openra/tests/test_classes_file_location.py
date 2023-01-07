@@ -2,12 +2,12 @@ import datetime
 from fs.memoryfs import MemoryFS
 
 from fs.tempfs import TempFS
-from fs.base import errors
 
 from unittest import TestCase
-from openra.structs import FileLocation
 
-class TestStructs(TestCase):
+from openra.classes.file_location import ErrorFileLocationCopyToTempFS, ErrorFileLocationGetOSDir, ErrorFileLocationGetOSPath, FileLocation
+
+class TestFileLocation(TestCase):
     def test_dir_location_can_return_an_os_path_if_available(self):
         fs = TempFS()
 
@@ -23,16 +23,16 @@ class TestStructs(TestCase):
         self.assertTrue(
             '/location/'
             in
-            file.get_os_dir()
+            file.get_os_dir().unwrap()
         )
 
         self.assertFalse(
             'test_file'
             in
-            file.get_os_dir()
+            file.get_os_dir().unwrap()
         )
 
-    def test_dir_will_throw_an_exception_if_there_is_no_file_path(self):
+    def test_dir_will_return_an_error_if_there_is_no_file_path(self):
         fs = MemoryFS()
 
         fs.makedir('location')
@@ -44,9 +44,11 @@ class TestStructs(TestCase):
             'test_flie'
         )
 
-        self.assertRaises(
-            errors.NoSysPath,
-            file.get_os_dir
+        result = file.get_os_dir()
+
+        self.assertIsInstance(
+            result.unwrap_err(),
+            ErrorFileLocationGetOSDir
         )
 
     def test_file_location_can_return_an_os_path_if_available(self):
@@ -64,10 +66,10 @@ class TestStructs(TestCase):
         self.assertTrue(
             '/location/test_file'
             in
-            file.get_os_path()
+            file.get_os_path().unwrap()
         )
 
-    def test_file_will_throw_an_exception_if_there_is_no_file_path(self):
+    def test_file_will_return_an_error_if_there_is_no_file_path(self):
         fs = MemoryFS()
 
         fs.makedir('location')
@@ -79,9 +81,11 @@ class TestStructs(TestCase):
             'test_flie'
         )
 
-        self.assertRaises(
-            errors.NoSysPath,
-            file.get_os_path
+        result = file.get_os_path()
+
+        self.assertIsInstance(
+            result.unwrap_err(),
+            ErrorFileLocationGetOSPath
         )
 
     def test_it_can_copy_a_file_to_a_tempfs(self):
@@ -96,7 +100,7 @@ class TestStructs(TestCase):
             'test_file'
         )
 
-        new_file = file.copy_to_tempfs('new_name')
+        new_file = file.copy_to_tempfs('new_name').unwrap()
 
         self.assertEquals(
             'new_name',
@@ -108,5 +112,18 @@ class TestStructs(TestCase):
             new_file.fs.readtext('new_name')
         )
 
+    def test_it_will_return_an_error_if_it_cant_copy_a_file_to_a_tempfs(self):
+        fs = MemoryFS()
 
+        fs.makedir('location')
 
+        file = FileLocation(
+            fs,
+            'location/',
+            'test_file'
+        )
+
+        self.assertIsInstance(
+            file.copy_to_tempfs('new_name').unwrap_err(),
+            ErrorFileLocationCopyToTempFS
+        )

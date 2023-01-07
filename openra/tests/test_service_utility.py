@@ -3,10 +3,10 @@ import datetime
 from unittest import TestCase
 from unittest.mock import  Mock, MagicMock
 from fs.tempfs import TempFS
+from openra.classes.file_location import FileLocation
 from openra.fakes import log
 from openra.services.docker import Docker
 from openra.services.utility import Utility
-from openra.structs import FileLocation
 
 class TestServiceUtility(TestCase):
     def test_map_hash_will_return_the_output_if_return_value_is_a_string(self):

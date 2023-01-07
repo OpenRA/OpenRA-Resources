@@ -4,7 +4,7 @@ import re
 from docker.client import DockerClient
 from result import Ok, Err
 
-from openra.errors import ErrorBase
+from openra.classes.errors import ErrorBase
 
 class Docker:
 

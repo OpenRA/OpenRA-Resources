@@ -7,7 +7,7 @@ from django.core.management import call_command
 from django.utils.six import StringIO
 from django.contrib.auth import authenticate
 from result import Err, Ok
-from openra.errors import ErrorBase
+from openra.classes.errors import ErrorBase
 
 from openra.models import User, Maps
 from dependency_injector import providers
