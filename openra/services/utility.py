@@ -1,5 +1,3 @@
-
-
 from dependency_injector.wiring import Provide
 from openra.facades import log
 from openra.services.docker import Docker
