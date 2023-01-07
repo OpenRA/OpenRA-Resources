@@ -1,5 +1,5 @@
 from dependency_injector.wiring import Provide, inject
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from openra.containers import Container
 from openra.services.docker import Docker
 
