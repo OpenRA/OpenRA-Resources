@@ -12,4 +12,7 @@ class OpenraConfig(AppConfig):
             ".handlers",
             ".tests.test_commands",
             ".management.commands.testdocker",
+            ".management.commands.import_latest_engines",
+            ".facades",
+            '.services.engine_provider'
         ])
