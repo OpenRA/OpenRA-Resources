@@ -1,10 +1,10 @@
-from typing import List, TypeVar
-
 from os import path
 from django.conf import settings
 import re
 from docker.client import DockerClient
-from result import Ok, Err, Result
+from result import Ok, Err
+
+from openra.errors import ErrorBase
 
 class Docker:
 
@@ -69,30 +69,6 @@ class Docker:
             return client.images.get(settings.DOCKER_IMAGE_TAG)
         except:
             return client.images.build(path=image_path, tag=settings.DOCKER_IMAGE_TAG)[0]
-
-class ErrorBase:
-
-    message: str
-    friendly: str
-    detail: List[str]
-
-    def __init__(self):
-        self.message = ''
-        self.detail = [] 
-        self.friendly = 'An error occurred, please try again later'
-
-    def get_full_details(self):
-        buffer = 'User Message: ' + self.friendly
-        buffer += '\n\n'
-        buffer += 'Error: ' + self.message
-        buffer += '\n\n'
-        buffer += 'Additional Details:\n'
-        for line in self.detail:
-            buffer += line + '\n'
-        return buffer
-
-    def print_full_details(self):
-        print(self.get_full_details())
 
 class ErrorDockerIncompatibleAppImagePath(ErrorBase):
     def __init__(self, appimage_path, to_dir):
