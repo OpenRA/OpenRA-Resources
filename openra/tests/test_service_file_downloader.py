@@ -1,13 +1,10 @@
-import datetime
-
 from unittest import TestCase
 from unittest.mock import MagicMock
-from fs.osfs import OSFS
 
 from fs.tempfs import TempFS
 from result import Ok
 
-from openra.services.file_downloader import ErrorFileDownloaderRetrieveFile, ErrorFileDownloaderStoreFile, FileDownloader
+from openra.services.file_downloader import ErrorFileDownloaderStoreFile, FileDownloader
 
 class TestServiceFileDownloader(TestCase):
 

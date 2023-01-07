@@ -69,58 +69,8 @@ class EngineProvider:
 
         return self.get_path(mod, version)
 
-    def import_appimage_by_url(self, mod, version, appimage_url):
-        appimage_location = self._download_appimage_and_create_fs(appimage_url)
-
-        if(appimage_location is None):
-            return None
-
-        return self.import_appimage(mod, version, appimage_location)
-
-
     def _get_target_path(self, mod, version):
         return str(os.path.join('engines', mod, version))
-
-    def _download_appimage_and_create_fs(self, url):
-        try:
-            temp_fs = TempFS()
-
-            download_request = self._download_appimage(url)
-            if isinstance(download_request, Err):
-                return download_request
-
-            temp_fs.writefile('appImage', download_request.unwrap())
-
-            return Ok(FileLocation(
-                temp_fs,
-                '',
-                'appImage'
-            ))
-        except Exception as exception:
-            return Err(ErrorEngineProviderDownloadAppImageToFS(exception, url))
-
-    def _download_appimage(self, url):
-        # This could probably be passed out to another service as
-        # it's an unknown atm
-        try:
-            http = urllib3.PoolManager()
-            return Ok(http.request('GET', url, preload_content=False))
-        except Exception as exception:
-            return Err(ErrorEngineProviderDownloadAppImage(exception, url))
-
-class ErrorEngineProviderDownloadAppImageToFS(ErrorBase):
-    def __init__(self, exception, url:str):
-        super().__init__()
-        self.message = "Engine provider caught an exception while attempting to store this appimage"
-        self.detail.append('url: ' + url)
-        self.detail.append('message: ' + str(exception))
-
-class ErrorEngineProviderDownloadAppImage(ErrorBase):
-    def __init__(self, exception, url:str):
-        super().__init__()
-        self.message = "Engine provider caught an exception while downloading an appimage"
-        self.detail.append('url: ' + url)
-        self.detail.append('message: ' + str(exception))
 
 class ErrorEngineProviderGetPath(ErrorBase):
     def __init__(self, exception, fs:FS, mod:str, version:str):
