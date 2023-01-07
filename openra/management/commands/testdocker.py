@@ -14,4 +14,11 @@ class Command(BaseCommand):
 
     @inject
     def _test_docker(self, docker:Docker=Provide[Container.docker]):
-        print(docker.test_docker())
+        result = docker.test_docker()
+
+        if result.is_ok():
+            print('Success:')
+            print(result.unwrap())
+        else:
+            print('Failed:')
+            print(result.unwrap_err().print_full_details())

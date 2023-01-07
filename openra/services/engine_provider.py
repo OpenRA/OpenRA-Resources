@@ -24,7 +24,7 @@ class EngineProvider:
         self._data_fs = data_fs
         self._docker = docker
 
-    def get_path(self, mod, version):
+    def get_path(self, mod:str, version:str):
         path = self._get_target_path(mod, version)
 
         if not self._data_fs.exists(os.path.join(path, 'AppRun')):
@@ -36,11 +36,11 @@ class EngineProvider:
             ''
         )
 
-    def import_appimage(self, mod, version, appimage_location):
+    def import_appimage(self, mod:str, version:str, appimage_location:FileLocation):
         path = self._get_target_path(mod, version)
         if not self._data_fs.exists(path):
             self._data_fs.makedirs(path)
-        appimage_temp = appimage_location.copy_to_tempfs('appImage')
+        appimage_temp:FileLocation = appimage_location.copy_to_tempfs('appImage')
         if self._docker.extract_appimage(
             # Prevent issues with docker volume n naming
             appimage_temp.get_os_path(),

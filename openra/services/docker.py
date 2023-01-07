@@ -1,14 +1,10 @@
-from django.core.management import os
-import docker
+from typing import List, TypeVar
 
 from os import path
 from django.conf import settings
 import re
 from docker.client import DockerClient
-from docker.errors import ContainerError
-
-from openra.facades import log
-
+from result import Ok, Err, Result
 
 class Docker:
 
@@ -22,16 +18,11 @@ class Docker:
             'echo "Docker appears to be running ok"',
         )
 
-    def extract_appimage(self, app_image_path, to_dir):
+    def extract_appimage(self, app_image_path:str, to_dir:str):
         pattern = re.compile('^[A-z0-9\-\/\.\_]+$')
         if not pattern.match(app_image_path):
-            raise IncompatibleAppImagePathException('Incompatible character used in appimage path: ' + app_image_path)
+            return Err(ErrorDockerIncompatibleAppImagePath(app_image_path, to_dir))
 
-        print('below')
-        print(app_image_path+':/in/AppImage')
-        print(to_dir+':/out/squashfs-root')
-        print(os.path.isdir(app_image_path))
-        print(os.path.exists(app_image_path))
         return self._docker_run(
             'bash -c "cp /in/AppImage . && '
                     'chmod +x AppImage && '
@@ -53,8 +44,8 @@ class Docker:
             working_dir='/build',
         )
 
-    def _docker_run(self, command, volumes=[], working_dir='/'):
-        # try:
+    def _docker_run(self, command:str, volumes:list=[], working_dir='/'):
+        try:
             output = self._client.containers.run(
                 self._get_docker_image(self._client),
                 command,
@@ -63,13 +54,12 @@ class Docker:
                 working_dir=working_dir
             )
             if isinstance(output, bytes):
-                return str(output.decode('UTF-8'))
+                return Ok(str(output.decode('UTF-8')))
             else:
-                log().info('Docker returned non bytes response')
-        # except:
-        #     log().info('Docker has thrown an exception, most likely non-0 return')
+                return Err(ErrorDockerNonByteResponse(output, command, volumes, working_dir))
+        except Exception as exception:
+            return Err(ErrorDockerExceptionResponse(exception, command, volumes, working_dir))
 
-        # return None
 
 
     def _get_docker_image(self, client):
@@ -80,6 +70,62 @@ class Docker:
         except:
             return client.images.build(path=image_path, tag=settings.DOCKER_IMAGE_TAG)[0]
 
-class IncompatibleAppImagePathException(Exception):
-    'Docker library only accepts basic characters, rename before extracting'
-    pass
+class ErrorBase:
+
+    message: str
+    friendly: str
+    detail: List[str]
+
+    def __init__(self):
+        self.message = ''
+        self.detail = [] 
+        self.friendly = 'An error occurred, please try again later'
+
+    def get_full_details(self):
+        buffer = 'User Message: ' + self.friendly
+        buffer += '\n\n'
+        buffer += 'Error: ' + self.message
+        buffer += '\n\n'
+        buffer += 'Additional Details:\n'
+        for line in self.detail:
+            buffer += line + '\n'
+        return buffer
+
+    def print_full_details(self):
+        print(self.get_full_details())
+
+class ErrorDockerIncompatibleAppImagePath(ErrorBase):
+    def __init__(self, appimage_path, to_dir):
+        super().__init__()
+        self.message = "Incompatible AppImage path provided"
+        self.detail.append('tip: rename the app image before passing in')
+        self.detail.append('path: ' + appimage_path)
+        self.detail.append('extracting to: ' + to_dir)
+
+class ErrorDockerNonByteResponse(ErrorBase):
+
+    def __init__(self, output, command:str, volumes:list, working_dir:str):
+        super().__init__()
+        self.message = "Docker non-byte response"
+        self.detail.append('command: ' + command)
+        if not volumes:
+            self.detail.append('volumes: none')
+        else:
+            for volume in volumes:
+                self.detail.append('volume: ' + volume)
+        self.detail.append('working_dir: ' + working_dir)
+        self.detail.append('output type: ' + str(type(output)))
+
+class ErrorDockerExceptionResponse(ErrorBase):
+    def __init__(self, exception, command:str, volumes:list, working_dir:str):
+        super().__init__()
+        self.message = "Docker threw an exception"
+        self.detail.append('tip: most likely a non 0 response from the container')
+        self.detail.append('command: ' + command)
+        if not volumes:
+            self.detail.append('volumes: none')
+        else:
+            for volume in volumes:
+                self.detail.append('volume: ' + volume)
+        self.detail.append('working_dir: ' + working_dir)
+        self.detail.append('message: ' + str(exception))
