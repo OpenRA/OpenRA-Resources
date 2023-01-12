@@ -1,15 +1,10 @@
-import urllib.request
-
 from dependency_injector.wiring import Provide, inject
 from django.conf import os
 from fs.base import FS
-from fs.tempfs import TempFS
 from result import Err, Ok
 from openra.classes.errors import ErrorBase
 from openra.classes.file_location import FileLocation
 from openra.services.docker import Docker
-from openra.services.github import Github
-import urllib3
 
 class EngineProvider:
 

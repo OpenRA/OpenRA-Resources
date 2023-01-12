@@ -53,9 +53,9 @@ class Github():
 class GithubRelease:
 
     tag:str
-    published:Type[datetime]
+    published:datetime
 
-    def __init__(self, tag:str, published:Type[datetime]):
+    def __init__(self, tag:str, published:datetime):
         self.tag = tag
         self.published = published
 

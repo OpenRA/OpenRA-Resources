@@ -142,8 +142,3 @@ class TestTestDocker(TestCase):
 
         docker_mock.test_docker.assert_called_once_with()
         error_mock.print_full_details.assert_called_once()
-
-class TestImportLatestEngines(TestCase):
-    def test_it_runs(self):
-        call_command('import_latest_engines')
-

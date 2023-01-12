@@ -1,5 +1,6 @@
 from dependency_injector.wiring import providers
 from openra import container
+from openra.classes.errors import ErrorBase
 
 
 def register():
@@ -21,8 +22,6 @@ def clear():
     entries = []
 
 class FakeLog:
-
-
     def info(self, message:str):
         self._add_log('info', message)
 
@@ -31,6 +30,9 @@ class FakeLog:
 
     def error(self, message:str):
         self._add_log('error', message)
+
+    def error_obj(self, error:ErrorBase):
+        self._add_log('error', error.get_full_details())
 
     def _add_log(self, log_type, message):
         entries.append({
