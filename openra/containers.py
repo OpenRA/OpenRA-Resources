@@ -6,6 +6,7 @@ import docker
 from openra.services.docker import Docker
 from github import Github as GithubClient
 from openra.services.engine_provider import EngineProvider
+from openra.services.file_downloader import FileDownloader
 from openra.services.github import Github
 from openra.services.log import Log
 
@@ -38,4 +39,8 @@ class Container(containers.DeclarativeContainer):
 
     engine_provider = providers.Singleton(
         EngineProvider
+    )
+
+    file_downloader = providers.Singleton(
+        FileDownloader
     )
