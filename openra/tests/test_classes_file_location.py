@@ -5,10 +5,10 @@ from fs.tempfs import TempFS
 
 from unittest import TestCase
 
-from openra.classes.file_location import ErrorFileLocationCopyToTempFS, ErrorFileLocationGetOSDir, ErrorFileLocationGetOSPath, FileLocation
+from openra.classes.file_location import ExceptionFileLocationCopyToTempFS, ExceptionFileLocationGetOSDir, ExceptionFileLocationGetOSPath, FileLocation
 
 class TestFileLocation(TestCase):
-    def test_dir_location_can_return_an_os_path_if_available(self):
+    def test_get_os_dir_returns_dir(self):
         fs = TempFS()
 
         fs.makedir('location')
@@ -23,16 +23,16 @@ class TestFileLocation(TestCase):
         self.assertTrue(
             '/location/'
             in
-            file.get_os_dir().unwrap()
+            file.get_os_dir()
         )
 
         self.assertFalse(
             'test_file'
             in
-            file.get_os_dir().unwrap()
+            file.get_os_dir()
         )
 
-    def test_dir_will_return_an_error_if_there_is_no_file_path(self):
+    def test_get_os_dir_throws_exception_if_no_os_dir(self):
         fs = MemoryFS()
 
         fs.makedir('location')
@@ -44,14 +44,12 @@ class TestFileLocation(TestCase):
             'test_flie'
         )
 
-        result = file.get_os_dir()
-
-        self.assertIsInstance(
-            result.unwrap_err(),
-            ErrorFileLocationGetOSDir
+        self.assertRaises(
+            ExceptionFileLocationGetOSDir,
+            file.get_os_dir
         )
 
-    def test_file_location_can_return_an_os_path_if_available(self):
+    def test_get_os_path_returns_path(self):
         fs = TempFS()
 
         fs.makedir('location')
@@ -66,10 +64,10 @@ class TestFileLocation(TestCase):
         self.assertTrue(
             '/location/test_file'
             in
-            file.get_os_path().unwrap()
+            file.get_os_path()
         )
 
-    def test_file_will_return_an_error_if_there_is_no_file_path(self):
+    def test_get_os_path_throws_exception_if_no_os_path(self):
         fs = MemoryFS()
 
         fs.makedir('location')
@@ -81,14 +79,12 @@ class TestFileLocation(TestCase):
             'test_flie'
         )
 
-        result = file.get_os_path()
-
-        self.assertIsInstance(
-            result.unwrap_err(),
-            ErrorFileLocationGetOSPath
+        self.assertRaises(
+            ExceptionFileLocationGetOSPath,
+            file.get_os_path
         )
 
-    def test_it_can_copy_a_file_to_a_tempfs(self):
+    def test_copy_to_tempfs_copies_a_file(self):
         fs = MemoryFS()
 
         fs.makedir('location')
@@ -100,7 +96,7 @@ class TestFileLocation(TestCase):
             'test_file'
         )
 
-        new_file = file.copy_to_tempfs('new_name').unwrap()
+        new_file = file.copy_to_tempfs('new_name')
 
         self.assertEquals(
             'new_name',
@@ -112,7 +108,7 @@ class TestFileLocation(TestCase):
             new_file.fs.readtext('new_name')
         )
 
-    def test_it_will_return_an_error_if_it_cant_copy_a_file_to_a_tempfs(self):
+    def test_copy_to_tempfs_throws_exception_if_unable_to_copy(self):
         fs = MemoryFS()
 
         fs.makedir('location')
@@ -123,7 +119,8 @@ class TestFileLocation(TestCase):
             'test_file'
         )
 
-        self.assertIsInstance(
-            file.copy_to_tempfs('new_name').unwrap_err(),
-            ErrorFileLocationCopyToTempFS
+        self.assertRaises(
+            ExceptionFileLocationCopyToTempFS,
+            file.copy_to_tempfs,
+            'new_name'
         )

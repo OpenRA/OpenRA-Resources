@@ -3,11 +3,11 @@ import datetime
 from unittest import TestCase
 from unittest.mock import  Mock, MagicMock
 from django.conf import settings
-from openra.services.github import ErrorGithubReleaseAssetsException, ErrorGithubReleaseException, Github, GithubRelease, GithubReleaseAsset
+from openra.services.github import ExceptionGithubReleaseException, ExceptionGithubReleaseAssetsException, Github, GithubRelease, GithubReleaseAsset
 
 class TestServiceGithub(TestCase):
 
-    def test_will_obtain_release_data_from_github(self):
+    def test_get_releases_returns_release_data(self):
         published_date = datetime.datetime
 
         repo_mock = Mock()
@@ -25,7 +25,7 @@ class TestServiceGithub(TestCase):
 
         github = Github(client_mock)
 
-        releases = github.get_releases().unwrap()
+        releases = github.get_releases()
 
         self.assertIsInstance(
             releases[0],
@@ -59,7 +59,7 @@ class TestServiceGithub(TestCase):
             lazy=True
         )
 
-    def test_will_return_err_for_get_releases_exceptions(self):
+    def test_get_releases_throws_release_exception_on_fail(self):
         client_mock = Mock()
         client_mock.get_repo = MagicMock(
             side_effect = Exception()
@@ -67,18 +67,12 @@ class TestServiceGithub(TestCase):
 
         github = Github(client_mock)
 
-        err = github.get_releases()
-
-        self.assertTrue(
-            err.is_err()
+        self.assertRaises(
+            ExceptionGithubReleaseException,
+            github.get_releases
         )
 
-        self.assertIsInstance(
-            err.unwrap_err(),
-            ErrorGithubReleaseException
-        )
-
-    def test_will_return_assets_for_a_release(self):
+    def test_get_assets_returns_assets_for_a_release(self):
         release_mock = Mock()
 
         mock_asset1 = Mock(browser_download_url="url1")
@@ -105,7 +99,7 @@ class TestServiceGithub(TestCase):
 
         github = Github(client_mock)
 
-        assets = github.get_release_assets('release_tag').unwrap()
+        assets = github.get_release_assets('release_tag')
 
         self.assertIsInstance(
             assets[0],
@@ -143,7 +137,7 @@ class TestServiceGithub(TestCase):
             lazy=True
         )
 
-    def test_will_return_err_for_get_release_assets_exceptions(self):
+    def test_get_release_assets_throws_release_exception_on_fail(self):
         client_mock = Mock()
         client_mock.get_repo = MagicMock(
             side_effect = Exception()
@@ -151,16 +145,12 @@ class TestServiceGithub(TestCase):
 
         github = Github(client_mock)
 
-        err = github.get_release_assets('123')
-
-        self.assertTrue(
-            err.is_err()
+        self.assertRaises(
+            ExceptionGithubReleaseAssetsException,
+            github.get_release_assets,
+            '123'
         )
 
-        self.assertIsInstance(
-            err.unwrap_err(),
-            ErrorGithubReleaseAssetsException
-        )
 
     def test_will_only_get_the_repo_once_over_multiple_calls(self):
         release_mock = Mock()

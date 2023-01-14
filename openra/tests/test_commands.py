@@ -6,8 +6,7 @@ from django.test import TestCase
 from django.core.management import call_command
 from django.utils.six import StringIO
 from django.contrib.auth import authenticate
-from result import Err, Ok
-from openra.classes.errors import ErrorBase
+from openra.classes.exceptions import ExceptionBase
 
 from openra.models import User, Maps
 from dependency_injector import providers
@@ -18,7 +17,7 @@ from fs.memoryfs import MemoryFS
 from fs.base import FS
 from os import path
 
-from openra.services.docker import Docker, ErrorDockerNonByteResponse
+from openra.services.docker import Docker, ExceptionDockerNonByteResponse
 
 class TestCommandSeedTestData(TestCase):
 
@@ -119,7 +118,7 @@ class TestTestDocker(TestCase):
     def test_it_runs_the_test_docker_command_and_prints_the_result_if_it_is_successful(self, print_mock):
         docker_mock = Mock(spec=Docker)
         docker_mock.test_docker = MagicMock(
-            return_value = Ok('sample')
+            return_value = 'sample'
         )
         container.docker.override(docker_mock)
 
@@ -130,15 +129,16 @@ class TestTestDocker(TestCase):
 
     def test_it_runs_the_test_docker_command_and_prints_the_error_if_it_failed(self):
 
-        error_mock = Mock(spec=ErrorBase)
-        error_mock.print_full_details = MagicMock()
+        exception_mock = ExceptionBase
+        exception_mock.print_full_details = MagicMock()
 
         docker_mock = Mock(spec=Docker)
         docker_mock.test_docker = MagicMock(
-            return_value = Err(error_mock)
+            side_effect = exception_mock
         )
         container.docker.override(docker_mock)
+
         call_command('testdocker')
 
         docker_mock.test_docker.assert_called_once_with()
-        error_mock.print_full_details.assert_called_once()
+        exception_mock.print_full_details.assert_called_once()

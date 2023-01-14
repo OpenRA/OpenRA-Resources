@@ -2,9 +2,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from fs.tempfs import TempFS
-from result import Ok
 
-from openra.services.file_downloader import ErrorFileDownloaderStoreFile, FileDownloader
+from openra.services.file_downloader import ExceptionFileDownloader, FileDownloader
 
 class TestServiceFileDownloader(TestCase):
 
@@ -14,14 +13,14 @@ class TestServiceFileDownloader(TestCase):
         return temp_fs.openbin('test')
 
 
-    def test_can_download_a_file(self):
+    def test_download_file_downloads_a_file(self):
         file_downloader = FileDownloader()
 
         file_downloader._get_file_like_object = MagicMock(
-            return_value = Ok(self.create_mock_file_like_object('sample'))
+            return_value = self.create_mock_file_like_object('sample')
         )
 
-        location = file_downloader.download_file('test_url', 'file_name').unwrap()
+        location = file_downloader.download_file('test_url', 'file_name')
 
         self.assertEquals(
             'sample',
@@ -30,16 +29,16 @@ class TestServiceFileDownloader(TestCase):
             )
         )
 
-    def test_will_return_an_err_if_the_downloader_lib_throws_an_exception(self):
+    def test_download_file_throws_exception_when_lib_throws_exception(self):
         file_downloader = FileDownloader()
 
         file_downloader._get_file_like_object = MagicMock(
             side_effect = Exception()
         )
 
-        result = file_downloader.download_file('test_url', 'file_name')
-
-        self.assertIsInstance(
-            result.unwrap_err(),
-            ErrorFileDownloaderStoreFile
+        self.assertRaises(
+            ExceptionFileDownloader,
+            file_downloader.download_file,
+            'test_url',
+            'file_name'
         )

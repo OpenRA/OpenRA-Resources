@@ -1,9 +1,8 @@
 from django.conf import os
 from fs.base import FS, copy
 from fs.tempfs import TempFS
-from result import Err, Ok
 
-from openra.classes.errors import ErrorBase
+from openra.classes.exceptions import ExceptionBase
 
 class FileLocation:
 
@@ -21,19 +20,21 @@ class FileLocation:
 
     def get_os_dir(self):
         try:
-            return Ok(self.fs.getospath(
+            return self.fs.getospath(
                 self.path
-            ).decode('utf-8'))
+            ).decode('utf-8')
+
         except Exception as exception:
-            return Err(ErrorFileLocationGetOSDir(exception, self.fs, self.path, self.file))
+            raise ExceptionFileLocationGetOSDir(exception, self.fs, self.path, self.file)
 
     def get_os_path(self):
         try:
-            return Ok(self.fs.getospath(
+            return self.fs.getospath(
                 self.get_fs_path()
-            ).decode('utf-8'))
+            ).decode('utf-8')
+
         except Exception as exception:
-            return Err(ErrorFileLocationGetOSPath(exception, self.fs, self.path, self.file))
+            raise ExceptionFileLocationGetOSPath(exception, self.fs, self.path, self.file)
 
     def copy_to_tempfs(self, filename:str):
         try:
@@ -48,15 +49,15 @@ class FileLocation:
                 filename
             )
 
-            return Ok(FileLocation(
+            return FileLocation(
                 temp_fs,
                 '',
                 filename
-            ))
+            )
         except Exception as exception:
-            return Err(ErrorFileLocationCopyToTempFS(exception, self.fs, self.path, self.file, filename))
+            raise ExceptionFileLocationCopyToTempFS(exception, self.fs, self.path, self.file, filename)
 
-class ErrorFileLocationGetOSDir(ErrorBase):
+class ExceptionFileLocationGetOSDir(ExceptionBase):
     def __init__(self, exception, fs:FS, path:str, file:str):
         super().__init__()
         self.message = "An exception occured while trying to get the os dir"
@@ -65,12 +66,12 @@ class ErrorFileLocationGetOSDir(ErrorBase):
         self.detail.append('file: ' + file)
         self.detail.append('message: ' + str(exception))
 
-class ErrorFileLocationGetOSPath(ErrorFileLocationGetOSDir):
+class ExceptionFileLocationGetOSPath(ExceptionFileLocationGetOSDir):
     def __init__(self, exception, fs:FS, path:str, file:str):
         super().__init__(exception, fs, path, file)
         self.message = "An exception occured while trying to get the os path"
 
-class ErrorFileLocationCopyToTempFS(ErrorBase):
+class ExceptionFileLocationCopyToTempFS(ExceptionBase):
     def __init__(self, exception, fs:FS, path:str, file:str, target:str):
         super().__init__()
         self.message = "An exception occured while trying to copy a file to a TempFS"

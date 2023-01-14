@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import patch
-from openra.classes.errors import ErrorBase
+from openra.classes.exceptions import ExceptionBase
 
 from openra.facades import log
 from freezegun import freeze_time
@@ -30,9 +30,9 @@ class TestServiceLog(TestCase):
 
     @patch('builtins.print')
     @freeze_time('1996-11-22 11:22:33')
-    def test_will_print_error_objs(self, print_mock):
-        error = ErrorBase()
+    def test_will_print_exception_objs(self, print_mock):
+        exception = ExceptionBase()
 
-        log().error_obj(error)
+        log().exception_obj(exception)
 
-        print_mock.assert_called_once_with('1996-11-22 11:22:33 error: '+error.get_full_details())
+        print_mock.assert_called_once_with('1996-11-22 11:22:33 exception: '+exception.get_full_details())

@@ -1,6 +1,6 @@
 from typing import List
 
-class ErrorBase:
+class ExceptionBase(Exception):
 
     message: str
     friendly: str
