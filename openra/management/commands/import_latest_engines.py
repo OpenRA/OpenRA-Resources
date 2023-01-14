@@ -5,6 +5,7 @@ from dependency_injector.wiring import Provide, inject
 from django.core.management.base import BaseCommand
 from openra.containers import Container
 import re
+from openra.models import Engines
 from openra.services.engine_file_repository import EngineFileRepository
 from openra.services.file_downloader import FileDownloader
 
@@ -93,15 +94,23 @@ class Command(BaseCommand):
         ):
         for engine in engines:
 
-            exists = engine_file_repository.exists(engine.mod, engine.version)
-            if not exists:
+            if not engine_file_repository.exists(engine.mod, engine.version):
                 log().info('Downloading: ' + engine.mod + ' ' + engine.version)
                 appimage_download = file_downloader.download_file(engine.url, 'appImage')
 
                 log().info('Importing: ' + engine.mod + ' ' + engine.version)
                 engine_file_repository.import_appimage(engine.mod, engine.version, appimage_download)
-            else:
-                log().info('Engine already exists: ' + engine.mod + ' ' + engine.version)
+
+            if not Engines.objects.filter(
+                    game_mod=engine.mod,
+                    version=engine.version
+                ).exists():
+                log().info('Adding to database: ' + engine.mod + ' ' + engine.version)
+                model = Engines(
+                    game_mod=engine.mod,
+                    version=engine.version
+                )
+                model.save()
 
 class EngineInfo:
 

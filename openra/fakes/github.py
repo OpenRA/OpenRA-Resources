@@ -4,9 +4,15 @@ from openra.services.github import GithubRelease, GithubReleaseAsset
 
 class FakeGithub():
 
+    only_one_release = False
     only_ra_asset = False
 
     def get_releases(self):
+        if self.only_one_release:
+            return [
+                GithubRelease('release-5', datetime.now()),
+            ]
+
         return [
             GithubRelease('playtest-7', datetime.now()),
             GithubRelease('playtest-6', datetime.now()),
