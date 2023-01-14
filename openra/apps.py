@@ -11,7 +11,7 @@ class OpenraConfig(AppConfig):
         container.wire(modules=[
             ".handlers",
             ".tests.test_commands",
-            ".management.commands.testdocker",
+            ".management.commands.test_docker",
             ".management.commands.import_latest_engines",
             ".facades",
             '.services.engine_file_repository'

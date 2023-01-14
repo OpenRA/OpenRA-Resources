@@ -35,7 +35,6 @@ class MapFileRepository:
 
         return path
 
-
     def _get_target_path(self, map_id:int):
         return os.path.join('maps', str(map_id))
 

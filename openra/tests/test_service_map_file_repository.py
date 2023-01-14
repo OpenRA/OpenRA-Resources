@@ -17,7 +17,7 @@ class TestServiceMapFileRepository(TestCase):
             data_fs=fs,
         )
 
-        location = map_file_repository.get_oramap_path('1')
+        location = map_file_repository.get_oramap_path(1)
 
         self.assertIsInstance(
             location,
