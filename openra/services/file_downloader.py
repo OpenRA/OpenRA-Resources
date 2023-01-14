@@ -29,7 +29,7 @@ class FileDownloader:
 
     def _get_file_like_object(self, url):
         http = urllib3.PoolManager()
-        http.request('GET', url, preload_content=False)
+        return http.request('GET', url, preload_content=False)
 
 class ExceptionFileDownloader(ExceptionBase):
     def __init__(self, exception, url:str):

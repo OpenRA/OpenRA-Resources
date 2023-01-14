@@ -5,7 +5,7 @@ from openra.classes.exceptions import ExceptionBase
 from openra.classes.file_location import FileLocation
 from openra.services.docker import Docker
 
-class EngineProvider:
+class EngineFileRepository:
 
     _data_fs: FS
     _docker: Docker
@@ -32,7 +32,7 @@ class EngineProvider:
                 ''
             )
         except Exception as exception:
-            raise ExceptionEngineProviderGetPath(exception, self._data_fs, mod, version)
+            raise ExceptionEngineFileRepositoryGetPath(exception, self._data_fs, mod, version)
 
 
     def import_appimage(self, mod:str, version:str, appimage_location:FileLocation):
@@ -57,7 +57,7 @@ class EngineProvider:
     def _get_target_path(self, mod, version):
         return str(os.path.join('engines', mod, version))
 
-class ExceptionEngineProviderGetPath(ExceptionBase):
+class ExceptionEngineFileRepositoryGetPath(ExceptionBase):
     def __init__(self, exception, fs:FS, mod:str, version:str):
         super().__init__()
         self.message = "Engine provider caught an exception while looking up an engine path"

@@ -3,7 +3,7 @@ from fs.tempfs import TempFS
 from openra.classes.file_location import FileLocation
 
 
-class FakeEngineProvider:
+class FakeEngineFileRepository:
 
     engine_exists:bool
     imported:list

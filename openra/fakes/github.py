@@ -8,6 +8,7 @@ class FakeGithub():
 
     def get_releases(self):
         return [
+            GithubRelease('playtest-7', datetime.now()),
             GithubRelease('playtest-6', datetime.now()),
             GithubRelease('release-5', datetime.now()),
             GithubRelease('playtest-4', datetime.now()),

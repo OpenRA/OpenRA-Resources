@@ -3,24 +3,23 @@ from unittest.mock import MagicMock, Mock
 from fs.memoryfs import MemoryFS
 
 from fs.tempfs import TempFS
-from openra.classes.exceptions import ExceptionBase
 from openra.classes.file_location import FileLocation
 from openra.services.docker import Docker
 
-from openra.services.engine_provider import EngineProvider, ExceptionEngineProviderGetPath
+from openra.services.engine_file_repository import EngineFileRepository, ExceptionEngineFileRepositoryGetPath
 
-class TestServiceEngineProvider(TestCase):
+class TestServiceEngineFileRepository(TestCase):
 
     def test_get_path_returns_engine_path(self):
         fs = TempFS()
         fs.makedirs('engines/ra/release123')
         fs.touch('engines/ra/release123/AppRun')
 
-        engine_provider = EngineProvider(
+        engine_file_repository = EngineFileRepository(
             data_fs=fs,
         )
 
-        location = engine_provider.get_path('ra', 'release123')
+        location = engine_file_repository.get_path('ra', 'release123')
 
         self.assertIsInstance(
             location,
@@ -40,11 +39,11 @@ class TestServiceEngineProvider(TestCase):
     def test_get_path_returns_none_where_no_engine_files(self):
         fs = TempFS()
 
-        engine_provider = EngineProvider(
+        engine_file_repository = EngineFileRepository(
             data_fs=fs
         )
 
-        location = engine_provider.get_path('ra', 'release123')
+        location = engine_file_repository.get_path('ra', 'release123')
 
         self.assertIsNone(
             location
@@ -57,14 +56,14 @@ class TestServiceEngineProvider(TestCase):
             side_effect = Exception()
         )
 
-        engine_provider = EngineProvider(
+        engine_file_repository = EngineFileRepository(
             data_fs=fs
         )
 
 
         self.assertRaises(
-            ExceptionEngineProviderGetPath,
-            engine_provider.get_path,
+            ExceptionEngineFileRepositoryGetPath,
+            engine_file_repository.get_path,
             'ra',
             'release123'
         )
@@ -79,7 +78,7 @@ class TestServiceEngineProvider(TestCase):
         fs.makedirs('engines/ra/version1')
         fs.touch('engines/ra/version1/AppRun')
 
-        engine_provider = EngineProvider(
+        engine_file_repository = EngineFileRepository(
             data_fs=fs,
             docker=docker_mock
         )
@@ -97,7 +96,7 @@ class TestServiceEngineProvider(TestCase):
             return_value=temp_fs_location
         )
 
-        location = engine_provider.import_appimage(
+        location = engine_file_repository.import_appimage(
             'ra',
             'version1',
             appimage_file
@@ -131,7 +130,7 @@ class TestServiceEngineProvider(TestCase):
 
         fs=TempFS()
 
-        engine_provider = EngineProvider(
+        engine_file_repository = EngineFileRepository(
             data_fs=fs,
             docker=docker_mock
         )
@@ -150,7 +149,7 @@ class TestServiceEngineProvider(TestCase):
             return_value=temp_fs_location
         )
 
-        location = engine_provider.import_appimage(
+        location = engine_file_repository.import_appimage(
             'ra',
             'version1',
             appimage_file
