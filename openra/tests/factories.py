@@ -143,3 +143,11 @@ class RatingFactory(factory.Factory):
     ex_name = ''
     rating = 0.0
     posted = timezone.now()
+
+class EngineFactory(factory.Factory):
+
+    class Meta:
+        model = models.Maps
+
+    game_mod = 'RA'
+    parser = factory.Faker('word')

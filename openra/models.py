@@ -151,3 +151,11 @@ class Rating(models.Model):
     ex_name             = models.CharField(max_length=16)
     rating              = models.FloatField(default=0.0)
     posted              = models.DateTimeField('date rated')
+
+class Engines(models.Model):
+
+    class Meta:
+        verbose_name_plural = 'Engines'
+
+    game_mod            = models.CharField(max_length=100)
+    version             = models.CharField(max_length=100)

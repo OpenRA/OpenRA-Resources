@@ -18,3 +18,4 @@ class TestFactories(TestCase):
         factories.ReportsFactory()
         factories.ScreenshotsFactory()
         factories.RatingFactory()
+        factories.EngineFactory()
