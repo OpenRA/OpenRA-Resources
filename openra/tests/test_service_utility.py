@@ -9,13 +9,14 @@ from fs.tempfs import TempFS
 from openra.classes.file_location import FileLocation
 from openra.containers import Container
 from openra.fakes.log import FakeLog
-from openra.services.docker import Docker
+from openra.services.docker import Docker, ExceptionDockerNonByteResponse
 from openra.services.log import Log
 from openra.services.utility import Utility
 from openra import container
 
 class TestServiceUtility(TestCase):
-    def test_map_hash_will_return_the_output_if_return_value_is_a_string(self):
+
+    def test_map_hash_will_run_map_hash_with_docker_and_pass_on_output(self):
         overrides = container.override_providers(
             log = Singleton(FakeLog)
         )
@@ -26,17 +27,21 @@ class TestServiceUtility(TestCase):
         )
         utility = Utility(docker_mock)
 
-        engine_path = '/engine/'
+        engine_location = FileLocation(
+            TempFS(),
+            '/engine/',
+            ''
+        )
         map_location = FileLocation(
             TempFS(),
             '/map/',
             'map.oramap'
         )
 
-        map_hash = utility.map_hash(engine_path, map_location)
+        map_hash = utility.map_hash(engine_location, map_location)
 
         docker_mock.run_utility_command.assert_called_once_with(
-            engine_path,
+            engine_location.get_os_dir(),
             '--map-hash "/map/' + map_location.file + '"',
             '/map/:' + map_location.get_os_dir()
         )
@@ -45,7 +50,6 @@ class TestServiceUtility(TestCase):
             'sample_hash',
             map_hash
         )
-
 
         log = container.log()
 
@@ -59,51 +63,6 @@ class TestServiceUtility(TestCase):
 
         self.assertTrue(
             log.contains('info', 'Success')
-        )
-
-        overrides.__exit__()
-
-    def test_map_hash_will_return_none_if_docker_returns_none(self):
-        overrides = container.override_providers(
-            log = Singleton(FakeLog)
-        )
-
-        docker_mock = Mock(spec=Docker)
-        docker_mock.run_utility_command = MagicMock(
-            return_value = None
-        )
-        utility = Utility(docker_mock)
-
-        engine_path = '/engine/'
-        map_location = FileLocation(
-            TempFS(),
-            '/map/',
-            'map.oramap'
-        )
-
-        result = utility.map_hash(engine_path, map_location)
-
-        docker_mock.run_utility_command.assert_called_once_with(
-            engine_path,
-            '--map-hash "/map/' + map_location.file + '"',
-            '/map/:' + map_location.get_os_dir()
-        )
-
-        self.assertEquals(
-            None,
-            result
-        )
-
-        log = container.log()
-
-        self.assertTrue(
-            log.contains('info', 'Getting hash for map: ' + 'map.oramap')
-        )
-        self.assertTrue(
-            log.contains('info', 'Map path: ' + map_location.get_os_dir())
-        )
-        self.assertTrue(
-            log.contains('info', 'Failed')
         )
 
         overrides.__exit__()

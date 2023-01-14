@@ -1,12 +1,12 @@
 import datetime
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock
 
 from django.utils import timezone
 from django.test import TestCase
 from django.core.management import call_command
-from django.utils.six import StringIO
 from django.contrib.auth import authenticate
 from openra.classes.exceptions import ExceptionBase
+from openra.fakes.log import FakeLog
 
 from openra.models import User, Maps
 from dependency_injector import providers
@@ -16,8 +16,7 @@ from openra.containers import Container
 from fs.memoryfs import MemoryFS
 from fs.base import FS
 from os import path
-
-from openra.services.docker import Docker, ExceptionDockerNonByteResponse
+from openra.services.docker import Docker
 
 class TestCommandSeedTestData(TestCase):
 
@@ -114,23 +113,36 @@ class TestCommandSeedTestData(TestCase):
 
 class TestTestDocker(TestCase):
 
-    @patch('builtins.print')
-    def test_it_runs_the_test_docker_command_and_prints_the_result_if_it_is_successful(self, print_mock):
+    def test_it_runs_the_test_docker_command_and_prints_the_result_if_it_is_successful(self):
+        overrides = container.override_providers(
+            log = providers.Singleton(FakeLog),
+        )
+
         docker_mock = Mock(spec=Docker)
         docker_mock.test_docker = MagicMock(
             return_value = 'sample'
         )
         container.docker.override(docker_mock)
 
-        call_command('testdocker')
+        call_command('test_docker')
 
         docker_mock.test_docker.assert_called_once_with()
-        print_mock.assert_called_with('sample')
+
+        self.assertTrue(
+            container.log().contains('info', 'sample')
+        )
+
+        overrides.__exit__()
 
     def test_it_runs_the_test_docker_command_and_prints_the_error_if_it_failed(self):
+        overrides = container.override_providers(
+            log = providers.Singleton(FakeLog),
+        )
 
         exception_mock = ExceptionBase
-        exception_mock.print_full_details = MagicMock()
+        exception_mock.get_full_details = MagicMock(
+            return_value = 'sample_output'
+        )
 
         docker_mock = Mock(spec=Docker)
         docker_mock.test_docker = MagicMock(
@@ -138,7 +150,12 @@ class TestTestDocker(TestCase):
         )
         container.docker.override(docker_mock)
 
-        call_command('testdocker')
+        call_command('test_docker')
 
         docker_mock.test_docker.assert_called_once_with()
-        exception_mock.print_full_details.assert_called_once()
+        self.assertTrue(
+            container.log().contains('exception', 'sample_output')
+        )
+
+        overrides.__exit__()
+
