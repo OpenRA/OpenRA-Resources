@@ -92,9 +92,9 @@ class Command(BaseCommand):
             file_downloader:FileDownloader=Provide['file_downloader']
         ):
         for engine in engines:
-            path = engine_file_repository.get_path(engine.mod, engine.version)
 
-            if path == None:
+            exists = engine_file_repository.exists(engine.mod, engine.version)
+            if not exists:
                 log().info('Downloading: ' + engine.mod + ' ' + engine.version)
                 appimage_download = file_downloader.download_file(engine.url, 'appImage')
 

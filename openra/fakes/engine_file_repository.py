@@ -1,6 +1,7 @@
 from fs.tempfs import TempFS
 
 from openra.classes.file_location import FileLocation
+from openra.services.engine_file_repository import ExceptionEngineFolderNotFound
 
 
 class FakeEngineFileRepository:
@@ -12,9 +13,12 @@ class FakeEngineFileRepository:
         self.imported = []
         self.engine_exists = False
 
+    def exists(self, mod:str, version:str):
+        return self.engine_exists
+
     def get_path(self, mod:str, version:str):
         if not self.engine_exists:
-            return None
+            raise ExceptionEngineFolderNotFound(TempFS(), mod, version, 'fake')
 
         temp_fs = TempFS()
         file = 'sample'
