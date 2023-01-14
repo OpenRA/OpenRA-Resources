@@ -1,5 +1,6 @@
 from dependency_injector.wiring import Provide, inject
 from django.core.management.base import BaseCommand
+from openra.classes.exceptions import ExceptionBase
 from openra.containers import Container
 from openra.services.docker import Docker
 
@@ -14,11 +15,9 @@ class Command(BaseCommand):
 
     @inject
     def _test_docker(self, docker:Docker=Provide[Container.docker]):
-        result = docker.test_docker()
-
-        if result.is_ok():
+        try:
             print('Success:')
-            print(result.unwrap())
-        else:
+            print(docker.test_docker())
+        except ExceptionBase as exception:
             print('Failed:')
-            print(result.unwrap_err().print_full_details())
+            exception.print_full_details()

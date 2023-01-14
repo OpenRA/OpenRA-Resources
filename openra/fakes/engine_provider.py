@@ -1,5 +1,4 @@
 from fs.tempfs import TempFS
-from result import Ok
 
 from openra.classes.file_location import FileLocation
 
@@ -15,16 +14,16 @@ class FakeEngineProvider:
 
     def get_path(self, mod:str, version:str):
         if not self.engine_exists:
-            return Ok(None)
+            return None
 
         temp_fs = TempFS()
         file = 'sample'
         temp_fs.touch(file)
-        return Ok(FileLocation(
+        return FileLocation(
             TempFS(),
             '',
             file
-        ))
+        )
 
 
     def import_appimage(self, mod:str, version:str, appimage_location:FileLocation):
@@ -36,8 +35,8 @@ class FakeEngineProvider:
         temp_fs = TempFS()
         file = 'sample'
         temp_fs.touch(file)
-        return Ok(FileLocation(
+        return FileLocation(
             TempFS(),
             '',
             file
-        ))
+        )

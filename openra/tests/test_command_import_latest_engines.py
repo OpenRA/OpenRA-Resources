@@ -9,7 +9,7 @@ from openra.fakes.file_downloader import FakeFileDownloader
 from openra.fakes.github import FakeGithub
 
 class TestImportLatestEngines(TestCase):
-    def test_it_will_import_engines(self):
+    def test_command_will_import_engines(self):
         fake_log = FakeLog()
         fake_github = FakeGithub()
         fake_engine_provider = FakeEngineProvider()
@@ -53,7 +53,7 @@ class TestImportLatestEngines(TestCase):
             fake_engine_provider.imported
         )
 
-    def test_it_can_be_set_to_import_up_to_x_releases_back_skipping_in_between_playtests(self):
+    def test_command_arg_can_be_set_to_number_of_releases_back_skipping_in_between_playtests(self):
         fake_log = FakeLog()
         fake_github = FakeGithub()
         fake_github.only_ra_asset = True

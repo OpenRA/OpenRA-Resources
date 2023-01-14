@@ -2,9 +2,8 @@ from os import path
 from django.conf import settings
 import re
 from docker.client import DockerClient
-from result import Ok, Err
 
-from openra.classes.errors import ErrorBase
+from openra.classes.exceptions import ExceptionBase
 
 class Docker:
 
@@ -21,7 +20,7 @@ class Docker:
     def extract_appimage(self, app_image_path:str, to_dir:str):
         pattern = re.compile('^[A-z0-9\-\/\.\_]+$')
         if not pattern.match(app_image_path):
-            return Err(ErrorDockerIncompatibleAppImagePath(app_image_path, to_dir))
+            raise ExceptionDockerIncompatibleAppImagePath(app_image_path, to_dir)
 
         return self._docker_run(
             'bash -c "cp /in/AppImage . && '
@@ -53,14 +52,12 @@ class Docker:
                 volumes=volumes,
                 working_dir=working_dir
             )
-            if isinstance(output, bytes):
-                return Ok(str(output.decode('UTF-8')))
-            else:
-                return Err(ErrorDockerNonByteResponse(output, command, volumes, working_dir))
         except Exception as exception:
-            return Err(ErrorDockerExceptionResponse(exception, command, volumes, working_dir))
-
-
+            raise ExceptionDockerExceptionResponse(exception, command, volumes, working_dir)
+        if isinstance(output, bytes):
+            return str(output.decode('UTF-8'))
+        else:
+            raise ExceptionDockerNonByteResponse(output, command, volumes, working_dir)
 
     def _get_docker_image(self, client):
         image_path = path.join(settings.BASE_DIR, 'openra', 'resources', 'docker')
@@ -70,7 +67,7 @@ class Docker:
         except:
             return client.images.build(path=image_path, tag=settings.DOCKER_IMAGE_TAG)[0]
 
-class ErrorDockerIncompatibleAppImagePath(ErrorBase):
+class ExceptionDockerIncompatibleAppImagePath(ExceptionBase):
     def __init__(self, appimage_path, to_dir):
         super().__init__()
         self.message = "Incompatible AppImage path provided"
@@ -78,7 +75,7 @@ class ErrorDockerIncompatibleAppImagePath(ErrorBase):
         self.detail.append('path: ' + appimage_path)
         self.detail.append('extracting to: ' + to_dir)
 
-class ErrorDockerNonByteResponse(ErrorBase):
+class ExceptionDockerNonByteResponse(ExceptionBase):
 
     def __init__(self, output, command:str, volumes:list, working_dir:str):
         super().__init__()
@@ -92,7 +89,7 @@ class ErrorDockerNonByteResponse(ErrorBase):
         self.detail.append('working_dir: ' + working_dir)
         self.detail.append('output type: ' + str(type(output)))
 
-class ErrorDockerExceptionResponse(ErrorBase):
+class ExceptionDockerExceptionResponse(ExceptionBase):
     def __init__(self, exception, command:str, volumes:list, working_dir:str):
         super().__init__()
         self.message = "Docker threw an exception"

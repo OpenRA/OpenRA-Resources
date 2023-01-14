@@ -1,10 +1,9 @@
-from datetime import date, datetime
+from datetime import datetime
 from typing import List, Type
 from dependency_injector.wiring import Provide, inject
 from github import Github as GithubClient
-from result import Err, Ok
 from openra import settings
-from openra.classes.errors import ErrorBase
+from openra.classes.exceptions import ExceptionBase
 
 class Github():
 
@@ -24,9 +23,9 @@ class Github():
                     release.published_at,
                 ))
 
-            return Ok(releases)
+            return releases
         except Exception as exception:
-            return Err(ErrorGithubReleaseException(exception))
+            raise ExceptionGithubReleaseException(exception)
 
 
 
@@ -40,9 +39,9 @@ class Github():
                     asset.browser_download_url
                 ))
 
-            return Ok(assets)
+            return assets
         except Exception as exception:
-            return Err(ErrorGithubReleaseAssetsException(exception, tag))
+            raise ExceptionGithubReleaseAssetsException(exception, tag)
 
     def _get_repo(self):
         if self._repo == None:
@@ -69,13 +68,13 @@ class GithubReleaseAsset:
         self.url = url
 
 
-class ErrorGithubReleaseException(ErrorBase):
+class ExceptionGithubReleaseException(ExceptionBase):
     def __init__(self, exception):
         super().__init__()
         self.message = "Github threw an exception while looking up available releases"
         self.detail.append('message: ' + str(exception))
 
-class ErrorGithubReleaseAssetsException(ErrorBase):
+class ExceptionGithubReleaseAssetsException(ExceptionBase):
     def __init__(self, exception, release:str):
         super().__init__()
         self.message = "Github threw an exception while looking up assets for a release"

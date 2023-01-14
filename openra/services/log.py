@@ -1,6 +1,6 @@
 from django.utils.timezone import datetime
 
-from openra.classes.errors import ErrorBase
+from openra.classes.exceptions import ExceptionBase
 
 class Log:
 
@@ -13,8 +13,8 @@ class Log:
     def error(self, message:str):
         self._add_log('error', message)
 
-    def error_obj(self, error:ErrorBase):
-        self._add_log('error', error.get_full_details())
+    def exception_obj(self, exception:ExceptionBase):
+        self._add_log('exception', exception.get_full_details())
 
     def _add_log(self, log_type, message):
         print(

@@ -1,8 +1,8 @@
+from openra.classes.exceptions import ExceptionBase
 from openra.facades import log
 from typing import List
 from dependency_injector.wiring import Provide, inject
 from django.core.management.base import BaseCommand
-from result import Err, Ok
 from openra.containers import Container
 import re
 from openra.services.engine_provider import EngineProvider
@@ -18,49 +18,38 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        release_count = options['release_count']
-        log().info("Checking github for the last {} release(s)".format(release_count))
-        engines_result = self._get_latest_engines(release_count)
-        if isinstance(engines_result, Err):
-            log().error_obj(engines_result.unwrap_err())
-            return
+        try:
+            release_count = options['release_count']
+            log().info("Checking github for the last {} release(s)".format(release_count))
+            engines = self._get_latest_engines(release_count)
 
-        log().info('The following engines were discovered on github')
-        for engine in engines_result.unwrap():
-            log().info(engine.mod + ' ' + engine.version + ' ' + engine.url)
+            log().info('The following engines were discovered on github')
+            for engine in engines:
+                log().info(engine.mod + ' ' + engine.version + ' ' + engine.url)
 
-        download_result = self._download_engines(engines_result.unwrap())
-        if isinstance(download_result, Err):
-            log().error_obj(download_result.unwrap_err())
-            return
+            self._download_engines(engines)
 
-        log().info('Complete')
+            log().info('Complete')
+        except ExceptionBase as exception:
+            log().info('Complete')
+            log.exception_obj(exception)
 
     @inject
     def _get_latest_engines(self, release_count=1, github:Github=Provide[Container.github]):
         playtest_regex = re.compile('^playtest-')
-
-        releases_result = github.get_releases()
-        if isinstance(releases_result, Err):
-            return releases_result
-
         engines:List[EngineInfo] = []
         release_added = False
 
-        for release in releases_result.unwrap():
+        for release in github.get_releases():
             tag = release.tag
-            playtest = playtest_regex.match(tag)
+            is_playtest = playtest_regex.match(tag)
 
-            if playtest and release_added:
+            if is_playtest and release_added:
                 continue
 
-            engines_result = self._get_release_engines(tag, github)
-            if isinstance(engines_result, Err):
-                return engines_result
+            engines += self._get_release_engines(tag, github)
 
-            engines += engines_result.unwrap()
-
-            if playtest:
+            if is_playtest:
                 continue
 
             release_count -= 1
@@ -70,14 +59,9 @@ class Command(BaseCommand):
             else:
                 release_added = True
 
-        return Ok(engines)
+        return engines
 
     def _get_release_engines(self, tag, github:Github):
-        assets_result = github.get_release_assets(
-            tag
-        )
-        if isinstance(assets_result, Err):
-            return assets_result
 
         mod_regex = [{
             'mod': 'ra',
@@ -92,7 +76,7 @@ class Command(BaseCommand):
 
         engines:List[EngineInfo] = []
 
-        for asset in assets_result.unwrap():
+        for asset in github.get_release_assets(tag):
             for mod in mod_regex:
                 if mod['regex'].match(asset.name):
                     engines.append(
@@ -103,7 +87,7 @@ class Command(BaseCommand):
                         )
                     )
 
-        return Ok(engines)
+        return engines
 
     @inject
     def _download_engines(self, engines,
@@ -111,25 +95,16 @@ class Command(BaseCommand):
             file_downloader:FileDownloader=Provide['file_downloader']
         ):
         for engine in engines:
-            path_result = engine_provider.get_path(engine.mod, engine.version)
-            if isinstance(path_result, Err):
-                return path_result
+            path = engine_provider.get_path(engine.mod, engine.version)
 
-            if path_result.unwrap() == None:
+            if path == None:
                 log().info('Downloading: ' + engine.mod + ' ' + engine.version)
-                appimage_download_result = file_downloader.download_file(engine.url, 'appImage')
-
-                if isinstance(appimage_download_result, Err):
-                    return appimage_download_result
+                appimage_download = file_downloader.download_file(engine.url, 'appImage')
 
                 log().info('Importing: ' + engine.mod + ' ' + engine.version)
-                import_result = engine_provider.import_appimage(engine.mod, engine.version, appimage_download_result.unwrap())
-
-                if isinstance(import_result, Err):
-                    return import_result
+                engine_provider.import_appimage(engine.mod, engine.version, appimage_download)
             else:
                 log().info('Engine already exists: ' + engine.mod + ' ' + engine.version)
-        return Ok()
 
 class EngineInfo:
 

@@ -1,12 +1,12 @@
 from unittest import TestCase
 from unittest.mock import  Mock, MagicMock
 
-from openra.services.docker import Docker, ErrorDockerExceptionResponse, ErrorDockerIncompatibleAppImagePath, ErrorDockerNonByteResponse
+from openra.services.docker import Docker, ExceptionDockerExceptionResponse, ExceptionDockerIncompatibleAppImagePath, ExceptionDockerNonByteResponse
 from os import path
 from django.conf import settings
 
 class TestServiceDocker(TestCase):
-    def test_that_test_docker_will_pass_the_correct_parameters(self):
+    def test_that_test_docker_calls_lib_correctly_and_returns_output(self):
         client_mock = Mock()
         client_mock.containers = Mock()
         client_mock.images = Mock()
@@ -21,7 +21,7 @@ class TestServiceDocker(TestCase):
 
         self.assertEquals(
             'mock_return',
-            docker.test_docker().unwrap()
+            docker.test_docker()
         )
 
         client_mock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
@@ -33,7 +33,7 @@ class TestServiceDocker(TestCase):
             working_dir='/',
         )
 
-    def test_extract_appimage_will_pass_the_correct_parameters(self):
+    def test_extract_appimage_calls_lib_correctly_and_returns_output(self):
         client_mock = Mock()
         client_mock.containers = Mock()
         client_mock.images = Mock()
@@ -51,7 +51,7 @@ class TestServiceDocker(TestCase):
             docker.extract_appimage(
                 '/sample/image.AppImage',
                 '/extract/to/location',
-            ).unwrap()
+            )
         )
 
         client_mock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
@@ -70,7 +70,7 @@ class TestServiceDocker(TestCase):
             working_dir="/out",
         )
 
-    def test_extract_appimage_will_allow_acceptable_filenames(self):
+    def test_extract_appimage_allows_acceptable_filenames(self):
         client_mock = Mock()
 
         docker = Docker(client_mock)
@@ -89,25 +89,58 @@ class TestServiceDocker(TestCase):
             docker.extract_appimage(
                 '/tmp/tmpkuld_787__tempfs__/appImage',
                 '/extract/to/location',
-            ).unwrap()
+            )
         )
 
-    def test_extract_appimage_will_throw_exception_if_an_incompatible_filename_is_used(self):
+    def test_extract_appimage_throws_exception_when_incompatible_filename_provided(self):
         client_mock = Mock()
 
         docker = Docker(client_mock)
 
-        output = docker.extract_appimage(
+        self.assertRaises(
+            ExceptionDockerIncompatibleAppImagePath,
+            docker.extract_appimage,
             '/sample/im age.App_image',
             '/extract/to/location'
         )
 
-        self.assertIsInstance(
-            output.unwrap_err(),
-            ErrorDockerIncompatibleAppImagePath
+    def test_it_throws_exception_when_output_from_lib_is_non_byte(self):
+        client_mock = Mock()
+        client_mock.containers = Mock()
+        client_mock.images = Mock()
+        client_mock.images.get = MagicMock(
+            return_value ='fake_image'
+        )
+        client_mock.containers.run = MagicMock(
+            return_value = 'non byte response'
         )
 
-    def test_run_utility_command_will_pass_the_correct_parameters(self):
+        docker = Docker(client_mock)
+
+        self.assertRaises(
+            ExceptionDockerNonByteResponse,
+            docker.test_docker
+        )
+
+    def test_it_throws_exception_when_client_containers_run_throws_exception(self):
+        client_mock = Mock()
+        client_mock.containers = Mock()
+        client_mock.images = Mock()
+        client_mock.images.get = MagicMock(
+            return_value ='fake_image'
+        )
+        client_mock.containers.run = MagicMock(
+            side_effect = Exception()
+        )
+
+        docker = Docker(client_mock)
+
+        self.assertRaises(
+            ExceptionDockerExceptionResponse,
+            docker.test_docker
+        )
+
+    def test_run_utility_command_calls_lib_correctly_and_returns_output(self):
         client_mock = Mock()
         client_mock.containers = Mock()
         client_mock.images = Mock()
@@ -131,7 +164,7 @@ class TestServiceDocker(TestCase):
                 [
                     'src/icons:icons'
                 ]
-            ).unwrap()
+            )
         )
 
         client_mock.images.get.assert_called_once_with(settings.DOCKER_IMAGE_TAG)
