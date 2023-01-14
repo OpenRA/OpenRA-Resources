@@ -5,7 +5,7 @@ from dependency_injector.wiring import Provide, inject
 from django.core.management.base import BaseCommand
 from openra.containers import Container
 import re
-from openra.services.engine_provider import EngineProvider
+from openra.services.engine_file_repository import EngineFileRepository
 from openra.services.file_downloader import FileDownloader
 
 from openra.services.github import Github
@@ -38,13 +38,12 @@ class Command(BaseCommand):
     def _get_latest_engines(self, release_count=1, github:Github=Provide[Container.github]):
         playtest_regex = re.compile('^playtest-')
         engines:List[EngineInfo] = []
-        release_added = False
 
         for release in github.get_releases():
             tag = release.tag
             is_playtest = playtest_regex.match(tag)
 
-            if is_playtest and release_added:
+            if is_playtest and len(engines) > 0:
                 continue
 
             engines += self._get_release_engines(tag, github)
@@ -56,8 +55,6 @@ class Command(BaseCommand):
 
             if release_count == 0:
                 break
-            else:
-                release_added = True
 
         return engines
 
@@ -91,18 +88,18 @@ class Command(BaseCommand):
 
     @inject
     def _download_engines(self, engines,
-            engine_provider:EngineProvider=Provide['engine_provider'],
+            engine_file_repository:EngineFileRepository=Provide['engine_file_repository'],
             file_downloader:FileDownloader=Provide['file_downloader']
         ):
         for engine in engines:
-            path = engine_provider.get_path(engine.mod, engine.version)
+            path = engine_file_repository.get_path(engine.mod, engine.version)
 
             if path == None:
                 log().info('Downloading: ' + engine.mod + ' ' + engine.version)
                 appimage_download = file_downloader.download_file(engine.url, 'appImage')
 
                 log().info('Importing: ' + engine.mod + ' ' + engine.version)
-                engine_provider.import_appimage(engine.mod, engine.version, appimage_download)
+                engine_file_repository.import_appimage(engine.mod, engine.version, appimage_download)
             else:
                 log().info('Engine already exists: ' + engine.mod + ' ' + engine.version)
 

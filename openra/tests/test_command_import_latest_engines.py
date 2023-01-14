@@ -5,8 +5,8 @@ from dependency_injector.wiring import providers
 from django.core.management import call_command
 
 from openra import container
+from openra.fakes.engine_file_repository import FakeEngineFileRepository
 from openra.fakes.log import FakeLog
-from openra.fakes.engine_provider import FakeEngineProvider
 from openra.fakes.file_downloader import FakeFileDownloader
 from openra.fakes.github import FakeGithub
 
@@ -15,7 +15,7 @@ class TestImportLatestEngines(TestCase):
         overrides = container.override_providers(
             log = Singleton(FakeLog),
             github = Singleton(FakeGithub),
-            engine_provider = Singleton(FakeEngineProvider),
+            engine_file_repository = Singleton(FakeEngineFileRepository),
             file_downloader = Singleton(FakeFileDownloader)
         )
 
@@ -24,13 +24,13 @@ class TestImportLatestEngines(TestCase):
         self.assertEqual([
             {
                 'mod': 'ra',
-                'version': 'playtest-6'
+                'version': 'playtest-7'
             },{
                 'mod': 'td',
-                'version': 'playtest-6'
+                'version': 'playtest-7'
             },{
                 'mod': 'd2k',
-                'version': 'playtest-6'
+                'version': 'playtest-7'
             },{
                 'mod': 'ra',
                 'version': 'release-5'
@@ -42,16 +42,16 @@ class TestImportLatestEngines(TestCase):
                 'version': 'release-5'
 
             }],
-            container.engine_provider().imported
+            container.engine_file_repository().imported
         )
 
         overrides.__exit__()
 
-    def test_command_arg_can_be_set_to_number_of_releases_back_skipping_in_between_playtests(self):
+    def test_command_arg_can_be_set_to_number_of_releases_back(self):
         overrides = container.override_providers(
             log = Singleton(FakeLog),
             github = Singleton(FakeGithub),
-            engine_provider = Singleton(FakeEngineProvider),
+            engine_file_repository = Singleton(FakeEngineFileRepository),
             file_downloader = Singleton(FakeFileDownloader)
         )
 
@@ -62,7 +62,7 @@ class TestImportLatestEngines(TestCase):
         self.assertEqual([
             {
                 'mod': 'ra',
-                'version': 'playtest-6'
+                'version': 'playtest-7'
             },{
                 'mod': 'ra',
                 'version': 'release-5'
@@ -70,7 +70,7 @@ class TestImportLatestEngines(TestCase):
                 'mod': 'ra',
                 'version': 'release-3'
             }],
-            container.engine_provider().imported
+            container.engine_file_repository().imported
         )
 
         overrides.__exit__()
