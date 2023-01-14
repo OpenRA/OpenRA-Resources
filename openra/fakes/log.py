@@ -2,26 +2,22 @@ from dependency_injector.wiring import providers
 from openra import container
 from openra.classes.exceptions import ExceptionBase
 
-
-def register():
-    container.log.override(providers.Singleton(
-        FakeLog
-    ))
-
-entries = []
-
-def contains(log_type, message):
-    global entries
-    for entry in entries:
-        if entry['log_type'] == log_type and entry['message'] == message:
-            return True
-    return False
-
-def clear():
-    global entries
-    entries = []
-
 class FakeLog:
+
+    entries:list
+
+    def __init__(self):
+        self.entries = []
+
+    def contains(self, log_type, message):
+        for entry in self.entries:
+            if entry['log_type'] == log_type and entry['message'] == message:
+                return True
+        return False
+
+    def clear(self):
+        self.entries = []
+
     def info(self, message:str):
         self._add_log('info', message)
 
@@ -35,7 +31,7 @@ class FakeLog:
         self._add_log('exception', exception.get_full_details())
 
     def _add_log(self, log_type, message):
-        entries.append({
+        self.entries.append({
             'log_type':log_type,
             'message':message
         })

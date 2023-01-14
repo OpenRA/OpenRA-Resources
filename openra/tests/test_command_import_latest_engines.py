@@ -1,4 +1,6 @@
 from unittest import TestCase
+from dependency_injector.providers import Singleton
+from dependency_injector.wiring import providers
 
 from django.core.management import call_command
 
@@ -10,23 +12,13 @@ from openra.fakes.github import FakeGithub
 
 class TestImportLatestEngines(TestCase):
     def test_command_will_import_engines(self):
-        fake_log = FakeLog()
-        fake_github = FakeGithub()
-        fake_engine_provider = FakeEngineProvider()
-        fake_file_downloader = FakeFileDownloader()
-        container.log.override(
-            fake_log
+        overrides = container.override_providers(
+            log = Singleton(FakeLog),
+            github = Singleton(FakeGithub),
+            engine_provider = Singleton(FakeEngineProvider),
+            file_downloader = Singleton(FakeFileDownloader)
         )
-        container.github.override(
-            fake_github
-        )
-        container.engine_provider.reset_override()
-        container.engine_provider.override(
-            fake_engine_provider
-        )
-        container.file_downloader.override(
-            fake_file_downloader
-        )
+
         call_command('import_latest_engines')
 
         self.assertEqual([
@@ -50,27 +42,21 @@ class TestImportLatestEngines(TestCase):
                 'version': 'release-5'
 
             }],
-            fake_engine_provider.imported
+            container.engine_provider().imported
         )
 
+        overrides.__exit__()
+
     def test_command_arg_can_be_set_to_number_of_releases_back_skipping_in_between_playtests(self):
-        fake_log = FakeLog()
-        fake_github = FakeGithub()
-        fake_github.only_ra_asset = True
-        fake_engine_provider = FakeEngineProvider()
-        fake_file_downloader = FakeFileDownloader()
-        container.log.override(
-            fake_log
+        overrides = container.override_providers(
+            log = Singleton(FakeLog),
+            github = Singleton(FakeGithub),
+            engine_provider = Singleton(FakeEngineProvider),
+            file_downloader = Singleton(FakeFileDownloader)
         )
-        container.github.override(
-            fake_github
-        )
-        container.engine_provider.override(
-            fake_engine_provider
-        )
-        container.file_downloader.override(
-            fake_file_downloader
-        )
+
+        container.github().only_ra_asset = True
+
         call_command('import_latest_engines', '2')
 
         self.assertEqual([
@@ -84,5 +70,7 @@ class TestImportLatestEngines(TestCase):
                 'mod': 'ra',
                 'version': 'release-3'
             }],
-            fake_engine_provider.imported
+            container.engine_provider().imported
         )
+
+        overrides.__exit__()
