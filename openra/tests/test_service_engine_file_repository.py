@@ -6,9 +6,32 @@ from fs.tempfs import TempFS
 from openra.classes.file_location import FileLocation
 from openra.services.docker import Docker
 
-from openra.services.engine_file_repository import EngineFileRepository, ExceptionEngineFileRepositoryGetPath
+from openra.services.engine_file_repository import EngineFileRepository, ExceptionEngineAppRunNotFound, ExceptionEngineFolderNotFound
 
 class TestServiceEngineFileRepository(TestCase):
+
+    def test_exists_returns_whether_engine_exists(self):
+        fs = TempFS()
+
+        engine_file_repository = EngineFileRepository(
+            data_fs=fs,
+        )
+
+        self.assertFalse(
+            engine_file_repository.exists('ra', 'release123')
+        )
+
+        fs.makedirs('engines/ra/release123')
+
+        self.assertFalse(
+            engine_file_repository.exists('ra', 'release123')
+        )
+
+        fs.touch('engines/ra/release123/AppRun')
+
+        self.assertTrue(
+            engine_file_repository.exists('ra', 'release123')
+        )
 
     def test_get_path_returns_engine_path(self):
         fs = TempFS()
@@ -36,37 +59,35 @@ class TestServiceEngineFileRepository(TestCase):
             'engines/ra/release123',
         )
 
-    def test_get_path_returns_none_where_no_engine_files(self):
+    def test_get_path_throws_exception_when_folder_doesnt_exist(self):
         fs = TempFS()
 
         engine_file_repository = EngineFileRepository(
             data_fs=fs
         )
 
-        location = engine_file_repository.get_path('ra', 'release123')
-
-        self.assertIsNone(
-            location
+        self.assertRaises(
+            ExceptionEngineFolderNotFound,
+            engine_file_repository.get_path,
+            'ra',
+            'release123'
         )
 
-    def test_get_path_throws_exception_when_exception_caught(self):
-        fs = Mock(spec=TempFS)
-
-        fs.exists = MagicMock(
-            side_effect = Exception()
-        )
+    def test_get_path_throws_exception_when_apprun_doesnt_exist(self):
+        fs = TempFS()
+        fs.makedirs('engines/ra/release123')
 
         engine_file_repository = EngineFileRepository(
             data_fs=fs
         )
 
-
         self.assertRaises(
-            ExceptionEngineFileRepositoryGetPath,
+            ExceptionEngineAppRunNotFound,
             engine_file_repository.get_path,
             'ra',
             'release123'
         )
+
 
     def test_import_appimage_imports_appimage(self):
         docker_mock = Mock(spec=Docker)
@@ -122,7 +143,7 @@ class TestServiceEngineFileRepository(TestCase):
             'engines/ra/version1',
         )
 
-    def test_import_appimage_will_return_none_if_get_path_returns_none(self):
+    def test_import_appimage_throws_exception_if_engine_doesnt_exist_after_import(self):
         docker_mock = Mock(spec=Docker)
         docker_mock.extract_appimage = MagicMock(
             return_value = 'sample_output'
@@ -149,7 +170,9 @@ class TestServiceEngineFileRepository(TestCase):
             return_value=temp_fs_location
         )
 
-        location = engine_file_repository.import_appimage(
+        self.assertRaises(
+            ExceptionEngineAppRunNotFound,
+            engine_file_repository.import_appimage,
             'ra',
             'version1',
             appimage_file
@@ -158,9 +181,5 @@ class TestServiceEngineFileRepository(TestCase):
         docker_mock.extract_appimage.assert_called_once_with(
             temp_fs_location.get_os_path(),
             fs.getospath('engines/ra/version1').decode('utf-8')
-        )
-
-        self.assertIsNone(
-            location
         )
 

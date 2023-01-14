@@ -5,7 +5,7 @@ from os import path
 import docker
 from openra.services.docker import Docker
 from github import Github as GithubClient
-from openra.services.engine_provider import EngineProvider
+from openra.services.engine_file_repository import EngineFileRepository
 from openra.services.file_downloader import FileDownloader
 from openra.services.github import Github
 from openra.services.log import Log
@@ -37,8 +37,8 @@ class Container(containers.DeclarativeContainer):
         )
     )
 
-    engine_provider = providers.Singleton(
-        EngineProvider
+    engine_file_repository = providers.Singleton(
+        EngineFileRepository
     )
 
     file_downloader = providers.Singleton(

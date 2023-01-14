@@ -14,5 +14,5 @@ class OpenraConfig(AppConfig):
             ".management.commands.testdocker",
             ".management.commands.import_latest_engines",
             ".facades",
-            '.services.engine_provider'
+            '.services.engine_file_repository'
         ])
