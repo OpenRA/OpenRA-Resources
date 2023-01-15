@@ -8,5 +8,6 @@ auth = {
 titles = {
     'home':'',
     'login':'Sign In',
+    'logout':'OpenRA Resource Center - Sign Out',
 
 }
