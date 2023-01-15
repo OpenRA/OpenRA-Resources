@@ -1,4 +1,5 @@
 from openra.classes.exceptions import ExceptionBase
+from openra.classes.release import Release
 from openra.facades import log
 from typing import List
 from dependency_injector.wiring import Provide, inject
@@ -26,7 +27,7 @@ class Command(BaseCommand):
 
             log().info('The following engines were discovered on github')
             for engine in engines:
-                log().info(engine.mod + ' ' + engine.version + ' ' + engine.url)
+                log().info(str(engine.release) + ' ' + engine.url)
 
             self._download_engines(engines)
 
@@ -79,8 +80,7 @@ class Command(BaseCommand):
                 if mod['regex'].match(asset.name):
                     engines.append(
                         EngineInfo(
-                            mod['mod'],
-                            tag,
+                            Release(mod['mod'], tag),
                             asset.url
                         )
                     )
@@ -94,33 +94,31 @@ class Command(BaseCommand):
         ):
         for engine in engines:
 
-            if not engine_file_repository.exists(engine.mod, engine.version):
-                log().info('Downloading: ' + engine.mod + ' ' + engine.version)
+            if not engine_file_repository.exists(engine.release):
+                log().info('Downloading: ' + str(engine.release))
                 appimage_download = file_downloader.download_file(engine.url, 'appImage')
 
-                log().info('Importing: ' + engine.mod + ' ' + engine.version)
-                engine_file_repository.import_appimage(engine.mod, engine.version, appimage_download)
+                log().info('Importing: ' + str(engine.release))
+                engine_file_repository.import_appimage(engine.release, appimage_download)
 
             if not Engines.objects.filter(
-                    game_mod=engine.mod,
-                    version=engine.version
+                    game_mod=engine.release.mod,
+                    version=engine.release.version
                 ).exists():
-                log().info('Adding to database: ' + engine.mod + ' ' + engine.version)
+                log().info('Adding to database: ' + str(engine.release))
                 model = Engines(
-                    game_mod=engine.mod,
-                    version=engine.version
+                    game_mod=engine.release.mod,
+                    version=engine.release.version
                 )
                 model.save()
 
 class EngineInfo:
 
-    mod:str
-    version:str
+    release:Release
     url:str
 
-    def __init__(self, mod, version, url):
-        self.mod = mod
-        self.version = version
+    def __init__(self, release:Release, url:str):
+        self.release = release
         self.url = url
 
 

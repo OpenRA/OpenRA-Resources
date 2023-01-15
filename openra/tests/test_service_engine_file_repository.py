@@ -4,6 +4,7 @@ from fs.memoryfs import MemoryFS
 
 from fs.tempfs import TempFS
 from openra.classes.file_location import FileLocation
+from openra.classes.release import Release
 from openra.services.docker import Docker
 
 from openra.services.engine_file_repository import EngineFileRepository, ExceptionEngineAppRunNotFound, ExceptionEngineFolderNotFound
@@ -17,20 +18,22 @@ class TestServiceEngineFileRepository(TestCase):
             data_fs=fs,
         )
 
+        release = Release('ra', 'release123')
+
         self.assertFalse(
-            engine_file_repository.exists('ra', 'release123')
+            engine_file_repository.exists(release)
         )
 
         fs.makedirs('engines/ra/release123')
 
         self.assertFalse(
-            engine_file_repository.exists('ra', 'release123')
+            engine_file_repository.exists(release)
         )
 
         fs.touch('engines/ra/release123/AppRun')
 
         self.assertTrue(
-            engine_file_repository.exists('ra', 'release123')
+            engine_file_repository.exists(release)
         )
 
     def test_get_path_returns_engine_path(self):
@@ -42,7 +45,9 @@ class TestServiceEngineFileRepository(TestCase):
             data_fs=fs,
         )
 
-        location = engine_file_repository.get_path('ra', 'release123')
+        release = Release('ra', 'release123')
+
+        location = engine_file_repository.get_path(release)
 
         self.assertIsInstance(
             location,
@@ -69,8 +74,7 @@ class TestServiceEngineFileRepository(TestCase):
         self.assertRaises(
             ExceptionEngineFolderNotFound,
             engine_file_repository.get_path,
-            'ra',
-            'release123'
+            Release('ra', 'release123')
         )
 
     def test_get_path_throws_exception_when_apprun_doesnt_exist(self):
@@ -84,8 +88,7 @@ class TestServiceEngineFileRepository(TestCase):
         self.assertRaises(
             ExceptionEngineAppRunNotFound,
             engine_file_repository.get_path,
-            'ra',
-            'release123'
+            Release('ra', 'release123')
         )
 
 
@@ -118,8 +121,7 @@ class TestServiceEngineFileRepository(TestCase):
         )
 
         location = engine_file_repository.import_appimage(
-            'ra',
-            'version1',
+            Release('ra', 'version1'),
             appimage_file
         )
 
@@ -173,8 +175,7 @@ class TestServiceEngineFileRepository(TestCase):
         self.assertRaises(
             ExceptionEngineAppRunNotFound,
             engine_file_repository.import_appimage,
-            'ra',
-            'version1',
+            Release('ra', 'version1'),
             appimage_file
         )
 

@@ -160,6 +160,8 @@ class TestTestDocker(TestCase):
 
         overrides.__exit__()
 
+class TestTestUtility(TestCase):
+
     def test_test_utility_runs_each_of_the_utility_command_and_prints_the_response(self):
         engine = EngineFactory()
         engine.save()
