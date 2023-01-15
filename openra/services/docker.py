@@ -35,13 +35,18 @@ class Docker:
         )
 
     def run_utility_command(self, engine_path, command, additional_volumes=[]):
-        return self._docker_run(
+        output = self._docker_run(
             '/engine/AppRun --utility ' + command,
             volumes=[
                 engine_path+':/engine',
             ]+additional_volumes,
             working_dir='/build',
         )
+
+        return self._filter_utility_warning(output)
+
+    def _filter_utility_warning(self, output:str):
+        return re.sub('^WARNING: Unable to sync system certificate store - https requests will fail\n', '', output)
 
     def _docker_run(self, command:str, volumes:list=[], working_dir='/'):
         try:

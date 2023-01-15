@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.files import File
 
-from openra.models import Maps
 from openra.handlers import process_upload
 
 class Command(BaseCommand):

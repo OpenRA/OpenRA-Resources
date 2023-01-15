@@ -17,6 +17,7 @@ from fs.memoryfs import MemoryFS
 from fs.base import FS
 from os import path
 from openra.services.docker import Docker
+from openra.tests.factories import EngineFactory, MapsFactory
 
 class TestCommandSeedTestData(TestCase):
 
@@ -158,4 +159,13 @@ class TestTestDocker(TestCase):
         )
 
         overrides.__exit__()
+
+    def test_test_utility_runs_each_of_the_utility_command_and_prints_the_response(self):
+        engine = EngineFactory()
+        engine.save()
+        map = MapsFactory(
+            game_mod = engine.game_mod
+        )
+        map.save()
+        call_command('test_utility')
 
