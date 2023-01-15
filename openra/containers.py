@@ -10,6 +10,7 @@ from openra.services.file_downloader import FileDownloader
 from openra.services.github import Github
 from openra.services.log import Log
 from openra.services.map_file_repository import MapFileRepository
+from openra.services.map_search import MapSearch
 from openra.services.utility import Utility
 
 class Container(containers.DeclarativeContainer):
@@ -54,3 +55,10 @@ class Container(containers.DeclarativeContainer):
     utility = providers.Singleton(
         Utility
     )
+
+    map_search = providers.Singleton(
+        MapSearch
+    )
+
+container = Container()
+container.config.from_dict(settings.__dict__)

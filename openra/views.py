@@ -8,6 +8,8 @@ import cgi
 import base64
 from urllib.parse import urlencode
 import urllib.request
+from dependency_injector.wiring import Provide, inject
+#from dependency_injector.wiring import Provide, inject
 
 from django.conf import settings
 from django.http import StreamingHttpResponse
@@ -23,6 +25,7 @@ from allauth.socialaccount.models import SocialAccount
 from openra import content, handlers, misc
 from openra.auth import ExceptionLoginFailed, set_session_to_remember_auth, try_login
 from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments
+from openra.services.map_search import MapSearch
 
 # TODO: Fix the code and reenable some of these warnings
 # pylint: disable=invalid-name
@@ -41,8 +44,6 @@ def standard_view(request, template, template_args):
     )
 
 def index(request):
-    scObject = Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
-
     return standard_view(
         request,
         'index.html',
@@ -50,7 +51,7 @@ def index(request):
             'content': 'index_content.html',
             'request': request,
             'title': content.titles['home'],
-            'screenshots': scObject,
+            'screenshots': Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
         }
     )
 
@@ -103,22 +104,24 @@ def logoutView(request):
     )
 
 def feed(request):
-    mapObject = Maps.objects.order_by("-posted")[0:20]
-    d = datetime.datetime.utcnow()
-    lastBuildDate = d.isoformat("T")
     template = loader.get_template('feed.html')
-    template_args = {
-        'request': request,
-        'title': 'OpenRA Resource Center - RSS Feed',
-        'lastBuildDate': lastBuildDate,
-        'mapObject': mapObject,
-    }
-    return StreamingHttpResponse(template.render(template_args, request), content_type='text/xml')
 
+    return HttpResponse(
+        template.render({
+            'request': request,
+            'title': content.titles['feed'],
+            'lastBuildDate': datetime.datetime.utcnow().isoformat("T"),
+            'mapObject': Maps.objects.order_by("-posted")[0:20]
+        }, request),
+        content_type='text/xml'
+    )
 
-def search(request, arg=""):
+@inject
+def search(request, search_query="",
+        map_search:MapSearch=Provide['map_search']
+   ):
 
-    if not arg:
+    if not search_query:
         if request.method == 'POST':
             if request.POST.get('qsearch', "").strip() == "":
                 return HttpResponseRedirect('/')
@@ -126,39 +129,16 @@ def search(request, arg=""):
         else:
             return HttpResponseRedirect('/')
 
-    search_request = arg
-
-    global_search_request = {}
-    global_search_request['maps'] = {'amount': 0, 'hash': None, 'title': None, 'info': None}
-
-    s_by_hash = Maps.objects.filter(map_hash=search_request)
-    global_search_request['maps']['hash'] = s_by_hash
-    global_search_request['maps']['amount'] += len(s_by_hash)
-
-    s_by_title = Maps.objects.filter(title__icontains=search_request)
-    global_search_request['maps']['title'] = s_by_title
-    global_search_request['maps']['amount'] += len(s_by_title)
-
-    s_by_info = Maps.objects.filter(info__icontains=search_request)
-    global_search_request['maps']['amount'] += len(s_by_info)
-
-    s_by_description = Maps.objects.filter(description__icontains=search_request).exclude(info__icontains=search_request)
-    global_search_request['maps']['amount'] += len(s_by_description)
-    global_search_request['maps']['info'] = [s_by_info, s_by_description]
-
-    s_by_author = Maps.objects.filter(author__icontains=search_request)
-    global_search_request['maps']['author'] = s_by_author
-    global_search_request['maps']['amount'] += len(s_by_author)
-
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'search.html',
-        'request': request,
-        'title': ' - Search',
-        'global_search_request': global_search_request,
-        'search_request': search_request,
-    }
-    return StreamingHttpResponse(template.render(template_args, request))
+    return standard_view(
+        request,
+        'search.html',
+        {
+            'request': request,
+            'title': content.titles['search'],
+            'search_results': map_search.run(search_query),
+            'search_request': search_query,
+        }
+    )
 
 
 def ControlPanel(request, page=1, filter=""):
@@ -180,7 +160,7 @@ def ControlPanel(request, page=1, filter=""):
     template_args = {
         'content': 'control_panel.html',
         'request': request,
-        'title': ' - My Content',
+        'title': 'My Content',
         'maps': mapObject,
         'page': int(page),
         'range': [i+1 for i in range(rowsRange)],
@@ -214,7 +194,7 @@ def maps(request, page=1):
     template_args = {
         'content': 'maps.html',
         'request': request,
-        'title': ' - Maps',
+        'title': 'Maps',
         'maps': mapObject,
         'page': int(page),
         'range': [i+1 for i in range(rowsRange)],
@@ -254,7 +234,7 @@ def maps_author(request, author, page=1):
     template_args = {
         'content': 'maps_author.html',
         'request': request,
-        'title': ' - Maps From ' + author,
+        'title': 'Maps From ' + author,
         'maps': mapObject,
         'page': int(page),
         'range': [i+1 for i in range(rowsRange)],
@@ -294,7 +274,7 @@ def maps_uploader(request, arg, page=1):
     template_args = {
         'content': 'maps_uploader.html',
         'request': request,
-        'title': ' - Maps uploaded by ' + mapObject[0].user.username,
+        'title': 'Maps uploaded by ' + mapObject[0].user.username,
         'maps': mapObject,
         'page': int(page),
         'range': [i+1 for i in range(rowsRange)],
@@ -333,7 +313,7 @@ def maps_duplicates(request, maphash, page=1):
     template_args = {
         'content': 'maps_duplicates.html',
         'request': request,
-        'title': ' - Duplicates of ' + mapObject[0].title,
+        'title': 'Duplicates of ' + mapObject[0].title,
         'maps': mapObject,
         'page': int(page),
         'range': [i+1 for i in range(rowsRange)],
@@ -383,7 +363,7 @@ def displayMap(request, arg):
                 template_args = {
                     'content': 'new_user_action_blocked.html',
                     'hours_remaining': 24 - int(account_age),
-                    'title': ' - Action Blocked',
+                    'title': 'Action Blocked',
                 }
 
                 return StreamingHttpResponse(template.render(template_args, request))
@@ -511,7 +491,7 @@ def displayMap(request, arg):
     template_args = {
         'content': 'displayMap.html',
         'request': request,
-        'title': ' - Map details - ' + mapObject.title,
+        'title': 'Map details - ' + mapObject.title,
         'map': mapObject,
         'userid': userObject,
         'arg': arg,
@@ -577,7 +557,7 @@ def updateMap(request, arg):
     template_args = {
         'content': 'map_update.html',
         'request': request,
-        'title': ' - Update Map - ' + mapObject[0].title,
+        'title': 'Update Map - ' + mapObject[0].title,
         'map': mapObject[0],
         'parsers': update_parsers,
         'update_failed': update_failed,
@@ -592,7 +572,7 @@ def updateMapLogs(request, arg):
     template_args = {
         'content': 'map_update_logs.html',
         'request': request,
-        'title': ' - Map Update Log - ' + mapObject[0].title,
+        'title': 'Map Update Log - ' + mapObject[0].title,
         'map': item,
         'logs': logs,
         'after_update_notice': 'updated' in request.GET.keys()
@@ -781,7 +761,7 @@ def uploadMap(request, previous_rev=0):
         template_args = {
             'content': 'new_user_action_blocked.html',
             'hours_remaining': 24 - int(account_age),
-            'title': ' - Action Blocked',
+            'title': 'Action Blocked',
         }
 
         return StreamingHttpResponse(template.render(template_args, request))
@@ -809,7 +789,7 @@ def uploadMap(request, previous_rev=0):
     template_args = {
         'content': 'uploadMap.html',
         'request': request,
-        'title': ' - Uploading Map',
+        'title': 'Uploading Map',
         'previous_rev': previous_rev,
         'previous_rev_title': previous_rev_title,
         'rev': rev,
@@ -913,7 +893,7 @@ def maps_revisions(request, arg, page=1):
     template_args = {
         'content': 'maps_revisions.html',
         'request': request,
-        'title': ' - Revisions',
+        'title': 'Revisions',
         'maps': mapObject,
         'page': int(page),
         'range': [i+1 for i in range(rowsRange)],
@@ -937,7 +917,7 @@ def screenshots(request):
     template_args = {
         'content': 'screenshots.html',
         'request': request,
-        'title': ' - Screenshots',
+        'title': 'Screenshots',
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
@@ -962,7 +942,7 @@ def comments(request, page=1):
     template_args = {
         'content': 'comments.html',
         'request': request,
-        'title': ' - Comments',
+        'title': 'Comments',
         'comments': comments,
         'amount': amount,
         'amount_this_page': amount_this_page,
@@ -994,7 +974,7 @@ def comments_by_user(request, arg, page=1):
     template_args = {
         'content': 'comments.html',
         'request': request,
-        'title': ' - Comments by ' + request.user.username,
+        'title': 'Comments by ' + request.user.username,
         'comments': comments,
         'amount': amount,
         'amount_this_page': amount_this_page,
@@ -1010,7 +990,7 @@ def handle404(request):
     template_args = {
         'content': '404.html',
         'request': request,
-        'title': ' - Page not found',
+        'title': 'Page not found',
     }
     return StreamingHttpResponse(template.render(template_args, request), status=404)
 
@@ -1028,7 +1008,7 @@ def profile(request):
     template_args = {
         'content': 'profile.html',
         'request': request,
-        'title': ' - Profile',
+        'title': 'Profile',
         'amountMaps': amountMaps,
         'ifsocial': ifsocial,
     }
@@ -1040,7 +1020,7 @@ def faq(request):
     template_args = {
         'content': 'faq.html',
         'request': request,
-        'title': ' - FAQ',
+        'title': 'FAQ',
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
@@ -1077,7 +1057,7 @@ def contacts(request):
     template_args = {
         'content': 'contacts.html',
         'request': request,
-        'title': ' - Contacts',
+        'title': 'Contacts',
         'message_sent': message_sent,
     }
     return StreamingHttpResponse(template.render(template_args, request))
@@ -1089,7 +1069,7 @@ def contacts_sent(request):
     template_args = {
         'content': 'contacts.html',
         'request': request,
-        'title': ' - Contacts',
+        'title': 'Contacts',
         'message_sent': message_sent,
     }
     return StreamingHttpResponse(template.render(template_args, request))

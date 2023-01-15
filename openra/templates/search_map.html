@@ -1,0 +1,31 @@
+<div class="search-map-preview">
+    <a class="minimap" href="/maps/{{item.id}}/">
+        <img src="/maps/{{item.id}}/minimap" />
+    </a>
+    <div class="info">
+        <div class="title">
+            <span>{{item.title}}</span>
+            by {{item.author}}
+        </div>
+        <div class="uploaded">
+            Uploaded {{ item.posted }} by {{ item.user.username }}
+        </div>
+        <div class="size">
+            Size: {{ item.width }} x {{ item.height}} Players: {{ item.players }}
+        </div>
+        <div class="custom-rules">
+            Advanced:
+            {% if item.advanced_map %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+            Lua:
+            {% if item.lua %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </div>
+    </div>
+</div>

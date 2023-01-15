@@ -13,7 +13,7 @@ from openra.fakes.log import FakeLog
 from openra.services.docker import Docker, ExceptionDockerNonByteResponse
 from openra.services.log import Log
 from openra.services.utility import Utility
-from openra import container
+from openra.containers import container
 from openra.services.utility.exceptions import ExceptionUtilityMapHashUnableToTranslate
 
 class TestServiceUtility(TestCase):

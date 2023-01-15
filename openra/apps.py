@@ -2,13 +2,15 @@
 
 from django.apps import AppConfig
 
-from openra import container
-
 class OpenraConfig(AppConfig):
     name = "openra"
 
     def ready(self):
+        # Import late as some services will need django assets
+        from openra.containers import container
+
         container.wire(modules=[
+            ".views",
             ".handlers",
             ".tests.test_commands",
             ".management.commands.test_docker",

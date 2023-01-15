@@ -1,37 +1,51 @@
+{% include 'header.html' %}
+
 <div class='cBlock'>
-{% if global_search_request.maps.amount == 0 %}
-Nothing found
+{% if search_results.total == 0 %}
+<h3>
+    Nothing found
+</h3>
 {% else %}
-	{% if global_search_request.maps.hash %}
-		<p>Matches in Map HASH:</p>
-		{% for item in global_search_request.maps.hash %}
-			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+    <div class="search-group">
+	{% if search_results.map_hash %}
+        <h3>Matches in Map HASH:</h3>
+		{% for item in search_results.map_hash %}
+            {% include 'search_map.html' %}
 		{% endfor %}
 	{% endif %}
+    </div>
 
-	{% if global_search_request.maps.title %}
-		<p>Matches in Map Title:</p>
-		{% for item in global_search_request.maps.title %}
-			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+    <div class="search-group">
+    {% if search_results.title %}
+        <h3>Matches in Map Title:</h3>
+		{% for item in search_results.title %}
+            {% include 'search_map.html' %}
 		{% endfor %}
 	{% endif %}
+    </div>
 
-	{% if global_search_request.maps.info.0 or global_search_request.maps.info.1 %}
-		<p>Matches in Map Info:</p>
-		{% for item in global_search_request.maps.info.0 %}
-			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+    <div class="search-group">
+	{% if search_results.info or search_results.description %}
+		<h3>Matches in Map Info:</h3>
+		{% for item in search_results.info %}
+            {% include 'search_map.html' %}
 		{% endfor %}
-		{% for item in global_search_request.maps.info.1 %}
-			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+		{% for item in search_results.description %}
+            {% include 'search_map.html' %}
 		{% endfor %}
 	{% endif %}
+    </div>
 
-	{% if global_search_request.maps.author %}
-		<p>Matches in Map Author:</p>
-		{% for item in global_search_request.maps.author %}
-			<a href="/maps/{{item.id}}/"><img src="/maps/{{item.id}}/minimap" /></a><br />
+    <div class="search-group">
+	{% if search_results.author %}
+		<h3>Matches in Map Author:</h3>
+		{% for item in search_results.author %}
+            {% include 'search_map.html' %}
 		{% endfor %}
 	{% endif %}
+    </div>
 
 {% endif %}
 </div>
+
+{% include 'footer.html' %}
