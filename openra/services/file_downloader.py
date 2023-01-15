@@ -4,7 +4,6 @@ from fs.tempfs import TempFS
 from openra.classes.exceptions import ExceptionBase
 from openra.classes.file_location import FileLocation
 
-
 class FileDownloader:
 
     def download_file(self, url:str, filename:str):
