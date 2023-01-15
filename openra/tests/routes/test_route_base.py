@@ -35,22 +35,17 @@ class TestRouteBase(TestCase):
         )
         return self._post(client, data)
 
-    def assert_ok_contains(self, response, content):
-        self.assertContains(
-            response,
-            content,
-            status_code=200
-        )
-
-        return response
-
-
-    def assert_ok_contains_many(self, response, contents):
+    def assert_contains(self, response, contents=[],
+            status_code=200,
+            title=''
+        ):
+        if title != '':
+            contents.append(f'<title>OpenRA Resource Center - {title}</title>')
         for content in contents:
             self.assertContains(
                 response,
                 content,
-                status_code=200
+                status_code=status_code
             )
 
         return response
