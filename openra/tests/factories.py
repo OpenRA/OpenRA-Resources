@@ -1,10 +1,29 @@
+from django.db.models import Model
+from django.db.models.base import ModelBase
 import factory
 
 from openra import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-class UserFactory(factory.Factory):
+
+class BaseFactory(factory.DjangoModelFactory):
+
+    _to_int_keys = []
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """Override the default ``_create`` to allow factories to default to ints."""
+        manager = cls._get_manager(model_class)
+
+        for key in cls._to_int_keys:
+            obj = kwargs.get(key, None)
+            if(issubclass(obj.__class__, Model)):
+                kwargs[key] = obj.id
+
+        return manager.create(*args, **kwargs)
+
+class UserFactory(BaseFactory):
 
     class Meta:
         model = User
@@ -15,7 +34,7 @@ class UserFactory(factory.Factory):
     date_joined = timezone.now()
     is_superuser = False
 
-class MapsFactory(factory.Factory):
+class MapsFactory(BaseFactory):
 
     class Meta:
         model = models.Maps
@@ -57,7 +76,7 @@ class MapsFactory(factory.Factory):
     policy_adaptations = factory.Faker('word')
     policy_commercial = False
 
-class MapCategoriesFactory(factory.Factory):
+class MapCategoriesFactory(BaseFactory):
 
     class Meta:
         model = models.MapCategories
@@ -65,7 +84,7 @@ class MapCategoriesFactory(factory.Factory):
     category_name = factory.Faker('word')
     posted = timezone.now()
 
-class MapUpgradeLogsFactory(factory.Factory):
+class MapUpgradeLogsFactory(BaseFactory):
 
     class Meta:
         model = models.MapUpgradeLogs
@@ -76,7 +95,9 @@ class MapUpgradeLogsFactory(factory.Factory):
     to_version = factory.Faker('word')
     upgrade_output = factory.Faker('paragraph')
 
-class LintsFactory(factory.Factory):
+class LintsFactory(BaseFactory):
+
+    _to_int_keys = ['map_id']
 
     class Meta:
         model = models.Lints
@@ -88,7 +109,9 @@ class LintsFactory(factory.Factory):
     lint_output = factory.Faker('paragraph')
     posted = timezone.now()
 
-class CommentsFactory(factory.Factory):
+class CommentsFactory(BaseFactory):
+
+    _to_int_keys = ['item_id']
 
     class Meta:
         model = models.Comments
@@ -100,7 +123,9 @@ class CommentsFactory(factory.Factory):
     posted = timezone.now()
     is_removed = False
 
-class UnsubscribeCommentsFactory(factory.Factory):
+class UnsubscribeCommentsFactory(BaseFactory):
+
+    _to_int_keys = ['item_id']
 
     class Meta:
         model = models.UnsubscribeComments
@@ -110,7 +135,7 @@ class UnsubscribeCommentsFactory(factory.Factory):
     item_id = factory.SubFactory(MapsFactory)
     unsubscribed = timezone.now()
 
-class ReportsFactory(factory.Factory):
+class ReportsFactory(BaseFactory):
 
     class Meta:
         model = models.Reports
@@ -122,7 +147,7 @@ class ReportsFactory(factory.Factory):
     infringement = False
     posted = timezone.now()
 
-class ScreenshotsFactory(factory.Factory):
+class ScreenshotsFactory(BaseFactory):
 
     class Meta:
         model = models.Screenshots
@@ -133,7 +158,7 @@ class ScreenshotsFactory(factory.Factory):
     posted = timezone.now()
     map_preview = False
 
-class RatingFactory(factory.Factory):
+class RatingFactory(BaseFactory):
 
     class Meta:
         model = models.Rating
@@ -144,10 +169,11 @@ class RatingFactory(factory.Factory):
     rating = 0.0
     posted = timezone.now()
 
-class EngineFactory(factory.Factory):
+class EngineFactory(BaseFactory):
 
     class Meta:
-        model = models.Maps
+        model = models.Engines
 
-    game_mod = 'RA'
-    parser = factory.Faker('word')
+    game_mod = 'ra'
+    version = factory.Faker('word')
+
