@@ -20,7 +20,8 @@ from django.utils import timezone
 from django.db.models import F
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
-from openra import handlers, misc
+from openra import content, handlers, misc
+from openra.auth import ExceptionLoginFailed, set_session_to_remember_auth, try_login
 from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments
 
 # TODO: Fix the code and reenable some of these warnings
@@ -29,8 +30,8 @@ from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, U
 # pylint: disable=missing-docstring
 # pylint: disable=bare-except
 
-def standard_view(request, template_args):
-    template = loader.get_template('index.html')
+def standard_view(request, template, template_args):
+    template = loader.get_template(template)
 
     return HttpResponse(
         template.render(
@@ -44,7 +45,8 @@ def index(request):
 
     return standard_view(
         request,
-        template_args = {
+        'index.html',
+        {
             'content': 'index_content.html',
             'request': request,
             'title': '',
@@ -59,45 +61,28 @@ def loginView(request):
 
     errors = []
 
-    username = request.POST.get('ora_username', '').strip()
-    password = request.POST.get('ora_password', '').strip()
-    remember = request.POST.get('ora_remember', '')
-    input_referer = request.POST.get('referer', '/')
+    if(request.method == 'POST'):
+        try:
+            try_login(request)
+            set_session_to_remember_auth(
+                request,
+                request.POST.get('ora_remember', False)
+            )
+            return HttpResponseRedirect('/')
+        except ExceptionLoginFailed as exception:
+            errors.append(
+                content.auth[exception.reason]
+            )
 
-    if username != '' and password != '':
-
-        if not remember:
-            request.session.set_expiry(0)  # the user’s session cookie will expire when the user’s Web browser is closed.
-
-        account = authenticate(username=username, password=password)
-        if account is not None:
-            if account.is_active:
-                login(request, account)
-                return HttpResponseRedirect(input_referer)
-            else:
-                errors.append("User is inactive, please activate account first.")
-        else:
-            errors.append("Incorrect username or password.")
-
-    referer = request.META.get('HTTP_REFERER', '/')
-    if input_referer != '/':
-        referer = input_referer
-    if 'auth' in referer or 'account' in referer:
-        referer = '/'
-
-    host = request.META.get('HTTP_HOST', None)
-    if host == None or not host in referer:
-        referer = '/'
-
-    template = loader.get_template('auth/login.html')
-    template_args = {
-        'request': request,
-        'title': 'OpenRA Resource Center - Sign In',
-        'referer': referer,
-        'errors': errors,
-    }
-    return HttpResponse(template.render(template_args, request))
-
+    return standard_view(
+        request,
+        'auth/login.html',
+        {
+            'request': request,
+            'title': 'OpenRA Resource Center - Sign In',
+            'errors': errors,
+        }
+    )
 
 def logoutView(request):
 
