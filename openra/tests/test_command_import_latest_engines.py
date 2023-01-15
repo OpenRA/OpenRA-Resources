@@ -5,7 +5,7 @@ from dependency_injector.wiring import providers
 from django.core.management import call_command
 from django.test.testcases import TestCase
 
-from openra import container
+from openra.containers import container
 from openra.classes.release import Release
 from openra.fakes.engine_file_repository import FakeEngineFileRepository
 from openra.fakes.log import FakeLog

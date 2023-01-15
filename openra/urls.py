@@ -83,7 +83,7 @@ urlpatterns = [
 
     url(r'^news/feed.rss?$', views.feed, name='feed'),
     url(r'^search/?$', views.search, name='search'),
-    url(r'^search/(?P<arg>.+?)/?$', views.search, name='search'),
+    url(r'^search/(?P<search_query>.+?)/?$', views.search, name='search'),
 
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
     url(r'^panel/mymaps/?$', views.ControlPanel, name='ControlPanel'),

@@ -1726,5 +1726,45 @@ p.registerInfo {
 }
 
 .center {
-	text-align: center;
+    text-align: center;
+}
+
+.search-group {
+    margin:20px;
+}
+
+.search-map-preview {
+    display:flex;
+    flex-direction:row;
+    width:100%;
+    box-sizing:border-box;
+    margin-top:20px;
+}
+
+.search-map-preview .info {
+    margin-left:10px;
+}
+
+.search-map-preview .info > div {
+    margin:15px;
+}
+
+.search-map-preview .info > div.title {
+    margin-top:5px;
+}
+
+.search-map-preview .title span {
+    font-weight:bold;
+}
+
+.search-map-preview .minimap {
+    display:block;
+    width:128px;
+    height:128px;
+}
+
+.search-map-preview .minimap img {
+    object-fit:contain;
+    height:100%;
+    width:100%;
 }

@@ -11,8 +11,7 @@ from openra.fakes.log import FakeLog
 from openra.models import User, Maps
 from dependency_injector import providers
 from dependency_injector.wiring import inject, Provide
-from openra import container
-from openra.containers import Container
+from openra.containers import Container, container
 from fs.memoryfs import MemoryFS
 from fs.base import FS
 from os import path

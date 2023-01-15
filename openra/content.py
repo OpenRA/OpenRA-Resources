@@ -8,6 +8,9 @@ auth = {
 titles = {
     'home':'',
     'login':'Sign In',
-    'logout':'OpenRA Resource Center - Sign Out',
+    'logout':'Sign Out',
+    # TODO reformat like others
+    'feed':'OpenRA Resource Center - RSS Feed',
+    'search':'Search',
 
 }

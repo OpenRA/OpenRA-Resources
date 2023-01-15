@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, Mock
 from dependency_injector.providers import Provider, Singleton
 
 from django.core.management import call_command
-from openra import container
+from openra.containers import container
 from openra.classes.map_hash import MapHash
 from openra.fakes.engine_file_repository import FakeEngineFileRepository
 from openra.fakes.file_downloader import FakeFileDownloader

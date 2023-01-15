@@ -1,5 +1,5 @@
 from dependency_injector.wiring import providers
-from openra import container
+from openra.containers import container
 from openra.classes.exceptions import ExceptionBase
 
 class FakeLog:
