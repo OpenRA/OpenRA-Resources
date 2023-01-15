@@ -36,6 +36,9 @@ class Command(BaseCommand):
 
             map_hash = utility.map_hash(engine_location, map_location)
             log().info('Map hash: ' + map_hash.map_hash)
+
+            map_rules = utility.map_rules(engine_location, map_location)
+            log().info('Map rules: ' + map_rules)
         except ExceptionBase as exception:
             log().exception_obj(exception)
 
