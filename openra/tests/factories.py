@@ -1,3 +1,4 @@
+from typing import List
 from django.db.models import Model
 from django.db.models.base import ModelBase
 import factory
@@ -23,12 +24,30 @@ class BaseFactory(factory.DjangoModelFactory):
 
         return manager.create(*args, **kwargs)
 
+class UniqueFaker(factory.Faker):
+
+    _values:List[str]
+
+    def __init__(self, *args, **kwargs):
+        super(UniqueFaker, self).__init__(*args, **kwargs)
+        self._values = []
+
+    def generate(self, extra_kwargs):
+        generated:str = super(UniqueFaker, self).generate(extra_kwargs)
+        value:str = generated
+        i = 2
+        while value in self._values:
+            value = generated + str(i)
+            i += 1
+        self._values.append(value)
+        return value
+
 class UserFactory(BaseFactory):
 
     class Meta:
         model = User
 
-    username = factory.Faker('first_name')
+    username = UniqueFaker('first_name')
     password = 'password'
     email = factory.Faker('email')
     date_joined = timezone.now()
@@ -137,24 +156,28 @@ class UnsubscribeCommentsFactory(BaseFactory):
 
 class ReportsFactory(BaseFactory):
 
+    _to_int_keys = ['ex_id']
+
     class Meta:
         model = models.Reports
 
     user = factory.SubFactory(UserFactory)
     reason = factory.Faker('paragraph')
-    ex_id = 0
-    ex_name = ''
+    ex_id = factory.SubFactory(MapsFactory)
+    ex_name = 'maps'
     infringement = False
     posted = timezone.now()
 
 class ScreenshotsFactory(BaseFactory):
 
+    _to_int_keys = ['ex_id']
+
     class Meta:
         model = models.Screenshots
 
     user = factory.SubFactory(UserFactory)
-    ex_id = 0
-    ex_name = ''
+    ex_id = factory.SubFactory(MapsFactory)
+    ex_name = 'maps'
     posted = timezone.now()
     map_preview = False
 

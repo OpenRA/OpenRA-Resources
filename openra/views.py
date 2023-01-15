@@ -11,6 +11,7 @@ import urllib.request
 
 from django.conf import settings
 from django.http import StreamingHttpResponse
+from django.http.response import HttpResponse
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, Http404
@@ -28,22 +29,28 @@ from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, U
 # pylint: disable=missing-docstring
 # pylint: disable=bare-except
 
+def standard_view(request, template_args):
+    template = loader.get_template('index.html')
+
+    return HttpResponse(
+        template.render(
+            template_args,
+            request
+        )
+    )
 
 def index(request):
     scObject = Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
 
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'index_content.html',
-        'request': request,
-        'title': '',
-        'screenshots': scObject,
-    }
-    if settings.SITE_MAINTENANCE:
-        template_args['content'] = 'service/maintenance.html'
-        template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
-    return StreamingHttpResponse(template.render(template_args, request))
-
+    return standard_view(
+        request,
+        template_args = {
+            'content': 'index_content.html',
+            'request': request,
+            'title': '',
+            'screenshots': scObject,
+        }
+    )
 
 def loginView(request):
 
@@ -78,14 +85,18 @@ def loginView(request):
     if 'auth' in referer or 'account' in referer:
         referer = '/'
 
+    host = request.META.get('HTTP_HOST', None)
+    if host == None or not host in referer:
+        referer = '/'
+
     template = loader.get_template('auth/login.html')
     template_args = {
         'request': request,
         'title': 'OpenRA Resource Center - Sign In',
-        'referer': referer if request.META['HTTP_HOST'] in referer else '/',
+        'referer': referer,
         'errors': errors,
     }
-    return StreamingHttpResponse(template.render(template_args, request))
+    return HttpResponse(template.render(template_args, request))
 
 
 def logoutView(request):
@@ -105,7 +116,7 @@ def logoutView(request):
         'title': 'OpenRA Resource Center - Sign Out',
         'referer': referer if request.META['HTTP_HOST'] in referer else '/',
     }
-    return StreamingHttpResponse(template.render(template_args, request))
+    return HttpResponse(template.render(template_args, request))
 
 
 def feed(request):
