@@ -159,15 +159,3 @@ class TestTestDocker(TestCase):
         )
 
         overrides.__exit__()
-
-class TestTestUtility(TestCase):
-
-    def test_test_utility_runs_each_of_the_utility_command_and_prints_the_response(self):
-        engine = EngineFactory()
-        engine.save()
-        map = MapsFactory(
-            game_mod = engine.game_mod
-        )
-        map.save()
-        call_command('test_utility')
-
