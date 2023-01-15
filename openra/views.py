@@ -61,7 +61,7 @@ def loginView(request):
 
     errors = []
 
-    if(request.method == 'POST'):
+    if request.method == 'POST':
         try:
             try_login(request)
             set_session_to_remember_auth(
@@ -91,18 +91,16 @@ def logoutView(request):
 
     if request.method == "POST":
         logout(request)
-        return HttpResponseRedirect(request.POST.get('referer', '/'))
+        return HttpResponseRedirect('/')
 
-    referer = request.META.get('HTTP_REFERER', '/')
-
-    template = loader.get_template('auth/logout.html')
-    template_args = {
-        'request': request,
-        'title': 'OpenRA Resource Center - Sign Out',
-        'referer': referer if request.META['HTTP_HOST'] in referer else '/',
-    }
-    return HttpResponse(template.render(template_args, request))
-
+    return standard_view(
+        request,
+        'auth/logout.html',
+        {
+            'request': request,
+            'title': content.titles['logout']
+        }
+    )
 
 def feed(request):
     mapObject = Maps.objects.order_by("-posted")[0:20]

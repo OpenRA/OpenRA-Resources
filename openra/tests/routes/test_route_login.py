@@ -1,4 +1,6 @@
+from django.contrib import auth
 from django.contrib.auth.base_user import make_password
+from django.contrib.auth.models import User
 from django.test import override_settings
 from openra import content
 from openra.helpers import merge_dicts
@@ -70,6 +72,10 @@ class TestRouteLogin(TestRouteBase):
 
         self.assertTrue(
             self._client.session.get_expire_at_browser_close()
+        )
+
+        self.assertTrue(
+            auth.get_user(self._client).is_authenticated()
         )
 
     def test_post_preserves_session_if_remember_is_ticked(self):
