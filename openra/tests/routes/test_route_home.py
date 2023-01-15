@@ -9,9 +9,9 @@ class TestRouteHome(TestRouteBase):
     _route = '/'
 
     def test_route_can_be_accessed_by_any_user(self):
-        self.assert_ok_contains(
+        self.assert_contains(
             self.get(),
-            'Share your Maps!'
+            ['Share your Maps!']
         )
 
     @override_settings(SITE_MAINTENANCE=True)
@@ -23,18 +23,17 @@ class TestRouteHome(TestRouteBase):
     def test_route_shows_latest_screenshots(self):
         screenshot_models = factory.create_batch(ScreenshotsFactory, 5)
 
-        response = self.assert_ok_contains(
+        response = self.assert_contains(
             self.get(),
-            'Share your Maps!'
+            ['Share your Maps!']
         )
 
         for model in screenshot_models:
-            self.assertContains(
+            self.assert_contains(
                 response,
-                f'/maps/{model.ex_id}/'
-            )
-            self.assertContains(
-                response,
-                f'/screenshots/{model.id}/'
+                [
+                    f'/maps/{model.ex_id}/',
+                    f'/screenshots/{model.id}/'
+                ]
             )
 

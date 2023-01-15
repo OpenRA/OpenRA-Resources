@@ -49,7 +49,7 @@ def index(request):
         {
             'content': 'index_content.html',
             'request': request,
-            'title': '',
+            'title': content.titles['home'],
             'screenshots': scObject,
         }
     )
@@ -79,7 +79,7 @@ def loginView(request):
         'auth/login.html',
         {
             'request': request,
-            'title': 'OpenRA Resource Center - Sign In',
+            'title': content.titles['login'],
             'errors': errors,
         }
     )

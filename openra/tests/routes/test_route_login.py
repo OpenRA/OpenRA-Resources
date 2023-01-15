@@ -11,7 +11,7 @@ class TestRouteLogin(TestRouteBase):
     _route = '/login/'
 
     def test_route_can_be_accessed_by_an_unauthed_user(self):
-        self.assert_ok_contains_many(
+        self.assert_contains(
             self.get(),
             [
                 'Sign In',
@@ -19,7 +19,8 @@ class TestRouteLogin(TestRouteBase):
                 'ora_password',
                 '/login/',
                 'POST'
-            ]
+            ],
+            title=content.titles['login']
         )
 
     @override_settings(SITE_MAINTENANCE=True)
@@ -86,18 +87,18 @@ class TestRouteLogin(TestRouteBase):
             password=make_password('password')
         )
 
-        self.assert_ok_contains(
+        self.assert_contains(
             self.post({
                 'ora_username':user.username,
                 'ora_password':'password'
             }),
-            content.auth['inactive']
+            [content.auth['inactive']]
         )
 
     def test_post_can_show_incorrect_credentials_error(self):
-        self.assert_ok_contains(
+        self.assert_contains(
             self._send_valid_post({
                 'ora_password':'wrong'
             }),
-            content.auth['incorrect']
+            [content.auth['incorrect']]
         )
