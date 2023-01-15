@@ -1,6 +1,7 @@
 from dependency_injector.wiring import Provide, inject
 from django.core.management.base import BaseCommand
 from openra.classes.exceptions import ExceptionBase
+from openra.classes.release import Release
 from openra.containers import Container
 from openra.facades import log
 from openra.models import Engines, Maps
@@ -28,7 +29,9 @@ class Command(BaseCommand):
             engine_model = Engines.objects.latest('id')
             map_model = Maps.objects.latest('id')
 
-            engine_location = engine_file_repository.get_path(engine_model.game_mod, engine_model.version)
+            release = Release(engine_model.game_mod, engine_model.version)
+
+            engine_location = engine_file_repository.get_path(release)
             map_location = map_file_repository.get_oramap_path(map_model.id)
 
             map_hash = utility.map_hash(engine_location, map_location)

@@ -6,6 +6,7 @@ from django.core.management import call_command
 from django.test.testcases import TestCase
 
 from openra import container
+from openra.classes.release import Release
 from openra.fakes.engine_file_repository import FakeEngineFileRepository
 from openra.fakes.log import FakeLog
 from openra.fakes.file_downloader import FakeFileDownloader
@@ -34,27 +35,16 @@ class TestImportLatestEngines(TestCase):
             Engines.objects.count()
         )
 
-        expected_engines = [{
-            'mod': 'ra',
-            'version': 'playtest-7'
-        },{
-            'mod': 'td',
-            'version': 'playtest-7'
-        },{
-            'mod': 'd2k',
-            'version': 'playtest-7'
-        },{
-            'mod': 'ra',
-            'version': 'release-5'
-        },{
-            'mod': 'td',
-            'version': 'release-5'
-        },{
-            'mod': 'd2k',
-            'version': 'release-5'
-        }]
+        expected_engines = [
+            Release('ra','playtest-7'),
+            Release('td','playtest-7'),
+            Release('d2k','playtest-7'),
+            Release('ra','release-5'),
+            Release('td','release-5'),
+            Release('d2k','release-5')
+        ]
 
-        self.assertEqual(
+        self.assertEquals(
             expected_engines,
             container.engine_file_repository().imported
         )
@@ -62,8 +52,8 @@ class TestImportLatestEngines(TestCase):
         for engine in expected_engines:
             self.assertTrue(
                 Engines.objects.filter(
-                    game_mod=engine['mod'],
-                    version=engine['version']
+                    game_mod=engine.mod,
+                    version=engine.version
                 ).exists()
         )
 
@@ -81,16 +71,11 @@ class TestImportLatestEngines(TestCase):
 
         call_command('import_latest_engines', '2')
 
-        expected_engines = [{
-            'mod': 'ra',
-            'version': 'playtest-7'
-        },{
-            'mod': 'ra',
-            'version': 'release-5'
-        },{
-            'mod': 'ra',
-            'version': 'release-3'
-        }]
+        expected_engines = [
+            Release('ra','playtest-7'),
+            Release('ra','release-5'),
+            Release('ra','release-3'),
+        ]
 
         self.assertEquals(
             3,
@@ -105,8 +90,8 @@ class TestImportLatestEngines(TestCase):
         for engine in expected_engines:
             self.assertTrue(
                 Engines.objects.filter(
-                    game_mod=engine['mod'],
-                    version=engine['version']
+                    game_mod=engine.mod,
+                    version=engine.version
                 ).exists()
         )
 
@@ -131,10 +116,9 @@ class TestImportLatestEngines(TestCase):
             len(container.file_downloader().downloaded)
         )
 
-        expected_engines = [{
-            'mod': 'ra',
-            'version': 'release-5'
-        }]
+        expected_engines = [
+            Release('ra','release-5'),
+        ]
 
         self.assertEqual(
             [],
@@ -144,8 +128,8 @@ class TestImportLatestEngines(TestCase):
         for engine in expected_engines:
             self.assertTrue(
                 Engines.objects.filter(
-                    game_mod=engine['mod'],
-                    version=engine['version']
+                    game_mod=engine.mod,
+                    version=engine.version
                 ).exists()
         )
 
@@ -180,10 +164,9 @@ class TestImportLatestEngines(TestCase):
             Engines.objects.count()
         )
 
-        expected_engines = [{
-            'mod': 'ra',
-            'version': 'release-5'
-        }]
+        expected_engines = [
+            Release('ra','release-5'),
+        ]
 
         self.assertEqual(
             expected_engines,
@@ -193,8 +176,8 @@ class TestImportLatestEngines(TestCase):
         for engine in expected_engines:
             self.assertTrue(
                 Engines.objects.filter(
-                    game_mod=engine['mod'],
-                    version=engine['version']
+                    game_mod=engine.mod,
+                    version=engine.version
                 ).exists()
         )
 
