@@ -140,7 +140,10 @@ class TestServiceDocker(TestCase):
             docker.test_docker
         )
 
-    def test_run_utility_command_calls_lib_correctly_and_returns_output(self):
+    def test_run_utility_command_calls_lib_correctly_and_returns_output_filtering_warning(self):
+
+        warning = b'WARNING: Unable to sync system certificate store - https requests will fail\n'
+
         client_mock = Mock()
         client_mock.containers = Mock()
         client_mock.images = Mock()
@@ -151,7 +154,7 @@ class TestServiceDocker(TestCase):
             return_value=('fake_image', 'something_else')
         )
         client_mock.containers.run = MagicMock(
-            return_value=b'mock_return'
+            return_value=warning+b'mock_return'
         )
 
         docker = Docker(client_mock)

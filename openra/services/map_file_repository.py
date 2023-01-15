@@ -18,7 +18,7 @@ class MapFileRepository:
     def get_oramap_path(self, map_id:int):
         path = self._get_target_path_and_throw_exception_if_doesnt_exist(map_id)
 
-        for file in self._data_fs.filterdir(path, ['*.oramap']):
+        for file in self._data_fs.filterdir(path, ['*.oramap'], None, ['*']):
             return FileLocation(
                 self._data_fs,
                 path,

@@ -15,6 +15,12 @@ class FakeLog:
                 return True
         return False
 
+    def contains_all(self, entries):
+        for entry in entries:
+            if not self.contains(entry[0], entry[1]):
+                return False
+        return True
+
     def clear(self):
         self.entries = []
 

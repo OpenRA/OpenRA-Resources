@@ -54,7 +54,7 @@ class TestServiceMapFileRepository(TestCase):
 
     def test_get_oramap_path_throws_exception_if_no_oramap_exists(self):
         fs = TempFS()
-        fs.makedirs('maps/1')
+        fs.makedirs('maps/1/content')
         fs.touch('maps/1/mymap.notoramap')
 
         map_file_repository = MapFileRepository(

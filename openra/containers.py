@@ -9,6 +9,8 @@ from openra.services.engine_file_repository import EngineFileRepository
 from openra.services.file_downloader import FileDownloader
 from openra.services.github import Github
 from openra.services.log import Log
+from openra.services.map_file_repository import MapFileRepository
+from openra.services.utility import Utility
 
 class Container(containers.DeclarativeContainer):
     config = providers.Configuration()
@@ -41,6 +43,14 @@ class Container(containers.DeclarativeContainer):
         EngineFileRepository
     )
 
+    map_file_repository = providers.Singleton(
+        MapFileRepository
+    )
+
     file_downloader = providers.Singleton(
         FileDownloader
+    )
+
+    utility = providers.Singleton(
+        Utility
     )
