@@ -16,7 +16,6 @@ from fs.memoryfs import MemoryFS
 from fs.base import FS
 from os import path
 from openra.services.docker import Docker
-from openra.tests.factories import EngineFactory, MapsFactory
 
 class TestCommandSeedTestData(TestCase):
 
@@ -41,7 +40,6 @@ class TestCommandSeedTestData(TestCase):
         return False
 
     def test_it_creates_a_super_user_with_the_details_provided(self):
-        return
         self.mock_file_system()
         self.run_seeder()
 
@@ -72,7 +70,6 @@ class TestCommandSeedTestData(TestCase):
         )
 
     def test_it_imports_the_sample_maps(self):
-        return
         self.mock_file_system()
 
         self.assertFalse(self.oramap_file_exists_for_map_id(1))
