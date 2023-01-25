@@ -13,6 +13,7 @@ class OpenraConfig(AppConfig):
             ".views",
             ".handlers",
             ".tests.test_commands",
+            ".tests.test_container",
             ".management.commands.test_docker",
             ".management.commands.test_utility",
             ".management.commands.import_latest_engines",
