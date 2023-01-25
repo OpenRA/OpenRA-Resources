@@ -14,13 +14,14 @@ from openra.fakes.github import FakeGithub
 from openra.models import Engines
 from openra.services.file_downloader import FileDownloader
 
+
 class TestImportLatestEngines(TestCase):
     def test_command_will_import_engines(self):
         overrides = container.override_providers(
-            log = Singleton(FakeLog),
-            github = Singleton(FakeGithub),
-            engine_file_repository = Singleton(FakeEngineFileRepository),
-            file_downloader = Singleton(FakeFileDownloader)
+            log=Singleton(FakeLog),
+            github=Singleton(FakeGithub),
+            engine_file_repository=Singleton(FakeEngineFileRepository),
+            file_downloader=Singleton(FakeFileDownloader)
         )
 
         self.assertEquals(
@@ -36,12 +37,12 @@ class TestImportLatestEngines(TestCase):
         )
 
         expected_engines = [
-            Release('ra','playtest-7'),
-            Release('td','playtest-7'),
-            Release('d2k','playtest-7'),
-            Release('ra','release-5'),
-            Release('td','release-5'),
-            Release('d2k','release-5')
+            Release('ra', 'playtest-7'),
+            Release('td', 'playtest-7'),
+            Release('d2k', 'playtest-7'),
+            Release('ra', 'release-5'),
+            Release('td', 'release-5'),
+            Release('d2k', 'release-5')
         ]
 
         self.assertEquals(
@@ -55,16 +56,16 @@ class TestImportLatestEngines(TestCase):
                     game_mod=engine.mod,
                     version=engine.version
                 ).exists()
-        )
+            )
 
         overrides.__exit__()
 
     def test_command_arg_can_be_set_to_number_of_releases_back(self):
         overrides = container.override_providers(
-            log = Singleton(FakeLog),
-            github = Singleton(FakeGithub),
-            engine_file_repository = Singleton(FakeEngineFileRepository),
-            file_downloader = Singleton(FakeFileDownloader)
+            log=Singleton(FakeLog),
+            github=Singleton(FakeGithub),
+            engine_file_repository=Singleton(FakeEngineFileRepository),
+            file_downloader=Singleton(FakeFileDownloader)
         )
 
         container.github().only_ra_asset = True
@@ -72,9 +73,9 @@ class TestImportLatestEngines(TestCase):
         call_command('import_latest_engines', '2')
 
         expected_engines = [
-            Release('ra','playtest-7'),
-            Release('ra','release-5'),
-            Release('ra','release-3'),
+            Release('ra', 'playtest-7'),
+            Release('ra', 'release-5'),
+            Release('ra', 'release-3'),
         ]
 
         self.assertEquals(
@@ -93,16 +94,16 @@ class TestImportLatestEngines(TestCase):
                     game_mod=engine.mod,
                     version=engine.version
                 ).exists()
-        )
+            )
 
         overrides.__exit__()
 
     def test_command_will_not_download_appimage_if_they_exist(self):
         overrides = container.override_providers(
-            log = Singleton(FakeLog),
-            github = Singleton(FakeGithub),
-            engine_file_repository = Singleton(FakeEngineFileRepository),
-            file_downloader = Singleton(FakeFileDownloader)
+            log=Singleton(FakeLog),
+            github=Singleton(FakeGithub),
+            engine_file_repository=Singleton(FakeEngineFileRepository),
+            file_downloader=Singleton(FakeFileDownloader)
         )
 
         container.github().only_one_release = True
@@ -117,7 +118,7 @@ class TestImportLatestEngines(TestCase):
         )
 
         expected_engines = [
-            Release('ra','release-5'),
+            Release('ra', 'release-5'),
         ]
 
         self.assertEqual(
@@ -131,16 +132,16 @@ class TestImportLatestEngines(TestCase):
                     game_mod=engine.mod,
                     version=engine.version
                 ).exists()
-        )
+            )
 
         overrides.__exit__()
 
     def test_command_will_not_create_models_if_they_already_exist(self):
         overrides = container.override_providers(
-            log = Singleton(FakeLog),
-            github = Singleton(FakeGithub),
-            engine_file_repository = Singleton(FakeEngineFileRepository),
-            file_downloader = Singleton(FakeFileDownloader)
+            log=Singleton(FakeLog),
+            github=Singleton(FakeGithub),
+            engine_file_repository=Singleton(FakeEngineFileRepository),
+            file_downloader=Singleton(FakeFileDownloader)
         )
 
         container.github().only_one_release = True
@@ -165,7 +166,7 @@ class TestImportLatestEngines(TestCase):
         )
 
         expected_engines = [
-            Release('ra','release-5'),
+            Release('ra', 'release-5'),
         ]
 
         self.assertEqual(
@@ -179,6 +180,6 @@ class TestImportLatestEngines(TestCase):
                     game_mod=engine.mod,
                     version=engine.version
                 ).exists()
-        )
+            )
 
         overrides.__exit__()

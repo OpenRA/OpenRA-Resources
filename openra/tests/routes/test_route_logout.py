@@ -7,6 +7,7 @@ from openra.tests.factories import UserFactory
 
 from openra.tests.routes.test_route_base import TestRouteBase
 
+
 class TestRouteLogout(TestRouteBase):
 
     _route = '/logout/'

@@ -27,3 +27,4 @@ docker==4.4.4
 PyGithub==1.56
 urllib3==1.26.13
 freezegun==1.2.2
+autopep8==2.0.1

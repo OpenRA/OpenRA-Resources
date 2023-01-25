@@ -5,6 +5,7 @@ from openra import content
 from openra.tests.factories import MapsFactory, ScreenshotsFactory
 from openra.tests.routes.test_route_base import TestRouteBase
 
+
 class TestRouteHome(TestRouteBase):
 
     _route = '/search/mymap'
@@ -55,5 +56,3 @@ class TestRouteHome(TestRouteBase):
             self.get(),
             titles
         )
-
-

@@ -17,13 +17,14 @@ from fs.base import FS
 from os import path
 from openra.services.docker import Docker
 
+
 class TestCommandSeedTestData(TestCase):
 
     def run_seeder(self):
         call_command('seedtestdata', 'sampleuser@example.com', 'sampleuser', 'pass123')
 
     @inject
-    def oramap_file_exists_for_map_id(self, map_id, data_fs:FS=Provide[Container.data_fs]):
+    def oramap_file_exists_for_map_id(self, map_id, data_fs: FS = Provide[Container.data_fs]):
         file_path = path.join('maps', str(map_id))
         if not data_fs.exists(file_path):
             return False
@@ -36,7 +37,7 @@ class TestCommandSeedTestData(TestCase):
 
     def test_it_creates_a_super_user_with_the_details_provided(self):
         overrides = container.override_providers(
-            data_fs = MemoryFS()
+            data_fs=MemoryFS()
         )
 
         self.run_seeder()
@@ -64,14 +65,14 @@ class TestCommandSeedTestData(TestCase):
 
         self.assertLess(
             user.date_joined,
-            timezone.now()-timezone.timedelta(days=5)
+            timezone.now() - timezone.timedelta(days=5)
         )
 
         overrides.__exit__()
 
     def test_it_imports_the_sample_maps(self):
         overrides = container.override_providers(
-            data_fs = MemoryFS()
+            data_fs=MemoryFS()
         )
 
         self.assertFalse(self.oramap_file_exists_for_map_id(1))
@@ -114,16 +115,17 @@ class TestCommandSeedTestData(TestCase):
 
         overrides.__exit__()
 
+
 class TestTestDocker(TestCase):
 
     def test_it_runs_the_test_docker_command_and_prints_the_result_if_it_is_successful(self):
         overrides = container.override_providers(
-            log = providers.Singleton(FakeLog),
+            log=providers.Singleton(FakeLog),
         )
 
         docker_mock = Mock(spec=Docker)
         docker_mock.test_docker = MagicMock(
-            return_value = 'sample'
+            return_value='sample'
         )
         container.docker.override(docker_mock)
 
@@ -139,17 +141,17 @@ class TestTestDocker(TestCase):
 
     def test_it_runs_the_test_docker_command_and_prints_the_error_if_it_failed(self):
         overrides = container.override_providers(
-            log = providers.Singleton(FakeLog),
+            log=providers.Singleton(FakeLog),
         )
 
         exception_mock = ExceptionBase
         exception_mock.get_full_details = MagicMock(
-            return_value = 'sample_output'
+            return_value='sample_output'
         )
 
         docker_mock = Mock(spec=Docker)
         docker_mock.test_docker = MagicMock(
-            side_effect = exception_mock
+            side_effect=exception_mock
         )
         container.docker.override(docker_mock)
 

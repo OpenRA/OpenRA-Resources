@@ -5,19 +5,19 @@ from fs.tempfs import TempFS
 
 from openra.services.file_downloader import ExceptionFileDownloader, FileDownloader
 
+
 class TestServiceFileDownloader(TestCase):
 
-    def create_mock_file_like_object(self, content:str):
+    def create_mock_file_like_object(self, content: str):
         temp_fs = TempFS()
         temp_fs.writetext('test', content)
         return temp_fs.openbin('test')
-
 
     def test_download_file_downloads_a_file(self):
         file_downloader = FileDownloader()
 
         file_downloader._get_file_like_object = MagicMock(
-            return_value = self.create_mock_file_like_object('sample')
+            return_value=self.create_mock_file_like_object('sample')
         )
 
         location = file_downloader.download_file('test_url', 'file_name')
@@ -33,7 +33,7 @@ class TestServiceFileDownloader(TestCase):
         file_downloader = FileDownloader()
 
         file_downloader._get_file_like_object = MagicMock(
-            side_effect = Exception()
+            side_effect=Exception()
         )
 
         self.assertRaises(

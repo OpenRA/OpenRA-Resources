@@ -13,6 +13,7 @@ from openra.services.map_file_repository import MapFileRepository
 from openra.services.map_search import MapSearch
 from openra.services.utility import Utility
 
+
 class Container(containers.DeclarativeContainer):
     config = providers.Configuration()
 
@@ -59,6 +60,7 @@ class Container(containers.DeclarativeContainer):
     map_search = providers.Singleton(
         MapSearch
     )
+
 
 container = Container()
 container.config.from_dict(settings.__dict__)

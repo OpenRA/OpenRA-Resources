@@ -178,5 +178,5 @@ def download_map(request, map_hash):
     response['Content-Disposition'] = 'attachment; filename = %s' % serve_filename
     response['Content-Length'] = os.path.getsize(oramap_path)
 
-    Maps.objects.filter(id=map_object.id).update(downloaded=map_object.downloaded+1)
+    Maps.objects.filter(id=map_object.id).update(downloaded=map_object.downloaded + 1)
     return response

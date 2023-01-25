@@ -11,42 +11,42 @@ class Maps(models.Model):
     def __str__(self):
         return str(self.id)
 
-    user                = models.ForeignKey(User)
-    title               = models.CharField(max_length=200)
-    description         = models.CharField(max_length=4000, blank=True, null=True)
-    info                = models.CharField(max_length=4000, blank=True, null=True)
-    author              = models.CharField(max_length=200)
-    map_type            = models.CharField(max_length=100, blank=True, null=True)
-    categories          = models.CharField(max_length=200, blank=True, null=True)
-    players             = models.IntegerField(default=0)
-    game_mod            = models.CharField(max_length=100)
-    map_hash            = models.CharField(max_length=200)
-    width               = models.CharField(max_length=16)
-    height              = models.CharField(max_length=16)
-    bounds              = models.CharField(max_length=50, default="")
-    tileset             = models.CharField(max_length=50)
-    spawnpoints         = models.CharField(max_length=1000, default="")
-    mapformat           = models.IntegerField(default=6)
-    parser              = models.CharField(max_length=100, default="release-20141029")
-    shellmap            = models.BooleanField(default=False)
-    base64_rules        = models.CharField(max_length=10000000, blank=True, null=True, default="")
-    base64_players      = models.CharField(max_length=10000000, blank=True, null=True, default="")
-    legacy_map          = models.BooleanField(default=False)
-    revision            = models.IntegerField(default=1)
-    pre_rev             = models.IntegerField(default=0)
-    next_rev            = models.IntegerField(default=0)
-    downloading         = models.BooleanField(default=True)
-    requires_upgrade    = models.BooleanField(default=False)
-    advanced_map        = models.BooleanField(default=False)
-    lua                 = models.BooleanField(default=False)
-    posted              = models.DateTimeField('date published')
-    viewed              = models.IntegerField(default=0)
-    downloaded          = models.IntegerField(default=0)
-    rating              = models.FloatField(default=0.0)
-    amount_reports      = models.IntegerField(default=0)
-    policy_cc           = models.BooleanField(default=False)
-    policy_adaptations  = models.CharField(max_length=30, blank=True, null=True)
-    policy_commercial   = models.BooleanField(default=False)
+    user = models.ForeignKey(User)
+    title = models.CharField(max_length=200)
+    description = models.CharField(max_length=4000, blank=True, null=True)
+    info = models.CharField(max_length=4000, blank=True, null=True)
+    author = models.CharField(max_length=200)
+    map_type = models.CharField(max_length=100, blank=True, null=True)
+    categories = models.CharField(max_length=200, blank=True, null=True)
+    players = models.IntegerField(default=0)
+    game_mod = models.CharField(max_length=100)
+    map_hash = models.CharField(max_length=200)
+    width = models.CharField(max_length=16)
+    height = models.CharField(max_length=16)
+    bounds = models.CharField(max_length=50, default="")
+    tileset = models.CharField(max_length=50)
+    spawnpoints = models.CharField(max_length=1000, default="")
+    mapformat = models.IntegerField(default=6)
+    parser = models.CharField(max_length=100, default="release-20141029")
+    shellmap = models.BooleanField(default=False)
+    base64_rules = models.CharField(max_length=10000000, blank=True, null=True, default="")
+    base64_players = models.CharField(max_length=10000000, blank=True, null=True, default="")
+    legacy_map = models.BooleanField(default=False)
+    revision = models.IntegerField(default=1)
+    pre_rev = models.IntegerField(default=0)
+    next_rev = models.IntegerField(default=0)
+    downloading = models.BooleanField(default=True)
+    requires_upgrade = models.BooleanField(default=False)
+    advanced_map = models.BooleanField(default=False)
+    lua = models.BooleanField(default=False)
+    posted = models.DateTimeField('date published')
+    viewed = models.IntegerField(default=0)
+    downloaded = models.IntegerField(default=0)
+    rating = models.FloatField(default=0.0)
+    amount_reports = models.IntegerField(default=0)
+    policy_cc = models.BooleanField(default=False)
+    policy_adaptations = models.CharField(max_length=30, blank=True, null=True)
+    policy_commercial = models.BooleanField(default=False)
 
 
 class MapCategories(models.Model):
@@ -57,8 +57,9 @@ class MapCategories(models.Model):
     def __str__(self):
         return self.category_name
 
-    category_name       = models.CharField(max_length=100)
-    posted              = models.DateTimeField('dated added', default=datetime.datetime.now)
+    category_name = models.CharField(max_length=100)
+    posted = models.DateTimeField('dated added', default=datetime.datetime.now)
+
 
 class MapUpgradeLogs(models.Model):
     class Meta:
@@ -67,23 +68,24 @@ class MapUpgradeLogs(models.Model):
     def __str__(self):
         return str(self.id)
 
-    map_id                = models.ForeignKey(Maps)
-    date_run              = models.DateTimeField(default=datetime.datetime.now)
-    from_version          = models.CharField(max_length=100, default="")
-    to_version            = models.CharField(max_length=100, default="")
-    upgrade_output        = models.CharField(max_length=10000000, default="")
+    map_id = models.ForeignKey(Maps)
+    date_run = models.DateTimeField(default=datetime.datetime.now)
+    from_version = models.CharField(max_length=100, default="")
+    to_version = models.CharField(max_length=100, default="")
+    upgrade_output = models.CharField(max_length=10000000, default="")
+
 
 class Lints(models.Model):
 
     class Meta:
         verbose_name_plural = 'Lints'
 
-    item_type           = models.CharField(max_length=16, default="maps")
-    map_id              = models.IntegerField(default=0)
-    version_tag         = models.CharField(max_length=100, default="release-20141029")
-    pass_status         = models.BooleanField(default=False)
-    lint_output         = models.CharField(max_length=10000000, default="")
-    posted              = models.DateTimeField('date of check')
+    item_type = models.CharField(max_length=16, default="maps")
+    map_id = models.IntegerField(default=0)
+    version_tag = models.CharField(max_length=100, default="release-20141029")
+    pass_status = models.BooleanField(default=False)
+    lint_output = models.CharField(max_length=10000000, default="")
+    posted = models.DateTimeField('date of check')
 
 
 class Comments(models.Model):
@@ -94,12 +96,12 @@ class Comments(models.Model):
     def __str__(self):
         return self.item_type + ' ' + str(self.item_id) + ' by ' + self.user.username
 
-    user                = models.ForeignKey(User)
-    content             = models.CharField(max_length=10000)
-    item_type           = models.CharField(max_length=16, default="maps")
-    item_id             = models.IntegerField(default=0)
-    posted              = models.DateTimeField('date of comment')
-    is_removed          = models.BooleanField(default=False)
+    user = models.ForeignKey(User)
+    content = models.CharField(max_length=10000)
+    item_type = models.CharField(max_length=16, default="maps")
+    item_id = models.IntegerField(default=0)
+    posted = models.DateTimeField('date of comment')
+    is_removed = models.BooleanField(default=False)
 
 
 class UnsubscribeComments(models.Model):
@@ -110,10 +112,10 @@ class UnsubscribeComments(models.Model):
     def __str__(self):
         return str(self.id)
 
-    user                = models.ForeignKey(User)
-    item_type           = models.CharField(max_length=16, default="maps")
-    item_id             = models.IntegerField(default=0)
-    unsubscribed        = models.DateTimeField('date of unsubscribe')
+    user = models.ForeignKey(User)
+    item_type = models.CharField(max_length=16, default="maps")
+    item_id = models.IntegerField(default=0)
+    unsubscribed = models.DateTimeField('date of unsubscribe')
 
 
 class Reports(models.Model):
@@ -121,12 +123,12 @@ class Reports(models.Model):
     class Meta:
         verbose_name_plural = 'Reports'
 
-    user                = models.ForeignKey(User)
-    reason              = models.CharField(max_length=400)
-    ex_id               = models.IntegerField(default=0)
-    ex_name             = models.CharField(max_length=16)
-    infringement        = models.BooleanField(default=False)
-    posted              = models.DateTimeField('date published')
+    user = models.ForeignKey(User)
+    reason = models.CharField(max_length=400)
+    ex_id = models.IntegerField(default=0)
+    ex_name = models.CharField(max_length=16)
+    infringement = models.BooleanField(default=False)
+    posted = models.DateTimeField('date published')
 
 
 class Screenshots(models.Model):
@@ -134,11 +136,11 @@ class Screenshots(models.Model):
     class Meta:
         verbose_name_plural = 'Screenshots'
 
-    user                = models.ForeignKey(User)
-    ex_id               = models.IntegerField(default=0)
-    ex_name             = models.CharField(max_length=16)
-    posted              = models.DateTimeField('date published')
-    map_preview         = models.BooleanField(default=False)
+    user = models.ForeignKey(User)
+    ex_id = models.IntegerField(default=0)
+    ex_name = models.CharField(max_length=16)
+    posted = models.DateTimeField('date published')
+    map_preview = models.BooleanField(default=False)
 
 
 class Rating(models.Model):
@@ -146,16 +148,17 @@ class Rating(models.Model):
     class Meta:
         verbose_name_plural = 'Ratings'
 
-    user                = models.ForeignKey(User)
-    ex_id               = models.IntegerField(default=0)
-    ex_name             = models.CharField(max_length=16)
-    rating              = models.FloatField(default=0.0)
-    posted              = models.DateTimeField('date rated')
+    user = models.ForeignKey(User)
+    ex_id = models.IntegerField(default=0)
+    ex_name = models.CharField(max_length=16)
+    rating = models.FloatField(default=0.0)
+    posted = models.DateTimeField('date rated')
+
 
 class Engines(models.Model):
 
     class Meta:
         verbose_name_plural = 'Engines'
 
-    game_mod            = models.CharField(max_length=100)
-    version             = models.CharField(max_length=100)
+    game_mod = models.CharField(max_length=100)
+    version = models.CharField(max_length=100)

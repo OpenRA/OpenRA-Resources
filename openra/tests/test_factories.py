@@ -5,6 +5,7 @@ from django.test import TestCase
 
 from . import factories
 
+
 class TestFactories(TestCase):
 
     def test_it_can_create_saveable_models_from_all_factories(self):

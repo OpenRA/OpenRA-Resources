@@ -6,6 +6,7 @@ from openra.classes.file_location import FileLocation
 from openra.classes.release import Release
 from openra.services.docker import Docker
 
+
 class EngineFileRepository:
 
     _data_fs: FS
@@ -13,19 +14,19 @@ class EngineFileRepository:
 
     @inject
     def __init__(
-            self,
-            data_fs:FS=Provide['data_fs'],
-            docker:Docker=Provide['docker'],
-        ):
+        self,
+        data_fs: FS = Provide['data_fs'],
+        docker: Docker = Provide['docker'],
+    ):
         self._data_fs = data_fs
         self._docker = docker
 
-    def exists(self, release:Release):
+    def exists(self, release: Release):
         path = self._get_target_path(release)
 
         return self._data_fs.exists(os.path.join(path, 'AppRun'))
 
-    def get_path(self, release:Release):
+    def get_path(self, release: Release):
         path = self._get_target_path_and_throw_exception_if_doesnt_exist(release)
 
         if not self._data_fs.exists(os.path.join(path, 'AppRun')):
@@ -37,8 +38,7 @@ class EngineFileRepository:
             ''
         )
 
-
-    def import_appimage(self, release:Release, appimage_location:FileLocation):
+    def import_appimage(self, release: Release, appimage_location: FileLocation):
         path = self._get_target_path(release)
 
         if not self._data_fs.exists(path):
@@ -57,7 +57,7 @@ class EngineFileRepository:
 
         return self.get_path(release)
 
-    def _get_target_path_and_throw_exception_if_doesnt_exist(self, release:Release):
+    def _get_target_path_and_throw_exception_if_doesnt_exist(self, release: Release):
         path = self._get_target_path(release)
 
         if not self._data_fs.exists(path):
@@ -68,16 +68,18 @@ class EngineFileRepository:
     def _get_target_path(self, release):
         return str(os.path.join('engines', release.mod, release.version))
 
+
 class ExceptionEngineFolderNotFound(ExceptionBase):
-    def __init__(self, fs:FS, release:Release, path:str):
+    def __init__(self, fs: FS, release: Release, path: str):
         super().__init__()
         self.message = "Folder not found for engine"
         self.detail.append('fs type: ' + str(type(fs)))
         self.detail.append('release: ' + str(release))
         self.detail.append('path: ' + path)
 
+
 class ExceptionEngineAppRunNotFound(ExceptionBase):
-    def __init__(self, fs:FS, release:Release, path:str):
+    def __init__(self, fs: FS, release: Release, path: str):
         super().__init__()
         self.message = "AppRun file not found for engine"
         self.detail.append('fs type: ' + str(type(fs)))

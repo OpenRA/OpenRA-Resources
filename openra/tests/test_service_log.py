@@ -5,6 +5,7 @@ from openra.classes.exceptions import ExceptionBase
 from openra.facades import log
 from freezegun import freeze_time
 
+
 class TestServiceLog(TestCase):
 
     @patch('builtins.print')
@@ -35,4 +36,4 @@ class TestServiceLog(TestCase):
 
         log().exception_obj(exception)
 
-        print_mock.assert_called_once_with('1996-11-22 11:22:33 exception: '+exception.get_full_details())
+        print_mock.assert_called_once_with('1996-11-22 11:22:33 exception: ' + exception.get_full_details())

@@ -24,8 +24,10 @@ from openra.containers import Container
 # pylint: disable=too-many-locals
 # pylint: disable=broad-except
 
+
 class InvalidMapException(Exception):
     """Failed to parse or process an OpenRA map file"""
+
     def __init__(self, message):
         super().__init__()
         self.message = message
@@ -36,7 +38,7 @@ def add_map_revision(oramap_path, user,
                      parser, game_mod,
                      info, policy_options, posted_date,
                      revision=1, previous_revision_id=0,
-                     data_fs:FS=Provide[Container.data_fs]):
+                     data_fs: FS = Provide[Container.data_fs]):
     """ Parse and save a given oramap into the database.
         The input file is not modified, and must be cleaned up afterwards by the caller.
         Returns a Maps model or raises an InvalidMapException on error
@@ -112,10 +114,10 @@ def add_map_revision(oramap_path, user,
         policy_cc=policy_options['cc'],
         policy_commercial=policy_options['commercial'],
         policy_adaptations=policy_options['adaptations'],
-        description='', # Obsolete field
-        map_type='', # Obsolete field
-        shellmap=False, # Obsolete field
-        legacy_map=False, # Obsolete field
+        description='',  # Obsolete field
+        map_type='',  # Obsolete field
+        shellmap=False,  # Obsolete field
+        legacy_map=False,  # Obsolete field
         **keyargs
     )
     item.save()
@@ -135,7 +137,7 @@ def add_map_revision(oramap_path, user,
     # TODO: Why do we need this?
     try:
         copy.copy_dir(ZipFS(oramap_path), '/', data_fs, item_content_path)
-    except:
+    except BaseException:
         pass
 
     if previous_revision_id:
@@ -166,6 +168,7 @@ def add_map_revision(oramap_path, user,
 
     print("--- New revision: %s" % item.id)
     return item
+
 
 def process_upload(user_id, file, post, revision=1, previous_revision=0):
     """Upload a new revision of a map
@@ -299,10 +302,10 @@ def process_update(item, parser=settings.OPENRA_VERSIONS[0]):
         }
 
         updated_item = add_map_revision(oramap_path, item.user,
-                                parser, item.game_mod,
-                                item.info, policy,
-                                item.posted, # preserve original date to avoid reordering map list
-                                item.revision + 1, item.id)
+                                        parser, item.game_mod,
+                                        item.info, policy,
+                                        item.posted,  # preserve original date to avoid reordering map list
+                                        item.revision + 1, item.id)
 
         # Update logs are only interesting if the map has custom rules
         if item.advanced_map:
@@ -315,6 +318,7 @@ def process_update(item, parser=settings.OPENRA_VERSIONS[0]):
             ).save()
 
         return updated_item
+
 
 def addScreenshot(request, arg, item):
     if item == 'map':
@@ -344,10 +348,10 @@ def addScreenshot(request, arg, item):
     transac = Screenshots(
         user=Object[0].user,
         ex_id=int(arg),
-        ex_name=item+"s",
+        ex_name=item + "s",
         posted=timezone.now(),
         map_preview=map_preview,
-        )
+    )
     transac.save()
 
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data',

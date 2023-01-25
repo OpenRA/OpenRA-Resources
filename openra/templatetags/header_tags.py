@@ -12,4 +12,6 @@ def new_comments(value, arg):
         if len(seek) != 0:
             return "+" + str(len(seek)) + " "
     return ""
+
+
 register.filter('new_comments', new_comments)

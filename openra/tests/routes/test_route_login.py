@@ -8,6 +8,7 @@ from openra.tests.factories import UserFactory
 
 from openra.tests.routes.test_route_base import TestRouteBase
 
+
 class TestRouteLogin(TestRouteBase):
 
     _route = '/login/'
@@ -53,8 +54,8 @@ class TestRouteLogin(TestRouteBase):
             password=make_password('password')
         )
         return self.post(merge_dicts({
-            'ora_username':user.username,
-            'ora_password':'password'
+            'ora_username': user.username,
+            'ora_password': 'password'
         }, data))
 
     def test_post_logs_in_user_and_redirects_to_home(self):
@@ -80,7 +81,7 @@ class TestRouteLogin(TestRouteBase):
 
     def test_post_preserves_session_if_remember_is_ticked(self):
         self._send_valid_post({
-            'ora_remember':'Yes'
+            'ora_remember': 'Yes'
         })
 
         self.assertFalse(
@@ -95,8 +96,8 @@ class TestRouteLogin(TestRouteBase):
 
         self.assert_contains(
             self.post({
-                'ora_username':user.username,
-                'ora_password':'password'
+                'ora_username': user.username,
+                'ora_password': 'password'
             }),
             [content.auth['inactive']]
         )
@@ -104,7 +105,7 @@ class TestRouteLogin(TestRouteBase):
     def test_post_can_show_incorrect_credentials_error(self):
         self.assert_contains(
             self._send_valid_post({
-                'ora_password':'wrong'
+                'ora_password': 'wrong'
             }),
             [content.auth['incorrect']]
         )

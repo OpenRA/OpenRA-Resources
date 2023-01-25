@@ -1,5 +1,6 @@
 from typing import List
 
+
 class ExceptionBase(Exception):
 
     message: str
@@ -8,7 +9,7 @@ class ExceptionBase(Exception):
 
     def __init__(self):
         self.message = ''
-        self.detail = [] 
+        self.detail = []
         self.friendly = 'An error occurred, please try again later'
 
     def get_full_details(self):
@@ -23,4 +24,3 @@ class ExceptionBase(Exception):
 
     def print_full_details(self):
         print(self.get_full_details())
-

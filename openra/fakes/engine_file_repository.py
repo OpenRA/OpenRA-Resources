@@ -8,17 +8,17 @@ from openra.services.engine_file_repository import ExceptionEngineFolderNotFound
 
 class FakeEngineFileRepository:
 
-    engine_exists:bool
-    imported:List[Release]
+    engine_exists: bool
+    imported: List[Release]
 
     def __init__(self):
         self.imported = []
         self.engine_exists = False
 
-    def exists(self, release:Release):
+    def exists(self, release: Release):
         return self.engine_exists
 
-    def get_path(self, release:Release):
+    def get_path(self, release: Release):
         if not self.engine_exists:
             raise ExceptionEngineFolderNotFound(TempFS(), release, 'fake')
 
@@ -31,8 +31,7 @@ class FakeEngineFileRepository:
             file
         )
 
-
-    def import_appimage(self, release:Release, appimage_location:FileLocation):
+    def import_appimage(self, release: Release, appimage_location: FileLocation):
         self.imported.append(release)
 
         temp_fs = TempFS()
