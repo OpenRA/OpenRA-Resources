@@ -1,7 +1,7 @@
 from django.test import TestCase, Client, override_settings
 
 from openra.tests.factories import UserFactory
-#@override_settings(SITE_MAINTENANCE=False)
+@override_settings(SITE_MAINTENANCE=False)
 class TestRouteBase(TestCase):
 
     _route:str

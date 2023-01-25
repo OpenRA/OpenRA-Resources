@@ -26,7 +26,7 @@ class FakeEngineFileRepository:
         file = 'sample'
         temp_fs.touch(file)
         return FileLocation(
-            TempFS(),
+            temp_fs,
             '',
             file
         )
@@ -39,7 +39,7 @@ class FakeEngineFileRepository:
         file = 'sample'
         temp_fs.touch(file)
         return FileLocation(
-            TempFS(),
+            temp_fs,
             '',
             file
         )

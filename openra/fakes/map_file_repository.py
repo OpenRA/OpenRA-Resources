@@ -1,9 +1,6 @@
-from typing import List
 from fs.tempfs import TempFS
 
 from openra.classes.file_location import FileLocation
-from openra.classes.release import Release
-from openra.services.engine_file_repository import ExceptionEngineFolderNotFound
 from openra.services.map_file_repository import ExceptionMapFolderNotFound
 
 
@@ -22,7 +19,7 @@ class FakeMapFileRepository:
         file = 'sample.oramap'
         temp_fs.touch(file)
         return FileLocation(
-            TempFS(),
+            temp_fs,
             '',
             file
         )
