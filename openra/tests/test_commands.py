@@ -22,11 +22,6 @@ class TestCommandSeedTestData(TestCase):
     def run_seeder(self):
         call_command('seedtestdata', 'sampleuser@example.com', 'sampleuser', 'pass123')
 
-    def mock_file_system(self):
-        container.data_fs.override(providers.Singleton(
-            MemoryFS
-        ))
-
     @inject
     def oramap_file_exists_for_map_id(self, map_id, data_fs:FS=Provide[Container.data_fs]):
         file_path = path.join('maps', str(map_id))
@@ -40,7 +35,10 @@ class TestCommandSeedTestData(TestCase):
         return False
 
     def test_it_creates_a_super_user_with_the_details_provided(self):
-        self.mock_file_system()
+        overrides = container.override_providers(
+            data_fs = MemoryFS()
+        )
+
         self.run_seeder()
 
         user = User.objects.first()
@@ -69,8 +67,12 @@ class TestCommandSeedTestData(TestCase):
             timezone.now()-timezone.timedelta(days=5)
         )
 
+        overrides.__exit__()
+
     def test_it_imports_the_sample_maps(self):
-        self.mock_file_system()
+        overrides = container.override_providers(
+            data_fs = MemoryFS()
+        )
 
         self.assertFalse(self.oramap_file_exists_for_map_id(1))
         self.run_seeder()
@@ -109,6 +111,8 @@ class TestCommandSeedTestData(TestCase):
         )
 
         self.assertTrue(self.oramap_file_exists_for_map_id(lua_map.id))
+
+        overrides.__exit__()
 
 class TestTestDocker(TestCase):
 
