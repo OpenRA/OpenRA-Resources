@@ -9,6 +9,7 @@ from openra.services.docker import Docker
 
 from openra.services.engine_file_repository import EngineFileRepository, ExceptionEngineAppRunNotFound, ExceptionEngineFolderNotFound
 
+
 class TestServiceEngineFileRepository(TestCase):
 
     def test_exists_returns_whether_engine_exists(self):
@@ -91,14 +92,13 @@ class TestServiceEngineFileRepository(TestCase):
             Release('ra', 'release123')
         )
 
-
     def test_import_appimage_imports_appimage(self):
         docker_mock = Mock(spec=Docker)
         docker_mock.extract_appimage = MagicMock(
-            return_value = 'sample_output'
+            return_value='sample_output'
         )
 
-        fs=TempFS()
+        fs = TempFS()
         fs.makedirs('engines/ra/version1')
         fs.touch('engines/ra/version1/AppRun')
 
@@ -148,10 +148,10 @@ class TestServiceEngineFileRepository(TestCase):
     def test_import_appimage_throws_exception_if_engine_doesnt_exist_after_import(self):
         docker_mock = Mock(spec=Docker)
         docker_mock.extract_appimage = MagicMock(
-            return_value = 'sample_output'
+            return_value='sample_output'
         )
 
-        fs=TempFS()
+        fs = TempFS()
 
         engine_file_repository = EngineFileRepository(
             data_fs=fs,
@@ -183,4 +183,3 @@ class TestServiceEngineFileRepository(TestCase):
             temp_fs_location.get_os_path(),
             fs.getospath('engines/ra/version1').decode('utf-8')
         )
-

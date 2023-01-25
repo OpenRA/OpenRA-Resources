@@ -1,9 +1,10 @@
 from unittest import TestCase
-from unittest.mock import  Mock, MagicMock
+from unittest.mock import Mock, MagicMock
 
 from openra.services.docker import Docker, ExceptionDockerExceptionResponse, ExceptionDockerIncompatibleAppImagePath, ExceptionDockerNonByteResponse
 from os import path
 from django.conf import settings
+
 
 class TestServiceDocker(TestCase):
     def test_that_test_docker_calls_lib_correctly_and_returns_output(self):
@@ -11,10 +12,10 @@ class TestServiceDocker(TestCase):
         client_mock.containers = Mock()
         client_mock.images = Mock()
         client_mock.images.get = MagicMock(
-            return_value ='fake_image'
+            return_value='fake_image'
         )
         client_mock.containers.run = MagicMock(
-            return_value = b'mock_return'
+            return_value=b'mock_return'
         )
 
         docker = Docker(client_mock)
@@ -38,10 +39,10 @@ class TestServiceDocker(TestCase):
         client_mock.containers = Mock()
         client_mock.images = Mock()
         client_mock.images.get = MagicMock(
-            return_value ='fake_image'
+            return_value='fake_image'
         )
         client_mock.containers.run = MagicMock(
-            return_value = b'mock_return'
+            return_value=b'mock_return'
         )
 
         docker = Docker(client_mock)
@@ -59,9 +60,9 @@ class TestServiceDocker(TestCase):
         client_mock.containers.run.assert_called_once_with(
             'fake_image',
             'bash -c "cp /in/AppImage . && '
-                    'chmod +x AppImage && '
-                    './AppImage --appimage-extract && '
-                    'rm AppImage"',
+            'chmod +x AppImage && '
+            './AppImage --appimage-extract && '
+            'rm AppImage"',
             remove=True,
             volumes=[
                 '/sample/image.AppImage:/in/AppImage',
@@ -78,10 +79,10 @@ class TestServiceDocker(TestCase):
         client_mock.containers = Mock()
         client_mock.images = Mock()
         client_mock.images.get = MagicMock(
-            return_value ='fake_image'
+            return_value='fake_image'
         )
         client_mock.containers.run = MagicMock(
-            return_value = b'mock_return'
+            return_value=b'mock_return'
         )
 
         self.assertEquals(
@@ -109,10 +110,10 @@ class TestServiceDocker(TestCase):
         client_mock.containers = Mock()
         client_mock.images = Mock()
         client_mock.images.get = MagicMock(
-            return_value ='fake_image'
+            return_value='fake_image'
         )
         client_mock.containers.run = MagicMock(
-            return_value = 'non byte response'
+            return_value='non byte response'
         )
 
         docker = Docker(client_mock)
@@ -127,10 +128,10 @@ class TestServiceDocker(TestCase):
         client_mock.containers = Mock()
         client_mock.images = Mock()
         client_mock.images.get = MagicMock(
-            return_value ='fake_image'
+            return_value='fake_image'
         )
         client_mock.containers.run = MagicMock(
-            side_effect = Exception()
+            side_effect=Exception()
         )
 
         docker = Docker(client_mock)
@@ -148,13 +149,13 @@ class TestServiceDocker(TestCase):
         client_mock.containers = Mock()
         client_mock.images = Mock()
         client_mock.images.get = MagicMock(
-            side_effect = Exception()
+            side_effect=Exception()
         )
         client_mock.images.build = MagicMock(
             return_value=('fake_image', 'something_else')
         )
         client_mock.containers.run = MagicMock(
-            return_value=warning+b'mock_return'
+            return_value=warning + b'mock_return'
         )
 
         docker = Docker(client_mock)

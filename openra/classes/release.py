@@ -1,10 +1,10 @@
 
 class Release:
 
-    mod:str
-    version:str
+    mod: str
+    version: str
 
-    def __init__(self, mod:str, version):
+    def __init__(self, mod: str, version):
         self.mod = mod
         self.version = version
 

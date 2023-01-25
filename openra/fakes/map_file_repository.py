@@ -6,12 +6,12 @@ from openra.services.map_file_repository import ExceptionMapFolderNotFound
 
 class FakeMapFileRepository:
 
-    map_exists:bool
+    map_exists: bool
 
     def __init__(self):
         self.map_exists = True
 
-    def get_oramap_path(self, map_id:int):
+    def get_oramap_path(self, map_id: int):
         if not self.map_exists:
             raise ExceptionMapFolderNotFound(TempFS(), map_id, 'fake')
 

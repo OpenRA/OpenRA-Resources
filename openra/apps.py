@@ -2,6 +2,7 @@
 
 from django.apps import AppConfig
 
+
 class OpenraConfig(AppConfig):
     name = "openra"
 

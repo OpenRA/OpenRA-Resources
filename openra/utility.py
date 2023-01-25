@@ -125,9 +125,9 @@ def parse_map_metadata(oramap_path):
                         posted=timezone.now(),
                     )
                     category_transac.save()
-                    category_ids.append('_'+str(category_transac.id)+'_')
+                    category_ids.append('_' + str(category_transac.id) + '_')
                 else:
-                    category_ids.append('_'+str(category.id)+'_')
+                    category_ids.append('_' + str(category.id) + '_')
             metadata['categories'] = json.dumps(category_ids)
         elif key == 'MapSize':
             size = value.split(',')

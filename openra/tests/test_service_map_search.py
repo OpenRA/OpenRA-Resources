@@ -3,6 +3,7 @@ from django.test import TestCase
 from openra.services.map_search import MapSearch
 from openra.tests.factories import MapsFactory
 
+
 class TestServiceMapSearch(TestCase):
 
     def test_get_search_returns_maps_matching_hash(self):

@@ -12,6 +12,7 @@ from openra.services.file_downloader import FileDownloader
 
 from openra.services.github import Github
 
+
 class Command(BaseCommand):
     help = 'Pulls the latest engines from GitHub'
 
@@ -37,9 +38,9 @@ class Command(BaseCommand):
             log.exception_obj(exception)
 
     @inject
-    def _get_latest_engines(self, release_count=1, github:Github=Provide[Container.github]):
+    def _get_latest_engines(self, release_count=1, github: Github = Provide[Container.github]):
         playtest_regex = re.compile('^playtest-')
-        engines:List[EngineInfo] = []
+        engines: List[EngineInfo] = []
 
         for release in github.get_releases():
             tag = release.tag
@@ -60,20 +61,20 @@ class Command(BaseCommand):
 
         return engines
 
-    def _get_release_engines(self, tag, github:Github):
+    def _get_release_engines(self, tag, github: Github):
 
         mod_regex = [{
             'mod': 'ra',
             'regex': re.compile('^OpenRA-Red-Alert-.*\.AppImage$')
-         },{
-             'mod': 'td',
-             'regex': re.compile('^OpenRA-Tiberian-Dawn-.*\.AppImage$')
-         },{
-             'mod': 'd2k',
-             'regex': re.compile('^OpenRA-Dune-2000-.*\.AppImage$')
+        }, {
+            'mod': 'td',
+            'regex': re.compile('^OpenRA-Tiberian-Dawn-.*\.AppImage$')
+        }, {
+            'mod': 'd2k',
+            'regex': re.compile('^OpenRA-Dune-2000-.*\.AppImage$')
         }]
 
-        engines:List[EngineInfo] = []
+        engines: List[EngineInfo] = []
 
         for asset in github.get_release_assets(tag):
             for mod in mod_regex:
@@ -89,9 +90,9 @@ class Command(BaseCommand):
 
     @inject
     def _download_engines(self, engines,
-            engine_file_repository:EngineFileRepository=Provide['engine_file_repository'],
-            file_downloader:FileDownloader=Provide['file_downloader']
-        ):
+                          engine_file_repository: EngineFileRepository = Provide['engine_file_repository'],
+                          file_downloader: FileDownloader = Provide['file_downloader']
+                          ):
         for engine in engines:
 
             if not engine_file_repository.exists(engine.release):
@@ -102,9 +103,9 @@ class Command(BaseCommand):
                 engine_file_repository.import_appimage(engine.release, appimage_download)
 
             if not Engines.objects.filter(
-                    game_mod=engine.release.mod,
-                    version=engine.release.version
-                ).exists():
+                game_mod=engine.release.mod,
+                version=engine.release.version
+            ).exists():
                 log().info('Adding to database: ' + str(engine.release))
                 model = Engines(
                     game_mod=engine.release.mod,
@@ -112,13 +113,12 @@ class Command(BaseCommand):
                 )
                 model.save()
 
+
 class EngineInfo:
 
-    release:Release
-    url:str
+    release: Release
+    url: str
 
-    def __init__(self, release:Release, url:str):
+    def __init__(self, release: Release, url: str):
         self.release = release
         self.url = url
-
-

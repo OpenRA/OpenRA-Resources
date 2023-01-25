@@ -6,5 +6,5 @@ from openra.services.log import Log
 
 
 @inject
-def log(log:Log=Provide['log']):
+def log(log: Log = Provide['log']):
     return log

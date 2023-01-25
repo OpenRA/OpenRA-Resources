@@ -5,6 +5,7 @@ from django.core.files import File
 
 from openra.handlers import process_upload
 
+
 class Command(BaseCommand):
     help = 'Seeds the database with some test data'
 
@@ -22,7 +23,7 @@ class Command(BaseCommand):
             username=username,
             password=password,
             email=email,
-            date_joined=timezone.now()-timezone.timedelta(days=6)
+            date_joined=timezone.now() - timezone.timedelta(days=6)
         )
 
         process_upload(
@@ -56,4 +57,3 @@ class Command(BaseCommand):
         )
 
         self.stdout.write('Database seeded')
-

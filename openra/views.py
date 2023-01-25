@@ -9,7 +9,7 @@ import base64
 from urllib.parse import urlencode
 import urllib.request
 from dependency_injector.wiring import Provide, inject
-#from dependency_injector.wiring import Provide, inject
+# from dependency_injector.wiring import Provide, inject
 
 from django.conf import settings
 from django.http import StreamingHttpResponse
@@ -33,6 +33,7 @@ from openra.services.map_search import MapSearch
 # pylint: disable=missing-docstring
 # pylint: disable=bare-except
 
+
 def standard_view(request, template, template_args):
     template = loader.get_template(template)
 
@@ -42,6 +43,7 @@ def standard_view(request, template, template_args):
             request
         )
     )
+
 
 def index(request):
     return standard_view(
@@ -54,6 +56,7 @@ def index(request):
             'screenshots': Screenshots.objects.filter(ex_name="maps").order_by('-posted')[0:5]
         }
     )
+
 
 def loginView(request):
 
@@ -85,6 +88,7 @@ def loginView(request):
         }
     )
 
+
 def logoutView(request):
 
     if not request.user.is_authenticated():
@@ -103,6 +107,7 @@ def logoutView(request):
         }
     )
 
+
 def feed(request):
     template = loader.get_template('feed.html')
 
@@ -116,10 +121,11 @@ def feed(request):
         content_type='text/xml'
     )
 
+
 @inject
 def search(request, search_query="",
-        map_search:MapSearch=Provide['map_search']
-   ):
+           map_search: MapSearch = Provide['map_search']
+           ):
 
     if not search_query:
         if request.method == 'POST':
@@ -145,11 +151,11 @@ def ControlPanel(request, page=1, filter=""):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
     perPage = 16
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
+    slice_start = perPage * int(page) - perPage
+    slice_end = perPage * int(page)
     mapObject = Maps.objects.filter(user_id=request.user.id).filter(next_rev=0).order_by('-posted')
     amount = len(mapObject)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/panel/")
@@ -163,7 +169,7 @@ def ControlPanel(request, page=1, filter=""):
         'title': 'My Content',
         'maps': mapObject,
         'page': int(page),
-        'range': [i+1 for i in range(rowsRange)],
+        'range': [i + 1 for i in range(rowsRange)],
         'amount_maps': amount,
         'comments': comments,
     }
@@ -176,11 +182,11 @@ def maps(request, page=1):
     mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
 
     perPage = 20
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
+    slice_start = perPage * int(page) - perPage
+    slice_end = perPage * int(page)
 
     amount = len(mapObject)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     amount_this_page = len(mapObject)
     if amount_this_page == 0 and int(page) != 1:
@@ -197,7 +203,7 @@ def maps(request, page=1):
         'title': 'Maps',
         'maps': mapObject,
         'page': int(page),
-        'range': [i+1 for i in range(rowsRange)],
+        'range': [i + 1 for i in range(rowsRange)],
         'amount': amount,
         'comments': comments,
 
@@ -211,17 +217,18 @@ def maps(request, page=1):
 
     return StreamingHttpResponse(template.render(template_args, request))
 
+
 def maps_author(request, author, page=1):
 
     mapObject = Maps.objects.filter(author=author.replace("%20", " "))
     mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
 
     perPage = 20
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
+    slice_start = perPage * int(page) - perPage
+    slice_end = perPage * int(page)
 
     amount = len(mapObject)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         if request.META['QUERY_STRING']:
@@ -237,7 +244,7 @@ def maps_author(request, author, page=1):
         'title': 'Maps From ' + author,
         'maps': mapObject,
         'page': int(page),
-        'range': [i+1 for i in range(rowsRange)],
+        'range': [i + 1 for i in range(rowsRange)],
         'amount': amount,
         'author': author,
         'comments': comments,
@@ -257,11 +264,11 @@ def maps_uploader(request, arg, page=1):
     mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
 
     perPage = 20
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
+    slice_start = perPage * int(page) - perPage
+    slice_end = perPage * int(page)
 
     amount = len(mapObject)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         if request.META['QUERY_STRING']:
@@ -277,7 +284,7 @@ def maps_uploader(request, arg, page=1):
         'title': 'Maps uploaded by ' + mapObject[0].user.username,
         'maps': mapObject,
         'page': int(page),
-        'range': [i+1 for i in range(rowsRange)],
+        'range': [i + 1 for i in range(rowsRange)],
         'amount': amount,
         'uploader': mapObject[0].user.username,
         'arg': arg,
@@ -298,11 +305,11 @@ def maps_duplicates(request, maphash, page=1):
     mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
 
     perPage = 20
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
+    slice_start = perPage * int(page) - perPage
+    slice_end = perPage * int(page)
 
     amount = len(mapObject)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/duplicates/%s/" % maphash)
@@ -316,7 +323,7 @@ def maps_duplicates(request, maphash, page=1):
         'title': 'Duplicates of ' + mapObject[0].title,
         'maps': mapObject,
         'page': int(page),
-        'range': [i+1 for i in range(rowsRange)],
+        'range': [i + 1 for i in range(rowsRange)],
         'amount': amount,
         'maphash': maphash,
         'comments': comments,
@@ -342,19 +349,19 @@ def displayMap(request, arg):
                     posted=timezone.now(),
                 )
                 transac.save()
-                Maps.objects.filter(id=arg).update(amount_reports=F('amount_reports')+1)
-                misc.send_email_to_admin_OnReport({'addr': request.META['HTTP_HOST']+'/maps/'+arg, 'user_id': request.user.id, 'reason': request.POST['reportReason'].strip(), 'infringement': infringement})
-                misc.send_email_to_user_OnReport({'addr': request.META['HTTP_HOST']+'/maps/'+arg, 'owner_id': Maps.objects.get(id=arg).user_id, 'reason': request.POST['reportReason'].strip(), 'resource_type': 'map'})
-                return HttpResponseRedirect('/maps/'+arg)
+                Maps.objects.filter(id=arg).update(amount_reports=F('amount_reports') + 1)
+                misc.send_email_to_admin_OnReport({'addr': request.META['HTTP_HOST'] + '/maps/' + arg, 'user_id': request.user.id, 'reason': request.POST['reportReason'].strip(), 'infringement': infringement})
+                misc.send_email_to_user_OnReport({'addr': request.META['HTTP_HOST'] + '/maps/' + arg, 'owner_id': Maps.objects.get(id=arg).user_id, 'reason': request.POST['reportReason'].strip(), 'resource_type': 'map'})
+                return HttpResponseRedirect('/maps/' + arg)
         elif request.POST.get('mapInfo', False) is not False:
             if request.user.is_superuser:
                 Maps.objects.filter(id=arg).update(info=request.POST['mapInfo'].strip())
             else:
                 Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())
-            return HttpResponseRedirect('/maps/'+arg)
+            return HttpResponseRedirect('/maps/' + arg)
         elif request.FILES.get('screenshot', False) is not False:
 
-                handlers.addScreenshot(request, arg, 'map')
+            handlers.addScreenshot(request, arg, 'map')
 
         elif request.POST.get('comment', "") != "":
             account_age = misc.user_account_age(request.user)
@@ -401,7 +408,7 @@ def displayMap(request, arg):
 
     try:
         mapObject = Maps.objects.get(id=arg)
-    except:
+    except BaseException:
         return HttpResponseRedirect('/')
 
     disk_size = os.path.getsize(os.path.join(path, oramap_filename))
@@ -420,7 +427,7 @@ def displayMap(request, arg):
         try:
             usr = User.objects.get(pk=item.user_id)
             reports.append([usr.username, item.reason, item.infringement, item.posted])
-        except:
+        except BaseException:
             pass
         if item.user_id == request.user.id:
             reportedByUser = True
@@ -454,7 +461,7 @@ def displayMap(request, arg):
             played_counter = played_counter["played"]
         else:
             played_counter = 0
-    except:
+    except BaseException:
         played_counter = 'unknown'
 
     ratesAmount = Rating.objects.filter(ex_id=mapObject.id, ex_name='map')
@@ -483,7 +490,7 @@ def displayMap(request, arg):
 
     license, icons = misc.selectLicenceInfo(mapObject)
     userObject = User.objects.get(pk=mapObject.user_id)
-    Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed+1)
+    Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed + 1)
 
     has_upgrade_logs = mapObject.mapupgradelogs_set.count() > 0
 
@@ -564,6 +571,7 @@ def updateMap(request, arg):
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
+
 def updateMapLogs(request, arg):
     mapObject = Maps.objects.filter(id=arg)
     item = mapObject[0]
@@ -579,6 +587,7 @@ def updateMapLogs(request, arg):
     }
     return StreamingHttpResponse(template.render(template_args, request))
 
+
 def deleteScreenshot(request, itemid):
     scObject = Screenshots.objects.filter(id=itemid)
     if scObject:
@@ -588,10 +597,10 @@ def deleteScreenshot(request, itemid):
             path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'screenshots', itemid)
             try:
                 shutil.rmtree(path)
-            except:
+            except BaseException:
                 pass
             scObject[0].delete()
-            return HttpResponseRedirect("/"+name+"/"+arg+"/")
+            return HttpResponseRedirect("/" + name + "/" + arg + "/")
     return HttpResponseRedirect("/")
 
 
@@ -605,7 +614,7 @@ def deleteComment(request, arg, item_type, item_id):
             if not coms_exist_for_map_for_user:
                 UnsubscribeComments.objects.filter(item_type=item_type, item_id=item_id, user=request.user.id).delete()
 
-    return HttpResponseRedirect("/"+item_type+"/"+item_id+"/")
+    return HttpResponseRedirect("/" + item_type + "/" + item_id + "/")
 
 
 def unsubscribe_from_comments(request, item_type, arg):
@@ -630,7 +639,7 @@ def serveScreenshot(request, itemid, itemname=""):
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'screenshots', itemid)
     try:
         Dir = os.listdir(path)
-    except:
+    except BaseException:
         return HttpResponseRedirect("/")
     for fn in Dir:
         if "-mini." in fn:
@@ -645,7 +654,7 @@ def serveScreenshot(request, itemid, itemname=""):
                 break
     if image == "":
         return StreamingHttpResponse("")
-    response = StreamingHttpResponse(open(image, 'rb'), content_type='image/'+mime)
+    response = StreamingHttpResponse(open(image, 'rb'), content_type='image/' + mime)
     response['Content-Disposition'] = 'attachment; filename = %s' % fn
     return response
 
@@ -655,7 +664,7 @@ def serveMinimap(request, arg):
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
     try:
         contentDir = os.listdir(os.path.join(path, 'content'))
-    except:
+    except BaseException:
         return HttpResponseRedirect("/")
     for filename in contentDir:
         if filename == "map.png":
@@ -682,22 +691,22 @@ def serveOramap(request, arg, sync=""):
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
     try:
         mapDir = os.listdir(path)
-    except:
+    except BaseException:
         return HttpResponseRedirect("/")
     for filename in mapDir:
         if filename.endswith(".oramap"):
             oramap = filename
             break
     if oramap == "":
-        return HttpResponseRedirect('/maps/'+arg)
+        return HttpResponseRedirect('/maps/' + arg)
     else:
         serveOramap = os.path.join(path, oramap)
         if sync == "sync":
-                oramap = arg + ".oramap"
+            oramap = arg + ".oramap"
         response = StreamingHttpResponse(open(serveOramap, 'rb'), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename = %s' % oramap
         response['Content-Length'] = os.path.getsize(serveOramap)
-        Maps.objects.filter(id=arg).update(downloaded=F('downloaded')+1)
+        Maps.objects.filter(id=arg).update(downloaded=F('downloaded') + 1)
         return response
 
 
@@ -809,7 +818,7 @@ def DeleteMap(request, arg):
         return HttpResponseRedirect('/maps/')
     try:
         mapObject = Maps.objects.get(id=arg)
-    except:
+    except BaseException:
         return HttpResponseRedirect('/maps/')
     mapTitle = mapObject.title
     mapAuthor = mapObject.author
@@ -817,7 +826,7 @@ def DeleteMap(request, arg):
         path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
         try:
             shutil.rmtree(path)
-        except:
+        except BaseException:
             pass
         Screenshots.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
         Reports.objects.filter(ex_id=mapObject.id, ex_name='maps').delete()
@@ -843,17 +852,17 @@ def DeleteMap(request, arg):
 
 def SetDownloadingStatus(request, arg):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect('/maps/'+arg)
+        return HttpResponseRedirect('/maps/' + arg)
     try:
         mapObject = Maps.objects.get(id=arg)
-    except:
+    except BaseException:
         return HttpResponseRedirect('/maps/')
     if mapObject.user_id == request.user.id or request.user.is_superuser:
         if mapObject.downloading:
             Maps.objects.filter(id=arg).update(downloading=False)
         else:
             Maps.objects.filter(id=arg).update(downloading=True)
-    return HttpResponseRedirect('/maps/'+arg)
+    return HttpResponseRedirect('/maps/' + arg)
 
 
 def addScreenshot(request, arg, item):
@@ -871,18 +880,18 @@ def addScreenshot(request, arg, item):
 
 def maps_revisions(request, arg, page=1):
     perPage = 20
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
+    slice_start = perPage * int(page) - perPage
+    slice_end = perPage * int(page)
 
     try:
         tempObj = Maps.objects.get(id=arg)
-    except:
+    except BaseException:
         return HttpResponseRedirect('/')
 
     revisions = misc.all_revisions_for_map(arg)
     mapObject = Maps.objects.filter(id__in=revisions).order_by('-revision', '-posted')
     amount = len(mapObject)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
         return HttpResponseRedirect("/maps/%s/revisions/" % arg)
@@ -896,7 +905,7 @@ def maps_revisions(request, arg, page=1):
         'title': 'Revisions',
         'maps': mapObject,
         'page': int(page),
-        'range': [i+1 for i in range(rowsRange)],
+        'range': [i + 1 for i in range(rowsRange)],
         'amount': amount,
         'arg': arg,
         'comments': comments,
@@ -908,8 +917,8 @@ def cancelReport(request, name, arg):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/')
     Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name=name).delete()
-    Maps.objects.filter(id=arg).update(amount_reports=F('amount_reports')-1)
-    return HttpResponseRedirect('/'+name+'/'+arg)
+    Maps.objects.filter(id=arg).update(amount_reports=F('amount_reports') - 1)
+    return HttpResponseRedirect('/' + name + '/' + arg)
 
 
 def screenshots(request):
@@ -924,12 +933,12 @@ def screenshots(request):
 
 def comments(request, page=1):
     perPage = 20
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
+    slice_start = perPage * int(page) - perPage
+    slice_end = perPage * int(page)
 
     comments = Comments.objects.filter(is_removed=False).order_by('-posted')
     amount = len(comments)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     comments = comments[slice_start:slice_end]
     amount_this_page = len(comments)
 
@@ -946,7 +955,7 @@ def comments(request, page=1):
         'comments': comments,
         'amount': amount,
         'amount_this_page': amount_this_page,
-        'range': [i+1 for i in range(rowsRange)],
+        'range': [i + 1 for i in range(rowsRange)],
         'page': int(page),
         'last_comment_id_seen': int(last_comment_id_seen),
     }
@@ -958,17 +967,17 @@ def comments(request, page=1):
 
 def comments_by_user(request, arg, page=1):
     perPage = 20
-    slice_start = perPage*int(page)-perPage
-    slice_end = perPage*int(page)
+    slice_start = perPage * int(page) - perPage
+    slice_end = perPage * int(page)
 
     comments = Comments.objects.filter(is_removed=False, user=arg).order_by('-posted')
     amount = len(comments)
-    rowsRange = int(math.ceil(amount/float(perPage)))   # amount of rows
+    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     comments = comments[slice_start:slice_end]
     amount_this_page = len(comments)
 
     if amount_this_page == 0 and int(page) != 1:
-        return HttpResponseRedirect("/comments/user/"+arg+"/")
+        return HttpResponseRedirect("/comments/user/" + arg + "/")
 
     template = loader.get_template('index.html')
     template_args = {
@@ -978,7 +987,7 @@ def comments_by_user(request, arg, page=1):
         'comments': comments,
         'amount': amount,
         'amount_this_page': amount_this_page,
-        'range': [i+1 for i in range(rowsRange)],
+        'range': [i + 1 for i in range(rowsRange)],
         'page': int(page),
         'comments_by_user': User.objects.filter(id=arg).first(),
     }
@@ -1023,6 +1032,7 @@ def faq(request):
         'title': 'FAQ',
     }
     return StreamingHttpResponse(template.render(template_args, request))
+
 
 def contacts(request):
     message_sent = False

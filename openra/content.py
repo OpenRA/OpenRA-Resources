@@ -1,16 +1,16 @@
 
 
 auth = {
-    'inactive':'User is inactive, please activate account first.',
-    'incorrect':'Incorrect username or password.',
+    'inactive': 'User is inactive, please activate account first.',
+    'incorrect': 'Incorrect username or password.',
 }
 
 titles = {
-    'home':'',
-    'login':'Sign In',
-    'logout':'Sign Out',
+    'home': '',
+    'login': 'Sign In',
+    'logout': 'Sign Out',
     # TODO reformat like others
-    'feed':'OpenRA Resource Center - RSS Feed',
-    'search':'Search',
+    'feed': 'OpenRA Resource Center - RSS Feed',
+    'search': 'Search',
 
 }

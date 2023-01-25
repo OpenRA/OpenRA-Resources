@@ -122,9 +122,9 @@ def send_email_to_user_OnComment(item_type, item_id, email_addr, info=""):
     connection = mail.get_connection()
     connection.open()
     if not info:
-        body = "New comment on " + item_type.title()[:-1]+" you've commented: " + http_host + "/maps/" + item_id + "/#comments"
+        body = "New comment on " + item_type.title()[:-1] + " you've commented: " + http_host + "/maps/" + item_id + "/#comments"
     elif info == "owner":
-        body = "Your "+item_type.title()[:-1]+" has been commented: " + http_host + "/maps/" + item_id + "/#comments"
+        body = "Your " + item_type.title()[:-1] + " has been commented: " + http_host + "/maps/" + item_id + "/#comments"
     email = mail.EmailMessage(
         'OpenRA Resource Center - New Comment',
         body,
@@ -296,7 +296,7 @@ def map_filter(request, mapObject):
             selected_filter['players'] = None
         elif selected_filter['players'] == 0:
             selected_filter['players'] = str(selected_filter['players'])
-    except:
+    except BaseException:
         selected_filter['players'] = None
 
     selected_filter['sort_by'] = request.GET.get('sort_by', None)
@@ -323,7 +323,7 @@ def map_filter(request, mapObject):
     # filter by map category
     if selected_filter['category'] and 'any' not in selected_filter['category']:
         query_category = MapCategories.objects.filter(category_name__in=selected_filter['category'])
-        query_category = ['_'+str(cat.id)+'_' for cat in query_category]
+        query_category = ['_' + str(cat.id) + '_' for cat in query_category]
 
         mapObject = mapObject.filter(reduce(lambda x, y: x | y, [Q(categories__contains=item) for item in query_category]))
 
@@ -425,12 +425,14 @@ def map_filter(request, mapObject):
 
     return [mapObject, filter_prepare, selected_filter]
 
+
 def user_account_age(user):
     """Returns the age of a user account in hours"""
     if not user or not user.is_authenticated():
         return 0
 
     return (timezone.now() - user.date_joined).total_seconds() / 3600
+
 
 def first_oramap_in_directory(path):
     """Returns the first matching .oramap filename in a given path or None

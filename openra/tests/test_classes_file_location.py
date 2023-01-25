@@ -7,6 +7,7 @@ from unittest import TestCase
 
 from openra.classes.file_location import ExceptionFileLocationCopyToTempFS, ExceptionFileLocationGetOSDir, ExceptionFileLocationGetOSPath, FileLocation
 
+
 class TestFileLocation(TestCase):
     def test_get_os_dir_returns_dir(self):
         fs = TempFS()
@@ -100,7 +101,7 @@ class TestFileLocation(TestCase):
 
         self.assertEquals(
             'new_name',
-             new_file.file
+            new_file.file
         )
 
         self.assertEquals(

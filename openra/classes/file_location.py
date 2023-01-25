@@ -4,13 +4,14 @@ from fs.tempfs import TempFS
 
 from openra.classes.exceptions import ExceptionBase
 
+
 class FileLocation:
 
     fs: FS
     path: str
     file: str
 
-    def __init__(self, fs:FS, path:str, file:str):
+    def __init__(self, fs: FS, path: str, file: str):
         self.fs = fs
         self.path = path
         self.file = file
@@ -36,7 +37,7 @@ class FileLocation:
         except Exception as exception:
             raise ExceptionFileLocationGetOSPath(exception, self.fs, self.path, self.file)
 
-    def copy_to_tempfs(self, filename:str):
+    def copy_to_tempfs(self, filename: str):
         try:
             temp_fs = TempFS()
             copy.copy_file(
@@ -57,8 +58,9 @@ class FileLocation:
         except Exception as exception:
             raise ExceptionFileLocationCopyToTempFS(exception, self.fs, self.path, self.file, filename)
 
+
 class ExceptionFileLocationGetOSDir(ExceptionBase):
-    def __init__(self, exception, fs:FS, path:str, file:str):
+    def __init__(self, exception, fs: FS, path: str, file: str):
         super().__init__()
         self.message = "An exception occured while trying to get the os dir"
         self.detail.append('fs type: ' + str(type(fs)))
@@ -66,13 +68,15 @@ class ExceptionFileLocationGetOSDir(ExceptionBase):
         self.detail.append('file: ' + file)
         self.detail.append('message: ' + str(exception))
 
+
 class ExceptionFileLocationGetOSPath(ExceptionFileLocationGetOSDir):
-    def __init__(self, exception, fs:FS, path:str, file:str):
+    def __init__(self, exception, fs: FS, path: str, file: str):
         super().__init__(exception, fs, path, file)
         self.message = "An exception occured while trying to get the os path"
 
+
 class ExceptionFileLocationCopyToTempFS(ExceptionBase):
-    def __init__(self, exception, fs:FS, path:str, file:str, target:str):
+    def __init__(self, exception, fs: FS, path: str, file: str, target: str):
         super().__init__()
         self.message = "An exception occured while trying to copy a file to a TempFS"
         self.detail.append('fs type: ' + str(type(fs)))

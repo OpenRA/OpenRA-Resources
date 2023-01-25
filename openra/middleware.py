@@ -2,6 +2,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.template import loader
 
+
 class ShowMaintenanceModeViewIfEnabled:
 
     def process_view(self, request, view_func, view_args, view_kwargs):

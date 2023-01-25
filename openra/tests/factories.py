@@ -19,28 +19,30 @@ class BaseFactory(factory.DjangoModelFactory):
 
         for key in cls._to_int_keys:
             obj = kwargs.get(key, None)
-            if(issubclass(obj.__class__, Model)):
+            if (issubclass(obj.__class__, Model)):
                 kwargs[key] = obj.id
 
         return manager.create(*args, **kwargs)
 
+
 class UniqueFaker(factory.Faker):
 
-    _values:List[str]
+    _values: List[str]
 
     def __init__(self, *args, **kwargs):
         super(UniqueFaker, self).__init__(*args, **kwargs)
         self._values = []
 
     def generate(self, extra_kwargs):
-        generated:str = super(UniqueFaker, self).generate(extra_kwargs)
-        value:str = generated
+        generated: str = super(UniqueFaker, self).generate(extra_kwargs)
+        value: str = generated
         i = 2
         while value in self._values:
             value = generated + str(i)
             i += 1
         self._values.append(value)
         return value
+
 
 class UserFactory(BaseFactory):
 
@@ -52,6 +54,7 @@ class UserFactory(BaseFactory):
     email = factory.Faker('email')
     date_joined = timezone.now()
     is_superuser = False
+
 
 class MapsFactory(BaseFactory):
 
@@ -95,6 +98,7 @@ class MapsFactory(BaseFactory):
     policy_adaptations = factory.Faker('word')
     policy_commercial = False
 
+
 class MapCategoriesFactory(BaseFactory):
 
     class Meta:
@@ -102,6 +106,7 @@ class MapCategoriesFactory(BaseFactory):
 
     category_name = factory.Faker('word')
     posted = timezone.now()
+
 
 class MapUpgradeLogsFactory(BaseFactory):
 
@@ -113,6 +118,7 @@ class MapUpgradeLogsFactory(BaseFactory):
     from_version = factory.Faker('word')
     to_version = factory.Faker('word')
     upgrade_output = factory.Faker('paragraph')
+
 
 class LintsFactory(BaseFactory):
 
@@ -128,6 +134,7 @@ class LintsFactory(BaseFactory):
     lint_output = factory.Faker('paragraph')
     posted = timezone.now()
 
+
 class CommentsFactory(BaseFactory):
 
     _to_int_keys = ['item_id']
@@ -142,6 +149,7 @@ class CommentsFactory(BaseFactory):
     posted = timezone.now()
     is_removed = False
 
+
 class UnsubscribeCommentsFactory(BaseFactory):
 
     _to_int_keys = ['item_id']
@@ -153,6 +161,7 @@ class UnsubscribeCommentsFactory(BaseFactory):
     item_type = "maps"
     item_id = factory.SubFactory(MapsFactory)
     unsubscribed = timezone.now()
+
 
 class ReportsFactory(BaseFactory):
 
@@ -168,6 +177,7 @@ class ReportsFactory(BaseFactory):
     infringement = False
     posted = timezone.now()
 
+
 class ScreenshotsFactory(BaseFactory):
 
     _to_int_keys = ['ex_id']
@@ -181,6 +191,7 @@ class ScreenshotsFactory(BaseFactory):
     posted = timezone.now()
     map_preview = False
 
+
 class RatingFactory(BaseFactory):
 
     class Meta:
@@ -192,6 +203,7 @@ class RatingFactory(BaseFactory):
     rating = 0.0
     posted = timezone.now()
 
+
 class EngineFactory(BaseFactory):
 
     class Meta:
@@ -199,4 +211,3 @@ class EngineFactory(BaseFactory):
 
     game_mod = 'ra'
     version = factory.Faker('word')
-

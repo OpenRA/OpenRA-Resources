@@ -2,7 +2,7 @@ import datetime
 from logging import log
 
 from unittest import TestCase
-from unittest.mock import  Mock, MagicMock
+from unittest.mock import Mock, MagicMock
 from dependency_injector.providers import Singleton
 from dependency_injector.wiring import Provider, providers
 from fs.tempfs import TempFS
@@ -16,12 +16,13 @@ from openra.services.utility import Utility
 from openra.containers import container
 from openra.services.utility.exceptions import ExceptionUtilityMapHashUnableToTranslate
 
+
 class TestServiceUtility(TestCase):
 
-    def _create_docker_mock(self, output:str):
+    def _create_docker_mock(self, output: str):
         docker_mock = Mock(spec=Docker)
         docker_mock.run_utility_command = MagicMock(
-            return_value = output
+            return_value=output
         )
         return docker_mock
 
@@ -41,7 +42,7 @@ class TestServiceUtility(TestCase):
 
     def test_map_hash_runs_command_and_returns_map_hash(self):
         overrides = container.override_providers(
-            log = Singleton(FakeLog)
+            log=Singleton(FakeLog)
         )
 
         sample_hash = ''.rjust(40, 'A')
@@ -59,7 +60,7 @@ class TestServiceUtility(TestCase):
         docker_mock.run_utility_command.assert_called_once_with(
             engine_location.get_os_dir(),
             '--map-hash "/map/' + map_location.file + '"',
-            [map_location.get_os_dir()+':/map/']
+            [map_location.get_os_dir() + ':/map/']
         )
 
         self.assertIsInstance(
@@ -84,7 +85,7 @@ class TestServiceUtility(TestCase):
 
     def test_map_hash_throws_an_exception_with_incorrect_output(self):
         overrides = container.override_providers(
-            log = Singleton(FakeLog)
+            log=Singleton(FakeLog)
         )
 
         docker_mock = self._create_docker_mock(
@@ -102,11 +103,10 @@ class TestServiceUtility(TestCase):
             map_location
         )
 
-
         docker_mock.run_utility_command.assert_called_once_with(
             engine_location.get_os_dir(),
             '--map-hash "/map/' + map_location.file + '"',
-            [map_location.get_os_dir()+':/map/']
+            [map_location.get_os_dir() + ':/map/']
         )
 
         self.assertTrue(
@@ -118,10 +118,10 @@ class TestServiceUtility(TestCase):
 
         overrides.__exit__()
 
-## TODO Improve this to parse the rules
+# TODO Improve this to parse the rules
     def test_map_rules_runs_with_docker_and_pass_on_output(self):
         overrides = container.override_providers(
-            log = Singleton(FakeLog)
+            log=Singleton(FakeLog)
         )
 
         docker_mock = self._create_docker_mock(
@@ -137,7 +137,7 @@ class TestServiceUtility(TestCase):
         docker_mock.run_utility_command.assert_called_once_with(
             engine_location.get_os_dir(),
             '--map-rules "/map/' + map_location.file + '"',
-            [map_location.get_os_dir()+':/map/']
+            [map_location.get_os_dir() + ':/map/']
         )
 
         self.assertEquals(

@@ -6,6 +6,7 @@ from fs.tempfs import TempFS
 from openra.classes.file_location import FileLocation
 from openra.services.map_file_repository import ExceptionMapFolderNotFound, ExceptionOramapNotFound, MapFileRepository
 
+
 class TestServiceMapFileRepository(TestCase):
 
     def test_get_oramap_path_returns_map_oramap_path(self):

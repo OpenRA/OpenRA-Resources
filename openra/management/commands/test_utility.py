@@ -10,6 +10,7 @@ from openra.services.engine_file_repository import EngineFileRepository
 from openra.services.map_file_repository import MapFileRepository
 from openra.services.utility import Utility
 
+
 class Command(BaseCommand):
     help = 'Test utility commands against an engine for expected output'
 
@@ -21,9 +22,9 @@ class Command(BaseCommand):
 
     @inject
     def _handle(self,
-            utility:Utility=Provide[Container.utility],
-            engine_file_repository:EngineFileRepository=Provide[Container.engine_file_repository],
-            map_file_repository:MapFileRepository=Provide[Container.map_file_repository]):
+                utility: Utility = Provide[Container.utility],
+                engine_file_repository: EngineFileRepository = Provide[Container.engine_file_repository],
+                map_file_repository: MapFileRepository = Provide[Container.map_file_repository]):
 
         try:
             engine_model = Engines.objects.latest('id')
@@ -41,4 +42,3 @@ class Command(BaseCommand):
             log().info('Map rules: ' + map_rules)
         except ExceptionBase as exception:
             log().exception_obj(exception)
-

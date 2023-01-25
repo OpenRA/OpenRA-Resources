@@ -1,9 +1,10 @@
 import datetime
 
 from unittest import TestCase
-from unittest.mock import  Mock, MagicMock
+from unittest.mock import Mock, MagicMock
 from django.conf import settings
 from openra.services.github import ExceptionGithubReleaseException, ExceptionGithubReleaseAssetsException, Github, GithubRelease, GithubReleaseAsset
+
 
 class TestServiceGithub(TestCase):
 
@@ -12,7 +13,7 @@ class TestServiceGithub(TestCase):
 
         repo_mock = Mock()
         repo_mock.get_releases = MagicMock(
-            return_value = [
+            return_value=[
                 Mock(tag_name="sample1", published_at=published_date),
                 Mock(tag_name="sample2", published_at=published_date)
             ]
@@ -20,7 +21,7 @@ class TestServiceGithub(TestCase):
 
         client_mock = Mock()
         client_mock.get_repo = MagicMock(
-            return_value = repo_mock
+            return_value=repo_mock
         )
 
         github = Github(client_mock)
@@ -62,7 +63,7 @@ class TestServiceGithub(TestCase):
     def test_get_releases_throws_release_exception_on_fail(self):
         client_mock = Mock()
         client_mock.get_repo = MagicMock(
-            side_effect = Exception()
+            side_effect=Exception()
         )
 
         github = Github(client_mock)
@@ -81,7 +82,7 @@ class TestServiceGithub(TestCase):
         mock_asset2.configure_mock(name="asset2")
 
         release_mock.get_assets = MagicMock(
-            return_value = [
+            return_value=[
                 mock_asset1,
                 mock_asset2,
             ]
@@ -89,12 +90,12 @@ class TestServiceGithub(TestCase):
 
         repo_mock = Mock()
         repo_mock.get_release = MagicMock(
-            return_value = release_mock
+            return_value=release_mock
         )
 
         client_mock = Mock()
         client_mock.get_repo = MagicMock(
-            return_value = repo_mock
+            return_value=repo_mock
         )
 
         github = Github(client_mock)
@@ -140,7 +141,7 @@ class TestServiceGithub(TestCase):
     def test_get_release_assets_throws_release_exception_on_fail(self):
         client_mock = Mock()
         client_mock.get_repo = MagicMock(
-            side_effect = Exception()
+            side_effect=Exception()
         )
 
         github = Github(client_mock)
@@ -151,22 +152,21 @@ class TestServiceGithub(TestCase):
             '123'
         )
 
-
     def test_will_only_get_the_repo_once_over_multiple_calls(self):
         release_mock = Mock()
         release_mock.get_assets = MagicMock(
-            return_value = []
+            return_value=[]
         )
         repo_mock = Mock()
         repo_mock.get_releases = MagicMock(
-            return_value = []
+            return_value=[]
         )
         repo_mock.get_release = MagicMock(
-            return_value = release_mock
+            return_value=release_mock
         )
         client_mock = Mock()
         client_mock.get_repo = MagicMock(
-            return_value = repo_mock
+            return_value=repo_mock
         )
 
         github = Github(client_mock)

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from openra.services.github import GithubRelease, GithubReleaseAsset
 
+
 class FakeGithub():
 
     only_one_release = False

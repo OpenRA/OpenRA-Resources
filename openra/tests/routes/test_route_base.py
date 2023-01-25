@@ -1,11 +1,13 @@
 from django.test import TestCase, Client, override_settings
 
 from openra.tests.factories import UserFactory
+
+
 @override_settings(SITE_MAINTENANCE=False)
 class TestRouteBase(TestCase):
 
-    _route:str
-    _client:Client
+    _route: str
+    _client: Client
 
     def _get(self, client, data):
         self._client = client
@@ -36,9 +38,9 @@ class TestRouteBase(TestCase):
         return self._post(client, data)
 
     def assert_contains(self, response, contents=[],
-            status_code=200,
-            title=''
-        ):
+                        status_code=200,
+                        title=''
+                        ):
         if title != '':
             contents.append(f'<title>OpenRA Resource Center - {title}</title>')
         for content in contents:
@@ -50,7 +52,7 @@ class TestRouteBase(TestCase):
 
         return response
 
-    def assert_is_maintenance(self,response):
+    def assert_is_maintenance(self, response):
         self.assertContains(
             response,
             'Site is under maintenance',
