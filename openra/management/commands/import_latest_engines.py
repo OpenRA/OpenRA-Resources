@@ -108,7 +108,7 @@ class Command(BaseCommand):
                 model = Engines(
                     game_mod=engine.release.mod,
                     version=engine.release.version,
-                    playtest=engine.release.playtest
+                    is_playtest=engine.release.is_playtest
                 )
                 model.save()
 
