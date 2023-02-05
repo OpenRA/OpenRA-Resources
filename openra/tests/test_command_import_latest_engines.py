@@ -13,6 +13,7 @@ from openra.fakes.file_downloader import FakeFileDownloader
 from openra.fakes.github import FakeGithub
 from openra.models import Engines
 
+
 class TestCommandImportLatestEngines(TestCase):
 
     def assert_engines(self, expected_engines):
