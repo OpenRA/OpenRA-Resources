@@ -3,47 +3,47 @@
 <div class='cBlock'>
 {% if search_results.total == 0 %}
 <h3>
-    Nothing found
+	Nothing found
 </h3>
 {% else %}
-    <div class="search-group">
+	<div class="search-group">
 	{% if search_results.map_hash %}
-        <h3>Matches in Map HASH:</h3>
+		<h3>Matches in Map HASH:</h3>
 		{% for item in search_results.map_hash %}
-            {% include 'search_map.html' %}
+			{% include 'search_map.html' %}
 		{% endfor %}
 	{% endif %}
-    </div>
+	</div>
 
-    <div class="search-group">
-    {% if search_results.title %}
-        <h3>Matches in Map Title:</h3>
+	<div class="search-group">
+	{% if search_results.title %}
+		<h3>Matches in Map Title:</h3>
 		{% for item in search_results.title %}
-            {% include 'search_map.html' %}
+			{% include 'search_map.html' %}
 		{% endfor %}
 	{% endif %}
-    </div>
+	</div>
 
-    <div class="search-group">
+	<div class="search-group">
 	{% if search_results.info or search_results.description %}
 		<h3>Matches in Map Info:</h3>
 		{% for item in search_results.info %}
-            {% include 'search_map.html' %}
+			{% include 'search_map.html' %}
 		{% endfor %}
 		{% for item in search_results.description %}
-            {% include 'search_map.html' %}
+			{% include 'search_map.html' %}
 		{% endfor %}
 	{% endif %}
-    </div>
+	</div>
 
-    <div class="search-group">
+	<div class="search-group">
 	{% if search_results.author %}
 		<h3>Matches in Map Author:</h3>
 		{% for item in search_results.author %}
-            {% include 'search_map.html' %}
+			{% include 'search_map.html' %}
 		{% endfor %}
 	{% endif %}
-    </div>
+	</div>
 
 {% endif %}
 </div>
