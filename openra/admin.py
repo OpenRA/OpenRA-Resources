@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Group
 
-from openra.models import Maps
+from openra.models import Engines, Maps
 from openra.models import MapCategories
 from openra.models import MapUpgradeLogs
 from openra.models import Lints
@@ -113,6 +113,11 @@ class ScreenshotsAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Screenshots, ScreenshotsAdmin)
+
+class EnginesAdmin(admin.ModelAdmin):
+    list_display = ('game_mod', 'version', 'is_playtest')
+
+admin.site.register(Engines, EnginesAdmin)
 
 # Add the registration date to the user list
 UserAdmin.list_display = list(UserAdmin.list_display) + ['date_joined']
