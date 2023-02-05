@@ -12,8 +12,6 @@ from openra.fakes.log import FakeLog
 from openra.fakes.file_downloader import FakeFileDownloader
 from openra.fakes.github import FakeGithub
 from openra.models import Engines
-from openra.services.file_downloader import FileDownloader
-
 
 class TestCommandImportLatestEngines(TestCase):
 
@@ -23,7 +21,7 @@ class TestCommandImportLatestEngines(TestCase):
                 Engines.objects.filter(
                     game_mod=engine.mod,
                     version=engine.version,
-                    playtest=engine.playtest
+                    is_playtest=engine.is_playtest
                 ).exists()
             )
 
@@ -143,7 +141,7 @@ class TestCommandImportLatestEngines(TestCase):
         engine = Engines(
             game_mod='ra',
             version='release-5',
-            playtest=False,
+            is_playtest=False,
         )
         engine.save()
 
