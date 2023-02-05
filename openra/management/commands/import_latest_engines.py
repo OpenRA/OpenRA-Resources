@@ -35,23 +35,21 @@ class Command(BaseCommand):
             log().info('Complete')
         except ExceptionBase as exception:
             log().info('Complete')
-            log.exception_obj(exception)
+            log().exception_obj(exception)
 
     @inject
     def _get_latest_engines(self, release_count=1, github: Github = Provide[Container.github]):
-        playtest_regex = re.compile('^playtest-')
         engines: List[EngineInfo] = []
 
         for release in github.get_releases():
             tag = release.tag
-            is_playtest = playtest_regex.match(tag)
 
-            if is_playtest and len(engines) > 0:
+            if release.playtest and len(engines) > 0:
                 continue
 
-            engines += self._get_release_engines(tag, github)
+            engines += self._get_release_engines(release, github)
 
-            if is_playtest:
+            if release.playtest:
                 continue
 
             release_count -= 1
@@ -61,7 +59,7 @@ class Command(BaseCommand):
 
         return engines
 
-    def _get_release_engines(self, tag, github: Github):
+    def _get_release_engines(self, release, github: Github):
 
         mod_regex = [{
             'mod': 'ra',
@@ -76,12 +74,12 @@ class Command(BaseCommand):
 
         engines: List[EngineInfo] = []
 
-        for asset in github.get_release_assets(tag):
+        for asset in github.get_release_assets(release.tag):
             for mod in mod_regex:
                 if mod['regex'].match(asset.name):
                     engines.append(
                         EngineInfo(
-                            Release(mod['mod'], tag),
+                            Release(mod['mod'], release.tag, release.playtest),
                             asset.url
                         )
                     )
@@ -109,7 +107,8 @@ class Command(BaseCommand):
                 log().info('Adding to database: ' + str(engine.release))
                 model = Engines(
                     game_mod=engine.release.mod,
-                    version=engine.release.version
+                    version=engine.release.version,
+                    playtest=engine.release.playtest
                 )
                 model.save()
 

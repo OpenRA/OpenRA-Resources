@@ -14,8 +14,8 @@ class TestServiceGithub(TestCase):
         repo_mock = Mock()
         repo_mock.get_releases = MagicMock(
             return_value=[
-                Mock(tag_name="sample1", published_at=published_date),
-                Mock(tag_name="sample2", published_at=published_date)
+                Mock(tag_name="sample1", published_at=published_date, prerelease=False),
+                Mock(tag_name="sample2", published_at=published_date, prerelease=True)
             ]
         )
 
@@ -41,6 +41,16 @@ class TestServiceGithub(TestCase):
         self.assertEquals(
             'sample2',
             releases[1].tag
+        )
+
+        self.assertEquals(
+            False,
+            releases[0].playtest
+        )
+
+        self.assertEquals(
+            True,
+            releases[1].playtest
         )
 
         self.assertEquals(

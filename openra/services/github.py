@@ -22,6 +22,7 @@ class Github():
                 releases.append(GithubRelease(
                     release.tag_name,
                     release.published_at,
+                    release.prerelease
                 ))
 
             return releases
@@ -53,10 +54,12 @@ class GithubRelease:
 
     tag: str
     published: datetime
+    playtest: bool
 
-    def __init__(self, tag: str, published: datetime):
+    def __init__(self, tag: str, published: datetime, playtest: bool):
         self.tag = tag
         self.published = published
+        self.playtest = playtest
 
 
 class GithubReleaseAsset:

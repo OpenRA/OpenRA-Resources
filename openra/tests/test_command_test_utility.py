@@ -15,7 +15,7 @@ from openra.services.utility import Utility
 from openra.tests.factories import EngineFactory, MapsFactory
 
 
-class TestTestUtility(TestCase):
+class TestCommandTestUtility(TestCase):
 
     def test_test_utility_runs_each_of_the_utility_command_and_prints_the_response(self):
         overrides = container.override_providers(

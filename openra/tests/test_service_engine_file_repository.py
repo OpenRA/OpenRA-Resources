@@ -19,7 +19,7 @@ class TestServiceEngineFileRepository(TestCase):
             data_fs=fs,
         )
 
-        release = Release('ra', 'release123')
+        release = Release('ra', 'release123', False)
 
         self.assertFalse(
             engine_file_repository.exists(release)
@@ -46,7 +46,7 @@ class TestServiceEngineFileRepository(TestCase):
             data_fs=fs,
         )
 
-        release = Release('ra', 'release123')
+        release = Release('ra', 'release123', False)
 
         location = engine_file_repository.get_path(release)
 
@@ -75,7 +75,7 @@ class TestServiceEngineFileRepository(TestCase):
         self.assertRaises(
             ExceptionEngineFolderNotFound,
             engine_file_repository.get_path,
-            Release('ra', 'release123')
+            Release('ra', 'release123', False)
         )
 
     def test_get_path_throws_exception_when_apprun_doesnt_exist(self):
@@ -89,7 +89,7 @@ class TestServiceEngineFileRepository(TestCase):
         self.assertRaises(
             ExceptionEngineAppRunNotFound,
             engine_file_repository.get_path,
-            Release('ra', 'release123')
+            Release('ra', 'release123', False)
         )
 
     def test_import_appimage_imports_appimage(self):
@@ -121,7 +121,7 @@ class TestServiceEngineFileRepository(TestCase):
         )
 
         location = engine_file_repository.import_appimage(
-            Release('ra', 'version1'),
+            Release('ra', 'version1', False),
             appimage_file
         )
 
@@ -175,7 +175,7 @@ class TestServiceEngineFileRepository(TestCase):
         self.assertRaises(
             ExceptionEngineAppRunNotFound,
             engine_file_repository.import_appimage,
-            Release('ra', 'version1'),
+            Release('ra', 'version1', False),
             appimage_file
         )
 

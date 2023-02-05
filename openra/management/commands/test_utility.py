@@ -30,7 +30,7 @@ class Command(BaseCommand):
             engine_model = Engines.objects.latest('id')
             map_model = Maps.objects.latest('id')
 
-            release = Release(engine_model.game_mod, engine_model.version)
+            release = Release(engine_model.game_mod, engine_model.version, False)
 
             engine_location = engine_file_repository.get_path(release)
             map_location = map_file_repository.get_oramap_path(map_model.id)
