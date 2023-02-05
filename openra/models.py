@@ -162,3 +162,4 @@ class Engines(models.Model):
 
     game_mod = models.CharField(max_length=100)
     version = models.CharField(max_length=100)
+    playtest = models.BooleanField(default=False)

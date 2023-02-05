@@ -211,3 +211,4 @@ class EngineFactory(BaseFactory):
 
     game_mod = 'ra'
     version = factory.Faker('word')
+    playtest = False

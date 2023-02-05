@@ -11,17 +11,17 @@ class FakeGithub():
     def get_releases(self):
         if self.only_one_release:
             return [
-                GithubRelease('release-5', datetime.now()),
+                GithubRelease('release-5', datetime.now(), False),
             ]
 
         return [
-            GithubRelease('playtest-7', datetime.now()),
-            GithubRelease('playtest-6', datetime.now()),
-            GithubRelease('release-5', datetime.now()),
-            GithubRelease('playtest-4', datetime.now()),
-            GithubRelease('release-3', datetime.now()),
-            GithubRelease('playtest-2', datetime.now()),
-            GithubRelease('release-1', datetime.now())
+            GithubRelease('playtest-7', datetime.now(), True),
+            GithubRelease('playtest-6', datetime.now(), True),
+            GithubRelease('release-5', datetime.now(), False),
+            GithubRelease('playtest-4', datetime.now(), True),
+            GithubRelease('release-3', datetime.now(), False),
+            GithubRelease('playtest-2', datetime.now(), True),
+            GithubRelease('release-1', datetime.now(), False)
         ]
 
     def get_release_assets(self, tag):

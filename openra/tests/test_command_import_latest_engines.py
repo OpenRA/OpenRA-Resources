@@ -15,7 +15,18 @@ from openra.models import Engines
 from openra.services.file_downloader import FileDownloader
 
 
-class TestImportLatestEngines(TestCase):
+class TestCommandImportLatestEngines(TestCase):
+
+    def assert_engines(self, expected_engines):
+        for engine in expected_engines:
+            self.assertTrue(
+                Engines.objects.filter(
+                    game_mod=engine.mod,
+                    version=engine.version,
+                    playtest=engine.playtest
+                ).exists()
+            )
+
     def test_command_will_import_engines(self):
         overrides = container.override_providers(
             log=Singleton(FakeLog),
@@ -37,12 +48,12 @@ class TestImportLatestEngines(TestCase):
         )
 
         expected_engines = [
-            Release('ra', 'playtest-7'),
-            Release('td', 'playtest-7'),
-            Release('d2k', 'playtest-7'),
-            Release('ra', 'release-5'),
-            Release('td', 'release-5'),
-            Release('d2k', 'release-5')
+            Release('ra', 'playtest-7', True),
+            Release('td', 'playtest-7', True),
+            Release('d2k', 'playtest-7', True),
+            Release('ra', 'release-5', False),
+            Release('td', 'release-5', False),
+            Release('d2k', 'release-5', False)
         ]
 
         self.assertEquals(
@@ -50,13 +61,7 @@ class TestImportLatestEngines(TestCase):
             container.engine_file_repository().imported
         )
 
-        for engine in expected_engines:
-            self.assertTrue(
-                Engines.objects.filter(
-                    game_mod=engine.mod,
-                    version=engine.version
-                ).exists()
-            )
+        self.assert_engines(expected_engines)
 
         overrides.__exit__()
 
@@ -73,9 +78,9 @@ class TestImportLatestEngines(TestCase):
         call_command('import_latest_engines', '2')
 
         expected_engines = [
-            Release('ra', 'playtest-7'),
-            Release('ra', 'release-5'),
-            Release('ra', 'release-3'),
+            Release('ra', 'playtest-7', True),
+            Release('ra', 'release-5', False),
+            Release('ra', 'release-3', False),
         ]
 
         self.assertEquals(
@@ -88,13 +93,7 @@ class TestImportLatestEngines(TestCase):
             container.engine_file_repository().imported
         )
 
-        for engine in expected_engines:
-            self.assertTrue(
-                Engines.objects.filter(
-                    game_mod=engine.mod,
-                    version=engine.version
-                ).exists()
-            )
+        self.assert_engines(expected_engines)
 
         overrides.__exit__()
 
@@ -118,7 +117,7 @@ class TestImportLatestEngines(TestCase):
         )
 
         expected_engines = [
-            Release('ra', 'release-5'),
+            Release('ra', 'release-5', False),
         ]
 
         self.assertEqual(
@@ -126,13 +125,7 @@ class TestImportLatestEngines(TestCase):
             container.engine_file_repository().imported
         )
 
-        for engine in expected_engines:
-            self.assertTrue(
-                Engines.objects.filter(
-                    game_mod=engine.mod,
-                    version=engine.version
-                ).exists()
-            )
+        self.assert_engines(expected_engines)
 
         overrides.__exit__()
 
@@ -149,7 +142,8 @@ class TestImportLatestEngines(TestCase):
 
         engine = Engines(
             game_mod='ra',
-            version='release-5'
+            version='release-5',
+            playtest=False,
         )
         engine.save()
 
@@ -166,7 +160,7 @@ class TestImportLatestEngines(TestCase):
         )
 
         expected_engines = [
-            Release('ra', 'release-5'),
+            Release('ra', 'release-5', False),
         ]
 
         self.assertEqual(
@@ -174,12 +168,6 @@ class TestImportLatestEngines(TestCase):
             container.engine_file_repository().imported
         )
 
-        for engine in expected_engines:
-            self.assertTrue(
-                Engines.objects.filter(
-                    game_mod=engine.mod,
-                    version=engine.version
-                ).exists()
-            )
+        self.assert_engines(expected_engines)
 
         overrides.__exit__()
