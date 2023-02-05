@@ -114,8 +114,10 @@ class ScreenshotsAdmin(admin.ModelAdmin):
 
 admin.site.register(Screenshots, ScreenshotsAdmin)
 
+
 class EnginesAdmin(admin.ModelAdmin):
     list_display = ('game_mod', 'version', 'is_playtest')
+
 
 admin.site.register(Engines, EnginesAdmin)
 
