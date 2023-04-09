@@ -76,7 +76,7 @@
 			<li><a href="/"><span {% if request.path == '/' %}{{ 'class="nav-selected"' }}{% endif %}>Home</span></a></li>
 			<li><a href="/maps/"><span {% if '/maps' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Maps</span></a></li>
 		{% if user.is_authenticated %}
-			<li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Content</span></a></li>
+			<li><a href="/panel/"><span {% if '/panel' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>My Maps</span></a></li>
 			<li><a href="/upload/map/"><span {% if '/upload/map' in request.path %}{{ 'class="nav-selected"' }}{% endif %}>Upload Map</span></a></li>
 		{% else %}
 			<li><a href="/login/"><span {% if request.path == '/login/' %}{{ 'class="nav-selected"' }}{% endif %}>Sign In</span></a></li>

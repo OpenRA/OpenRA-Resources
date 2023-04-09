@@ -9,38 +9,44 @@ class TestRouteBase(TestCase):
     _route: str
     _client: Client
 
-    def _get(self, client, data):
+    def _get(self, client, data, route):
         self._client = client
-        return client.get(self._route, data)
+        return client.get(
+            route if route else self._route,
+            data
+        )
 
-    def get(self, data={}):
-        return self._get(Client(), data)
+    def get(self, data={}, route=None):
+        return self._get(Client(), data, route)
 
-    def get_authed(self, data={}):
+    def get_authed(self, data={}, user=None, route=None):
         client = Client()
         client.force_login(
-            UserFactory()
+            user if user else UserFactory()
         )
-        return self._get(client, data)
+        return self._get(client, data, route)
 
-    def _post(self, client, data):
+    def _post(self, client, data, route):
         self._client = client
-        return self._client.post(self._route, data)
+        return client.post(
+            route if route else self._route,
+            data
+        )
 
-    def post(self, data={}):
-        return self._post(Client(), data)
+    def post(self, data={}, route=None):
+        return self._post(Client(), data, route)
 
-    def post_authed(self, data={}):
+    def post_authed(self, data={}, user=None, route=None):
         client = Client()
         client.force_login(
-            UserFactory()
+            user if user else UserFactory()
         )
-        return self._post(client, data)
+        return self._post(client, data, route)
 
     def assert_contains(self, response, contents=[],
-                        status_code=200,
-                        title=''
-                        ):
+            status_code=200,
+            title=''
+        ):
         if title != '':
             contents.append(f'<title>OpenRA Resource Center - {title}</title>')
         for content in contents:
@@ -48,6 +54,16 @@ class TestRouteBase(TestCase):
                 response,
                 content,
                 status_code=status_code
+            )
+
+        return response
+
+    def assert_doesnt_contain(self, response, contents=[]):
+        decoded_response = response.content.decode('utf-8')
+        for content in contents:
+            self.assertNotIn(
+                content,
+                decoded_response
             )
 
         return response

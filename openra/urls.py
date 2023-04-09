@@ -86,10 +86,7 @@ urlpatterns = [
     url(r'^search/(?P<search_query>.+?)/?$', views.search, name='search'),
 
     url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
-    url(r'^panel/mymaps/?$', views.ControlPanel, name='ControlPanel'),
-    url(r'^panel/mymaps/page/(?P<page>\d+)/?$', views.ControlPanel, name='maps_paged'),
-    url(r'^panel/mymaps/page/(?P<page>\d+)/filter/(?P<filter>\w+)/?$', views.ControlPanel, name='maps_paged_filtered'),
-    url(r'^panel/mymaps/filter/(?P<filter>\w+)/?$', views.ControlPanel, name='maps_filtered'),
+    url(r'^panel/page/(?P<page>\d+)/?$', views.ControlPanel, name='maps_paged'),
 
     url(r'^faq/?$', views.faq, name='faq'),
     url(r'^contacts/?$', views.contacts, name='contacts'),
