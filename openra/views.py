@@ -147,14 +147,15 @@ def search(request, search_query="",
     )
 
 
-def ControlPanel(request, page=1, filter=""):
+def ControlPanel(request, page=1):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
-    perPage = 16
+
+    perPage = 20
     slice_start = perPage * int(page) - perPage
     slice_end = perPage * int(page)
     mapObject = Maps.objects.filter(user_id=request.user.id).filter(next_rev=0).order_by('-posted')
-    amount = len(mapObject)
+    amount = mapObject.count()
     rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     if len(mapObject) == 0 and int(page) != 1:
@@ -166,14 +167,14 @@ def ControlPanel(request, page=1, filter=""):
     template_args = {
         'content': 'control_panel.html',
         'request': request,
-        'title': 'My Content',
+        'title': content.titles['panel'],
         'maps': mapObject,
         'page': int(page),
         'range': [i + 1 for i in range(rowsRange)],
         'amount_maps': amount,
         'comments': comments,
     }
-    return StreamingHttpResponse(template.render(template_args, request))
+    return HttpResponse(template.render(template_args, request))
 
 
 def maps(request, page=1):

@@ -12,5 +12,5 @@ titles = {
     # TODO reformat like others
     'feed': 'OpenRA Resource Center - RSS Feed',
     'search': 'Search',
-
+    'panel': 'My Maps',
 }
