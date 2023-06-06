@@ -387,13 +387,13 @@ def map_filter(request, mapObject):
     ####################
     if selected_filter['sort_by'] and selected_filter['sort_by'] != 'latest':
         if selected_filter['sort_by'] == 'oldest':
-            mapObject = mapObject.order_by('-posted')
+            mapObject = mapObject.order_by('posted')
         elif selected_filter['sort_by'] == 'title':
             mapObject = mapObject.order_by('title')
         elif selected_filter['sort_by'] == 'title_reversed':
             mapObject = mapObject.order_by('-title')
         elif selected_filter['sort_by'] == 'players':
-            mapObject = mapObject.order_by('players')
+            mapObject = mapObject.order_by('-players')
         elif selected_filter['sort_by'] == 'lately_commented':
             mapObject = mapObject.extra({'last_comment': 'SELECT coalesce(MAX(posted), \'1990-01-01 00:00:00\') FROM openra_comments WHERE openra_comments.item_id = openra_maps.id AND openra_comments.item_type = \'maps\' AND openra_comments.is_removed = False' }).order_by('-last_comment')
         elif selected_filter['sort_by'] == 'rating':
@@ -403,7 +403,7 @@ def map_filter(request, mapObject):
         elif selected_filter['sort_by'] == 'downloads':
             mapObject = mapObject.order_by('-downloaded')
         elif selected_filter['sort_by'] == 'revisions':
-            mapObject = mapObject.order_by('revision')
+            mapObject = mapObject.order_by('-revision')
     else:
         mapObject = mapObject.order_by('-posted')
 
