@@ -192,7 +192,7 @@ def maps(request, page=1, output_format=""):
     amount_this_page = len(mapObject)
 
     if output_format == 'json':
-        return JsonResponse(misc.maps_to_list(mapObject, request.build_absolute_uri('/')))
+        return JsonResponse(misc.prepare_maps_for_json(mapObject, request.build_absolute_uri('/')))
 
     if amount_this_page == 0 and int(page) != 1:
         if request.META['QUERY_STRING']:
