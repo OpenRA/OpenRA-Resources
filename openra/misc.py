@@ -385,46 +385,57 @@ def map_filter(request, mapObject):
     ####################
     # Sorting
     ####################
-    mapObject = mapObject.distinct('map_hash').order_by('map_hash')
-
     if selected_filter['sort_by'] and selected_filter['sort_by'] != 'latest':
-        if selected_filter['sort_by'] == 'oldest':
-            mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=False)
-        elif selected_filter['sort_by'] == 'title':
-            mapObject = sorted(mapObject, key=lambda x: (x.title), reverse=False)
-        elif selected_filter['sort_by'] == 'title_reversed':
-            mapObject = sorted(mapObject, key=lambda x: (x.title), reverse=True)
-        elif selected_filter['sort_by'] == 'players':
-            mapObject = sorted(mapObject, key=lambda x: (x.players), reverse=True)
-        elif selected_filter['sort_by'] == 'lately_commented':
+         if selected_filter['sort_by'] == 'oldest':
+             mapObject = mapObject.order_by('-posted')
+         elif selected_filter['sort_by'] == 'title':
+             mapObject = mapObject.order_by('title')
+         elif selected_filter['sort_by'] == 'title_reversed':
+             mapObject = mapObject.order_by('-title')
+         elif selected_filter['sort_by'] == 'players':
+             mapObject = mapObject.order_by('players')
+         elif selected_filter['sort_by'] == 'lately_commented':
+             mapObject = mapObject.extra({'last_comment': 'SELECT coalesce(MAX(posted), \'1990-01-01 00:00:00\') FROM openra_comments WHERE openra_comments.item_id = openra_maps.id AND openra_comments.item_type = \'maps\' AND openra_comments.is_removed = False' }).order_by('-last_comment')
 
-            copy_maps = []
-            copy_comments = {}
-            for mp in mapObject:
-
-                copy_maps.append(mp.id)
-
-                comments_for_map = Comments.objects.filter(is_removed=False, item_type='maps', item_id=mp.id).first()
-                if comments_for_map:
-                    copy_comments[mp.id] = comments_for_map.posted
-                else:
-                    copy_comments[mp.id] = datetime.datetime(2000, 1, 1, 1, 00, 00, tzinfo=pytz.UTC)
-            mapObject = sorted(mapObject, key=lambda x: (copy_comments[x.id]), reverse=True)
-
-        elif selected_filter['sort_by'] == 'rating':
-            mapObject = sorted(mapObject, key=lambda x: (x.rating), reverse=True)
-        elif selected_filter['sort_by'] == 'views':
-            mapObject = sorted(mapObject, key=lambda x: (x.viewed), reverse=True)
-        elif selected_filter['sort_by'] == 'downloads':
-            mapObject = sorted(mapObject, key=lambda x: (x.downloaded), reverse=True)
-        elif selected_filter['sort_by'] == 'revisions':
-            mapObject = sorted(mapObject, key=lambda x: (x.revision), reverse=True)
+         elif selected_filter['sort_by'] == 'rating':
+             mapObject = mapObject.order_by('-rating')
+         elif selected_filter['sort_by'] == 'views':
+             mapObject = mapObject.order_by('-viewed')
+         elif selected_filter['sort_by'] == 'downloads':
+             mapObject = mapObject.order_by('-downloaded')
+         elif selected_filter['sort_by'] == 'revisions':
+             mapObject = mapObject.order_by('revision')
     else:
-        mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
-    ####################
+         mapObject = mapObject.order_by('-posted')
+
+    ###################
 
     return [mapObject, filter_prepare, selected_filter]
 
+def maps_to_list(mapsObject, base_uri):
+    mapsObject.prefetch_related('user')
+    output = {}
+    i = 0
+    for current_map in mapsObject:
+        output[i] = {
+            'id': current_map.id,
+            'uploader': current_map.user.username,
+            'title': current_map.title,
+            'description': current_map.description,
+            'author': current_map.author,
+            'players': current_map.players,
+            'game_mod': current_map.game_mod,
+            'map_hash': current_map.map_hash,
+            'width': current_map.width,
+            'height': current_map.height,
+            'advanced_map': current_map.advanced_map,
+            'lua': current_map.lua,
+            'website_url': base_uri + 'maps/' + str(current_map.id),
+            'download_url': base_uri + 'maps/' + str(current_map.id) + '/oramap',
+        }
+        i+=1
+
+    return output
 
 def user_account_age(user):
     """Returns the age of a user account in hours"""

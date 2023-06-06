@@ -12,7 +12,7 @@ from dependency_injector.wiring import Provide, inject
 # from dependency_injector.wiring import Provide, inject
 
 from django.conf import settings
-from django.http import StreamingHttpResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from django.http.response import HttpResponse
 from django.template import loader
 from django.contrib.auth import authenticate, login, logout
@@ -177,7 +177,7 @@ def ControlPanel(request, page=1):
     return HttpResponse(template.render(template_args, request))
 
 
-def maps(request, page=1):
+def maps(request, page=1, output_format=""):
 
     mapObject = Maps.objects.filter()
     mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
@@ -186,10 +186,14 @@ def maps(request, page=1):
     slice_start = perPage * int(page) - perPage
     slice_end = perPage * int(page)
 
-    amount = len(mapObject)
+    amount = mapObject.count()
     rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
     mapObject = mapObject[slice_start:slice_end]
     amount_this_page = len(mapObject)
+
+    if output_format == 'json':
+        return JsonResponse(misc.maps_to_list(mapObject, request.build_absolute_uri('/')))
+
     if amount_this_page == 0 and int(page) != 1:
         if request.META['QUERY_STRING']:
             return HttpResponseRedirect("/maps/?" + request.META['QUERY_STRING'])
@@ -216,7 +220,7 @@ def maps(request, page=1):
         template_args['content'] = 'service/maintenance.html'
         template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
 
-    return StreamingHttpResponse(template.render(template_args, request))
+    return HttpResponse(template.render(template_args, request))
 
 
 def maps_author(request, author, page=1):

@@ -13,4 +13,5 @@ titles = {
     'feed': 'OpenRA Resource Center - RSS Feed',
     'search': 'Search',
     'panel': 'My Maps',
+    'maps': 'Maps',
 }
