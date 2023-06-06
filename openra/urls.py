@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
 
     url(r'^maps/?$', views.maps, name='maps'),
+    url(r'^maps/json/?$', views.maps, {'output_format': 'json'}, name='maps'),
     url(r'^maps/(?P<arg>\d+)/?$', views.displayMap, name='displayMap'),
     url(r'^maps/(?P<arg>\d+)/minimap/?$', views.serveMinimap, name='serveMinimap'),
     url(r'^maps/(?P<arg>\d+)/oramap/?$', views.serveOramap, name='serveOramap'),
