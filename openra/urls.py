@@ -29,7 +29,6 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
 
     url(r'^maps/?$', views.maps, name='maps'),
-    url(r'^maps/json/?$', views.maps, {'output_format': 'json'}, name='maps'),
     url(r'^maps/(?P<arg>\d+)/?$', views.displayMap, name='displayMap'),
     url(r'^maps/(?P<arg>\d+)/minimap/?$', views.serveMinimap, name='serveMinimap'),
     url(r'^maps/(?P<arg>\d+)/oramap/?$', views.serveOramap, name='serveOramap'),
@@ -104,6 +103,8 @@ urlpatterns = [
         url(r'^lastmap/?$', api.latest_map_info, name='mapAPI'),
         url(r'^(?P<map_hash>\w+)/?$', api.download_map, name='mapAPI_download'),
     ])),
+
+    url(r'^api/maps?$', views.maps, {'output_format': 'json'}, name='maps'),
 
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
     url(r'^robots.txt$', views.robots, name='robots.txt'),
