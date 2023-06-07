@@ -179,49 +179,46 @@ def ControlPanel(request, page=1):
 
 def maps(request, page=1, output_format=""):
 
-    mapObject = Maps.objects.filter()
-    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
+    maps_query = Maps.objects.filter()
+    maps_query, filter_prepare, selected_filter = misc.map_filter(request, maps_query)
 
     perPage = 20
     slice_start = perPage * int(page) - perPage
     slice_end = perPage * int(page)
 
-    amount = mapObject.count()
+    amount = maps_query.count()
     rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
-    mapObject = mapObject[slice_start:slice_end]
-    amount_this_page = len(mapObject)
+    maps_query = maps_query[slice_start:slice_end]
 
     if output_format == 'json':
-        return JsonResponse(misc.prepare_maps_for_json(mapObject, request.build_absolute_uri('/')))
+        return JsonResponse(misc.prepare_maps_for_json(maps_query, request.build_absolute_uri('/')))
+
+    amount_this_page = len(maps_query)
 
     if amount_this_page == 0 and int(page) != 1:
         if request.META['QUERY_STRING']:
             return HttpResponseRedirect("/maps/?" + request.META['QUERY_STRING'])
         return HttpResponseRedirect("/maps/")
 
-    comments = misc.count_comments_for_many(mapObject)
+    comments = misc.count_comments_for_many(maps_query)
 
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'maps.html',
-        'request': request,
-        'title': 'Maps',
-        'maps': mapObject,
-        'page': int(page),
-        'range': [i + 1 for i in range(rowsRange)],
-        'amount': amount,
-        'comments': comments,
+    return standard_view(
+        request,
+        'index.html',
+        {
+            'content': 'maps.html',
+            'request': request,
+            'title': content.titles['maps'],
+            'maps': maps_query,
+            'page': int(page),
+            'range': [i + 1 for i in range(rowsRange)],
+            'amount': amount,
+            'comments': comments,
 
-        'filter_prepare': filter_prepare,
-        'selected_filter': selected_filter,
-    }
-
-    if settings.SITE_MAINTENANCE:
-        template_args['content'] = 'service/maintenance.html'
-        template_args['maintenance_over'] = settings.SITE_MAINTENANCE_OVER
-
-    return HttpResponse(template.render(template_args, request))
-
+            'filter_prepare': filter_prepare,
+            'selected_filter': selected_filter,
+        }
+    )
 
 def maps_author(request, author, page=1):
 

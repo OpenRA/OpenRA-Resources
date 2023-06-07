@@ -250,7 +250,7 @@ def all_revisions_for_map(item_id):
         pass
 
 
-def map_filter(request, mapObject):
+def map_filter(request, maps_query):
 
     selected_filter = {}
     filter_prepare = {}
@@ -318,67 +318,67 @@ def map_filter(request, mapObject):
 
     # filter by game mod
     if selected_filter['mod'] and 'any' not in selected_filter['mod']:
-        mapObject = mapObject.filter(game_mod__in=selected_filter['mod'])
+        maps_query = maps_query.filter(game_mod__in=selected_filter['mod'])
 
     # filter by map category
     if selected_filter['category'] and 'any' not in selected_filter['category']:
         query_category = MapCategories.objects.filter(category_name__in=selected_filter['category'])
         query_category = ['_' + str(cat.id) + '_' for cat in query_category]
 
-        mapObject = mapObject.filter(reduce(lambda x, y: x | y, [Q(categories__contains=item) for item in query_category]))
+        maps_query = maps_query.filter(reduce(lambda x, y: x | y, [Q(categories__contains=item) for item in query_category]))
 
     # filter by MapFormat
     if selected_filter['format'] and 'any' not in selected_filter['format']:
-        mapObject = mapObject.filter(mapformat__in=selected_filter['format'])
+        maps_query = maps_query.filter(mapformat__in=selected_filter['format'])
 
     # filter by engine parser
     if selected_filter['parser'] and 'any' not in selected_filter['parser']:
-        mapObject = mapObject.filter(parser__in=selected_filter['parser'])
+        maps_query = maps_query.filter(parser__in=selected_filter['parser'])
 
     # filter by tileset
     if selected_filter['tileset'] and 'any' not in selected_filter['tileset']:
-        mapObject = mapObject.filter(tileset__in=selected_filter['tileset'])
+        maps_query = maps_query.filter(tileset__in=selected_filter['tileset'])
 
     # filter by amount of spawn slots
     if selected_filter['players']:
-        mapObject = mapObject.filter(players=selected_filter['players'])
+        maps_query = maps_query.filter(players=selected_filter['players'])
 
     # filter: show all revisions or only the latest
     if selected_filter['show_all_revisions'] != 'on':
-        mapObject = mapObject.filter(next_rev=0)
+        maps_query = maps_query.filter(next_rev=0)
 
     # filter: show only maps with reports
     if selected_filter['show_with_reports'] == 'on':
-        mapObject = mapObject.exclude(amount_reports=0)
+        maps_query = maps_query.exclude(amount_reports=0)
 
     # filter: show only advanced maps
     if selected_filter['only_advanced'] == 'on':
-        mapObject = mapObject.filter(advanced_map=True)
+        maps_query = maps_query.filter(advanced_map=True)
 
     # filter: show only maps with Lua scripts
     if selected_filter['only_lua'] == 'on':
-        mapObject = mapObject.filter(lua=True)
+        maps_query = maps_query.filter(lua=True)
 
     # filter: show only maps with duplicates (by map_hash)
     if selected_filter['with_duplicates'] == 'on':
         dup_Ob = Maps.objects.values_list('map_hash', flat=True).annotate(Count('id')).order_by().filter(id__count__gt=1)
-        mapObject = mapObject.filter(map_hash__in=[dup_it for dup_it in dup_Ob])
+        maps_query = maps_query.filter(map_hash__in=[dup_it for dup_it in dup_Ob])
 
     # filter: show only last revisions of maps where parser is not equal to the latest official
     if selected_filter['outdated'] == 'on':
         latest_official_parser = settings.OPENRA_VERSIONS[0]
-        mapObject = mapObject.filter(next_rev=0).exclude(parser=latest_official_parser)
+        maps_query = maps_query.filter(next_rev=0).exclude(parser=latest_official_parser)
 
     # filter options for maps with problems
     if selected_filter['with_problems'] and selected_filter['with_problems'] != 'show':
         if selected_filter['with_problems'] == 'hide_lint_failed':
-            mapObject = mapObject.filter(requires_upgrade=False)
+            maps_query = maps_query.filter(requires_upgrade=False)
         elif selected_filter['with_problems'] == 'show_only_lint_failed':
-            mapObject = mapObject.filter(requires_upgrade=True)
+            maps_query = maps_query.filter(requires_upgrade=True)
         elif selected_filter['with_problems'] == 'api_dl_disabled':
-            mapObject = mapObject.filter(downloading=False)
+            maps_query = maps_query.filter(downloading=False)
         elif selected_filter['with_problems'] == 'many_reports':
-            mapObject = mapObject.filter(amount_reports__gte=3)
+            maps_query = maps_query.filter(amount_reports__gte=3)
     ####################
     ####################
 
@@ -387,35 +387,35 @@ def map_filter(request, mapObject):
     ####################
     if selected_filter['sort_by'] and selected_filter['sort_by'] != 'latest':
         if selected_filter['sort_by'] == 'oldest':
-            mapObject = mapObject.order_by('posted')
+            maps_query = maps_query.order_by('posted')
         elif selected_filter['sort_by'] == 'title':
-            mapObject = mapObject.order_by('title')
+            maps_query = maps_query.order_by('title')
         elif selected_filter['sort_by'] == 'title_reversed':
-            mapObject = mapObject.order_by('-title')
+            maps_query = maps_query.order_by('-title')
         elif selected_filter['sort_by'] == 'players':
-            mapObject = mapObject.order_by('-players')
+            maps_query = maps_query.order_by('-players')
         elif selected_filter['sort_by'] == 'lately_commented':
-            mapObject = mapObject.extra({'last_comment': 'SELECT coalesce(MAX(posted), \'1990-01-01 00:00:00\') FROM openra_comments WHERE openra_comments.item_id = openra_maps.id AND openra_comments.item_type = \'maps\' AND openra_comments.is_removed = False' }).order_by('-last_comment')
+            maps_query = maps_query.extra({'last_comment': 'SELECT coalesce(MAX(posted), \'1990-01-01 00:00:00\') FROM openra_comments WHERE openra_comments.item_id = openra_maps.id AND openra_comments.item_type = \'maps\' AND openra_comments.is_removed = False' }).order_by('-last_comment')
         elif selected_filter['sort_by'] == 'rating':
-            mapObject = mapObject.order_by('-rating')
+            maps_query = maps_query.order_by('-rating')
         elif selected_filter['sort_by'] == 'views':
-            mapObject = mapObject.order_by('-viewed')
+            maps_query = maps_query.order_by('-viewed')
         elif selected_filter['sort_by'] == 'downloads':
-            mapObject = mapObject.order_by('-downloaded')
+            maps_query = maps_query.order_by('-downloaded')
         elif selected_filter['sort_by'] == 'revisions':
-            mapObject = mapObject.order_by('-revision')
+            maps_query = maps_query.order_by('-revision')
     else:
-        mapObject = mapObject.order_by('-posted')
+        maps_query = maps_query.order_by('-posted')
 
     ###################
 
-    return [mapObject, filter_prepare, selected_filter]
+    return [maps_query, filter_prepare, selected_filter]
 
-def prepare_maps_for_json(mapsObject, base_uri):
-    mapsObject.prefetch_related('user')
+def prepare_maps_for_json(maps_query, base_uri):
+    maps_query.prefetch_related('user')
     output = {}
     i = 0
-    for current_map in mapsObject:
+    for current_map in maps_query:
         output[i] = {
             'id': current_map.id,
             'uploader': current_map.user.username,

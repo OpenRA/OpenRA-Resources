@@ -59,7 +59,7 @@ class TestRouteMaps(TestRouteBase):
             titles.append(map_model.title)
 
         self.assert_contains(
-            self.get(route='/maps/json'),
+            self.get(route='/api/maps'),
             titles
         )
 
@@ -69,8 +69,6 @@ class TestRouteMaps(TestRouteBase):
         MapsFactory(info='mymap'),
         MapsFactory(description='mymap'),
         MapsFactory(author='mymap')
-
-        titles = []
 
         for sort in [
             'latest',
@@ -87,5 +85,6 @@ class TestRouteMaps(TestRouteBase):
             self.assert_contains(
                 self.get({
                     'sort_by': sort
-                })
+                }),
+                'Custom maps are stored in the user'
             )
