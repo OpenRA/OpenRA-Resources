@@ -64,10 +64,10 @@ class TestRouteMaps(TestRouteBase):
         )
 
     def test_route_allows_any_sort_by_option(self):
-        MapsFactory(map_hash='mymap'),
-        MapsFactory(title='mymap'),
-        MapsFactory(info='mymap'),
-        MapsFactory(description='mymap'),
+        MapsFactory(map_hash='mymap')
+        MapsFactory(title='mymap')
+        MapsFactory(info='mymap')
+        MapsFactory(description='mymap')
         MapsFactory(author='mymap')
 
         for sort in [
