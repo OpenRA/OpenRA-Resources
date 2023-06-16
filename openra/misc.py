@@ -411,6 +411,32 @@ def map_filter(request, maps_query):
 
     return [maps_query, filter_prepare, selected_filter]
 
+def prepare_maps_for_json(maps_query):
+    maps_query.prefetch_related('user')
+    output = {}
+    i = 0
+    for current_map in maps_query:
+        output[i] = {
+            'id': current_map.id,
+            'posted': str(current_map.posted),
+            'uploader': current_map.user.username,
+            'title': current_map.title,
+            'description': current_map.description,
+            'info': current_map.info,
+            'author': current_map.author,
+            'players': current_map.players,
+            'game_mod': current_map.game_mod,
+            'map_hash': current_map.map_hash,
+            'width': current_map.width,
+            'height': current_map.height,
+            'bounds': current_map.bounds,
+            'advanced_map': current_map.advanced_map,
+            'lua': current_map.lua
+        }
+        i+=1
+
+    return output
+
 def user_account_age(user):
     """Returns the age of a user account in hours"""
     if not user or not user.is_authenticated():
