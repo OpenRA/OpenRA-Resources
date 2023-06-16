@@ -411,31 +411,6 @@ def map_filter(request, maps_query):
 
     return [maps_query, filter_prepare, selected_filter]
 
-def prepare_maps_for_json(maps_query, base_uri):
-    maps_query.prefetch_related('user')
-    output = {}
-    i = 0
-    for current_map in maps_query:
-        output[i] = {
-            'id': current_map.id,
-            'uploader': current_map.user.username,
-            'title': current_map.title,
-            'description': current_map.description,
-            'author': current_map.author,
-            'players': current_map.players,
-            'game_mod': current_map.game_mod,
-            'map_hash': current_map.map_hash,
-            'width': current_map.width,
-            'height': current_map.height,
-            'advanced_map': current_map.advanced_map,
-            'lua': current_map.lua,
-            'website_url': base_uri + 'maps/' + str(current_map.id),
-            'download_url': base_uri + 'maps/' + str(current_map.id) + '/oramap',
-        }
-        i+=1
-
-    return output
-
 def user_account_age(user):
     """Returns the age of a user account in hours"""
     if not user or not user.is_authenticated():
