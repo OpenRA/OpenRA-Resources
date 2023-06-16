@@ -195,9 +195,7 @@ def maps(request, page=1, output_format=""):
     maps_query = maps_query[slice_start:slice_end]
 
     if output_format == 'json':
-        maps_query.prefetch_related('user')
-        from openra import api
-        return api.__map_info_from_objects(request, maps_query, False)
+        return JsonResponse(misc.prepare_maps_for_json(maps_query))
 
     amount_this_page = len(maps_query)
 
