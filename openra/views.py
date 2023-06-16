@@ -182,6 +182,10 @@ def maps(request, page=1, output_format=""):
     maps_query = Maps.objects.filter()
     maps_query, filter_prepare, selected_filter = misc.map_filter(request, maps_query)
 
+    get_page = request.GET.get('page', False)
+    if get_page:
+        page = get_page
+
     perPage = 20
     slice_start = perPage * int(page) - perPage
     slice_end = perPage * int(page)
@@ -191,7 +195,9 @@ def maps(request, page=1, output_format=""):
     maps_query = maps_query[slice_start:slice_end]
 
     if output_format == 'json':
-        return JsonResponse(misc.prepare_maps_for_json(maps_query, request.build_absolute_uri('/')))
+        maps_query.prefetch_related('user')
+        from openra import api
+        return api.__map_info_from_objects(request, maps_query, False)
 
     amount_this_page = len(maps_query)
 

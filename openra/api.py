@@ -80,6 +80,7 @@ def __map_info_from_objects(request, map_objects, yaml):
         # TODO: Title and author have ' replaced with '' before insertion into the database. Work out why and fix it
         results[map_object.map_hash] = {
             'id': map_object.id,
+            'uploader': map_object.user.username,
             'title': map_object.title.replace("''", "'"),
             'description': map_object.description,
             'info': map_object.info,
