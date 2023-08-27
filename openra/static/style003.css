@@ -1484,6 +1484,17 @@ p.registerInfo {
 	margin-top: 25px;
 }
 
+.upload-map-playtest-warning {
+    margin-bottom:10px;
+    color:#FF0000;
+    background:white;
+    background:#FFEEEE;
+    margin-right:10px;
+    padding:10px;
+    border:1px solid #ff3333;
+    display:none;
+}
+
 .upload-map-form-stars {
 	font-size: 0.9em;
 }
