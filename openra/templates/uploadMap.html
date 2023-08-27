@@ -9,7 +9,9 @@
 				$(".license_options").hide();
 			});
 
-			$('.upload-map-form-parser option:first-child').attr("selected", "selected");
+			$('.upload-map-form-parser option').filter(function(){
+				return /^release-/.test(this.value);
+			}).first().attr("selected", "selected");
 
 			$('.upload-map-form-parser option:first-child').append(' (latest version)')
 		});
