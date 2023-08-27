@@ -9,11 +9,20 @@
 				$(".license_options").hide();
 			});
 
+			function is_release_version(version) {
+				return /^release-/.test(version);
+			}
+
 			$('.upload-map-form-parser option').filter(function(){
-				return /^release-/.test(this.value);
+				return is_release_version(this.value)
 			}).first().attr("selected", "selected");
 
 			$('.upload-map-form-parser option:first-child').append(' (latest version)')
+
+			$('.upload-map-form-parser select').on('click change', function(e){
+
+				$('.upload-map-playtest-warning').toggle(!is_release_version(e.target.value))
+			})
 		});
 	</script>
 
@@ -38,6 +47,9 @@
 				</div>
 
 				<div class='upload-map-form-file'>
+					<div class="upload-map-playtest-warning">
+						Warning: You are uploading a map for a playtest. It will not be possible to update this automatically for the next release.
+					</div>
 					<input class="id_file" name="file" type="file">
 					<button type="submit">Upload</button>
 				</div>
