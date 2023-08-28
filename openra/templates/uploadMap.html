@@ -19,8 +19,7 @@
 
 			$('.upload-map-form-parser option:first-child').append(' (latest version)')
 
-			$('.upload-map-form-parser select').on('click change', function(e){
-
+			$('.upload-map-form-parser select').on('click change', function(e) {
 				$('.upload-map-playtest-warning').toggle(!is_release_version(e.target.value))
 			})
 		});
