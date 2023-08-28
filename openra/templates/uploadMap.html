@@ -13,7 +13,7 @@
 				return /^release-/.test(version);
 			}
 
-			$('.upload-map-form-parser option').filter(function(){
+			$('.upload-map-form-parser option').filter(function() {
 				return is_release_version(this.value)
 			}).first().attr("selected", "selected");
 
