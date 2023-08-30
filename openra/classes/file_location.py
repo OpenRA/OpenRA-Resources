@@ -1,3 +1,5 @@
+from __future__ import annotations
+import io
 from django.conf import os
 from fs.base import FS, copy
 from fs.tempfs import TempFS
@@ -17,7 +19,7 @@ class FileLocation:
         self.file = file
 
     def get_fs_path(self):
-        return os.path.join(self.path + self.file)
+        return os.path.join(self.path, self.file)
 
     def get_os_dir(self):
         try:
@@ -36,6 +38,30 @@ class FileLocation:
 
         except Exception as exception:
             raise ExceptionFileLocationGetOSPath(exception, self.fs, self.path, self.file)
+
+    def ensure_file_exists(self):
+        if not self.fs.exists(self.get_fs_path()):
+            if self.path:
+                self.fs.makedirs(self.path)
+            self.fs.create(self.get_fs_path())
+
+    def copy_to_file_location(self, location: FileLocation):
+        try:
+            location.ensure_file_exists()
+            copy.copy_file(
+                self.fs,
+                os.path.join(
+                    self.path,
+                    self.file
+                ),
+                location.fs,
+                location.get_fs_path()
+            )
+
+            return location
+
+        except Exception as exception:
+            raise ExceptionFileLocationCopyToFileLocation(exception, self.fs, self.path, self.file, location)
 
     def copy_to_tempfs(self, filename: str):
         try:
@@ -58,6 +84,23 @@ class FileLocation:
         except Exception as exception:
             raise ExceptionFileLocationCopyToTempFS(exception, self.fs, self.path, self.file, filename)
 
+    def get_file_clone(self):
+        try:
+
+            file = io.BytesIO()
+
+            self.fs.download(
+                self.get_fs_path(),
+                file
+            )
+
+            file.seek(0)
+
+            return file
+
+        except Exception as exception:
+            raise ExceptionFileLocationGetFileClone(exception, self.fs, self.path, self.file)
+
 
 class ExceptionFileLocationGetOSDir(ExceptionBase):
     def __init__(self, exception, fs: FS, path: str, file: str):
@@ -75,6 +118,19 @@ class ExceptionFileLocationGetOSPath(ExceptionFileLocationGetOSDir):
         self.message = "An exception occured while trying to get the os path"
 
 
+class ExceptionFileLocationCopyToFileLocation(ExceptionBase):
+    def __init__(self, exception, fs: FS, path: str, file: str, target: FileLocation):
+        super().__init__()
+        self.message = "An exception occured while trying to copy a file to a TempFS"
+        self.detail.append('from fs type: ' + str(type(fs)))
+        self.detail.append('from path: ' + path)
+        self.detail.append('from file: ' + file)
+        self.detail.append('to fs type: ' + str(type(target.fs)))
+        self.detail.append('to path: ' + target.path)
+        self.detail.append('to file: ' + target.file)
+        self.detail.append('message: ' + str(exception))
+
+
 class ExceptionFileLocationCopyToTempFS(ExceptionBase):
     def __init__(self, exception, fs: FS, path: str, file: str, target: str):
         super().__init__()
@@ -83,4 +139,14 @@ class ExceptionFileLocationCopyToTempFS(ExceptionBase):
         self.detail.append('path: ' + path)
         self.detail.append('file: ' + file)
         self.detail.append('target: ' + target)
+        self.detail.append('message: ' + str(exception))
+
+
+class ExceptionFileLocationGetFileClone(ExceptionBase):
+    def __init__(self, exception, fs: FS, path: str, file: str):
+        super().__init__()
+        self.message = "An exception occured while trying to clone a file"
+        self.detail.append('fs type: ' + str(type(fs)))
+        self.detail.append('path: ' + path)
+        self.detail.append('file: ' + file)
         self.detail.append('message: ' + str(exception))

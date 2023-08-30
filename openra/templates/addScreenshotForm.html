@@ -1,6 +1,6 @@
 {% if request.user.is_authenticated %}
 	<div class="upload_container">
-		<form action="/maps/{{arg}}/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+		<form action="/maps/{{arg}}/upload-screenshot" method="POST" enctype="multipart/form-data">{% csrf_token %}
 			<div class='cBlock no-pd-bot'>
 				<h3>Upload screenshot of your map</h3>
 			</div>

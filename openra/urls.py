@@ -49,6 +49,7 @@ urlpatterns = [
 
     url(r'^maps/(?P<map_id>\d+)/report', views.map_report, name='map_report'),
     url(r'^maps/(?P<map_id>\d+)/update-map-info', views.map_update_map_info, name='map_update_map_info'),
+    url(r'^maps/(?P<map_id>\d+)/upload-screenshot', views.map_upload_screenshot, name='map_upload_screenshot'),
 
     url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
     url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),

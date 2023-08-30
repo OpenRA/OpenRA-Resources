@@ -25,9 +25,11 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openra import content, handlers, misc
 from openra.auth import ExceptionLoginFailed, set_session_to_remember_auth, try_login
+from openra.classes.screenshot_resource import ScreenshotResource
 from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments
 from openra.services.map_search import MapSearch
 from openra.classes.pagination import Pagination
+from openra.services.screenshot_repository import ScreenshotRepository
 
 # TODO: Fix the code and reenable some of these warnings
 # pylint: disable=invalid-name
@@ -344,13 +346,34 @@ def map_update_map_info(request, map_id):
     return HttpResponseRedirect('/maps/' + map_id)
 
 
+@inject
+def map_upload_screenshot(request, map_id,
+                          screenshot_repository: ScreenshotRepository = Provide['screenshot_repository']
+
+                          ):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login/')
+
+    if request.FILES.get('screenshot', False):
+
+        target_map = Maps.objects.get(id=map_id)
+        if request.user.is_superuser or request.user.id == target_map.user_id:
+            screenshot_repository.create_from_uploaded_file(
+                request.FILES.get('screenshot', False),
+                request.user,
+                ScreenshotResource(
+                    'maps',
+                    target_map.id,
+                ),
+                request.POST.get('map_preview', None) == 'on'
+            )
+
+    return HttpResponseRedirect('/maps/' + map_id)
+
+
 def displayMap(request, arg):
     if request.method == 'POST':
-        if request.FILES.get('screenshot', False) is not False:
-
-            handlers.addScreenshot(request, arg, 'map')
-
-        elif request.POST.get('comment', "") != "":
+        if request.POST.get('comment', "") != "":
             account_age = misc.user_account_age(request.user)
             if account_age < 24:
                 template = loader.get_template('index.html')

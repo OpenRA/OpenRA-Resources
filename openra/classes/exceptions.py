@@ -24,3 +24,6 @@ class ExceptionBase(Exception):
 
     def print_full_details(self):
         print(self.get_full_details())
+
+    def __str__(self):
+        return self.get_full_details()
