@@ -14,4 +14,5 @@ titles = {
     'search': 'Search',
     'panel': 'My Maps',
     'maps': 'Maps',
+    'maps_author': 'Maps from {}',
 }

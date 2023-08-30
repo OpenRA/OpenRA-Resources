@@ -217,41 +217,43 @@ def maps(request, output_format=""):
     )
 
 
-def maps_author(request, author, page=1):
+def maps_author(request, author):
 
-    mapObject = Maps.objects.filter(author=author.replace("%20", " "))
-    mapObject, filter_prepare, selected_filter = misc.map_filter(request, mapObject)
+    page = int(request.GET.get('page', 1))
 
-    perPage = 20
-    slice_start = perPage * int(page) - perPage
-    slice_end = perPage * int(page)
+    maps_query, filter_prepare, selected_filter = misc.map_filter(
+        request,
+        Maps.objects.filter(
+            author=author.replace("%20", " ")
+        )
+    )
 
-    amount = len(mapObject)
-    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
-    mapObject = mapObject[slice_start:slice_end]
-    if len(mapObject) == 0 and int(page) != 1:
+    pagination = Pagination(maps_query, 20)
+
+    maps_query = pagination.get_page(page)
+
+    if len(maps_query) == 0 and page != 1:
         if request.META['QUERY_STRING']:
-            return HttpResponseRedirect("/maps/author/%s/?%s" % (author, request.META['QUERY_STRING']))
-        return HttpResponseRedirect("/maps/author/%s/" % author)
+            return HttpResponseRedirect("/maps/author/%s/?%s" % (author, re.sub("page=\d+&?", "", request.META['QUERY_STRING'])))
 
-    comments = misc.count_comments_for_many(mapObject)
+    comments = misc.count_comments_for_many(maps_query)
 
     template = loader.get_template('index.html')
     template_args = {
         'content': 'maps_author.html',
         'request': request,
-        'title': 'Maps From ' + author,
-        'maps': mapObject,
-        'page': int(page),
-        'range': [i + 1 for i in range(rowsRange)],
-        'amount': amount,
+        'title': content.titles['maps_author'].format(author),
+        'maps': maps_query,
+        'page': page,
+        'pagination': pagination.get_links(page, request.META['QUERY_STRING']),
+        'amount': pagination.total,
         'author': author,
         'comments': comments,
 
         'filter_prepare': filter_prepare,
         'selected_filter': selected_filter,
     }
-    return StreamingHttpResponse(template.render(template_args, request))
+    return HttpResponse(template.render(template_args, request))
 
 
 def maps_uploader(request, arg, page=1):

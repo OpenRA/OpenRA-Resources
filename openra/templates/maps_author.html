@@ -178,30 +178,5 @@
 	{% endfor %}
 	<div class="clear"></div>
 </div>
-{% if 2 in range %}
-<div id="paging">
-	{% for i in range %}
-		<div class="paging_cell">
-		{% if i <= 3 or i >= range|length|add:"-2" or i < page|add:"3" and i > page|add:"-3" or i == 4 and page == 7 or i == range|length|add:"-3" and page == range|length|add:"-6" %}
-			{% if page == i %}
-				<span>{{ i }}</span>
-			{% else %}
-				{% if request.META.QUERY_STRING %}
-					<a href="/maps/author/{{author}}/page/{{i}}/?{{request.META.QUERY_STRING}}">{{ i }}</a>
-				{% else %}
-					<a href="/maps/author/{{author}}/page/{{i}}/">{{ i }}</a>
-				{% endif %}
-			{% endif %}
-		{% else %}
-			{% if i < page %}
-				<span class='no-page-before hide_block'>...</span>
-			{% else %}
-				<span class='no-page-after hide_block'>...</span>
-			{% endif %}
-		{% endif %}
-		</div>
-	{% endfor %}
-</div>
-{% endif %}
-<div class="clear"></div>
+{% include 'pagination.html' %}
 {% endif %}
