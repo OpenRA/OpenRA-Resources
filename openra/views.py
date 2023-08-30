@@ -330,15 +330,23 @@ def map_report(request, map_id):
     return HttpResponseRedirect('/maps/' + map_id)
 
 
+def map_update_map_info(request, map_id):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login/')
+
+    map_info = request.POST.get('mapInfo', False)
+    if map_info:
+        map_info = map_info.strip()
+        target_map = Maps.objects.get(id=map_id)
+        if request.user.is_superuser or request.user.id == target_map.user_id:
+            target_map.info = map_info
+            target_map.save()
+    return HttpResponseRedirect('/maps/' + map_id)
+
+
 def displayMap(request, arg):
     if request.method == 'POST':
-        if request.POST.get('mapInfo', False) is not False:
-            if request.user.is_superuser:
-                Maps.objects.filter(id=arg).update(info=request.POST['mapInfo'].strip())
-            else:
-                Maps.objects.filter(id=arg, user_id=request.user.id).update(info=request.POST['mapInfo'].strip())
-            return HttpResponseRedirect('/maps/' + arg)
-        elif request.FILES.get('screenshot', False) is not False:
+        if request.FILES.get('screenshot', False) is not False:
 
             handlers.addScreenshot(request, arg, 'map')
 
