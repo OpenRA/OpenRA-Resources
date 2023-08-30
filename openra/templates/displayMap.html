@@ -111,7 +111,7 @@
 			<div class="popup-content-wrapper">
 				<div class="closePopup"><label class="x"></label></div>
 				<h3>Edit map info</h3>
-				<form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+				<form method="POST" action="/maps/{{map.id}}/update-map-info">{% csrf_token %}
 					<div><textarea name="mapInfo" placeholder="Map info">{{map.info}}</textarea></div>
 					<div><button type="submit">Submit</button></div>
 				</form>
