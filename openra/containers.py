@@ -11,6 +11,8 @@ from openra.services.github import Github
 from openra.services.log import Log
 from openra.services.map_file_repository import MapFileRepository
 from openra.services.map_search import MapSearch
+from openra.services.screenshot_repository import ScreenshotRepository
+from openra.services.uploaded_file_importer import UploadedFileImporter
 from openra.services.utility import Utility
 
 
@@ -39,6 +41,14 @@ class Container(containers.DeclarativeContainer):
             GithubClient,
             settings.GITHUB_API_KEY
         )
+    )
+
+    uploaded_file_importer = providers.Singleton(
+        UploadedFileImporter
+    )
+
+    screenshot_repository = providers.Singleton(
+        ScreenshotRepository
     )
 
     engine_file_repository = providers.Singleton(

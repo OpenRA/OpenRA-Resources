@@ -5,7 +5,7 @@ from fs.tempfs import TempFS
 
 from unittest import TestCase
 
-from openra.classes.file_location import ExceptionFileLocationCopyToTempFS, ExceptionFileLocationGetOSDir, ExceptionFileLocationGetOSPath, FileLocation
+from openra.classes.file_location import ExceptionFileLocationCopyToTempFS, ExceptionFileLocationGetFileClone, ExceptionFileLocationGetOSDir, ExceptionFileLocationGetOSPath, FileLocation
 
 
 class TestFileLocation(TestCase):
@@ -85,6 +85,33 @@ class TestFileLocation(TestCase):
             file.get_os_path
         )
 
+    def test_copy_to_file_location_copies_a_file(self):
+        fs = MemoryFS()
+
+        fs.makedir('location')
+        fs.writetext('location/test_file', 'file_content')
+
+        file = FileLocation(
+            fs,
+            'location/',
+            'test_file'
+        )
+
+        fs2 = MemoryFS()
+
+        file2 = FileLocation(
+            fs2,
+            'location2/',
+            'test_file2'
+        )
+
+        file.copy_to_file_location(file2)
+
+        self.assertEquals(
+            'file_content',
+            file2.fs.readtext(file2.get_fs_path())
+        )
+
     def test_copy_to_tempfs_copies_a_file(self):
         fs = MemoryFS()
 
@@ -124,4 +151,39 @@ class TestFileLocation(TestCase):
             ExceptionFileLocationCopyToTempFS,
             file.copy_to_tempfs,
             'new_name'
+        )
+
+    def test_get_file_clone(self):
+        fs = MemoryFS()
+
+        fs.makedir('location')
+        fs.writetext('location/test_file', 'file_content')
+
+        file = FileLocation(
+            fs,
+            'location/',
+            'test_file'
+        )
+
+        clone = file.get_file_clone()
+
+        self.assertEquals(
+            b'file_content',
+            clone.read()
+        )
+
+    def test_get_file_clone_throws_exception_if_unable_to_clone(self):
+        fs = MemoryFS()
+
+        fs.makedir('location')
+
+        file = FileLocation(
+            fs,
+            'location/',
+            'test_file'
+        )
+
+        self.assertRaises(
+            ExceptionFileLocationGetFileClone,
+            file.get_file_clone
         )

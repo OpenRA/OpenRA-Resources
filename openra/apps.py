@@ -20,5 +20,6 @@ class OpenraConfig(AppConfig):
             ".management.commands.import_latest_engines",
             ".facades",
             '.services.engine_file_repository',
-            '.services.map_file_repository'
+            '.services.map_file_repository',
+            '.services.screenshot_repository',
         ])

@@ -1,5 +1,5 @@
 decorator==4.0.9
-defusedxml==0.4.1
+defusedxml==0.7.1
 Django==1.9.4
 django-allauth==0.24.1
 django-cors-headers==1.1.0
@@ -28,3 +28,4 @@ PyGithub==1.56
 urllib3==1.26.13
 freezegun==1.2.2
 autopep8==2.0.1
+pillow==9.5.0
