@@ -7,7 +7,7 @@ from openra.tests.factories import MapsFactory, ScreenshotsFactory, UserFactory
 from openra.tests.routes.test_route_base import TestRouteBase
 
 
-class TestRouteMaps(TestRouteBase):
+class TestRouteMapsUploader(TestRouteBase):
 
     _route = '/maps/uploader/'
 
