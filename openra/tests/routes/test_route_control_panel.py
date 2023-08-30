@@ -47,12 +47,12 @@ class TestRouteControlPanel(TestRouteBase):
         user = UserFactory()
         user.save()
         map = MapsFactory(
-            user = user
+            user=user
         )
         map.save()
 
         map2 = MapsFactory(
-            title = 'different_title'
+            title='different_title'
         )
         map2.save()
 
@@ -82,9 +82,9 @@ class TestRouteControlPanel(TestRouteBase):
         shown = []
         for i in range(20):
             map = MapsFactory(
-                user = user,
-                posted = timezone.now(),
-                title = "map_title_" + str(i) + "_"
+                user=user,
+                posted=timezone.now(),
+                title="map_title_" + str(i) + "_"
             )
             map.save()
             shown.append(map)
@@ -92,9 +92,9 @@ class TestRouteControlPanel(TestRouteBase):
         not_shown = []
         for i in range(20, 22):
             map = MapsFactory(
-                user = user,
-                posted = timezone.now() - timedelta(hours=1),
-                title = "map_title_" + str(i) + "_"
+                user=user,
+                posted=timezone.now() - timedelta(hours=1),
+                title="map_title_" + str(i) + "_"
             )
             map.save()
             not_shown.append(map)
@@ -132,9 +132,9 @@ class TestRouteControlPanel(TestRouteBase):
         not_shown = []
         for i in range(20):
             map = MapsFactory(
-                user = user,
-                posted = timezone.now(),
-                title = "map_title_" + str(i) + "_"
+                user=user,
+                posted=timezone.now(),
+                title="map_title_" + str(i) + "_"
             )
             map.save()
             not_shown.append(map)
@@ -142,9 +142,9 @@ class TestRouteControlPanel(TestRouteBase):
         shown = []
         for i in range(20, 22):
             map = MapsFactory(
-                user = user,
-                posted = timezone.now() - timedelta(hours=1),
-                title = "map_title_" + str(i) + "_"
+                user=user,
+                posted=timezone.now() - timedelta(hours=1),
+                title="map_title_" + str(i) + "_"
             )
             map.save()
             shown.append(map)

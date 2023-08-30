@@ -395,7 +395,7 @@ def map_filter(request, maps_query):
         elif selected_filter['sort_by'] == 'players':
             maps_query = maps_query.order_by('-players')
         elif selected_filter['sort_by'] == 'lately_commented':
-            maps_query = maps_query.extra({'last_comment': 'SELECT coalesce(MAX(posted), \'1990-01-01 00:00:00\') FROM openra_comments WHERE openra_comments.item_id = openra_maps.id AND openra_comments.item_type = \'maps\' AND openra_comments.is_removed = False' }).order_by('-last_comment')
+            maps_query = maps_query.extra({'last_comment': 'SELECT coalesce(MAX(posted), \'1990-01-01 00:00:00\') FROM openra_comments WHERE openra_comments.item_id = openra_maps.id AND openra_comments.item_type = \'maps\' AND openra_comments.is_removed = False'}).order_by('-last_comment')
         elif selected_filter['sort_by'] == 'rating':
             maps_query = maps_query.order_by('-rating')
         elif selected_filter['sort_by'] == 'views':
@@ -410,6 +410,7 @@ def map_filter(request, maps_query):
     ###################
 
     return [maps_query, filter_prepare, selected_filter]
+
 
 def prepare_maps_for_json(maps_query):
     maps_query.prefetch_related('user')
@@ -433,9 +434,10 @@ def prepare_maps_for_json(maps_query):
             'advanced_map': current_map.advanced_map,
             'lua': current_map.lua
         }
-        i+=1
+        i += 1
 
     return output
+
 
 def user_account_age(user):
     """Returns the age of a user account in hours"""

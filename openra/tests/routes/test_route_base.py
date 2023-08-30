@@ -44,9 +44,9 @@ class TestRouteBase(TestCase):
         return self._post(client, data, route)
 
     def assert_contains(self, response, contents=[],
-            status_code=200,
-            title=''
-        ):
+                        status_code=200,
+                        title=''
+                        ):
         if title != '':
             contents.append(f'<title>OpenRA Resource Center - {title}</title>')
         for content in contents:

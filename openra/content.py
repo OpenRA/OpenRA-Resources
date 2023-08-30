@@ -15,4 +15,5 @@ titles = {
     'panel': 'My Maps',
     'maps': 'Maps',
     'maps_author': 'Maps from {}',
+    'maps_uploader': 'Maps uploaded by {}',
 }
