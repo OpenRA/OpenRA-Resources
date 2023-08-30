@@ -303,29 +303,36 @@ def maps_uploader(request, uploader):
     return HttpResponse(template.render(template_args, request))
 
 
+def map_report(request, map_id):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login/')
+
+    reason = request.POST.get('reportReason', "").strip()
+    if reason != "":
+        existing_reports_from_user = Reports.objects.filter(user_id=request.user.id, ex_id=map_id, ex_name='maps')
+        if not existing_reports_from_user:
+            infringement = request.POST.get('infringement', False)
+            if infringement == "true":
+                infringement = True
+            report = Reports(
+                user_id=request.user.id,
+                reason=reason,
+                ex_id=map_id,
+                ex_name='maps',
+                infringement=infringement,
+                posted=timezone.now(),
+            )
+            report.save()
+            Maps.objects.filter(id=map_id).update(amount_reports=Reports.objects.filter(ex_name='maps', ex_id=map_id).count())
+
+            misc.send_email_to_admin_OnReport({'addr': request.META.get('HTTP_HOST', '') + '/maps/' + map_id, 'user_id': request.user.id, 'reason': request.POST['reportReason'].strip(), 'infringement': infringement})
+            misc.send_email_to_user_OnReport({'addr': request.META.get('HTTP_HOST', '') + '/maps/' + map_id, 'owner_id': Maps.objects.get(id=map_id).user_id, 'reason': request.POST['reportReason'].strip(), 'resource_type': 'map'})
+    return HttpResponseRedirect('/maps/' + map_id)
+
+
 def displayMap(request, arg):
     if request.method == 'POST':
-        if request.POST.get('reportReason', "").strip() != "":
-            checkReports = Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name='maps')
-            if not checkReports:
-                checkReports = Reports.objects.filter(ex_id=arg, ex_name='maps')
-                infringement = request.POST.get('infringement', False)
-                if infringement == "true":
-                    infringement = True
-                transac = Reports(
-                    user_id=request.user.id,
-                    reason=request.POST['reportReason'].strip(),
-                    ex_id=arg,
-                    ex_name='maps',
-                    infringement=infringement,
-                    posted=timezone.now(),
-                )
-                transac.save()
-                Maps.objects.filter(id=arg).update(amount_reports=F('amount_reports') + 1)
-                misc.send_email_to_admin_OnReport({'addr': request.META['HTTP_HOST'] + '/maps/' + arg, 'user_id': request.user.id, 'reason': request.POST['reportReason'].strip(), 'infringement': infringement})
-                misc.send_email_to_user_OnReport({'addr': request.META['HTTP_HOST'] + '/maps/' + arg, 'owner_id': Maps.objects.get(id=arg).user_id, 'reason': request.POST['reportReason'].strip(), 'resource_type': 'map'})
-                return HttpResponseRedirect('/maps/' + arg)
-        elif request.POST.get('mapInfo', False) is not False:
+        if request.POST.get('mapInfo', False) is not False:
             if request.user.is_superuser:
                 Maps.objects.filter(id=arg).update(info=request.POST['mapInfo'].strip())
             else:

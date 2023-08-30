@@ -152,7 +152,7 @@
 				<div class="popup-content-wrapper">
 					<div class="closePopup"><label class="x"></label></div>
 					<h3>Report this map</h3>
-					<form method="POST" action="/maps/{{map.id}}">{% csrf_token %}
+					<form method="POST" action="/maps/{{map.id}}/report">{% csrf_token %}
 						<div><textarea name="reportReason" placeholder="Reason"></textarea></div>
 						<div class="checkboxRow"><label>Copyright Infringement: </label><input type="checkbox" name="infringement" value="true"></div>
 						<div><button type="submit">Submit</button></div>
