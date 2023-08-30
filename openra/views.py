@@ -303,41 +303,6 @@ def maps_uploader(request, uploader):
     return HttpResponse(template.render(template_args, request))
 
 
-def maps_duplicates(request, maphash, page=1):
-
-    mapObject = Maps.objects.filter(map_hash=maphash)
-    if not mapObject:
-        HttpResponseRedirect('/maps/')
-
-    mapObject = sorted(mapObject, key=lambda x: (x.posted), reverse=True)
-
-    perPage = 20
-    slice_start = perPage * int(page) - perPage
-    slice_end = perPage * int(page)
-
-    amount = len(mapObject)
-    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
-    mapObject = mapObject[slice_start:slice_end]
-    if len(mapObject) == 0 and int(page) != 1:
-        return HttpResponseRedirect("/maps/duplicates/%s/" % maphash)
-
-    comments = misc.count_comments_for_many(mapObject)
-
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'maps_duplicates.html',
-        'request': request,
-        'title': 'Duplicates of ' + mapObject[0].title,
-        'maps': mapObject,
-        'page': int(page),
-        'range': [i + 1 for i in range(rowsRange)],
-        'amount': amount,
-        'maphash': maphash,
-        'comments': comments,
-    }
-    return StreamingHttpResponse(template.render(template_args, request))
-
-
 def displayMap(request, arg):
     if request.method == 'POST':
         if request.POST.get('reportReason', "").strip() != "":
