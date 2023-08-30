@@ -41,7 +41,6 @@ urlpatterns = [
     url(r'^maps/(?P<arg>\d+)/update/?$', views.updateMap, name='updateMap'),
     url(r'^maps/(?P<arg>\d+)/update_logs/?$', views.updateMapLogs, name='updateMapLogs'),
     url(r'^(?P<item_type>\w+)/(?P<arg>\d+)/unsubscribe/?$', views.unsubscribe_from_comments, name='Unsubscribe from comments to item'),
-    url(r'^maps/author/(?P<author>.+?)/page/(?P<page>\d+)/?$', views.maps_author, name='maps_author'),
     url(r'^maps/author/(?P<author>.+?)/?$', views.maps_author, name='maps_author'),
     url(r'^maps/uploader/(?P<arg>\d+)/?$', views.maps_uploader, name='maps_uploader'),
     url(r'^maps/uploader/(?P<arg>\d+)/page/(?P<page>\d+)/?$', views.maps_uploader, name='maps_uploader'),
