@@ -1,0 +1,16 @@
+<div id="paging">
+	{% for cell in pagination %}
+	<div class="paging_cell">
+		{% if cell.type == 'link' %}
+		{% if cell.active %}
+		<span>{{ cell.text }}</span>
+		{% else %}
+		<a href="{{ cell.href }}">{{ cell.text }}</a>
+		{% endif %}
+		{% else %}
+		<span class='no-page-after hide_block'>...</span>
+		{% endif %}
+	</div>
+	{% endfor %}
+</div>
+<div class="clear"></div>

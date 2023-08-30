@@ -74,7 +74,7 @@ def __map_info_from_objects(request, map_objects, yaml):
         else:
             minimap = ''
 
-        download_url = 'http://' + request.META['HTTP_HOST'] + \
+        download_url = 'http://' + request.META.get('HTTP_HOST', 'resource.openra.net') + \
                        '/maps/' + str(map_object.id) + '/oramap'
 
         # TODO: Title and author have ' replaced with '' before insertion into the database. Work out why and fix it
