@@ -1,6 +1,7 @@
 import os
 import math
 import datetime
+import re
 import shutil
 import random
 import json
@@ -26,6 +27,7 @@ from openra import content, handlers, misc
 from openra.auth import ExceptionLoginFailed, set_session_to_remember_auth, try_login
 from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments
 from openra.services.map_search import MapSearch
+from openra.classes.pagination import Pagination
 
 # TODO: Fix the code and reenable some of these warnings
 # pylint: disable=invalid-name
@@ -177,32 +179,22 @@ def ControlPanel(request, page=1):
     return HttpResponse(template.render(template_args, request))
 
 
-def maps(request, page=1, output_format=""):
+def maps(request, output_format=""):
 
-    maps_query = Maps.objects.filter()
-    maps_query, filter_prepare, selected_filter = misc.map_filter(request, maps_query)
+    page = int(request.GET.get('page', 1))
 
-    get_page = request.GET.get('page', False)
-    if get_page:
-        page = get_page
+    maps_query, filter_prepare, selected_filter = misc.map_filter(request, Maps.objects.filter())
 
-    perPage = 20
-    slice_start = perPage * int(page) - perPage
-    slice_end = perPage * int(page)
+    pagination = Pagination(maps_query, 20)
 
-    amount = maps_query.count()
-    rowsRange = int(math.ceil(amount / float(perPage)))   # amount of rows
-    maps_query = maps_query[slice_start:slice_end]
+    maps_query = pagination.get_page(page)
 
     if output_format == 'json':
         return JsonResponse(misc.prepare_maps_for_json(maps_query))
 
-    amount_this_page = len(maps_query)
-
-    if amount_this_page == 0 and int(page) != 1:
+    if len(maps_query) == 0 and page != 1:
         if request.META['QUERY_STRING']:
-            return HttpResponseRedirect("/maps/?" + request.META['QUERY_STRING'])
-        return HttpResponseRedirect("/maps/")
+            return HttpResponseRedirect("/maps/?" + re.sub("page=\d+&?", "", request.META['QUERY_STRING']))
 
     comments = misc.count_comments_for_many(maps_query)
 
@@ -214,15 +206,16 @@ def maps(request, page=1, output_format=""):
             'request': request,
             'title': content.titles['maps'],
             'maps': maps_query,
-            'page': int(page),
-            'range': [i + 1 for i in range(rowsRange)],
-            'amount': amount,
+            'page': page,
+            'pagination': pagination.get_links(page, request.META['QUERY_STRING']),
+            'amount': pagination.total,
             'comments': comments,
 
             'filter_prepare': filter_prepare,
             'selected_filter': selected_filter,
         }
     )
+
 
 def maps_author(request, author, page=1):
 

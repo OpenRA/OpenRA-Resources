@@ -67,7 +67,7 @@ class MapsFactory(BaseFactory):
     info = factory.Faker('paragraph')
     author = factory.Faker('word')
     map_type = 'conquest'
-    categories = factory.Faker('word')
+    categories = ''
     players = factory.Faker('random_number')
     game_mod = 'RA'
     map_hash = factory.Faker('random_letters')
