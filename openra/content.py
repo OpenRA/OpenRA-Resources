@@ -9,6 +9,7 @@ titles = {
     'home': '',
     'login': 'Sign In',
     'logout': 'Sign Out',
+    'user_actions_blocked': 'Account Blocked',
     # TODO reformat like others
     'feed': 'OpenRA Resource Center - RSS Feed',
     'search': 'Search',

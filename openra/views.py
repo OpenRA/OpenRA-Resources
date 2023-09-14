@@ -181,6 +181,23 @@ def ControlPanel(request, page=1):
     return HttpResponse(template.render(template_args, request))
 
 
+def user_actions_blocked(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login/')
+
+    account_age = misc.user_account_age(request.user)
+
+    template = loader.get_template('index.html')
+    template_args = {
+        'content': 'new_user_action_blocked.html',
+        'account_blocked': account_age < 24,
+        'hours_remaining': 24 - int(account_age),
+        'title': content.titles['user_actions_blocked']
+    }
+
+    return HttpResponse(template.render(template_args, request))
+
+
 def maps(request, output_format=""):
 
     page = int(request.GET.get('page', 1))
@@ -371,46 +388,41 @@ def map_upload_screenshot(request, map_id,
     return HttpResponseRedirect('/maps/' + map_id)
 
 
+def map_post_comment(request, map_id):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login/')
+
+    if misc.user_account_age(request.user) < 24:
+        return HttpResponseRedirect('/accounts/actions-blocked')
+
+    comment = Comments(
+        item_type='maps',
+        item_id=int(map_id),
+        user=request.user,
+        content=request.POST['comment'].strip(),
+        posted=timezone.now(),
+        is_removed=False,
+    )
+    comment.save()
+
+    target_map = Maps.objects.get(id=map_id)
+    if target_map.user != request.user:
+        misc.send_email_to_user_OnComment('maps', map_id, target_map.user.email, info="owner")
+
+    map_comments = Comments.objects.filter(item_type='maps', item_id=map_id, is_removed=False)
+    if map_comments:
+        for map_comment in map_comments:
+            if map_comment.user != request.user and map_comment.user != target_map.user:
+
+                unsubscribed = UnsubscribeComments.objects.filter(item_type='maps', item_id=map_id, user=map_comment.user)
+
+                if not unsubscribed:
+                    misc.send_email_to_user_OnComment('maps', map_id, map_comment.user.email)
+
+    return HttpResponseRedirect('/maps/' + map_id + '/#comments')
+
+
 def displayMap(request, arg):
-    if request.method == 'POST':
-        if request.POST.get('comment', "") != "":
-            account_age = misc.user_account_age(request.user)
-            if account_age < 24:
-                template = loader.get_template('index.html')
-                template_args = {
-                    'content': 'new_user_action_blocked.html',
-                    'hours_remaining': 24 - int(account_age),
-                    'title': 'Action Blocked',
-                }
-
-                return StreamingHttpResponse(template.render(template_args, request))
-
-            transac = Comments(
-                item_type='maps',
-                item_id=int(arg),
-                user=request.user,
-                content=request.POST['comment'].strip(),
-                posted=timezone.now(),
-                is_removed=False,
-            )
-            transac.save()
-
-            commented_map_obj = Maps.objects.get(id=arg)
-            if commented_map_obj.user != request.user:
-                misc.send_email_to_user_OnComment('maps', arg, commented_map_obj.user.email, info="owner")
-
-            comsObj = Comments.objects.filter(item_type='maps', item_id=arg, is_removed=False)
-            if comsObj:
-                for com in comsObj:
-                    if com.user != request.user and com.user != commented_map_obj.user:
-
-                        unsubObj = UnsubscribeComments.objects.filter(item_type='maps', item_id=arg, user=com.user)
-
-                        if not unsubObj:
-                            misc.send_email_to_user_OnComment('maps', arg, com.user.email)
-
-            return HttpResponseRedirect('/maps/' + arg + '/')
-
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
     oramap_filename = misc.first_oramap_in_directory(path)
     if not oramap_filename:
