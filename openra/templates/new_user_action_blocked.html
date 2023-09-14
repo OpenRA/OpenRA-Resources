@@ -6,5 +6,9 @@
 
 <div class="cBlock_comments">
 	<p style="margin-top: 0px">User accounts must be one day old before they can post content.</p>
-	<p>Please try again in {{hours_remaining}} hours.</p>
+    {% if account_blocked %}
+        <p>Please try again in {{hours_remaining}} hours.</p>
+    {% else %}
+        <p>Your block is over, please try again now.</p>
+    {% endif %}
 </div>

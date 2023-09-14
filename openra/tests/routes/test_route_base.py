@@ -1,6 +1,7 @@
 from django.test import TestCase, Client, override_settings
 
 from openra.tests.factories import UserFactory
+from django.utils import timezone
 
 
 @override_settings(SITE_MAINTENANCE=False)
@@ -42,6 +43,11 @@ class TestRouteBase(TestCase):
             user if user else UserFactory()
         )
         return self._post(client, data, route)
+
+    def create_old_user(self):
+        return UserFactory(
+            date_joined=timezone.datetime(1996, 11, 29, 0, 0)
+        )
 
     def assert_contains(self, response, contents=[],
                         status_code=200,

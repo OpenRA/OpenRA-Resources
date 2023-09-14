@@ -237,7 +237,7 @@
 
 		{% if request.user.is_authenticated %}
 			<div class='cBlock'>
-				<form class='post_comment' method='POST' action='{{request.path}}#comments'>{% csrf_token %}
+				<form class='post_comment' method='POST' action='/maps/{{map.id}}/post-comment'>{% csrf_token %}
 					<textarea name='comment'></textarea>
 					<input type='submit' value="Comment" class='button'>
 				</form>
