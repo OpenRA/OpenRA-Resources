@@ -1056,57 +1056,6 @@ def faq(request):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def contacts(request):
-    message_sent = False
-    if request.method == 'POST':
-        if request.POST.get('contacts_submit', "").strip() != "":
-            name = request.POST.get('name', "")
-            email = request.POST.get('email', "")
-            message = request.POST.get('message', "")
-
-            g_recaptcha_response = request.POST.get('g-recaptcha-response', "")
-            if g_recaptcha_response:
-                params = urlencode({
-                    'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
-                    'response': g_recaptcha_response,
-                    'remoteip': request.META.get("REMOTE_ADDR", ""),
-                }).encode('utf-8')
-                req = urllib.request.Request(
-                    url="https://www.google.com/recaptcha/api/siteverify",
-                    data=params,
-                    headers={
-                        "Content-type": "application/x-www-form-urlencoded",
-                        "User-agent": "reCAPTCHA Python"
-                    }
-                )
-                resp = urllib.request.urlopen(req).read().decode('utf-8')
-                json_resp = json.loads(resp)
-                if json_resp['success']:
-                    misc.send_email_contacts_form(name, email, message)
-                    return HttpResponseRedirect('/contacts/sent/')
-            return HttpResponseRedirect('/contacts/')
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'contacts.html',
-        'request': request,
-        'title': 'Contacts',
-        'message_sent': message_sent,
-    }
-    return StreamingHttpResponse(template.render(template_args, request))
-
-
-def contacts_sent(request):
-    message_sent = True
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'contacts.html',
-        'request': request,
-        'title': 'Contacts',
-        'message_sent': message_sent,
-    }
-    return StreamingHttpResponse(template.render(template_args, request))
-
-
 def robots(request):
     template = loader.get_template('service/robots.txt')
     template_args = {

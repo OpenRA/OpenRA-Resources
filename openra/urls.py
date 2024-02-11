@@ -90,8 +90,6 @@ urlpatterns = [
     url(r'^panel/page/(?P<page>\d+)/?$', views.ControlPanel, name='maps_paged'),
 
     url(r'^faq/?$', views.faq, name='faq'),
-    url(r'^contacts/?$', views.contacts, name='contacts'),
-    url(r'^contacts/sent/?$', views.contacts_sent, name='contacts_sent'),
 
     url(r'^map/', include([
         url(r'^hash/(?P<map_hashes>[^/]+)/yaml/?$', api.map_info_from_hashes, {'yaml': True}, name='mapAPI'),
