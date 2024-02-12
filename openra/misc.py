@@ -42,21 +42,6 @@ def selectLicenceInfo(itemObject):
     return name, icons
 
 
-def send_email_contacts_form(name, email, message):
-    connection = mail.get_connection()
-    connection.open()
-
-    email = mail.EmailMessage(
-        'OpenRA Resource Center - Contacts form',
-        'Name: %s\nEmail: %s\nMessage: %s\n' % (name, email, message),
-        settings.ADMIN_EMAIL_FROM,
-        [settings.ADMIN_EMAIL_TO],
-        connection=connection)
-
-    email.send()
-    connection.close()
-
-
 def send_email_to_admin_OnMapFail(tempname):
     connection = mail.get_connection()
     connection.open()
