@@ -554,12 +554,6 @@ table tr td {
 	width: 800px;
 }
 
-.Contacts {
-	width: 55px;
-	float: right;
-	margin-right: 10px;
-}
-
 .FAQ {
 	width: 40px;
 	float: right;
@@ -1544,17 +1538,6 @@ p.registerInfo {
 
 .lint_check_h3 h3 {
 	margin: 0px 0px 0px 0px;
-}
-
-.contacts textarea {
-	width: 405px;
-	height: 100px;
-	font-size: 0.9em;
-}
-
-.contacts label {
-	width: 60px;
-	display: inline-block;
 }
 
 .bottom-store-info {
