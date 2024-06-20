@@ -1253,6 +1253,7 @@ p.registerInfo {
 			color: #eee;
 			text-align: left;
 			padding: 0 0 1px;
+			margin-right: 0.2rem;
 			vertical-align: top;
 			font-size: 0.9em;
 		}
