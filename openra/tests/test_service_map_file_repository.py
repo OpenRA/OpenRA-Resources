@@ -4,7 +4,7 @@ from fs.memoryfs import MemoryFS
 
 from fs.tempfs import TempFS
 from openra.classes.file_location import FileLocation
-from openra.services.map_file_repository import ExceptionMapFolderNotFound, ExceptionOramapNotFound, MapFileRepository
+from openra.services.map_file_repository import ExceptionMapContentFolderNotFound, ExceptionMapFolderNotFound, ExceptionOramapNotFound, MapFileRepository
 
 
 class TestServiceMapFileRepository(TestCase):
@@ -132,7 +132,7 @@ class TestServiceMapFileRepository(TestCase):
         )
 
         self.assertRaises(
-            ExceptionMapFolderNotFound,
+            ExceptionMapContentFolderNotFound,
             map_file_repository.get_lua_paths,
             1
         )

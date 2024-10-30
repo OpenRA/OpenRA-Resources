@@ -57,7 +57,7 @@ class MapFileRepository:
         path = self._get_content_path(map_id)
 
         if not self._data_fs.exists(path):
-            raise ExceptionMapFolderNotFound(self._data_fs, map_id, path)
+            raise ExceptionMapContentFolderNotFound(self._data_fs, map_id, path)
 
         return path
 
