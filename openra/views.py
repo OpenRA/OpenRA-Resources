@@ -25,8 +25,10 @@ from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialAccount
 from openra import content, handlers, misc
 from openra.auth import ExceptionLoginFailed, set_session_to_remember_auth, try_login
+from openra.classes.exceptions import ExceptionBase
 from openra.classes.screenshot_resource import ScreenshotResource
 from openra.models import Maps, Lints, Screenshots, Reports, Rating, Comments, UnsubscribeComments
+from openra.services.map_file_repository import MapFileRepository
 from openra.services.map_search import MapSearch
 from openra.classes.pagination import Pagination
 from openra.services.screenshot_repository import ScreenshotRepository
@@ -422,29 +424,31 @@ def map_post_comment(request, map_id):
     return HttpResponseRedirect('/maps/' + map_id + '/#comments')
 
 
-def displayMap(request, arg):
-    path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
-    oramap_filename = misc.first_oramap_in_directory(path)
-    if not oramap_filename:
+@inject
+def display_map(request, map_id,
+                map_file_repository: MapFileRepository = Provide['map_file_repository']
+                ):
+    try:
+        location = map_file_repository.get_oramap_path(map_id)
+    except ExceptionBase:
         return HttpResponseRedirect('/')
 
     try:
-        mapObject = Maps.objects.get(id=arg)
+        model = Maps.objects.get(id=map_id)
     except BaseException:
         return HttpResponseRedirect('/')
 
-    disk_size = os.path.getsize(os.path.join(path, oramap_filename))
-    disk_size = misc.sizeof_fmt(disk_size)
+    disk_size = location.get_file_size_formatted()
 
     lints = []
-    lintObject = Lints.objects.filter(map_id=mapObject.id, item_type='maps')
+    lintObject = Lints.objects.filter(map_id=model.id, item_type='maps')
     lintObject = sorted(lintObject, key=lambda x: (x.posted), reverse=False)
     for lint_item in lintObject:
         lints.append([lint_item.version_tag, lint_item.pass_status, lint_item.lint_output])
 
     reportedByUser = False
     reports = []
-    reportObject = Reports.objects.filter(ex_id=mapObject.id, ex_name='maps')
+    reportObject = Reports.objects.filter(ex_id=map_id, ex_name='maps')
     for item in reportObject:
         try:
             usr = User.objects.get(pk=item.user_id)
@@ -455,29 +459,25 @@ def displayMap(request, arg):
             reportedByUser = True
 
     luaNames = []
+    for lua_path in map_file_repository.get_lua_paths(map_id):
+        luaNames.append(lua_path.get_file_basename())
 
-    listContent = os.listdir(os.path.join(path, 'content'))
-
-    for fn in listContent:
-        if fn.endswith('.lua'):
-            luaNames.append(os.path.splitext(fn)[0])
-
-    mapsFromAuthor = Maps.objects.filter(author=mapObject.author, next_rev=0).exclude(id=mapObject.id).distinct('map_hash').order_by('map_hash', '-posted').exclude(map_hash=mapObject.map_hash)
+    mapsFromAuthor = Maps.objects.filter(author=model.author, next_rev=0).exclude(id=model.id).distinct('map_hash').order_by('map_hash', '-posted').exclude(map_hash=model.map_hash)
     if len(mapsFromAuthor) >= 8:
         mapsFromAuthor = random.sample(list(mapsFromAuthor), 8)
     else:
         mapsFromAuthor = random.sample(list(mapsFromAuthor), len(mapsFromAuthor))
 
-    similarMaps = Maps.objects.filter(next_rev=0, game_mod=mapObject.game_mod, tileset=mapObject.tileset, players=mapObject.players, map_type=mapObject.map_type, width=mapObject.width, height=mapObject.height).exclude(map_hash=mapObject.map_hash)[0:8]
+    similarMaps = Maps.objects.filter(next_rev=0, game_mod=model.game_mod, tileset=model.tileset, players=model.players, map_type=model.map_type, width=model.width, height=model.height).exclude(map_hash=model.map_hash)[0:8]
 
-    duplicates = Maps.objects.filter(map_hash=mapObject.map_hash).exclude(id=mapObject.id)
+    duplicates = Maps.objects.filter(map_hash=model.map_hash).exclude(id=model.id)
     if duplicates:
         duplicates = True
 
-    screenshots = Screenshots.objects.filter(ex_name="maps", ex_id=arg)
+    screenshots = Screenshots.objects.filter(ex_name="maps", ex_id=map_id)
 
     try:
-        played_counter = urllib.request.urlopen("http://master.openra.net/map_stats?hash=%s" % mapObject.map_hash).read().decode()
+        played_counter = urllib.request.urlopen("http://master.openra.net/map_stats?hash=%s" % model.map_hash).read().decode()
         played_counter = json.loads(played_counter)
         if played_counter:
             played_counter = played_counter["played"]
@@ -486,21 +486,21 @@ def displayMap(request, arg):
     except BaseException:
         played_counter = 'unknown'
 
-    ratesAmount = Rating.objects.filter(ex_id=mapObject.id, ex_name='map')
+    ratesAmount = Rating.objects.filter(ex_id=model.id, ex_name='map')
     ratesAmount = len(ratesAmount)
 
-    comments = misc.get_comments_for_all_revisions(request, 'maps', arg)
+    comments = misc.get_comments_for_all_revisions(request, 'maps', map_id)
 
     # showing upgrade map button
     show_upgrade_map_button = True
 
-    if not (request.user == mapObject.user or request.user.is_superuser):
+    if not (request.user == model.user or request.user.is_superuser):
         show_upgrade_map_button = False
 
-    if mapObject.next_rev != 0:
+    if model.next_rev != 0:
         show_upgrade_map_button = False  # upgrade only the latest revision
 
-    if not any([mapObject.parser in v for v in settings.OPENRA_UPDATE_VERSIONS.values()]):
+    if not any([model.parser in v for v in settings.OPENRA_UPDATE_VERSIONS.values()]):
         show_upgrade_map_button = False  # no compatible update targets
 
     ###
@@ -510,20 +510,20 @@ def displayMap(request, arg):
         if sc_item.map_preview:
             map_preview = sc_item
 
-    license, icons = misc.selectLicenceInfo(mapObject)
-    userObject = User.objects.get(pk=mapObject.user_id)
-    Maps.objects.filter(id=mapObject.id).update(viewed=mapObject.viewed + 1)
+    license, icons = misc.selectLicenceInfo(model)
+    userObject = User.objects.get(pk=model.user_id)
+    Maps.objects.filter(id=model.id).update(viewed=model.viewed + 1)
 
-    has_upgrade_logs = mapObject.mapupgradelogs_set.count() > 0
+    has_upgrade_logs = model.mapupgradelogs_set.count() > 0
 
     template = loader.get_template('index.html')
     template_args = {
-        'content': 'displayMap.html',
+        'content': 'display_map.html',
         'request': request,
-        'title': 'Map details - ' + mapObject.title,
-        'map': mapObject,
+        'title': 'Map details - ' + model.title,
+        'map': model,
         'userid': userObject,
-        'arg': arg,
+        'arg': map_id,
         'license': license,
         'icons': icons,
         'reports': reports,
@@ -544,7 +544,7 @@ def displayMap(request, arg):
         'last_parser': settings.OPENRA_VERSIONS[0],
         'has_upgrade_logs': has_upgrade_logs
     }
-    return StreamingHttpResponse(template.render(template_args, request))
+    return HttpResponse(template.render(template_args, request))
 
 
 def updateMap(request, arg):
@@ -577,6 +577,7 @@ def updateMap(request, arg):
 
                 return HttpResponseRedirect(redirect)
             except handlers.InvalidMapException as exception:
+                return HttpResponse(exception.message)
                 update_failed = True
                 print('Update Failed: ' + exception.message)
 

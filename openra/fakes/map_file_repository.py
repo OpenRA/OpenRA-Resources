@@ -7,9 +7,11 @@ from openra.services.map_file_repository import ExceptionMapFolderNotFound
 class FakeMapFileRepository:
 
     map_exists: bool
+    lua_paths: list
 
     def __init__(self):
         self.map_exists = True
+        self.lua_paths = []
 
     def get_oramap_path(self, map_id: int):
         if not self.map_exists:
@@ -23,3 +25,6 @@ class FakeMapFileRepository:
             '',
             file
         )
+
+    def get_lua_paths(self, map_id: int):
+        return self.lua_paths
