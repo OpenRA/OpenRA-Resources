@@ -577,7 +577,6 @@ def updateMap(request, arg):
 
                 return HttpResponseRedirect(redirect)
             except handlers.InvalidMapException as exception:
-                return HttpResponse(exception.message)
                 update_failed = True
                 print('Update Failed: ' + exception.message)
 
