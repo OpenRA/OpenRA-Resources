@@ -25,7 +25,7 @@ class FileLocation:
 
     def get_file_extension(self):
         extension = os.path.splitext(self.file)[1]
-        if (len(extension) == 0):
+        if len(extension) == 0:
             return ""
 
         return extension[1:]
