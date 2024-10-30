@@ -460,7 +460,7 @@ def display_map(request, map_id,
 
     luaNames = []
     for lua_path in map_file_repository.get_lua_paths(map_id):
-        luaNames.append(lua_path.get_file_basename())
+        luaNames.append(lua_path.get_filename_without_extension())
 
     mapsFromAuthor = Maps.objects.filter(author=model.author, next_rev=0).exclude(id=model.id).distinct('map_hash').order_by('map_hash', '-posted').exclude(map_hash=model.map_hash)
     if len(mapsFromAuthor) >= 8:
