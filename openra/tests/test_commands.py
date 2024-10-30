@@ -36,6 +36,7 @@ class TestCommandSeedTestData(TestCase):
         return False
 
     def test_it_creates_a_super_user_with_the_details_provided(self):
+        # Early return as it isn't currently possible to test this without live updates (yet!), however can be useful to uncomment test a development set up
         return
         overrides = container.override_providers(
             data_fs=MemoryFS()
@@ -72,6 +73,7 @@ class TestCommandSeedTestData(TestCase):
         overrides.__exit__()
 
     def test_it_imports_the_sample_maps(self):
+        # Early return as it isn't currently possible to test this without live updates (yet!), however can be useful to uncomment test a development set up
         return
         overrides = container.override_providers(
             data_fs=MemoryFS()
