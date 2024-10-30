@@ -1,8 +1,10 @@
 from __future__ import annotations
 import io
 from django.conf import os
+from fs import filesize
 from fs.base import FS, copy
 from fs.tempfs import TempFS
+import re
 
 from openra.classes.exceptions import ExceptionBase
 
@@ -17,6 +19,16 @@ class FileLocation:
         self.fs = fs
         self.path = path
         self.file = file
+
+    def get_file_basename(self):
+        return re.sub(r"\.[^\.]+$", "", self.file)
+
+    def get_file_extension(self):
+        search = re.search(r"\.([^\.]+)$", self.file)
+        if (search is None):
+            return ""
+
+        return search.group(1)
 
     def get_fs_path(self):
         return os.path.join(self.path, self.file)
@@ -44,6 +56,14 @@ class FileLocation:
             if self.path:
                 self.fs.makedirs(self.path)
             self.fs.create(self.get_fs_path())
+
+    def get_file_size_formatted(self):
+        info = self.fs.getinfo(self.get_fs_path(), ["details"])
+
+        return filesize.traditional(info.size)
+
+    def open(self, mode):
+        return self.fs.open(self.get_fs_path(), mode)
 
     def copy_to_file_location(self, location: FileLocation):
         try:

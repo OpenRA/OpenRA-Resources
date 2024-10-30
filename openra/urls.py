@@ -29,7 +29,7 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
 
     url(r'^maps/?$', views.maps, name='maps'),
-    url(r'^maps/(?P<arg>\d+)/?$', views.displayMap, name='displayMap'),
+    url(r'^maps/(?P<map_id>\d+)/?$', views.display_map, name='display_map'),
     url(r'^maps/(?P<arg>\d+)/minimap/?$', views.serveMinimap, name='serveMinimap'),
     url(r'^maps/(?P<arg>\d+)/oramap/?$', views.serveOramap, name='serveOramap'),
     url(r'^maps/(?P<arg>\d+)/oramap/(?P<sync>\w+)/?$', views.serveOramap, name='serverSyncOramap'),

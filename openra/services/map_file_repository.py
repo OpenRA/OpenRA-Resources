@@ -28,6 +28,20 @@ class MapFileRepository:
 
         raise ExceptionOramapNotFound(self._data_fs, map_id, path)
 
+    def get_lua_paths(self, map_id: int):
+        path = self._get_content_path_and_throw_exception_if_doesnt_exist(map_id)
+
+        lua_locations = []
+
+        for file in self._data_fs.filterdir(path, ['*.lua'], None, ['*']):
+            lua_locations.append(FileLocation(
+                self._data_fs,
+                path,
+                file.name
+            ))
+
+        return lua_locations
+
     def _get_target_path_and_throw_exception_if_doesnt_exist(self, map_id: int):
         path = self._get_target_path(map_id)
 
@@ -39,11 +53,31 @@ class MapFileRepository:
     def _get_target_path(self, map_id: int):
         return os.path.join('maps', str(map_id))
 
+    def _get_content_path_and_throw_exception_if_doesnt_exist(self, map_id: int):
+        path = self._get_content_path(map_id)
+
+        if not self._data_fs.exists(path):
+            raise ExceptionMapFolderNotFound(self._data_fs, map_id, path)
+
+        return path
+
+    def _get_content_path(self, map_id: int):
+        return os.path.join('maps', str(map_id), 'content')
+
 
 class ExceptionMapFolderNotFound(ExceptionBase):
     def __init__(self, fs: FS, map_id: int, path: str):
         super().__init__()
         self.message = "Folder not found for map"
+        self.detail.append('fs type: ' + str(type(fs)))
+        self.detail.append('map: ' + str(map_id))
+        self.detail.append('path: ' + path)
+
+
+class ExceptionMapContentFolderNotFound(ExceptionBase):
+    def __init__(self, fs: FS, map_id: int, path: str):
+        super().__init__()
+        self.message = "Content folder not found for map"
         self.detail.append('fs type: ' + str(type(fs)))
         self.detail.append('map: ' + str(map_id))
         self.detail.append('path: ' + path)

@@ -9,6 +9,126 @@ from openra.classes.file_location import ExceptionFileLocationCopyToTempFS, Exce
 
 
 class TestFileLocation(TestCase):
+    def test_get_file_basename(self):
+        fs = MemoryFS()
+
+        file = FileLocation(
+            fs,
+            '/location/',
+            'test_file.txt'
+        )
+
+        self.assertEquals(
+            'test_file',
+            file.get_file_basename()
+        )
+
+        file2 = FileLocation(
+            fs,
+            '/location/',
+            'test_file'
+        )
+
+        self.assertEquals(
+            'test_file',
+            file2.get_file_basename()
+        )
+
+        file3 = FileLocation(
+            fs,
+            '/location/',
+            ''
+        )
+
+        self.assertEquals(
+            '',
+            file3.get_file_basename()
+        )
+
+        file4 = FileLocation(
+            fs,
+            '/location/',
+            'test_file.txt.zip'
+        )
+
+        self.assertEquals(
+            'test_file.txt',
+            file4.get_file_basename()
+        )
+
+    def test_get_file_extension(self):
+        fs = MemoryFS()
+
+        file = FileLocation(
+            fs,
+            '/location/',
+            'test_file.txt'
+        )
+
+        self.assertEquals(
+            'txt',
+            file.get_file_extension()
+        )
+
+        file2 = FileLocation(
+            fs,
+            '/location/',
+            'test_file'
+        )
+
+        self.assertEquals(
+            '',
+            file2.get_file_extension()
+        )
+
+        file3 = FileLocation(
+            fs,
+            '/location/',
+            ''
+        )
+
+        self.assertEquals(
+            '',
+            file3.get_file_extension()
+        )
+
+        file4 = FileLocation(
+            fs,
+            '/location/',
+            'test_file.txt.zip'
+        )
+
+        self.assertEquals(
+            'zip',
+            file4.get_file_extension()
+        )
+
+    def test_get_file_size_formatted(self):
+        fs = TempFS()
+
+        fs.makedir('location')
+        fs.touch('location/test_file')
+
+        file = FileLocation(
+            fs,
+            '/location/',
+            'test_file'
+        )
+
+        self.assertEquals(
+            '0 bytes',
+            file.get_file_size_formatted()
+        )
+
+        with file.open('w') as fh:
+            for i in range(0, 9999):
+                fh.write('0')
+
+        self.assertEquals(
+            '9.8 KB',
+            file.get_file_size_formatted()
+        )
+
     def test_get_os_dir_returns_dir(self):
         fs = TempFS()
 
