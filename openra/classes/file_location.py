@@ -20,15 +20,15 @@ class FileLocation:
         self.path = path
         self.file = file
 
-    def get_file_basename(self):
-        return re.sub(r"\.[^\.]+$", "", self.file)
+    def get_filename_without_extension(self):
+        return os.path.splitext(self.file)[0]
 
     def get_file_extension(self):
-        search = re.search(r"\.([^\.]+)$", self.file)
-        if (search is None):
+        extension = os.path.splitext(self.file)[1]
+        if (len(extension) == 0):
             return ""
 
-        return search.group(1)
+        return extension[1:]
 
     def get_fs_path(self):
         return os.path.join(self.path, self.file)
