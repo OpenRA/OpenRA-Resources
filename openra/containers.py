@@ -13,6 +13,7 @@ from openra.services.map_file_repository import MapFileRepository
 from openra.services.map_search import MapSearch
 from openra.services.screenshot_repository import ScreenshotRepository
 from openra.services.uploaded_file_importer import UploadedFileImporter
+from openra.services.openra_master import OpenraMaster
 from openra.services.utility import Utility
 
 
@@ -69,6 +70,10 @@ class Container(containers.DeclarativeContainer):
 
     map_search = providers.Singleton(
         MapSearch
+    )
+
+    openra_master = providers.Singleton(
+        OpenraMaster
     )
 
 
