@@ -6,6 +6,7 @@ from fs.base import FS
 from fs.memoryfs import MemoryFS
 from openra.classes.file_location import FileLocation
 from openra.fakes.map_file_repository import FakeMapFileRepository
+from openra.fakes.openra_master import FakeOpenraMaster
 from openra.tests.factories import MapsFactory
 from openra.tests.routes.test_route_base import TestRouteBase
 from openra.containers import container
@@ -17,7 +18,8 @@ class TestRouteDisplayMap(TestRouteBase):
 
     def test_route_can_be_accessed_by_any_user(self):
         overrides = container.override_providers(
-            map_file_repository=Singleton(FakeMapFileRepository)
+            map_file_repository=Singleton(FakeMapFileRepository),
+            openra_master=Singleton(FakeOpenraMaster)
         )
 
         data_fs = MemoryFS()
@@ -30,10 +32,17 @@ class TestRouteDisplayMap(TestRouteBase):
             )
         ]
 
+        played_count = 1234
+
+        container.openra_master().played_count = played_count
+
         FakeMapFileRepository.map_exists = False
 
-        model = MapsFactory(lua=True)
-        model.lua = True
+        model = MapsFactory(
+            lua=True,
+            downloading=True,
+            bounds="a,b,123,456",
+        )
 
         response = self.get(
             {},
@@ -50,6 +59,20 @@ class TestRouteDisplayMap(TestRouteBase):
             [
                 str(model.title),
                 'sample_lua_name',
+                model.author,
+                model.user.username,
+                model.game_mod,
+                model.categories,
+                model.players,
+                model.tileset[0].upper() + model.tileset[1:],
+                "123x456",
+                model.mapformat,
+                model.posted.strftime("%b. %d - %Y"),
+                'allowed',
+                model.parser,
+                model.viewed,
+                model.downloaded,
+                played_count,
             ],
         )
 

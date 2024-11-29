@@ -90,8 +90,8 @@ class MapsFactory(BaseFactory):
     advanced_map = False
     lua = False
     posted = timezone.now()
-    viewed = 0
-    downloaded = 0
+    viewed = factory.Faker('random_number')
+    downloaded = factory.Faker('random_number')
     rating = 0.0
     amount_reports = 0
     policy_cc = False

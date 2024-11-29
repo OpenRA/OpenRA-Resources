@@ -32,6 +32,7 @@ from openra.services.map_file_repository import MapFileRepository
 from openra.services.map_search import MapSearch
 from openra.classes.pagination import Pagination
 from openra.services.screenshot_repository import ScreenshotRepository
+from openra.services.openra_master import OpenraMaster
 
 # TODO: Fix the code and reenable some of these warnings
 # pylint: disable=invalid-name
@@ -368,7 +369,6 @@ def map_update_map_info(request, map_id):
 @inject
 def map_upload_screenshot(request, map_id,
                           screenshot_repository: ScreenshotRepository = Provide['screenshot_repository']
-
                           ):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
@@ -426,7 +426,8 @@ def map_post_comment(request, map_id):
 
 @inject
 def display_map(request, map_id,
-                map_file_repository: MapFileRepository = Provide['map_file_repository']
+                map_file_repository: MapFileRepository = Provide['map_file_repository'],
+                openra_master: OpenraMaster = Provide['openra_master']
                 ):
     try:
         location = map_file_repository.get_oramap_path(map_id)
@@ -476,15 +477,9 @@ def display_map(request, map_id,
 
     screenshots = Screenshots.objects.filter(ex_name="maps", ex_id=map_id)
 
-    try:
-        played_counter = urllib.request.urlopen("http://master.openra.net/map_stats?hash=%s" % model.map_hash).read().decode()
-        played_counter = json.loads(played_counter)
-        if played_counter:
-            played_counter = played_counter["played"]
-        else:
-            played_counter = 0
-    except BaseException:
-        played_counter = 'unknown'
+    played_counter = openra_master.get_played_count(model.map_hash)
+    if played_counter is None:
+        played_counter = 'Unknown'
 
     ratesAmount = Rating.objects.filter(ex_id=model.id, ex_name='map')
     ratesAmount = len(ratesAmount)
