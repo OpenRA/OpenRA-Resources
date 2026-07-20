@@ -1657,16 +1657,20 @@ p.registerInfo {
 	width: 180px;
 }
 
-.filter_section input[type="text"] {
-	width: 27px;
+.filter_container input[type="text"] {
 	margin-top: 2px;
+	min-width: 100%;
+	box-sizing: border-box;
+	padding-left: 5px;
 }
 
 .filter_container select {
+	padding: 2px 5px;
 	margin-top: 2px;
 	background: url("/static/images/subNavBg.png") #204770;
 	color: #fff;
 	border: 1px solid #74c2e7;
+	min-width:100%;
 }
 
 .filter_container select[name="mod"] {
@@ -1685,12 +1689,7 @@ p.registerInfo {
 	width: 104px;
 }
 .filter_container select[name="with_problems"] {
-	width: 130px;
-	margin-bottom: 5px;
-}
-
-.filter_container input[name="players"] {
-	margin-left: 5px;
+	width: 10px;
 }
 
 .filter_section_checks {
@@ -1766,7 +1765,7 @@ p.registerInfo {
 
 form.filter_maps {
     height: auto !important;
-    padding-bottom: 15px;
+    padding-bottom: 5px;
 }
 .filter_container .filter_end {
     display: block !important;
@@ -1778,17 +1777,15 @@ form.filter_maps {
     box-sizing: border-box !important;
     padding-left: 5px !important;
     padding-right: 5px !important;
-    padding-bottom: 12px;
     gap: 12px;
     width: 100% !important;
+    font-size: 0.9em;
+    margin-top: 4px;
 }
 .filter_end_inputs select { margin-left: 0 !important; }
 
-.filter_end_inputs input[name="search"] { width: 140px !important; }
-.filter_end_inputs input[name="players"] { 
-    width: 4ch !important;
-    margin-left: 0 !important; 
-}
+.filter_end_inputs input[name="search"] { width: 140px; }
+.filter_end_inputs input[name="players"] { width: 14px; }
 
 .filter_end_inputs .filter_input_grow {
     display: block;
@@ -1804,9 +1801,9 @@ form.filter_maps {
 .filter_end_actions {
     display: flex !important;
     gap: 25px;
-    align-items: flex-start;
+    align-items: center;
     padding-left: 5px;
-    margin-top: 5px;
+    margin-top: 10px;
 }
 .filter_end_actions .filter_apply {
     padding: 0 !important;
