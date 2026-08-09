@@ -9,7 +9,7 @@ from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, get_list_or_404
 
 from openra.models import Maps
-from openra.models import MapCategories
+from openra.models import MapCategories, Screenshots
 from openra import misc
 
 # pylint: disable=too-many-locals
@@ -77,6 +77,13 @@ def __map_info_from_objects(request, map_objects, yaml):
         download_url = 'http://' + request.META['HTTP_HOST'] + \
                        '/maps/' + str(map_object.id) + '/oramap'
 
+        screenshots = Screenshots.objects.filter(ex_name="maps", ex_id=map_object.id)
+
+        map_preview = None
+        for sc_item in screenshots:
+            if sc_item.map_preview:
+                map_preview = sc_item
+
         # TODO: Title and author have ' replaced with '' before insertion into the database. Work out why and fix it
         results[map_object.map_hash] = {
             'id': map_object.id,
@@ -114,6 +121,7 @@ def __map_info_from_objects(request, map_objects, yaml):
             'rules': map_object.base64_rules,
             'players_block': map_object.base64_players,
             'reports': map_object.amount_reports,
+            'map_preview': map_preview
         }
 
     return __generate_response(results, yaml)
