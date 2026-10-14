@@ -4,18 +4,16 @@ import datetime
 import re
 import shutil
 import random
-import json
 import cgi
 import base64
-import urllib.request
 from dependency_injector.wiring import Provide, inject
-# from dependency_injector.wiring import Provide, inject
 
 from django.conf import settings
 from django.http import JsonResponse, StreamingHttpResponse
 from django.http.response import HttpResponse
+from django.shortcuts import render
 from django.template import loader
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import logout
 from django.http import HttpResponseRedirect, Http404
 from django.utils import timezone
 
@@ -40,19 +38,8 @@ from openra.services.openra_master import OpenraMaster
 # pylint: disable=bare-except
 
 
-def standard_view(request, template, template_args):
-    template = loader.get_template(template)
-
-    return HttpResponse(
-        template.render(
-            template_args,
-            request
-        )
-    )
-
-
 def index(request):
-    return standard_view(
+    return render(
         request,
         'index.html',
         {
@@ -84,7 +71,7 @@ def loginView(request):
                 content.auth[exception.reason]
             )
 
-    return standard_view(
+    return render(
         request,
         'auth/login.html',
         {
@@ -104,7 +91,7 @@ def logoutView(request):
         logout(request)
         return HttpResponseRedirect('/')
 
-    return standard_view(
+    return render(
         request,
         'auth/logout.html',
         {
@@ -141,7 +128,7 @@ def search(request, search_query="",
         else:
             return HttpResponseRedirect('/')
 
-    return standard_view(
+    return render(
         request,
         'search.html',
         {
@@ -223,7 +210,7 @@ def maps(request, output_format=""):
 
     comments = misc.count_comments_for_many(maps_query)
 
-    return standard_view(
+    return render(
         request,
         'index.html',
         {
