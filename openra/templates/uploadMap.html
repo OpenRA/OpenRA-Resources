@@ -1,113 +1,113 @@
 {% if user.is_authenticated %}
 
-	<script>
-		$(document).ready(function() {
-			$("input[value=cc_yes]").click(function() {
-				$(".license_options").show();
-			});
-			$("input[value=cc_no]").click(function() {
-				$(".license_options").hide();
-			});
+    <script>
+        $(document).ready(function() {
+            $("input[value=cc_yes]").click(function() {
+                $(".license_options").show();
+            });
+            $("input[value=cc_no]").click(function() {
+                $(".license_options").hide();
+            });
 
-			function is_release_version(version) {
-				return /^release-/.test(version);
-			}
+            function is_release_version(version) {
+                return /^release-/.test(version);
+            }
 
-			$('.upload-map-form-parser option').filter(function() {
-				return is_release_version(this.value)
-			}).first().attr("selected", "selected");
+            $('.upload-map-form-parser option').filter(function() {
+                return is_release_version(this.value)
+            }).first().attr("selected", "selected");
 
-			$('.upload-map-form-parser option:first-child').append(' (latest version)')
+            $('.upload-map-form-parser option:first-child').append(' (latest version)')
 
-			$('.upload-map-form-parser select').on('click change', function(e) {
-				$('.upload-map-playtest-warning').toggle(!is_release_version(e.target.value))
-			})
-		});
-	</script>
+            $('.upload-map-form-parser select').on('click change', function(e) {
+                $('.upload-map-playtest-warning').toggle(!is_release_version(e.target.value))
+            })
+        });
+    </script>
 
-	<div class='cBlock no-pd-bot'>
-		<div class="upload_container">
-			{% if previous_rev == 0 %}
-				<h3>Upload your ORAMAP or MPR(INI)<span class='red'>*</span> file</h3>
-			{% else %}
-				<h3>Upload revision {{rev}} of <a href="/maps/{{previous_rev}}/" title="{{previous_rev_title}}">map {{previous_rev}}</a>
-			{% endif %}
-		</div>
-	</div>
+    <div class='cBlock no-pd-bot'>
+        <div class="upload_container">
+            {% if previous_rev == 0 %}
+                <h3>Upload your ORAMAP or MPR(INI)<span class='red'>*</span> file</h3>
+            {% else %}
+                <h3>Upload revision {{rev}} of <a href="/maps/{{previous_rev}}/" title="{{previous_rev_title}}">map {{previous_rev}}</a>
+            {% endif %}
+        </div>
+    </div>
 
 
-	<form action={{ '/upload/map/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
-		<div class='cBlock'>
+    <form action={{ '/upload/map/' }}{% if previous_rev != 0 %}{{ previous_rev }}{% endif %} method="POST" enctype="multipart/form-data">{% csrf_token %}
+        <div class='cBlock'>
 
-			<div class='upload-map-form-left'>
+            <div class='upload-map-form-left'>
 
-				<div class='upload-map-form-info'>
-					<textarea class="id_info" name="info" placeholder="Description" title="Description"></textarea>
-				</div>
+                <div class='upload-map-form-info'>
+                    <textarea class="id_info" name="info" placeholder="Description" title="Description"></textarea>
+                </div>
 
-				<div class='upload-map-form-file'>
-					<div class="upload-map-playtest-warning">
-						Warning: You are uploading a map for a playtest. It will not be possible to update this automatically for the next release.
-					</div>
-					<input class="id_file" name="file" type="file">
-					<button type="submit">Upload</button>
-				</div>
+                <div class='upload-map-form-file'>
+                    <div class="upload-map-playtest-warning">
+                        Warning: You are uploading a map for a playtest. It will not be possible to update this automatically for the next release.
+                    </div>
+                    <input class="id_file" name="file" type="file">
+                    <button type="submit">Upload</button>
+                </div>
 
-			</div>
+            </div>
 
-			<div class='upload-map-form-right'>
+            <div class='upload-map-form-right'>
 
-				<div class='upload-map-form-parser'>
-					Parse with OpenRA version<span class="red">**</span>:<br />
-					<select name="parser" size="4">
-						{% for parser in parsers %}
-							<option value="{{ parser }}">{{ parser }}</option>
-						{% endfor %}
-					</select>
-				</div>
+                <div class='upload-map-form-parser'>
+                    Parse with OpenRA version<span class="red">**</span>:<br />
+                    <select name="parser" size="4">
+                        {% for parser in parsers %}
+                            <option value="{{ parser }}">{{ parser }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
+        </div>
 
-		{% if previous_rev == 0 %}
-		<div class='cBlock'>
-			<div class="license_cc">
-				Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
-				<label><input name="policy_cc" type="radio" value="cc_yes"> Yes</label>
-				<label><input name="policy_cc" checked="checked" type="radio" value="cc_no"> No</label>
-			</div>
-			<div class="license_options"><br>
-				Allow commercial uses of your work?<br>
-				<label><input name="commercial" type="radio" value="com_yes"> Yes</label>
-				<label><input checked="checked" name="commercial" type="radio" value="com_no"> No</label>
-				<br /><br />
-				Allow modifications of your work?<br>
-				<label><input name="adaptations" type="radio" value="adapt_yes"> Yes</label>
-				<label><input name="adaptations" type="radio" value="adapt_no"> No</label>
-				<label><input checked="checked" name="adaptations" type="radio" value="adapt_alike"> Yes, as long as others share alike</label>
-			</div>
-		</div>
-		{% endif %}
-	</form>
+        {% if previous_rev == 0 %}
+        <div class='cBlock'>
+            <div class="license_cc">
+                Use a Creative Commons license (<a target="_blank" href="https://creativecommons.org/">More details</a>)?<br />
+                <label><input name="policy_cc" type="radio" value="cc_yes"> Yes</label>
+                <label><input name="policy_cc" checked="checked" type="radio" value="cc_no"> No</label>
+            </div>
+            <div class="license_options"><br>
+                Allow commercial uses of your work?<br>
+                <label><input name="commercial" type="radio" value="com_yes"> Yes</label>
+                <label><input checked="checked" name="commercial" type="radio" value="com_no"> No</label>
+                <br /><br />
+                Allow modifications of your work?<br>
+                <label><input name="adaptations" type="radio" value="adapt_yes"> Yes</label>
+                <label><input name="adaptations" type="radio" value="adapt_no"> No</label>
+                <label><input checked="checked" name="adaptations" type="radio" value="adapt_alike"> Yes, as long as others share alike</label>
+            </div>
+        </div>
+        {% endif %}
+    </form>
 
-	{% if error_response %}
-	<div class='cBlock'>
-		<p>Error:</p>
-		<p>{{error_response}}</p>
-		{% if uid %}
-			<p><a href={{ '/maps/' }}{{ uid }}{{'/'}}>
-			<img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>
-		{% endif %}
-	</div>
-	{% endif %}
+    {% if error_response %}
+    <div class='cBlock'>
+        <p>Error:</p>
+        <p>{{error_response}}</p>
+        {% if uid %}
+            <p><a href={{ '/maps/' }}{{ uid }}{{'/'}}>
+            <img src={{ '/maps/' }}{{ uid }}{{ '/minimap' }} /></a></p>
+        {% endif %}
+    </div>
+    {% endif %}
 
-	{% if previous_rev == 0 %}
-	<div class='cBlock'>
-		<div class='upload-map-form-stars'>
-			<span class='red'>*</span>&nbsp;&nbsp;&nbsp;<span>Format of original Red Alert maps (MPR, INI); will automatically import it during uploading</span><br />
-			<span class='red'>**</span>&nbsp;&nbsp;<span>Choose version the map was created for. If a newer version of OpenRA is available, you will be able to update the map after uploading using the <b>Upgrade Map</b> button.</span>
-		</div>
-	</div>
-	{% endif %}
+    {% if previous_rev == 0 %}
+    <div class='cBlock'>
+        <div class='upload-map-form-stars'>
+            <span class='red'>*</span>&nbsp;&nbsp;&nbsp;<span>Format of original Red Alert maps (MPR, INI); will automatically import it during uploading</span><br />
+            <span class='red'>**</span>&nbsp;&nbsp;<span>Choose version the map was created for. If a newer version of OpenRA is available, you will be able to update the map after uploading using the <b>Upgrade Map</b> button.</span>
+        </div>
+    </div>
+    {% endif %}
 {% endif %}

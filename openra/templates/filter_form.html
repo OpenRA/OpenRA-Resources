@@ -1,145 +1,145 @@
 <div class='cBlock'>
-	<form name='filter_maps' class='filter_maps' action='{{request.path}}' method='GET'>
-		<div class='filter_container'>
+    <form name='filter_maps' class='filter_maps' action='{{request.path}}' method='GET'>
+        <div class='filter_container'>
 
 
-			<div class='filter_section'>
-				<span class="">Mod:</span>
-				<select name="mod" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.mod %}selected{% endif %}>any</option>
-					{% for mod in filter_prepare.mods %}
-						<option value="{{mod}}" {% if mod in selected_filter.mod %}selected{% endif %}>{{mod|upper}}</option>
-					{% endfor %}
-				</select>
-			</div>
+            <div class='filter_section'>
+                <span class="">Mod:</span>
+                <select name="mod" multiple class="noscroll">
+                    <option value="any" {% if 'any' in selected_filter.mod %}selected{% endif %}>any</option>
+                    {% for mod in filter_prepare.mods %}
+                        <option value="{{mod}}" {% if mod in selected_filter.mod %}selected{% endif %}>{{mod|upper}}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-			<div class='filter_section'>
-				<span class="">Category:</span>
-				<select name="category" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.category %}selected{% endif %}>any</option>
-					{% for category in filter_prepare.categories %}
-						<option value="{{category}}" {% if category in selected_filter.category %}selected{% endif %}>{{category}}</option>
-					{% endfor %}
-				</select>
-			</div>
+            <div class='filter_section'>
+                <span class="">Category:</span>
+                <select name="category" multiple class="noscroll">
+                    <option value="any" {% if 'any' in selected_filter.category %}selected{% endif %}>any</option>
+                    {% for category in filter_prepare.categories %}
+                        <option value="{{category}}" {% if category in selected_filter.category %}selected{% endif %}>{{category}}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-			<div class='filter_section'>
-				<span class="">Format:</span>
-				<select name="format" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.format %}selected{% endif %}>any</option>
-					{% for format in filter_prepare.formats %}
-						<option value="{{format}}" {% if format in selected_filter.format %}selected{% endif %}>{{format}}
-					{% endfor %}
-				</select>
-			</div>
+            <div class='filter_section'>
+                <span class="">Format:</span>
+                <select name="format" multiple class="noscroll">
+                    <option value="any" {% if 'any' in selected_filter.format %}selected{% endif %}>any</option>
+                    {% for format in filter_prepare.formats %}
+                        <option value="{{format}}" {% if format in selected_filter.format %}selected{% endif %}>{{format}}
+                    {% endfor %}
+                </select>
+            </div>
 
-			<div class='filter_section'>
-				<span class="">Parsed by:</span>
-				<select name="parser" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.parser %}selected{% endif %}>any</option>
-					{% for parser in filter_prepare.parsers %}
-						<option value="{{parser}}" {% if parser in selected_filter.parser %}selected{% endif %}>{{parser}}</option>
-					{% endfor %}
-				</select>
-			</div>
+            <div class='filter_section'>
+                <span class="">Parsed by:</span>
+                <select name="parser" multiple class="noscroll">
+                    <option value="any" {% if 'any' in selected_filter.parser %}selected{% endif %}>any</option>
+                    {% for parser in filter_prepare.parsers %}
+                        <option value="{{parser}}" {% if parser in selected_filter.parser %}selected{% endif %}>{{parser}}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-			<div class='filter_section'>
-				<span class="">Tileset:</span>
-				<select name="tileset" multiple class="noscroll">
-					<option value="any" {% if 'any' in selected_filter.tileset %}selected{% endif %}>any</option>
-					{% for tileset in filter_prepare.tilesets %}
-						<option value="{{tileset}}" {% if tileset in selected_filter.tileset %}selected{% endif %}>{{tileset}}</option>
-					{% endfor %}
-				</select>
-			</div>
-
-
-			<div class='clear'></div>
+            <div class='filter_section'>
+                <span class="">Tileset:</span>
+                <select name="tileset" multiple class="noscroll">
+                    <option value="any" {% if 'any' in selected_filter.tileset %}selected{% endif %}>any</option>
+                    {% for tileset in filter_prepare.tilesets %}
+                        <option value="{{tileset}}" {% if tileset in selected_filter.tileset %}selected{% endif %}>{{tileset}}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
 
-			<div class='filter_end'>
+            <div class='clear'></div>
 
-				<div class='filter_end_inputs'>
-					<div>
-						<span class="">Search:</span><br />
-						<input type='text' placeholder='title, description, hash...' name='search' maxlength="100" value="{{selected_filter.search}}">
-					</div>
 
-					<div>
-						<span>Sort by:</span><br />
-						<select name="sort_by">
-							{% for sorting in filter_prepare.sort_by %}
-								<option value="{{sorting.0}}" {% if sorting.0 in selected_filter.sort_by %}selected{% endif %}>{{sorting.1}}</option>
-							{% endfor %}
-						</select>
-					</div>
+            <div class='filter_end'>
 
-					<div>
-						<span>Maps with problems:</span><br />
-						<select name="with_problems">
-							{% for problem in filter_prepare.with_problems %}
-								<option value="{{problem.0}}" {% if problem.0 in selected_filter.with_problems %}selected{% endif %}>{{problem.1}}</option>
-							{% endfor %}
-						</select>
-					</div>
+                <div class='filter_end_inputs'>
+                    <div>
+                        <span class="">Search:</span><br />
+                        <input type='text' placeholder='title, description, hash...' name='search' maxlength="100" value="{{selected_filter.search}}">
+                    </div>
 
-					<div>
-						<span>Players:</span><br />
-						<input type='text' placeholder='any' name='players' {% if selected_filter.players %}value="{{selected_filter.players}}"{% endif %}>
-					</div>
+                    <div>
+                        <span>Sort by:</span><br />
+                        <select name="sort_by">
+                            {% for sorting in filter_prepare.sort_by %}
+                                <option value="{{sorting.0}}" {% if sorting.0 in selected_filter.sort_by %}selected{% endif %}>{{sorting.1}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-					{% if not '/maps/author/' in request.path %}
-					<div class="filter_input_grow">
-						<span>Author:</span><br />
-						<input type='text' placeholder='any' name='author' maxlength="100" value="{{selected_filter.author}}">
-					</div>
-					{% endif %}
+                    <div>
+                        <span>Maps with problems:</span><br />
+                        <select name="with_problems">
+                            {% for problem in filter_prepare.with_problems %}
+                                <option value="{{problem.0}}" {% if problem.0 in selected_filter.with_problems %}selected{% endif %}>{{problem.1}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-					{% if not '/maps/uploader/' in request.path %}
-					<div class="filter_input_grow">
-						<span>Uploader:</span><br />
-						<input type='text' placeholder='any' name='uploader' maxlength="100" value="{{selected_filter.uploader}}">
-					</div>
-					{% endif %}
-				</div>
+                    <div>
+                        <span>Players:</span><br />
+                        <input type='text' placeholder='any' name='players' {% if selected_filter.players %}value="{{selected_filter.players}}"{% endif %}>
+                    </div>
 
-				<div class='filter_end_actions'>
-					
-					<div class="filter_apply">
-						<button type="submit">Apply Filter/Sorting</button>
-					</div>
+                    {% if not '/maps/author/' in request.path %}
+                    <div class="filter_input_grow">
+                        <span>Author:</span><br />
+                        <input type='text' placeholder='any' name='author' maxlength="100" value="{{selected_filter.author}}">
+                    </div>
+                    {% endif %}
 
-					<div class='filter_end_checks'>
-						<div>
-							<input type='checkbox' {% if selected_filter.show_all_revisions == 'on' %}checked{% endif %} name='show_all_revisions'>
-							<span>Show all revisions</span>
-							<br />
-							<input type='checkbox' name='show_with_reports' {% if selected_filter.show_with_reports == 'on' %}checked{% endif %}>
-							<span>Show only with reports</span>
-						</div>
+                    {% if not '/maps/uploader/' in request.path %}
+                    <div class="filter_input_grow">
+                        <span>Uploader:</span><br />
+                        <input type='text' placeholder='any' name='uploader' maxlength="100" value="{{selected_filter.uploader}}">
+                    </div>
+                    {% endif %}
+                </div>
 
-						<div>
-							<input type='checkbox' name='with_duplicates' {% if selected_filter.with_duplicates == 'on' %}checked{% endif %}>
-							<span>With duplicates</span>
-							<br />
-							<input type='checkbox' name='only_advanced' {% if selected_filter.only_advanced == 'on' %}checked{% endif %}>
-							<span>Only Advanced</span>
-						</div>
+                <div class='filter_end_actions'>
+                    
+                    <div class="filter_apply">
+                        <button type="submit">Apply Filter/Sorting</button>
+                    </div>
 
-						<div>
-							<input type='checkbox' name='only_lua' {% if selected_filter.only_lua == 'on' %}checked{% endif %}>
-							<span>Only Lua</span>
-							<br />
-							<input type='checkbox' name='outdated' {% if selected_filter.outdated == 'on' %}checked{% endif %}>
-							<span>Outdated</span>
-						</div>
-					</div>
+                    <div class='filter_end_checks'>
+                        <div>
+                            <input type='checkbox' {% if selected_filter.show_all_revisions == 'on' %}checked{% endif %} name='show_all_revisions'>
+                            <span>Show all revisions</span>
+                            <br />
+                            <input type='checkbox' name='show_with_reports' {% if selected_filter.show_with_reports == 'on' %}checked{% endif %}>
+                            <span>Show only with reports</span>
+                        </div>
 
-				</div>
-			</div>
+                        <div>
+                            <input type='checkbox' name='with_duplicates' {% if selected_filter.with_duplicates == 'on' %}checked{% endif %}>
+                            <span>With duplicates</span>
+                            <br />
+                            <input type='checkbox' name='only_advanced' {% if selected_filter.only_advanced == 'on' %}checked{% endif %}>
+                            <span>Only Advanced</span>
+                        </div>
 
-		</div>
-	</form>
+                        <div>
+                            <input type='checkbox' name='only_lua' {% if selected_filter.only_lua == 'on' %}checked{% endif %}>
+                            <span>Only Lua</span>
+                            <br />
+                            <input type='checkbox' name='outdated' {% if selected_filter.outdated == 'on' %}checked{% endif %}>
+                            <span>Outdated</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </form>
 </div>
 
 
