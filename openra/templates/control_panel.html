@@ -2,57 +2,57 @@
 {% include 'filter_form.html' %}
 
 <div class='cBlock no-pd-bot map-grid-header-info'>
-	<h3>Found {{ amount }} maps{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
+    <h3>Found {{ amount }} maps{% if page > 1 %} ( page {{page}} ){% endif %}</h3>
 </div>
 
 <div id="panel_content">
-	{% if amount != 0 %}
-		<div id="map_grid">
-			{% for item in maps %}
-			<div class="map_grid_cell">
-				<a href="/maps/{{item.id}}/">
-					<div class="cell-link-container">
-						<div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
-					</div>
-					{% if item.downloading == False or item.amount_reports >= 3 %}
-					<div class="map-custom-status"><img src="/static/images/attention-mini.jpg" /></div>
-					{% endif %}
-					{% if item.advanced_map %}
-					<div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" /></div>
-					{% endif %}
-					{% if item.lua %}
-					<div class="map-custom-status"><img src="/static/images/lua-mini.jpg" /></div>
-					{% endif %}
-				</a>
-				<div class="map_tooltip">
-					<div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
-					<table>
-						<tr>
-							<td class="tooltip_title">Author: </td>
-							<td class="tooltip_value">{{ item.author|strip_tags }} </td>
-						</tr>
-					</table>
-					<table>
-						<tr>
-							<td class="tooltip_title_misc">Revision: </td>
-							<td class="tooltip_value_misc">{{ item.revision }}</td>
-							<td class="tooltip_title_misc">Players: </td>
-							<td class="tooltip_value_misc">{{ item.players }}</td>
-						</tr>
-						<tr>
-							<td class="tooltip_title_misc">Comments: </td>
-							<td class="tooltip_value_misc">{{ comments|amount_comments:item.id }}</td>
-							<td class="tooltip_title_misc">Rating: </td>
-							<td class="tooltip_value_misc">{{ item.rating }}</td>
-						</tr>
-					</table>
-				</div>
-			</div>
-			{% endfor %}
-		</div>
-		<div class="clear"></div>
-		{% if pagination %}
-		  {% include 'pagination.html' %}
+    {% if amount != 0 %}
+        <div id="map_grid">
+            {% for item in maps %}
+            <div class="map_grid_cell">
+                <a href="/maps/{{item.id}}/">
+                    <div class="cell-link-container">
+                        <div><img src="/maps/{{item.id}}/minimap" /></div><div class="link_title">{{ item.title|strip_tags }}</div>
+                    </div>
+                    {% if item.downloading == False or item.amount_reports >= 3 %}
+                    <div class="map-custom-status"><img src="/static/images/attention-mini.jpg" /></div>
+                    {% endif %}
+                    {% if item.advanced_map %}
+                    <div class="map-custom-status"><img src="/static/images/advanced-mini.jpg" /></div>
+                    {% endif %}
+                    {% if item.lua %}
+                    <div class="map-custom-status"><img src="/static/images/lua-mini.jpg" /></div>
+                    {% endif %}
+                </a>
+                <div class="map_tooltip">
+                    <div class="map_tooltip_mod mod_{{ item.game_mod }}">{{ item.game_mod|upper }}</div>
+                    <table>
+                        <tr>
+                            <td class="tooltip_title">Author: </td>
+                            <td class="tooltip_value">{{ item.author|strip_tags }} </td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <td class="tooltip_title_misc">Revision: </td>
+                            <td class="tooltip_value_misc">{{ item.revision }}</td>
+                            <td class="tooltip_title_misc">Players: </td>
+                            <td class="tooltip_value_misc">{{ item.players }}</td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip_title_misc">Comments: </td>
+                            <td class="tooltip_value_misc">{{ comments|amount_comments:item.id }}</td>
+                            <td class="tooltip_title_misc">Rating: </td>
+                            <td class="tooltip_value_misc">{{ item.rating }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="clear"></div>
+        {% if pagination %}
+          {% include 'pagination.html' %}
         {% endif %}
-	{% endif %}
+    {% endif %}
 </div>
