@@ -51,7 +51,7 @@ def index(request):
     )
 
 
-def loginView(request):
+def login_view(request):
 
     if request.user.is_authenticated():
         return HttpResponseRedirect('/')
@@ -82,7 +82,7 @@ def loginView(request):
     )
 
 
-def logoutView(request):
+def logout_view(request):
 
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
@@ -140,7 +140,7 @@ def search(request, search_query="",
     )
 
 
-def ControlPanel(request, page=1):
+def control_panel(request, page=1):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
 
@@ -532,7 +532,7 @@ def display_map(request, map_id,
     return HttpResponse(template.render(template_args, request))
 
 
-def updateMap(request, arg):
+def update_map(request, arg):
 
     mapObject = Maps.objects.filter(id=arg)
     if not mapObject or not mapObject[0]:
@@ -579,7 +579,7 @@ def updateMap(request, arg):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def updateMapLogs(request, arg):
+def update_map_logs(request, arg):
     mapObject = Maps.objects.filter(id=arg)
     item = mapObject[0]
     logs = item.mapupgradelogs_set.all().order_by('-id')
@@ -595,7 +595,7 @@ def updateMapLogs(request, arg):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def deleteScreenshot(request, itemid):
+def delete_screenshot(request, itemid):
     scObject = Screenshots.objects.filter(id=itemid)
     if scObject:
         arg = str(scObject[0].ex_id)
@@ -611,7 +611,7 @@ def deleteScreenshot(request, itemid):
     return HttpResponseRedirect("/")
 
 
-def deleteComment(request, arg, item_type, item_id):
+def delete_comment(request, arg, item_type, item_id):
     comObject = Comments.objects.filter(id=arg)
     if comObject:
         if comObject[0].user == request.user or request.user.is_superuser:
@@ -641,7 +641,7 @@ def unsubscribe_from_comments(request, item_type, arg):
     return HttpResponseRedirect("/" + item_type + "/" + arg + "/")
 
 
-def serveScreenshot(request, itemid, itemname=""):
+def serve_screenshot(request, itemid, itemname=""):
     image = ""
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'screenshots', itemid)
     try:
@@ -666,7 +666,7 @@ def serveScreenshot(request, itemid, itemname=""):
     return response
 
 
-def serveMinimap(request, arg):
+def serve_minimap(request, arg):
     minimap = ""
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
     try:
@@ -693,7 +693,7 @@ def serveMinimap(request, arg):
     return response
 
 
-def serveOramap(request, arg, sync=""):
+def serve_oramap(request, arg, sync=""):
     oramap = ""
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg)
     try:
@@ -717,14 +717,14 @@ def serveOramap(request, arg, sync=""):
         return response
 
 
-def serveYaml(request, arg):
+def serve_yaml(request, arg):
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg, 'content', 'map.yaml')
     response = StreamingHttpResponse(cgi.escape(open(path).read(), quote=None), content_type='application/plain')
     response['Content-Disposition'] = 'attachment; filename = map.yaml'
     return response
 
 
-def serveYamlRules(request, arg):
+def serve_yaml_rules(request, arg):
 
     result = ""
 
@@ -751,7 +751,7 @@ def serveYamlRules(request, arg):
     return response
 
 
-def serveLua(request, arg, name):
+def serve_lua(request, arg, name):
     path = os.path.join(settings.BASE_DIR, __name__.split('.')[0], 'data', 'maps', arg, 'content')
     fname = ""
     listdir = os.listdir(path)
@@ -767,7 +767,7 @@ def serveLua(request, arg, name):
     return response
 
 
-def uploadMap(request, previous_rev=0):
+def upload_map(request, previous_rev=0):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
 
@@ -820,7 +820,7 @@ def uploadMap(request, previous_rev=0):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def DeleteMap(request, arg):
+def delete_map(request, arg):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/')
     try:
@@ -857,7 +857,7 @@ def DeleteMap(request, arg):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def SetDownloadingStatus(request, arg):
+def set_downloading_status(request, arg):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/maps/' + arg)
     try:
@@ -872,7 +872,7 @@ def SetDownloadingStatus(request, arg):
     return HttpResponseRedirect('/maps/' + arg)
 
 
-def addScreenshot(request, arg, item):
+def add_screenshot(request, arg, item):
     if item == 'map':
         Object = Maps.objects.filter(id=arg)
     if not (Object[0].user_id == request.user.id or request.user.is_superuser):
@@ -920,7 +920,7 @@ def maps_revisions(request, arg, page=1):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def cancelReport(request, name, arg):
+def cancel_report(request, name, arg):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/')
     Reports.objects.filter(user_id=request.user.id, ex_id=arg, ex_name=name).delete()
