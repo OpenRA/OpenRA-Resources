@@ -30,36 +30,36 @@ urlpatterns = [
 
     url(r'^maps/?$', views.maps, name='maps'),
     url(r'^maps/(?P<map_id>\d+)/?$', views.display_map, name='display_map'),
-    url(r'^maps/(?P<arg>\d+)/minimap/?$', views.serveMinimap, name='serveMinimap'),
-    url(r'^maps/(?P<arg>\d+)/oramap/?$', views.serveOramap, name='serveOramap'),
-    url(r'^maps/(?P<arg>\d+)/oramap/(?P<sync>\w+)/?$', views.serveOramap, name='serverSyncOramap'),
-    url(r'^maps/(?P<arg>\d+)/delete/?$', views.DeleteMap, name='DeleteMap'),
-    url(r'^maps/(?P<arg>\d+)/setdownloadingstatus/?$', views.SetDownloadingStatus, name='SetDownloadingStatus'),
-    url(r'^maps/(?P<arg>\d+)/add(?P<item>\w+)sc/?$', views.addScreenshot, name='addScreenshot'),
+    url(r'^maps/(?P<arg>\d+)/minimap/?$', views.serve_minimap, name='serveMinimap'),
+    url(r'^maps/(?P<arg>\d+)/oramap/?$', views.serve_oramap, name='serveOramap'),
+    url(r'^maps/(?P<arg>\d+)/oramap/(?P<sync>\w+)/?$', views.serve_oramap, name='serverSyncOramap'),
+    url(r'^maps/(?P<arg>\d+)/delete/?$', views.delete_map, name='DeleteMap'),
+    url(r'^maps/(?P<arg>\d+)/setdownloadingstatus/?$', views.set_downloading_status, name='SetDownloadingStatus'),
+    url(r'^maps/(?P<arg>\d+)/add(?P<item>\w+)sc/?$', views.add_screenshot, name='addScreenshot'),
     url(r'^maps/(?P<arg>\d+)/revisions/?$', views.maps_revisions, name='maps_revisions'),
     url(r'^maps/(?P<arg>\d+)/revisions/page/(?P<page>\d+)/?$', views.maps_revisions, name='maps_revisions'),
-    url(r'^maps/(?P<arg>\d+)/update/?$', views.updateMap, name='updateMap'),
-    url(r'^maps/(?P<arg>\d+)/update_logs/?$', views.updateMapLogs, name='updateMapLogs'),
+    url(r'^maps/(?P<arg>\d+)/update/?$', views.update_map, name='updateMap'),
+    url(r'^maps/(?P<arg>\d+)/update_logs/?$', views.update_map_logs, name='updateMapLogs'),
     url(r'^(?P<item_type>\w+)/(?P<arg>\d+)/unsubscribe/?$', views.unsubscribe_from_comments, name='Unsubscribe from comments to item'),
     url(r'^maps/author/(?P<author>.+?)/?$', views.maps_author, name='maps_author'),
     url(r'^maps/uploader/(?P<uploader>.+?)/?$', views.maps_uploader, name='maps_uploader'),
-    url(r'^maps/(?P<arg>\d+)/yaml/?$', views.serveYaml, name='printYaml'),
-    url(r'^maps/(?P<arg>\d+)/rules/?$', views.serveYamlRules, name='printYamlRules'),
-    url(r'^maps/(?P<arg>\d+)/lua/(?P<name>[^/]+)/?$', views.serveLua, name='printLua'),
+    url(r'^maps/(?P<arg>\d+)/yaml/?$', views.serve_yaml, name='printYaml'),
+    url(r'^maps/(?P<arg>\d+)/rules/?$', views.serve_yaml_rules, name='printYamlRules'),
+    url(r'^maps/(?P<arg>\d+)/lua/(?P<name>[^/]+)/?$', views.serve_lua, name='printLua'),
 
     url(r'^maps/(?P<map_id>\d+)/report', views.map_report, name='map_report'),
     url(r'^maps/(?P<map_id>\d+)/update-map-info', views.map_update_map_info, name='map_update_map_info'),
     url(r'^maps/(?P<map_id>\d+)/upload-screenshot', views.map_upload_screenshot, name='map_upload_screenshot'),
     url(r'^maps/(?P<map_id>\d+)/post-comment', views.map_post_comment, name='map_post_comment'),
 
-    url(r'^upload/map/?$', views.uploadMap, name='uploadMap'),
-    url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.uploadMap, name='uploadMap'),
+    url(r'^upload/map/?$', views.upload_map, name='uploadMap'),
+    url(r'^upload/map/(?P<previous_rev>\d+)/?$', views.upload_map, name='uploadMap'),
 
 
     url(r'^screenshots/?$', views.screenshots, name='screenshots'),
-    url(r'^screenshots/(?P<itemid>\d+)/?$', views.serveScreenshot, name='serveScreenshot'),
-    url(r'^screenshots/(?P<itemid>\d+)/delete/?$', views.deleteScreenshot, name='deleteScreenshot'),
-    url(r'^screenshots/(?P<itemid>\d+)/(?P<itemname>\w+)/?$', views.serveScreenshot, name='serveScreenshot'),
+    url(r'^screenshots/(?P<itemid>\d+)/?$', views.serve_screenshot, name='serveScreenshot'),
+    url(r'^screenshots/(?P<itemid>\d+)/delete/?$', views.delete_screenshot, name='deleteScreenshot'),
+    url(r'^screenshots/(?P<itemid>\d+)/(?P<itemname>\w+)/?$', views.serve_screenshot, name='serveScreenshot'),
 
     url(r'^comments/?$', views.comments, name='comments'),
     url(r'^comments/page/(?P<page>\d+)/?$', views.comments, name='comments_paged'),
@@ -67,15 +67,15 @@ urlpatterns = [
     url(r'^comments/user/(?P<arg>\d+)/page/(?P<page>\d+)/?$', views.comments_by_user, name='comments_by_user_paged'),
 
 
-    url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancelReport, name='cancelReport'),
+    url(r'^(?P<name>\w+)/(?P<arg>\d+)/cancelreport/?$', views.cancel_report, name='cancelReport'),
 
-    url(r'^deletecomment/(?P<arg>\d+)/(?P<item_type>\w+)/(?P<item_id>\w+)/?$', views.deleteComment, name='deleteComment'),
+    url(r'^deletecomment/(?P<arg>\d+)/(?P<item_type>\w+)/(?P<item_id>\w+)/?$', views.delete_comment, name='deleteComment'),
 
     url(r'^auth/register/?$', RegistrationView.as_view(form_class=RegistrationFormUniqueEmail), name='registration_register'),
     url(r'^auth/', include('registration.backends.default.urls')),
 
-    url(r'^login/?$', views.loginView, name='loginView'),
-    url(r'^logout/?$', views.logoutView, name='logoutView'),
+    url(r'^login/?$', views.login_view, name='loginView'),
+    url(r'^logout/?$', views.logout_view, name='logoutView'),
 
     url(r'^accounts/', include('allauth.urls')),
     url(r'^accounts/profile/?$', views.profile, name='profile'),
@@ -86,7 +86,7 @@ urlpatterns = [
     url(r'^search/?$', views.search, name='search'),
     url(r'^search/(?P<search_query>.+?)/?$', views.search, name='search'),
 
-    url(r'^panel/?$', views.ControlPanel, name='ControlPanel'),
+    url(r'^panel/?$', views.control_panel, name='ControlPanel'),
 
     url(r'^faq/?$', views.faq, name='faq'),
 
