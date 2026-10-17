@@ -102,15 +102,15 @@ def logoutView(request):
 
 
 def feed(request):
-    template = loader.get_template('feed.html')
-
-    return HttpResponse(
-        template.render({
+    return render(
+        request,
+        'feed.html',
+        {
             'request': request,
             'title': content.titles['feed'],
             'lastBuildDate': datetime.datetime.utcnow().isoformat("T"),
             'mapObject': Maps.objects.order_by("-posted")[0:20]
-        }, request),
+        },
         content_type='text/xml'
     )
 
@@ -158,20 +158,22 @@ def ControlPanel(request, page=1):
 
     comments = misc.count_comments_for_many(maps_query)
 
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'control_panel.html',
-        'request': request,
-        'title': content.titles['panel'],
-        'maps': maps_query,
-        'page': page,
-        'amount': pagination.total,
-        'comments': comments,
-        'filter_prepare': filter_prepare,
-        'selected_filter': selected_filter,
-        'pagination': pagination.get_links(page, request.META['QUERY_STRING']),
-    }
-    return HttpResponse(template.render(template_args, request))
+    return render(
+        request,
+        'index.html',
+        {
+            'content': 'control_panel.html',
+            'request': request,
+            'title': content.titles['panel'],
+            'maps': maps_query,
+            'page': page,
+            'amount': pagination.total,
+            'comments': comments,
+            'filter_prepare': filter_prepare,
+            'selected_filter': selected_filter,
+            'pagination': pagination.get_links(page, request.META['QUERY_STRING']),
+        },
+    )
 
 
 def user_actions_blocked(request):
@@ -180,15 +182,16 @@ def user_actions_blocked(request):
 
     account_age = misc.user_account_age(request.user)
 
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'new_user_action_blocked.html',
-        'account_blocked': account_age < 24,
-        'hours_remaining': 24 - int(account_age),
-        'title': content.titles['user_actions_blocked']
-    }
-
-    return HttpResponse(template.render(template_args, request))
+    return render(
+        request,
+        'index.html',
+        {
+            'content': 'new_user_action_blocked.html',
+            'account_blocked': account_age < 24,
+            'hours_remaining': 24 - int(account_age),
+            'title': content.titles['user_actions_blocked']
+        }
+    )
 
 
 def maps(request, output_format=""):
@@ -250,22 +253,24 @@ def maps_author(request, author):
 
     comments = misc.count_comments_for_many(maps_query)
 
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'maps_author.html',
-        'request': request,
-        'title': content.titles['maps_author'].format(author),
-        'maps': maps_query,
-        'page': page,
-        'pagination': pagination.get_links(page, request.META['QUERY_STRING']),
-        'amount': pagination.total,
-        'author': author,
-        'comments': comments,
+    return render(
+        request,
+        'index.html',
+        {
+            'content': 'maps_author.html',
+            'request': request,
+            'title': content.titles['maps_author'].format(author),
+            'maps': maps_query,
+            'page': page,
+            'pagination': pagination.get_links(page, request.META['QUERY_STRING']),
+            'amount': pagination.total,
+            'author': author,
+            'comments': comments,
 
-        'filter_prepare': filter_prepare,
-        'selected_filter': selected_filter,
-    }
-    return HttpResponse(template.render(template_args, request))
+            'filter_prepare': filter_prepare,
+            'selected_filter': selected_filter,
+        }
+    )
 
 
 def maps_uploader(request, uploader):
@@ -296,23 +301,25 @@ def maps_uploader(request, uploader):
 
     comments = misc.count_comments_for_many(maps_query)
 
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'maps_uploader.html',
-        'request': request,
-        'title': content.titles['maps_uploader'].format(uploader),
-        'maps': maps_query,
-        'page': page,
-        'pagination': pagination.get_links(page, request.META['QUERY_STRING']),
-        'amount': pagination.total,
-        'uploader': uploader,
-        'arg': uploader,
-        'comments': comments,
+    return render(
+        request,
+        'index.html',
+        {
+            'content': 'maps_uploader.html',
+            'request': request,
+            'title': content.titles['maps_uploader'].format(uploader),
+            'maps': maps_query,
+            'page': page,
+            'pagination': pagination.get_links(page, request.META['QUERY_STRING']),
+            'amount': pagination.total,
+            'uploader': uploader,
+            'arg': uploader,
+            'comments': comments,
 
-        'filter_prepare': filter_prepare,
-        'selected_filter': selected_filter,
-    }
-    return HttpResponse(template.render(template_args, request))
+            'filter_prepare': filter_prepare,
+            'selected_filter': selected_filter,
+        }
+    )
 
 
 def map_report(request, map_id):
@@ -501,35 +508,37 @@ def display_map(request, map_id,
 
     has_upgrade_logs = model.mapupgradelogs_set.count() > 0
 
-    template = loader.get_template('index.html')
-    template_args = {
-        'content': 'display_map.html',
-        'request': request,
-        'title': 'Map details - ' + model.title,
-        'map': model,
-        'userid': userObject,
-        'arg': map_id,
-        'license': license,
-        'icons': icons,
-        'reports': reports,
-        'reported': reportedByUser,
-        'luaNames': luaNames,
-        'mapsFromAuthor': mapsFromAuthor,
-        'similarMaps': similarMaps,
-        'screenshots': screenshots,
-        'disk_size': disk_size,
-        'duplicates': duplicates,
-        'played_counter': played_counter,
-        'ratesAmount': ratesAmount,
-        'REPORTS_PENALTY_AMOUNT': settings.REPORTS_PENALTY_AMOUNT,
-        'lints': lints,
-        'comments': comments,
-        'show_upgrade_map_button': show_upgrade_map_button,
-        'map_preview': map_preview,
-        'last_parser': settings.OPENRA_VERSIONS[0],
-        'has_upgrade_logs': has_upgrade_logs
-    }
-    return HttpResponse(template.render(template_args, request))
+    return render(
+        request,
+        'index.html',
+        {
+            'content': 'display_map.html',
+            'request': request,
+            'title': 'Map details - ' + model.title,
+            'map': model,
+            'userid': userObject,
+            'arg': map_id,
+            'license': license,
+            'icons': icons,
+            'reports': reports,
+            'reported': reportedByUser,
+            'luaNames': luaNames,
+            'mapsFromAuthor': mapsFromAuthor,
+            'similarMaps': similarMaps,
+            'screenshots': screenshots,
+            'disk_size': disk_size,
+            'duplicates': duplicates,
+            'played_counter': played_counter,
+            'ratesAmount': ratesAmount,
+            'REPORTS_PENALTY_AMOUNT': settings.REPORTS_PENALTY_AMOUNT,
+            'lints': lints,
+            'comments': comments,
+            'show_upgrade_map_button': show_upgrade_map_button,
+            'map_preview': map_preview,
+            'last_parser': settings.OPENRA_VERSIONS[0],
+            'has_upgrade_logs': has_upgrade_logs
+        }
+    )
 
 
 def updateMap(request, arg):
