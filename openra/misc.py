@@ -12,7 +12,7 @@ from allauth.socialaccount.models import SocialAccount
 from openra.models import Maps, MapCategories, Comments, UnsubscribeComments
 
 
-def selectLicenceInfo(itemObject):
+def select_licence_info(itemObject):
     creative_commons = itemObject.policy_cc
     commercial_use = itemObject.policy_commercial
     cc_adaptations = itemObject.policy_adaptations

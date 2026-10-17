@@ -45,7 +45,7 @@ def __map_info_from_objects(request, map_objects, yaml):
         if map_object.next_rev != 0:
             last_revision = False
 
-        license_label, _ = misc.selectLicenceInfo(map_object)
+        license_label, _ = misc.select_licence_info(map_object)
         if license_label is not None:
             license_label = "Creative Commons " + license_label
         else:
