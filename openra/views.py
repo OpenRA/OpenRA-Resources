@@ -495,7 +495,7 @@ def display_map(request, map_id,
         if sc_item.map_preview:
             map_preview = sc_item
 
-    license, icons = misc.selectLicenceInfo(model)
+    license, icons = misc.select_licence_info(model)
     userObject = User.objects.get(pk=model.user_id)
     Maps.objects.filter(id=model.id).update(viewed=model.viewed + 1)
 
