@@ -122,10 +122,12 @@ class EnginesAdmin(admin.ModelAdmin):
 admin.site.register(Engines, EnginesAdmin)
 
 # Add the registration date to the user list
-UserAdmin.list_display = list(UserAdmin.list_display) + ['date_joined']
-UserAdmin.ordering = ('-date_joined',)
+class CustomUserAdmin(UserAdmin):
+    list_display = list(UserAdmin.list_display) + ['date_joined']
+    ordering = ('-date_joined',)
+
 admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+admin.site.register(User, CustomUserAdmin)
 
 # Unregister unused models
 admin.site.unregister(Group)
