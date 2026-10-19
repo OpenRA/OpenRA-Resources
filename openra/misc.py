@@ -42,7 +42,7 @@ def select_licence_info(itemObject):
     return name, icons
 
 
-def send_email_to_admin_OnMapFail(tempname):
+def send_email_to_admin_on_map_fail(tempname):
     connection = mail.get_connection()
     connection.open()
     email = mail.EmailMessage(
@@ -56,7 +56,7 @@ def send_email_to_admin_OnMapFail(tempname):
     connection.close()
 
 
-def send_email_to_admin_OnReport(args):
+def send_email_to_admin_on_report(args):
     connection = mail.get_connection()
     connection.open()
     body = "Item: http://%s  \nBy user_id: %s  \nReason: %s  \nInfringement: %s" % (args['addr'], args['user_id'], args['reason'], args['infringement'])
@@ -70,7 +70,7 @@ def send_email_to_admin_OnReport(args):
     connection.close()
 
 
-def send_email_to_user_OnReport(args):
+def send_email_to_user_on_report(args):
     mail_addr = return_email(args['owner_id'])
     if mail_addr == "":
         return False
@@ -87,20 +87,7 @@ def send_email_to_user_OnReport(args):
     connection.close()
 
 
-def send_email_to_user_OnLint(email_addr, body):
-    connection = mail.get_connection()
-    connection.open()
-    email = mail.EmailMessage(
-        'OpenRA Resource Center - Lint failed',
-        body,
-        settings.ADMIN_EMAIL_FROM,
-        [email_addr],
-        connection=connection)
-    email.send()
-    connection.close()
-
-
-def send_email_to_user_OnComment(item_type, item_id, email_addr, info=""):
+def send_email_to_user_on_comment(item_type, item_id, email_addr, info=""):
     if not email_addr:
         return False
     http_host = 'http://resource.openra.net'

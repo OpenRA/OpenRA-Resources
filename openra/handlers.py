@@ -59,7 +59,7 @@ def add_map_revision(oramap_path, user,
     print('Parsing map.yaml metadata')
     metadata = utility.parse_map_metadata(oramap_path)
     if not metadata:
-        misc.send_email_to_admin_OnMapFail(oramap_path)
+        misc.send_email_to_admin_on_map_fail(oramap_path)
         raise InvalidMapException('Unable to parse map metadata.')
 
     if int(metadata['mapformat']) < 10:
@@ -74,7 +74,7 @@ def add_map_revision(oramap_path, user,
             '--map-rules', oramap_path])
 
         if rules_retcode != 0:
-            misc.send_email_to_admin_OnMapFail(oramap_path)
+            misc.send_email_to_admin_on_map_fail(oramap_path)
             raise InvalidMapException('Failed to parse custom rules.')
 
         # TODO: Check against the game's Ruleset.DefinesUnsafeCustomRules code instead of line count
@@ -244,7 +244,7 @@ def process_upload(user_id, file, post, revision=1, previous_revision=0):
             if os.path.exists(import_path):
                 upload_path = import_path
             else:
-                misc.send_email_to_admin_OnMapFail(upload_path)
+                misc.send_email_to_admin_on_map_fail(upload_path)
                 raise InvalidMapException('Failed to import legacy map.')
 
         # TODO: Replace hardcoded RA with the parser mod when that rewrite happens
