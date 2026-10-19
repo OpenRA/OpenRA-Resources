@@ -1010,7 +1010,7 @@ def comments_by_user(request, arg, page=1):
     return StreamingHttpResponse(template.render(template_args, request))
 
 
-def handle404(request):
+def handle_404(request):
     template = loader.get_template('index.html')
     template_args = {
         'content': '404.html',
