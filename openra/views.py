@@ -337,8 +337,8 @@ def map_report(request, map_id):
             report.save()
             Maps.objects.filter(id=map_id).update(amount_reports=Reports.objects.filter(ex_name='maps', ex_id=map_id).count())
 
-            misc.send_email_to_admin_OnReport({'addr': request.META.get('HTTP_HOST', '') + '/maps/' + map_id, 'user_id': request.user.id, 'reason': request.POST['reportReason'].strip(), 'infringement': infringement})
-            misc.send_email_to_user_OnReport({'addr': request.META.get('HTTP_HOST', '') + '/maps/' + map_id, 'owner_id': Maps.objects.get(id=map_id).user_id, 'reason': request.POST['reportReason'].strip(), 'resource_type': 'map'})
+            misc.send_email_to_admin_on_report({'addr': request.META.get('HTTP_HOST', '') + '/maps/' + map_id, 'user_id': request.user.id, 'reason': request.POST['reportReason'].strip(), 'infringement': infringement})
+            misc.send_email_to_user_on_report({'addr': request.META.get('HTTP_HOST', '') + '/maps/' + map_id, 'owner_id': Maps.objects.get(id=map_id).user_id, 'reason': request.POST['reportReason'].strip(), 'resource_type': 'map'})
     return HttpResponseRedirect('/maps/' + map_id)
 
 
@@ -399,7 +399,7 @@ def map_post_comment(request, map_id):
 
     target_map = Maps.objects.get(id=map_id)
     if target_map.user != request.user:
-        misc.send_email_to_user_OnComment('maps', map_id, target_map.user.email, info="owner")
+        misc.send_email_to_user_on_comment('maps', map_id, target_map.user.email, info="owner")
 
     map_comments = Comments.objects.filter(item_type='maps', item_id=map_id, is_removed=False)
     if map_comments:
@@ -409,7 +409,7 @@ def map_post_comment(request, map_id):
                 unsubscribed = UnsubscribeComments.objects.filter(item_type='maps', item_id=map_id, user=map_comment.user)
 
                 if not unsubscribed:
-                    misc.send_email_to_user_OnComment('maps', map_id, map_comment.user.email)
+                    misc.send_email_to_user_on_comment('maps', map_id, map_comment.user.email)
 
     return HttpResponseRedirect('/maps/' + map_id + '/#comments')
 
